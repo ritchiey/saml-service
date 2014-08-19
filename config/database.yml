@@ -1,0 +1,23 @@
+development:
+  adapter: mysql2
+  encoding: utf8
+  database: saml_development
+  username: saml_app
+  password: password
+  host: localhost
+
+test:
+  adapter: mysql2
+  encoding: utf8
+  database: saml_test
+  username: saml_app
+  password: password
+  host: localhost
+
+production:
+  adapter: mysql2
+  encoding: utf8
+  database: saml
+  username: saml_app
+  password: <%= Rails.application.secrets.database_password %>
+  host: localhost
