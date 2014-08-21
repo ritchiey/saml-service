@@ -35,4 +35,5 @@ group :development, :test do
   gem 'pry-theme'
   gem 'pry-rails'
   gem 'brakeman'
+  gem 'rspec_sequel_matchers'
 end
