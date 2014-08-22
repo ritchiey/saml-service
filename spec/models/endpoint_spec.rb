@@ -1,11 +1,7 @@
 require 'rails_helper'
 
 describe Endpoint do
-
   it { is_expected.to validate_presence :location }
-  it { is_expected.to validate_format %r{https?://[\S]+}, :location }
-  it { is_expected.to validate_format %r{https?://[\S]+}, :response_location }
-
   it { is_expected.to validate_presence :created_at }
   it { is_expected.to validate_presence :updated_at }
 

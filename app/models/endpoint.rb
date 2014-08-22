@@ -3,8 +3,9 @@ class Endpoint < Sequel::Model
 
   def validate
     super
+    uri_regexp = URI.regexp(%w(http https))
     validates_presence [:location, :created_at, :updated_at]
-    validates_format %r{https?://[\S]+}, :location
-    validates_format %r{https?://[\S]+}, :response_location, allow_nil: true
+    validates_format uri_regexp, :location
+    validates_format uri_regexp, :response_location, allow_nil: true
   end
 end
