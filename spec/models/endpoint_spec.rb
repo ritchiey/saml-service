@@ -5,9 +5,6 @@ describe Endpoint do
   it { is_expected.to validate_presence :created_at }
   it { is_expected.to validate_presence :updated_at }
 
-  shared_examples 'a url' do
-  end
-
   context 'location' do
     it 'rejects invalid URL' do
       subject.location = 'invalid'
