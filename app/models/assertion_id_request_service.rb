@@ -1,0 +1,2 @@
+class AssertionIdRequestService < Endpoint
+end

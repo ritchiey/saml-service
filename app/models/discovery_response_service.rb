@@ -1,0 +1,2 @@
+class DiscoveryResponseService < IndexedEndpoint
+end

@@ -1,0 +1,2 @@
+class ManageNameIdService < Endpoint
+end

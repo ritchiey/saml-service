@@ -1,0 +1,2 @@
+class SingleSignOnService < Endpoint
+end

@@ -1,0 +1,2 @@
+class NameIdMappingService < Endpoint
+end

@@ -1,0 +1,2 @@
+class AssertionConsumerService < IndexedEndpoint
+end

@@ -1,0 +1,2 @@
+class SingleLogoutService < Endpoint
+end

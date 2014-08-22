@@ -1,0 +1,2 @@
+class ArtifactResolutionService < IndexedEndpoint
+end

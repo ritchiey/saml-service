@@ -1,0 +1,2 @@
+class AttributeService < Endpoint
+end
