@@ -1,5 +1,13 @@
 Sequel.migration do
   change do
+    create_table(:additional_metadata_locations) do
+      primary_key :id, :type=>"int(11)"
+      column :uri, "varchar(255)"
+      column :namespace, "varchar(255)"
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+    end
+    
     create_table(:artifact_resolution_services) do
       primary_key :id, :type=>"int(11)"
     end
@@ -51,6 +59,8 @@ Sequel.migration do
       column :uri, "varchar(255)", :null=>false
       column :type, "int(11)", :null=>false
       column :description, "varchar(255)"
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
     end
     
     create_table(:schema_migrations) do
@@ -83,5 +93,6 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140822005656_create_assertion_consumer_services.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140822005711_create_discovery_response_services.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140822031543_create_saml_uris.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140901052651_create_additional_metadata_locations.rb')"
   end
 end
