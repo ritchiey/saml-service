@@ -1,9 +1,9 @@
 require 'rails_helper'
 
 describe Endpoint do
+  it_behaves_like 'a basic model'
+
   it { is_expected.to validate_presence :location }
-  it { is_expected.to validate_presence :created_at }
-  it { is_expected.to validate_presence :updated_at }
 
   context 'location' do
     it 'rejects invalid URL' do

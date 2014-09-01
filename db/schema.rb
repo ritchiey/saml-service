@@ -46,6 +46,13 @@ Sequel.migration do
       primary_key :id, :type=>"int(11)"
     end
     
+    create_table(:saml_uris) do
+      primary_key :id, :type=>"int(11)"
+      column :uri, "varchar(255)", :null=>false
+      column :type, "int(11)", :null=>false
+      column :description, "varchar(255)"
+    end
+    
     create_table(:schema_migrations) do
       column :filename, "varchar(255)", :null=>false
       
@@ -75,5 +82,6 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140822005638_create_artifact_resolution_services.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140822005656_create_assertion_consumer_services.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140822005711_create_discovery_response_services.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140822031543_create_saml_uris.rb')"
   end
 end
