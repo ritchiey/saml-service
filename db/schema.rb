@@ -76,6 +76,21 @@ Sequel.migration do
     create_table(:single_sign_on_services) do
       primary_key :id, :type=>"int(11)"
     end
+    
+    create_table(:attribute_bases) do
+      primary_key :id, :type=>"int(11)"
+      column :name, "varchar(255)"
+      column :legacy_name, "varchar(255)"
+      column :oid, "varchar(255)"
+      column :description, "varchar(255)"
+      foreign_key :name_format_id, :saml_uris, :type=>"int(11)", :key=>[:id]
+      column :admin_restricted, "tinyint(1)"
+      column :specification_required, "tinyint(1)"
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      
+      index [:name_format_id], :name=>:name_format_id_fkey
+    end
   end
 end
 Sequel.migration do
@@ -94,5 +109,6 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140822005711_create_discovery_response_services.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140822031543_create_saml_uris.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140901052651_create_additional_metadata_locations.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140901054038_create_attribute_bases.rb')"
   end
 end
