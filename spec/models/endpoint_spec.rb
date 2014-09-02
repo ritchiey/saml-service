@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 describe Endpoint do
   it_behaves_like 'a basic model'
 
@@ -30,7 +28,7 @@ describe Endpoint do
   end
 
   context 'response_location' do
-    subject { FactoryGirl.create(:endpoint) }
+    subject { FactoryGirl.create(:_endpoint) }
 
     it 'rejects invalid URL' do
       subject.response_location = 'invalid'
