@@ -24,7 +24,7 @@ group :development, :test do
   gem 'rspec-rails', '~> 3.0.0'
   gem 'shoulda-matchers'
   gem 'faker'
-  gem 'factory_girl_rails'
+  gem 'factory_girl_rails', require: false
   gem 'simplecov'
   gem 'rubocop'
   gem 'guard'
