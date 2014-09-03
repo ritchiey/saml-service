@@ -24,6 +24,14 @@ Sequel.migration do
       primary_key :id, :type=>"int(11)"
     end
     
+    create_table(:attribute_values) do
+      primary_key :id, :type=>"int(11)"
+      column :value, "varchar(255)"
+      column :approved, "tinyint(1)"
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+    end
+    
     create_table(:authz_services) do
       primary_key :id, :type=>"int(11)"
     end
@@ -110,5 +118,6 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140822031543_create_saml_uris.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140901052651_create_additional_metadata_locations.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140901054038_create_attribute_bases.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140903003601_create_attribute_values.rb')"
   end
 end
