@@ -1,4 +1,6 @@
 class Attribute < Sequel::Model
+  plugin :class_table_inheritance
+
   many_to_one :attribute_base
   one_to_many :attribute_values
 

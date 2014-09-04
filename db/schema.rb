@@ -54,6 +54,15 @@ Sequel.migration do
       primary_key :id, :type=>"int(11)"
     end
     
+    create_table(:requested_attributes) do
+      primary_key :id, :type=>"int(11)"
+      column :reasoning, "varchar(255)", :null=>false
+      column :required, "tinyint(1)", :null=>false
+      column :approved, "tinyint(1)"
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+    end
+    
     create_table(:saml_uris) do
       primary_key :id, :type=>"int(11)"
       column :uri, "varchar(255)", :null=>false
@@ -133,5 +142,6 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140903003601_create_attribute_values.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140903010608_create_attributes.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140903021522_add_attribute_foreign_key_to_attribute_values.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140904004949_create_requested_attributes.rb')"
   end
 end
