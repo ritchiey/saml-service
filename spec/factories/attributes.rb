@@ -13,7 +13,7 @@ FactoryGirl.define do
       end
     end
 
-    factory :requested_attribute, class: RequestedAttribute do
+    factory :requested_attribute, class: 'RequestedAttribute' do
       reasoning { Faker::Lorem.sentence }
       required false
     end

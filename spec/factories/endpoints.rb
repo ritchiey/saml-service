@@ -19,7 +19,7 @@ FactoryGirl.define do
     is_default true
   end
 
-  factory :_endpoint, class: Endpoint, traits: [:endpoint]
+  factory :_endpoint, class: 'Endpoint', traits: [:endpoint]
   factory :assertion_id_request_service, traits: [:endpoint]
   factory :attribute_service, traits: [:endpoint]
   factory :authz_service, traits: [:endpoint]
@@ -28,7 +28,7 @@ FactoryGirl.define do
   factory :single_logout_service, traits: [:endpoint]
   factory :single_sign_on_service, traits: [:endpoint]
 
-  factory :_indexed_endpoint, class: IndexedEndpoint,
+  factory :_indexed_endpoint, class: 'IndexedEndpoint',
                               traits: [:indexed_endpoint]
   factory :artifact_resolution_service, traits: [:indexed_endpoint]
   factory :assertion_consumer_service, traits: [:indexed_endpoint]
