@@ -28,6 +28,13 @@ Sequel.migration do
       primary_key :id, :type=>"int(11)"
     end
     
+    create_table(:ca_certificates) do
+      primary_key :id, :type=>"int(11)"
+      column :data, "text", :null=>false
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+    end
+    
     create_table(:discovery_response_services) do
       primary_key :id, :type=>"int(11)"
     end
@@ -143,5 +150,6 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140903010608_create_attributes.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140903021522_add_attribute_foreign_key_to_attribute_values.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140904004949_create_requested_attributes.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140904022108_create_ca_certificates.rb')"
   end
 end
