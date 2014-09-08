@@ -1,12 +1,22 @@
 require 'openssl'
 
 FactoryGirl.define do
-  factory :ca_key_info do
+  trait :base_key_info do
     data { generate_certificate }
     key_name { Faker::Lorem.word }
     expiry Time.now + 3600
 
     to_create { |i| i.save }
+  end
+
+  factory :ca_key_info do
+    base_key_info
+  end
+
+  factory :key_info do
+    base_key_info
+    subject { "CN=#{Faker::Internet.url}" }
+    issuer { "O=#{Faker::Company.name}" }
   end
 end
 
