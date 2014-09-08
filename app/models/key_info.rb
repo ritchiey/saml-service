@@ -1,4 +1,6 @@
 class KeyInfo < Sequel::Model
+  plugin :class_table_inheritance
+
   # Strictly this model should be
   # KeyInfo has_a Certificate
   # However by modelling as we have we reduce validation complexity and

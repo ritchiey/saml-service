@@ -9,10 +9,7 @@ FactoryGirl.define do
     to_create { |i| i.save }
   end
 
-  factory :ca_key_info do
-    base_key_info
-  end
-
+  factory :ca_key_info, class: 'CaKeyInfo', traits: [:base_key_info]
   factory :key_info do
     base_key_info
     subject { "CN=#{Faker::Internet.url}" }

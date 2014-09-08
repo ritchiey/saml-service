@@ -30,11 +30,6 @@ Sequel.migration do
     
     create_table(:ca_key_infos) do
       primary_key :id, :type=>"int(11)"
-      column :key_name, "varchar(255)"
-      column :expiry, "datetime"
-      column :data, "text", :null=>false
-      column :created_at, "datetime"
-      column :updated_at, "datetime"
     end
     
     create_table(:discovery_response_services) do
