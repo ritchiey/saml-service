@@ -61,6 +61,13 @@ Sequel.migration do
       column :updated_at, "datetime"
     end
     
+    create_table(:key_types) do
+      primary_key :id, :type=>"int(11)"
+      column :use, "int(11)", :null=>false
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+    end
+    
     create_table(:manage_name_id_services) do
       primary_key :id, :type=>"int(11)"
     end
@@ -160,5 +167,6 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140904004949_create_requested_attributes.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140904052630_create_ca_key_infos.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140908032428_create_key_infos.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140908222924_create_key_types.rb')"
   end
 end
