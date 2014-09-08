@@ -36,6 +36,15 @@ Sequel.migration do
       primary_key :id, :type=>"int(11)"
     end
     
+    create_table(:encryption_methods) do
+      primary_key :id, :type=>"int(11)"
+      column :algorithm, "varchar(255)", :null=>false
+      column :key_size, "varchar(255)"
+      column :oae_params, "varchar(255)"
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+    end
+    
     create_table(:endpoints) do
       primary_key :id, :type=>"int(11)"
       column :location, "varchar(255)", :null=>false
@@ -168,5 +177,6 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140904052630_create_ca_key_infos.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140908032428_create_key_infos.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140908222924_create_key_types.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140908225337_create_encryption_methods.rb')"
   end
 end
