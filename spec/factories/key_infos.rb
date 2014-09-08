@@ -1,10 +1,14 @@
 require 'openssl'
 
 FactoryGirl.define do
+  subject = "CN=#{Faker::Lorem.word}/DC=#{Faker::Lorem.word}"
+  issuer = "CN=#{Faker::Lorem.word}/DC=#{Faker::Lorem.word}"
   trait :base_key_info do
-    data { generate_certificate }
     key_name { Faker::Lorem.word }
     expiry Time.now + 3600
+    subject { subject }
+    issuer { issuer }
+    data { generate_certificate subject, issuer }
 
     to_create { |i| i.save }
   end
@@ -12,20 +16,18 @@ FactoryGirl.define do
   factory :ca_key_info, class: 'CaKeyInfo', traits: [:base_key_info]
   factory :key_info do
     base_key_info
-    subject { "CN=#{Faker::Internet.url}" }
-    issuer { "O=#{Faker::Company.name}" }
   end
 end
 
-def generate_certificate
+def generate_certificate(subject, issuer)
   key = OpenSSL::PKey::RSA.new 1024
-  public_key = key.public_key
 
   cert = OpenSSL::X509::Certificate.new
-  cert.subject = cert.issuer = OpenSSL::X509::Name.parse 'DC=example,DC=com'
+  cert.subject = OpenSSL::X509::Name.parse subject
+  cert.issuer = OpenSSL::X509::Name.parse issuer
   cert.not_before = Time.now
   cert.not_after = Time.now + 3600
-  cert.public_key = public_key
+  cert.public_key = key.public_key
   cert.serial = 0x0
   cert.version = 2
 
