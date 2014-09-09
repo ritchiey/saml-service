@@ -1,3 +1,3 @@
 FactoryGirl.define do
-  to_create { |i| i.save }
+  to_create(&:save)
 end

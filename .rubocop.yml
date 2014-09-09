@@ -7,3 +7,4 @@ AllCops:
     - config/initializers/secret_token.rb
     - bin/**/*
     - db/**/*
+    - Guardfile
