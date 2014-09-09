@@ -7,4 +7,8 @@ class KeyDescriptor < Sequel::Model
     super
     validates_presence [:key_type, :key_info, :created_at, :updated_at]
   end
+
+  def type
+    key_type.use
+  end
 end
