@@ -1,7 +1,6 @@
 FactoryGirl.define do
   trait :endpoint do
     location { Faker::Internet.url 'example.com' }
-    to_create { |i| i.save }
   end
 
   trait :response_location do

@@ -1,7 +1,6 @@
 FactoryGirl.define do
   factory :attribute do
     association :attribute_base, factory: :attribute_basis
-    to_create { |i| i.save }
 
     trait :with_values do
       ignore do

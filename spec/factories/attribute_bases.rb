@@ -10,7 +10,5 @@ FactoryGirl.define do
     specification_required false
 
     association :name_format, factory: :attribute_name_saml_uri
-
-    to_create { |i| i.save }
   end
 end

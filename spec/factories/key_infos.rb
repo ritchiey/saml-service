@@ -9,8 +9,6 @@ FactoryGirl.define do
     subject { subject }
     issuer { issuer }
     data { generate_certificate subject, issuer }
-
-    to_create { |i| i.save }
   end
 
   factory :ca_key_info, class: 'CaKeyInfo', traits: [:base_key_info]
