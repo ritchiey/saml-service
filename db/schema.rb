@@ -55,6 +55,15 @@ Sequel.migration do
       column :updated_at, "datetime"
     end
     
+    create_table(:entities_descriptors) do
+      primary_key :id, :type=>"int(11)"
+      column :identifier, "varchar(255)", :null=>false
+      column :name, "varchar(255)", :null=>false
+      column :extensions, "varchar(255)"
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+    end
+    
     create_table(:indexed_endpoints) do
       primary_key :id, :type=>"int(11)"
       column :is_default, "tinyint(1)", :null=>false
@@ -221,5 +230,6 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140910011808_create_contacts.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140910024454_create_contact_people.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140910045450_create_organizations.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140910052947_create_entities_descriptors.rb')"
   end
 end
