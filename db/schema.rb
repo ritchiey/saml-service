@@ -32,6 +32,17 @@ Sequel.migration do
       primary_key :id, :type=>"int(11)"
     end
     
+    create_table(:contacts) do
+      primary_key :id, :type=>"int(11)"
+      column :given_name, "varchar(255)"
+      column :surname, "varchar(255)"
+      column :email_address, "varchar(255)"
+      column :telephone_number, "varchar(255)"
+      column :company, "varchar(255)"
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+    end
+    
     create_table(:discovery_response_services) do
       primary_key :id, :type=>"int(11)"
     end
@@ -186,5 +197,6 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140908225337_create_encryption_methods.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140908235114_create_key_descriptors.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140909005102_add_key_descriptor_foreign_key_to_encryption_method.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140910011808_create_contacts.rb')"
   end
 end
