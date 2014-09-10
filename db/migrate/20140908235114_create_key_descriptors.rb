@@ -3,11 +3,10 @@ Sequel.migration do
 
     create_table :key_descriptors do
       primary_key :id
-      foreign_key :key_type_id, :key_types,
-                  foreign_key_constraint_name: 'key_type_id_fkey'
       foreign_key :key_info_id, :key_infos,
                   foreign_key_constraint_name: 'key_info_id_fkey'
 
+      Integer :key_type_id, null: false
       TrueClass :disabled
 
       DateTime :created_at

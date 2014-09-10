@@ -61,13 +61,6 @@ Sequel.migration do
       column :updated_at, "datetime"
     end
     
-    create_table(:key_types) do
-      primary_key :id, :type=>"int(11)"
-      column :use, "int(11)", :null=>false
-      column :created_at, "datetime"
-      column :updated_at, "datetime"
-    end
-    
     create_table(:manage_name_id_services) do
       primary_key :id, :type=>"int(11)"
     end
@@ -125,14 +118,13 @@ Sequel.migration do
     
     create_table(:key_descriptors) do
       primary_key :id, :type=>"int(11)"
-      foreign_key :key_type_id, :key_types, :type=>"int(11)", :key=>[:id]
       foreign_key :key_info_id, :key_infos, :type=>"int(11)", :key=>[:id]
+      column :key_type_id, "int(11)", :null=>false
       column :disabled, "tinyint(1)"
       column :created_at, "datetime"
       column :updated_at, "datetime"
       
       index [:key_info_id], :name=>:key_info_id_fkey
-      index [:key_type_id], :name=>:key_type_id_fkey
     end
     
     create_table(:attributes) do
@@ -191,7 +183,6 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140904004949_create_requested_attributes.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140904052630_create_ca_key_infos.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140908032428_create_key_infos.rb')"
-    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140908222924_create_key_types.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140908225337_create_encryption_methods.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140908235114_create_key_descriptors.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140909005102_add_key_descriptor_foreign_key_to_encryption_method.rb')"
