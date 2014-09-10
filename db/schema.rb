@@ -1,13 +1,5 @@
 Sequel.migration do
   change do
-    create_table(:additional_metadata_locations) do
-      primary_key :id, :type=>"int(11)"
-      column :uri, "varchar(255)"
-      column :namespace, "varchar(255)"
-      column :created_at, "datetime"
-      column :updated_at, "datetime"
-    end
-    
     create_table(:artifact_resolution_services) do
       primary_key :id, :type=>"int(11)"
     end
@@ -157,6 +149,18 @@ Sequel.migration do
       index [:contact_id], :name=>:contact_id_fkey
     end
     
+    create_table(:entity_descriptors) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :entities_descriptor_id, :entities_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
+      foreign_key :organization_id, :organizations, :type=>"int(11)", :key=>[:id]
+      column :entity_id, "varchar(255)", :null=>false
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      
+      index [:entities_descriptor_id], :name=>:entities_descriptors_id_key
+      index [:organization_id], :name=>:organization_id_key
+    end
+    
     create_table(:key_descriptors) do
       primary_key :id, :type=>"int(11)"
       foreign_key :key_info_id, :key_infos, :type=>"int(11)", :key=>[:id]
@@ -166,6 +170,17 @@ Sequel.migration do
       column :updated_at, "datetime"
       
       index [:key_info_id], :name=>:key_info_id_fkey
+    end
+    
+    create_table(:additional_metadata_locations) do
+      primary_key :id, :type=>"int(11)"
+      column :uri, "varchar(255)", :null=>false
+      column :namespace, "varchar(255)", :null=>false
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
+      
+      index [:entity_descriptor_id], :name=>:entity_descriptors_id_key
     end
     
     create_table(:attributes) do
@@ -231,5 +246,7 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140910024454_create_contact_people.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140910045450_create_organizations.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140910052947_create_entities_descriptors.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140910054604_create_entity_descriptors.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140910232552_add_entity_descriptor_foreign_key_to_additional_metadata_locations.rb')"
   end
 end

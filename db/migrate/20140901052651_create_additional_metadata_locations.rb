@@ -3,8 +3,9 @@ Sequel.migration do
 
     create_table :additional_metadata_locations do
       primary_key :id
-      String :uri
-      String :namespace
+
+      String :uri, null: false
+      String :namespace, null: false
 
       DateTime :created_at
       DateTime :updated_at
