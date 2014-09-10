@@ -127,6 +127,17 @@ Sequel.migration do
       index [:name_format_id], :name=>:name_format_id_fkey
     end
     
+    create_table(:contact_people) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :contact_id, :contacts, :type=>"int(11)", :null=>false, :key=>[:id]
+      column :contact_type_id, "int(11)", :null=>false
+      column :extensions, "text"
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      
+      index [:contact_id], :name=>:contact_id_fkey
+    end
+    
     create_table(:key_descriptors) do
       primary_key :id, :type=>"int(11)"
       foreign_key :key_info_id, :key_infos, :type=>"int(11)", :key=>[:id]
@@ -198,5 +209,6 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140908235114_create_key_descriptors.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140909005102_add_key_descriptor_foreign_key_to_encryption_method.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140910011808_create_contacts.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140910024454_create_contact_people.rb')"
   end
 end
