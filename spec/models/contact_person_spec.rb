@@ -11,6 +11,6 @@ describe ContactPerson do
   it { is_expected.to validate_includes types, :contact_type }
 
   context 'optional attributes' do
-    it { is_expected.to respond_to :extensions }
+    it { is_expected.to have_column :extensions, type: :text }
   end
 end

@@ -7,6 +7,6 @@ describe EntitiesDescriptor do
   it { is_expected.to validate_presence :name }
 
   context 'optional attributes' do
-    it { is_expected.to respond_to :extensions }
+    it { is_expected.to have_column :extensions, type: :text }
   end
 end
