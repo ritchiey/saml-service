@@ -5,4 +5,11 @@ describe EntityDescriptor do
 
   it { is_expected.to validate_presence :entities_descriptor }
   it { is_expected.to validate_presence :entity_id }
+
+  context 'optional attributes' do
+    it { is_expected.to respond_to :organization }
+    it { is_expected.to respond_to :contact_people }
+    it { is_expected.to respond_to :additional_metadata_locations }
+  end
+
 end
