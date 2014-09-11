@@ -1,6 +1,7 @@
 class ContactPerson < Sequel::Model
   many_to_one :contact
   many_to_one :entity_descriptor
+  many_to_one :role_descriptor
 
   TYPE = { technical: 0, support: 1, administrative: 2,
            billing: 3, other: 4 }

@@ -150,17 +150,6 @@ Sequel.migration do
       index [:organization_id], :name=>:organization_id_key
     end
     
-    create_table(:key_descriptors) do
-      primary_key :id, :type=>"int(11)"
-      foreign_key :key_info_id, :key_infos, :type=>"int(11)", :key=>[:id]
-      column :key_type_id, "int(11)", :null=>false
-      column :disabled, "tinyint(1)"
-      column :created_at, "datetime"
-      column :updated_at, "datetime"
-      
-      index [:key_info_id], :name=>:key_info_id_fkey
-    end
-    
     create_table(:additional_metadata_locations) do
       primary_key :id, :type=>"int(11)"
       column :uri, "varchar(255)", :null=>false
@@ -181,6 +170,31 @@ Sequel.migration do
       index [:attribute_base_id], :name=>:attribute_base_id_fkey
     end
     
+    create_table(:role_descriptors) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
+      foreign_key :organization_id, :organizations, :type=>"int(11)", :key=>[:id]
+      column :error_url, "varchar(255)"
+      column :active, "tinyint(1)"
+      column :extensions, "text"
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      
+      index [:entity_descriptor_id], :name=>:ed_rd_key
+      index [:organization_id], :name=>:o_rd_key
+    end
+    
+    create_table(:attribute_values) do
+      primary_key :id, :type=>"int(11)"
+      column :value, "varchar(255)"
+      column :approved, "tinyint(1)"
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      foreign_key :attribute_id, :attributes, :type=>"int(11)", :key=>[:id]
+      
+      index [:attribute_id], :name=>:attributes_id_fkey
+    end
+    
     create_table(:contact_people) do
       primary_key :id, :type=>"int(11)"
       foreign_key :contact_id, :contacts, :type=>"int(11)", :null=>false, :key=>[:id]
@@ -189,9 +203,24 @@ Sequel.migration do
       column :created_at, "datetime"
       column :updated_at, "datetime"
       foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :key=>[:id]
+      foreign_key :role_descriptor_id, :role_descriptors, :type=>"int(11)", :key=>[:id]
       
       index [:contact_id], :name=>:contact_id_fkey
       index [:entity_descriptor_id], :name=>:ed_id_cp_fkey
+      index [:role_descriptor_id], :name=>:rd_cp_fkey
+    end
+    
+    create_table(:key_descriptors) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :key_info_id, :key_infos, :type=>"int(11)", :key=>[:id]
+      column :key_type_id, "int(11)", :null=>false
+      column :disabled, "tinyint(1)"
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      foreign_key :role_descriptor_id, :role_descriptors, :type=>"int(11)", :key=>[:id]
+      
+      index [:key_info_id], :name=>:key_info_id_fkey
+      index [:role_descriptor_id], :name=>:rd_kd_fkey
     end
     
     create_table(:encryption_methods) do
@@ -204,17 +233,6 @@ Sequel.migration do
       foreign_key :key_descriptor_id, :key_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
       
       index [:key_descriptor_id], :name=>:key_descriptors_enc_fkey
-    end
-    
-    create_table(:attribute_values) do
-      primary_key :id, :type=>"int(11)"
-      column :value, "varchar(255)"
-      column :approved, "tinyint(1)"
-      column :created_at, "datetime"
-      column :updated_at, "datetime"
-      foreign_key :attribute_id, :attributes, :type=>"int(11)", :key=>[:id]
-      
-      index [:attribute_id], :name=>:attributes_id_fkey
     end
   end
 end
@@ -251,5 +269,8 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140910054604_create_entity_descriptors.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140910232552_add_entity_descriptor_foreign_key_to_additional_metadata_locations.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140910233606_add_entity_descriptor_foreign_key_to_contact_people.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140911004429_create_role_descriptors.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140911005408_add_role_descriptor_foreign_key_to_key_descriptor.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140911005511_add_role_descriptor_foreign_key_to_contact_person.rb')"
   end
 end
