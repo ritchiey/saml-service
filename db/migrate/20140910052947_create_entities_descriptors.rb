@@ -6,7 +6,7 @@ Sequel.migration do
 
       String :identifier, null: false
       String :name, null: false
-      String :extensions
+      String :extensions, text: true
 
       DateTime :created_at
       DateTime :updated_at

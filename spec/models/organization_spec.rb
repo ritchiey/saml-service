@@ -7,8 +7,4 @@ describe Organization do
   it { is_expected.to validate_presence :display_name }
   it { is_expected.to validate_presence :url }
   it { is_expected.to validate_presence :name }
-
-  context 'optional attributes' do
-    it { is_expected.to respond_to :extensions }
-  end
 end

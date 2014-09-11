@@ -10,6 +10,8 @@ describe EntityDescriptor do
     it { is_expected.to respond_to :organization }
     it { is_expected.to respond_to :contact_people }
     it { is_expected.to respond_to :additional_metadata_locations }
+
+    it { is_expected.to respond_to :extensions }
   end
 
 end

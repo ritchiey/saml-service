@@ -51,7 +51,7 @@ Sequel.migration do
       primary_key :id, :type=>"int(11)"
       column :identifier, "varchar(255)", :null=>false
       column :name, "varchar(255)", :null=>false
-      column :extensions, "varchar(255)"
+      column :extensions, "text"
       column :created_at, "datetime"
       column :updated_at, "datetime"
     end
@@ -86,7 +86,6 @@ Sequel.migration do
       column :name, "varchar(255)", :null=>false
       column :display_name, "varchar(255)", :null=>false
       column :url, "varchar(255)", :null=>false
-      column :extensions, "text"
       column :created_at, "datetime"
       column :updated_at, "datetime"
     end
@@ -143,6 +142,7 @@ Sequel.migration do
       foreign_key :entities_descriptor_id, :entities_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
       foreign_key :organization_id, :organizations, :type=>"int(11)", :key=>[:id]
       column :entity_id, "varchar(255)", :null=>false
+      column :extensions, "text"
       column :created_at, "datetime"
       column :updated_at, "datetime"
       
