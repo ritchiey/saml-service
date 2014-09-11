@@ -138,17 +138,6 @@ Sequel.migration do
       index [:name_format_id], :name=>:name_format_id_fkey
     end
     
-    create_table(:contact_people) do
-      primary_key :id, :type=>"int(11)"
-      foreign_key :contact_id, :contacts, :type=>"int(11)", :null=>false, :key=>[:id]
-      column :contact_type_id, "int(11)", :null=>false
-      column :extensions, "text"
-      column :created_at, "datetime"
-      column :updated_at, "datetime"
-      
-      index [:contact_id], :name=>:contact_id_fkey
-    end
-    
     create_table(:entity_descriptors) do
       primary_key :id, :type=>"int(11)"
       foreign_key :entities_descriptor_id, :entities_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
@@ -190,6 +179,19 @@ Sequel.migration do
       column :updated_at, "datetime"
       
       index [:attribute_base_id], :name=>:attribute_base_id_fkey
+    end
+    
+    create_table(:contact_people) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :contact_id, :contacts, :type=>"int(11)", :null=>false, :key=>[:id]
+      column :contact_type_id, "int(11)", :null=>false
+      column :extensions, "text"
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :key=>[:id]
+      
+      index [:contact_id], :name=>:contact_id_fkey
+      index [:entity_descriptor_id], :name=>:ed_id_cp_fkey
     end
     
     create_table(:encryption_methods) do
@@ -248,5 +250,6 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140910052947_create_entities_descriptors.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140910054604_create_entity_descriptors.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140910232552_add_entity_descriptor_foreign_key_to_additional_metadata_locations.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140910233606_add_entity_descriptor_foreign_key_to_contact_people.rb')"
   end
 end

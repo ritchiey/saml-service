@@ -1,4 +1,8 @@
 FactoryGirl.define do
+  trait :with_contact do
+    association :contact_people, factory: :contact_person
+  end
+
   trait :with_organization do
     association :organization
   end
