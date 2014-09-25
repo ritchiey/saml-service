@@ -6,4 +6,5 @@ describe Attribute do
   it { is_expected.to validate_presence :attribute_base }
   it { is_expected.to have_many_to_one :attribute_base }
   it { is_expected.to have_one_to_many :attribute_values }
+  it { is_expected.to have_many_to_one :idp_sso_descriptor }
 end

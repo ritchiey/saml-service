@@ -4,10 +4,6 @@ Sequel.migration do
       primary_key :id, :type=>"int(11)"
     end
     
-    create_table(:assertion_id_request_services) do
-      primary_key :id, :type=>"int(11)"
-    end
-    
     create_table(:attribute_services) do
       primary_key :id, :type=>"int(11)"
     end
@@ -52,6 +48,11 @@ Sequel.migration do
       column :updated_at, "datetime"
     end
     
+    create_table(:idp_sso_descriptors) do
+      primary_key :id, :type=>"int(11)"
+      column :want_authn_requests_signed, "tinyint(1)", :null=>false
+    end
+    
     create_table(:indexed_endpoints) do
       primary_key :id, :type=>"int(11)"
       column :is_default, "tinyint(1)", :null=>false
@@ -67,10 +68,6 @@ Sequel.migration do
       column :expiry, "datetime"
       column :created_at, "datetime"
       column :updated_at, "datetime"
-    end
-    
-    create_table(:name_id_mapping_services) do
-      primary_key :id, :type=>"int(11)"
     end
     
     create_table(:organizations) do
@@ -97,10 +94,6 @@ Sequel.migration do
       primary_key [:filename]
     end
     
-    create_table(:single_sign_on_services) do
-      primary_key :id, :type=>"int(11)"
-    end
-    
     create_table(:sso_descriptors) do
       primary_key :id, :type=>"int(11)"
     end
@@ -110,6 +103,13 @@ Sequel.migration do
       foreign_key :sso_descriptor_id, :sso_descriptors, :type=>"int(11)", :key=>[:id]
       
       index [:sso_descriptor_id], :name=>:sso_ars_fkey
+    end
+    
+    create_table(:assertion_id_request_services) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :idp_sso_descriptor_id, :idp_sso_descriptors, :type=>"int(11)", :key=>[:id]
+      
+      index [:idp_sso_descriptor_id], :name=>:idp_aidr_fkey
     end
     
     create_table(:entity_descriptors) do
@@ -132,16 +132,11 @@ Sequel.migration do
       index [:sso_descriptor_id], :name=>:sso_mnid_fkey
     end
     
-    create_table(:saml_uris) do
+    create_table(:name_id_mapping_services) do
       primary_key :id, :type=>"int(11)"
-      column :uri, "varchar(255)", :null=>false
-      column :type, "int(11)", :null=>false
-      column :description, "varchar(255)"
-      column :created_at, "datetime"
-      column :updated_at, "datetime"
-      foreign_key :sso_descriptor_id, :sso_descriptors, :type=>"int(11)", :key=>[:id]
+      foreign_key :idp_sso_descriptor_id, :idp_sso_descriptors, :type=>"int(11)", :key=>[:id]
       
-      index [:sso_descriptor_id], :name=>:sso_name_id_fkey
+      index [:idp_sso_descriptor_id], :name=>:idp_nidms_fkey
     end
     
     create_table(:single_logout_services) do
@@ -149,6 +144,13 @@ Sequel.migration do
       foreign_key :sso_descriptor_id, :sso_descriptors, :type=>"int(11)", :key=>[:id]
       
       index [:sso_descriptor_id], :name=>:sso_slo_fkey
+    end
+    
+    create_table(:single_sign_on_services) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :idp_sso_descriptor_id, :idp_sso_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
+      
+      index [:idp_sso_descriptor_id], :name=>:idp_ssos_fkey
     end
     
     create_table(:additional_metadata_locations) do
@@ -160,21 +162,6 @@ Sequel.migration do
       foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
       
       index [:entity_descriptor_id], :name=>:entity_descriptors_id_key
-    end
-    
-    create_table(:attribute_bases) do
-      primary_key :id, :type=>"int(11)"
-      foreign_key :name_format_id, :saml_uris, :type=>"int(11)", :key=>[:id]
-      column :name, "varchar(255)"
-      column :legacy_name, "varchar(255)"
-      column :oid, "varchar(255)"
-      column :description, "varchar(255)"
-      column :admin_restricted, "tinyint(1)"
-      column :specification_required, "tinyint(1)"
-      column :created_at, "datetime"
-      column :updated_at, "datetime"
-      
-      index [:name_format_id], :name=>:name_format_id_fkey
     end
     
     create_table(:role_descriptors) do
@@ -189,15 +176,6 @@ Sequel.migration do
       
       index [:entity_descriptor_id], :name=>:ed_rd_key
       index [:organization_id], :name=>:o_rd_key
-    end
-    
-    create_table(:attributes) do
-      primary_key :id, :type=>"int(11)"
-      foreign_key :attribute_base_id, :attribute_bases, :type=>"int(11)", :null=>false, :key=>[:id]
-      column :created_at, "datetime"
-      column :updated_at, "datetime"
-      
-      index [:attribute_base_id], :name=>:attribute_base_id_fkey
     end
     
     create_table(:contact_people) do
@@ -228,15 +206,31 @@ Sequel.migration do
       index [:role_descriptor_id], :name=>:rd_kd_fkey
     end
     
-    create_table(:attribute_values) do
+    create_table(:saml_uris) do
       primary_key :id, :type=>"int(11)"
-      column :value, "varchar(255)"
-      column :approved, "tinyint(1)"
+      column :uri, "varchar(255)", :null=>false
+      column :type, "int(11)", :null=>false
+      column :description, "varchar(255)"
       column :created_at, "datetime"
       column :updated_at, "datetime"
-      foreign_key :attribute_id, :attributes, :type=>"int(11)", :key=>[:id]
+      foreign_key :role_descriptor_id, :role_descriptors, :type=>"int(11)", :key=>[:id]
       
-      index [:attribute_id], :name=>:attributes_id_fkey
+      index [:role_descriptor_id], :name=>:uri_descriptor_id_fkey
+    end
+    
+    create_table(:attribute_bases) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :name_format_id, :saml_uris, :type=>"int(11)", :key=>[:id]
+      column :name, "varchar(255)"
+      column :legacy_name, "varchar(255)"
+      column :oid, "varchar(255)"
+      column :description, "varchar(255)"
+      column :admin_restricted, "tinyint(1)"
+      column :specification_required, "tinyint(1)"
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      
+      index [:name_format_id], :name=>:name_format_id_fkey
     end
     
     create_table(:encryption_methods) do
@@ -249,6 +243,28 @@ Sequel.migration do
       foreign_key :key_descriptor_id, :key_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
       
       index [:key_descriptor_id], :name=>:key_descriptors_enc_fkey
+    end
+    
+    create_table(:attributes) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :attribute_base_id, :attribute_bases, :type=>"int(11)", :null=>false, :key=>[:id]
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      foreign_key :idp_sso_descriptor_id, :idp_sso_descriptors, :type=>"int(11)", :key=>[:id]
+      
+      index [:attribute_base_id], :name=>:attribute_base_id_fkey
+      index [:idp_sso_descriptor_id], :name=>:idp_attr_fkey
+    end
+    
+    create_table(:attribute_values) do
+      primary_key :id, :type=>"int(11)"
+      column :value, "varchar(255)"
+      column :approved, "tinyint(1)"
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      foreign_key :attribute_id, :attributes, :type=>"int(11)", :key=>[:id]
+      
+      index [:attribute_id], :name=>:attributes_id_fkey
     end
   end
 end
@@ -292,6 +308,11 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140911025316_add_sso_descriptor_foreign_key_to_artifact_resolution_service.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140911044906_add_sso_descriptor_foreign_key_to_single_logout_service.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140911045122_add_sso_descriptor_foreign_key_to_manage_name_id_service.rb')"
-    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140911045706_add_sso_descriptor_foreign_key_to_saml_uri.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140911045706_add_descriptor_foreign_key_to_saml_uri.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140924020619_create_idp_sso_descriptors.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140924021644_add_idp_sso_descriptor_foreign_key_to_single_sign_on_service.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140924041941_add_idp_sso_descriptor_foreign_key_to_name_id_mapping_service.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140924051829_add_idp_sso_descriptor_foreign_key_to_assertion_id_request_service.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140925015857_add_idp_sso_descriptor_foreign_key_to_attribute.rb')"
   end
 end
