@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 # Core
-gem 'rails', '4.1.4'
+gem 'rails', '4.1.5'
 gem 'mysql2'
 gem 'sequel-rails'
 
@@ -34,5 +34,5 @@ group :development, :test do
   gem 'pry-theme'
   gem 'pry-rails'
   gem 'brakeman'
-  gem 'rspec_sequel_matchers'
+  gem 'rspec_sequel_matchers', git: 'https://github.com/bradleybeddoes/rspec_sequel_matchers.git'
 end
