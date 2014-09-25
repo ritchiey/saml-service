@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :idp_sso_descriptor, parent: :sso_descriptor,
-                               class: 'IdpSsoDescriptor' do
+                               class: 'IDPSSODescriptor' do
 
     want_authn_requests_signed false
 

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe SsoDescriptor do
+describe SSODescriptor do
   context 'extends role_descriptor' do
     context 'optional attributes' do
       it { is_expected.to have_one_to_many :artifact_resolution_services }

@@ -1,4 +1,4 @@
-class SsoDescriptor < RoleDescriptor
+class SSODescriptor < RoleDescriptor
   one_to_many :artifact_resolution_services
   one_to_many :single_logout_services
   one_to_many :manage_name_id_services

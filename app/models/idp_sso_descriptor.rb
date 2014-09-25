@@ -1,4 +1,4 @@
-class IdpSsoDescriptor < SsoDescriptor
+class IDPSSODescriptor < SSODescriptor
   one_to_many :single_sign_on_services
   one_to_many :name_id_mapping_services
   one_to_many :assertion_id_request_services
