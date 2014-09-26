@@ -1,9 +1,5 @@
 Sequel.migration do
   change do
-    create_table(:assertion_consumer_services) do
-      primary_key :id, :type=>"int(11)"
-    end
-    
     create_table(:attribute_services) do
       primary_key :id, :type=>"int(11)"
     end
@@ -70,6 +66,14 @@ Sequel.migration do
       column :updated_at, "datetime"
     end
     
+    create_table(:localized_names) do
+      primary_key :id, :type=>"int(11)"
+      column :value, "varchar(255)", :null=>false
+      column :lang, "varchar(255)", :null=>false
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+    end
+    
     create_table(:organizations) do
       primary_key :id, :type=>"int(11)"
       column :name, "varchar(255)", :null=>false
@@ -79,19 +83,16 @@ Sequel.migration do
       column :updated_at, "datetime"
     end
     
-    create_table(:requested_attributes) do
-      primary_key :id, :type=>"int(11)"
-      column :reasoning, "varchar(255)", :null=>false
-      column :required, "tinyint(1)", :null=>false
-      column :approved, "tinyint(1)"
-      column :created_at, "datetime"
-      column :updated_at, "datetime"
-    end
-    
     create_table(:schema_migrations) do
       column :filename, "varchar(255)", :null=>false
       
       primary_key [:filename]
+    end
+    
+    create_table(:sp_sso_descriptors) do
+      primary_key :id, :type=>"int(11)"
+      column :authn_requests_signed, "tinyint(1)", :null=>false
+      column :want_assertions_signed, "tinyint(1)", :null=>false
     end
     
     create_table(:sso_descriptors) do
@@ -105,11 +106,29 @@ Sequel.migration do
       index [:sso_descriptor_id], :name=>:sso_ars_fkey
     end
     
+    create_table(:assertion_consumer_services) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :sp_sso_descriptor_id, :sp_sso_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
+      
+      index [:sp_sso_descriptor_id], :name=>:sp_acs_fkey
+    end
+    
     create_table(:assertion_id_request_services) do
       primary_key :id, :type=>"int(11)"
       foreign_key :idp_sso_descriptor_id, :idp_sso_descriptors, :type=>"int(11)", :key=>[:id]
       
       index [:idp_sso_descriptor_id], :name=>:idp_aidr_fkey
+    end
+    
+    create_table(:attribute_consuming_services) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :sp_sso_descriptor_id, :sp_sso_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
+      column :index, "int(11)", :null=>false
+      column :default, "tinyint(1)", :null=>false
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      
+      index [:sp_sso_descriptor_id], :name=>:sp_attrcs_fkey
     end
     
     create_table(:entity_descriptors) do
@@ -164,6 +183,18 @@ Sequel.migration do
       index [:entity_descriptor_id], :name=>:entity_descriptors_id_key
     end
     
+    create_table(:requested_attributes) do
+      primary_key :id, :type=>"int(11)"
+      column :reasoning, "varchar(255)", :null=>false
+      column :required, "tinyint(1)", :null=>false
+      column :approved, "tinyint(1)"
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      foreign_key :attribute_consuming_service_id, :attribute_consuming_services, :type=>"int(11)", :null=>false, :key=>[:id]
+      
+      index [:attribute_consuming_service_id], :name=>:attrcs_ra_fkey
+    end
+    
     create_table(:role_descriptors) do
       primary_key :id, :type=>"int(11)"
       foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
@@ -176,6 +207,20 @@ Sequel.migration do
       
       index [:entity_descriptor_id], :name=>:ed_rd_key
       index [:organization_id], :name=>:o_rd_key
+    end
+    
+    create_table(:service_descriptions) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :attribute_consuming_service_id, :attribute_consuming_services, :type=>"int(11)", :null=>false, :key=>[:id]
+      
+      index [:attribute_consuming_service_id], :name=>:acs_sd_ln_fkey
+    end
+    
+    create_table(:service_names) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :attribute_consuming_service_id, :attribute_consuming_services, :type=>"int(11)", :null=>false, :key=>[:id]
+      
+      index [:attribute_consuming_service_id], :name=>:acs_sn_ln_fkey
     end
     
     create_table(:contact_people) do
@@ -314,5 +359,12 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140924041941_add_idp_sso_descriptor_foreign_key_to_name_id_mapping_service.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140924051829_add_idp_sso_descriptor_foreign_key_to_assertion_id_request_service.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140925015857_add_idp_sso_descriptor_foreign_key_to_attribute.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140925040205_create_sp_sso_descriptors.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140925043234_add_sp_sso_descriptor_foreign_key_to_assertion_consumer_service.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140926014310_create_attribute_consuming_services.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140926014915_create_localized_names.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140926032216_add_assertion_consumer_service_foreign_key_to_requested_attribute.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140926040234_create_service_names.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140926041237_create_service_descriptions.rb')"
   end
 end

@@ -15,6 +15,8 @@ FactoryGirl.define do
     factory :requested_attribute, class: 'RequestedAttribute' do
       reasoning { Faker::Lorem.sentence }
       required false
+
+      association :attribute_consuming_service
     end
   end
 end
