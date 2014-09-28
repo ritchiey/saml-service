@@ -3,8 +3,15 @@ require 'rails_helper'
 describe Organization do
   it_behaves_like 'a basic model'
 
-  it { is_expected.to validate_presence :name }
-  it { is_expected.to validate_presence :display_name }
-  it { is_expected.to validate_presence :url }
-  it { is_expected.to validate_presence :name }
+  it { is_expected.to have_one_to_many :organization_names }
+
+  let(:subject) { create Organization }
+  it 'has at least 1 organization_name' do
+    expect(subject).to validate_presence :organization_names,
+                                         allow_missing: false
+  end
+  it 'has at least 1 organization_display_name' do
+    expect(subject).to validate_presence :organization_display_names,
+                                         allow_missing: false
+  end
 end

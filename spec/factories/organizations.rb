@@ -1,7 +1,9 @@
 FactoryGirl.define do
   factory :organization do
-    name { Faker::Company.name }
-    display_name { Faker::Company.catch_phrase }
-    url { Faker::Internet.url }
+    after(:create) do |org|
+      org.add_organization_name create :organization_name, organization: org
+      org.add_organization_display_name create :organization_display_name,
+                                               organization: org
+    end
   end
 end

@@ -76,8 +76,6 @@ Sequel.migration do
     
     create_table(:organizations) do
       primary_key :id, :type=>"int(11)"
-      column :name, "varchar(255)", :null=>false
-      column :display_name, "varchar(255)", :null=>false
       column :url, "varchar(255)", :null=>false
       column :created_at, "datetime"
       column :updated_at, "datetime"
@@ -156,6 +154,24 @@ Sequel.migration do
       foreign_key :idp_sso_descriptor_id, :idp_sso_descriptors, :type=>"int(11)", :key=>[:id]
       
       index [:idp_sso_descriptor_id], :name=>:idp_nidms_fkey
+    end
+    
+    create_table(:organization_display_names) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :organization_id, :organizations, :type=>"int(11)", :null=>false, :key=>[:id]
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      
+      index [:organization_id], :name=>:org_odn_ln_fkey
+    end
+    
+    create_table(:organization_names) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :organization_id, :organizations, :type=>"int(11)", :null=>false, :key=>[:id]
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      
+      index [:organization_id], :name=>:org_on_ln_fkey
     end
     
     create_table(:single_logout_services) do
@@ -366,5 +382,8 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140926032216_add_assertion_consumer_service_foreign_key_to_requested_attribute.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140926040234_create_service_names.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140926041237_create_service_descriptions.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140926044821_alter_organization_to_drop_name_columns.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140926045318_create_organization_names.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140928232726_create_organiation_display_names.rb')"
   end
 end
