@@ -3,6 +3,7 @@ require 'rails_helper'
 describe AttributeConsumingService do
   it_behaves_like 'a basic model'
 
+  it { is_expected.to have_one_to_many :service_descriptions }
   it { is_expected.to validate_presence :index, allow_missing: false }
   it { is_expected.to validate_presence :default, allow_missing: false }
   it 'should validate presence of :sp_sso_descriptor with
