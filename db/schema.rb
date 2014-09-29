@@ -182,6 +182,15 @@ Sequel.migration do
       index [:organization_id], :name=>:org_on_ln_fkey
     end
     
+    create_table(:organization_urls) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :organization_id, :organizations, :type=>"int(11)", :null=>false, :key=>[:id]
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      
+      index [:organization_id], :name=>:org_ou_lu_fkey
+    end
+    
     create_table(:single_logout_services) do
       primary_key :id, :type=>"int(11)"
       foreign_key :sso_descriptor_id, :sso_descriptors, :type=>"int(11)", :key=>[:id]
@@ -394,5 +403,6 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140926045318_create_organization_names.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140928232726_create_organiation_display_names.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140929001858_create_localized_uris.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140929011857_create_organization_urls.rb')"
   end
 end

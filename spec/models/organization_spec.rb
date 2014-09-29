@@ -14,4 +14,8 @@ describe Organization do
     expect(subject).to validate_presence :organization_display_names,
                                          allow_missing: false
   end
+  it 'has at least 1 organization_url' do
+    expect(subject).to validate_presence :organization_urls,
+                                         allow_missing: false
+  end
 end
