@@ -1,5 +1,5 @@
 class AttributeBase < Sequel::Model
-  many_to_one :name_format, class: :SamlUri
+  many_to_one :name_format, class: :SamlURI
 
   def validate
     super

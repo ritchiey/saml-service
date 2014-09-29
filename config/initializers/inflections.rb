@@ -14,4 +14,5 @@ ActiveSupport::Inflector.inflections(:en) do |inflect|
   inflect.acronym 'SSO'
   inflect.acronym 'IDP'
   inflect.acronym 'SP'
+  inflect.acronym 'URI'
 end

@@ -1,4 +1,4 @@
-class SamlUri < Sequel::Model
+class SamlURI < Sequel::Model
   many_to_one :role_descriptor
 
   TYPE = { attribute_name_format: 0, attribute_profile: 1,
