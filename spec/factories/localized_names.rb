@@ -1,4 +1,3 @@
-
 FactoryGirl.define do
   factory :localized_name do
     value { Faker::Lorem.sentence }

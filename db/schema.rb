@@ -74,6 +74,14 @@ Sequel.migration do
       column :updated_at, "datetime"
     end
     
+    create_table(:localized_uris) do
+      primary_key :id, :type=>"int(11)"
+      column :value, "varchar(255)", :null=>false
+      column :lang, "varchar(255)", :null=>false
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+    end
+    
     create_table(:organizations) do
       primary_key :id, :type=>"int(11)"
       column :url, "varchar(255)", :null=>false
@@ -385,5 +393,6 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140926044821_alter_organization_to_drop_name_columns.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140926045318_create_organization_names.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140928232726_create_organiation_display_names.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140929001858_create_localized_uris.rb')"
   end
 end
