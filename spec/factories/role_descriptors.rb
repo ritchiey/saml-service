@@ -4,5 +4,9 @@ FactoryGirl.define do
 
     error_url { Faker::Internet.url }
     active true
+
+    after :create do |rd|
+      rd.add_protocol_support(create :protocol_support, role_descriptor: rd)
+    end
   end
 end

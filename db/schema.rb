@@ -284,10 +284,16 @@ Sequel.migration do
       index [:role_descriptor_id], :name=>:rd_kd_fkey
     end
     
+    create_table(:protocol_supports) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :role_descriptor_id, :role_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
+      
+      index [:role_descriptor_id], :name=>:ps_rd_fkey
+    end
+    
     create_table(:saml_uris) do
       primary_key :id, :type=>"int(11)"
       column :uri, "varchar(255)", :null=>false
-      column :type, "int(11)", :null=>false
       column :description, "varchar(255)"
       column :created_at, "datetime"
       column :updated_at, "datetime"
@@ -404,5 +410,7 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140928232726_create_organiation_display_names.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140929001858_create_localized_uris.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140929011857_create_organization_urls.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140929105127_drop_type_from_saml_uri.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140929222759_create_protocol_supports.rb')"
   end
 end
