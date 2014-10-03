@@ -1,9 +1,8 @@
 class AttributeBase < Sequel::Model
-  many_to_one :name_format, class: :SamlURI
+  one_to_one :name_format
 
   def validate
     super
-    validates_presence [:name, :legacy_name, :oid, :description, :name_format,
-                        :created_at, :updated_at]
+    validates_presence [:name, :oid, :description, :created_at, :updated_at]
   end
 end
