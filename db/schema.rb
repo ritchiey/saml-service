@@ -157,6 +157,13 @@ Sequel.migration do
       index [:sso_descriptor_id], :name=>:sso_mnid_fkey
     end
     
+    create_table(:name_id_formats) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :sso_descriptor_id, :sso_descriptors, :type=>"int(11)", :key=>[:id]
+      
+      index [:sso_descriptor_id], :name=>:nidf_sso_fkey
+    end
+    
     create_table(:name_id_mapping_services) do
       primary_key :id, :type=>"int(11)"
       foreign_key :idp_sso_descriptor_id, :idp_sso_descriptors, :type=>"int(11)", :key=>[:id]
@@ -412,5 +419,6 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140929011857_create_organization_urls.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140929105127_drop_type_from_saml_uri.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140929222759_create_protocol_supports.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141003031946_create_name_id_formats.rb')"
   end
 end
