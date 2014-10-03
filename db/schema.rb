@@ -137,6 +137,13 @@ Sequel.migration do
       index [:sp_sso_descriptor_id], :name=>:sp_attrcs_fkey
     end
     
+    create_table(:attribute_profiles) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :idp_sso_descriptor_id, :idp_sso_descriptors, :type=>"int(11)", :key=>[:id]
+      
+      index [:idp_sso_descriptor_id], :name=>:ap_idp_fkey
+    end
+    
     create_table(:entity_descriptors) do
       primary_key :id, :type=>"int(11)"
       foreign_key :entities_descriptor_id, :entities_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
@@ -420,5 +427,6 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140929105127_drop_type_from_saml_uri.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140929222759_create_protocol_supports.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141003031946_create_name_id_formats.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141003034807_create_attribute_profiles.rb')"
   end
 end
