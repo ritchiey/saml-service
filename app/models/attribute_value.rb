@@ -3,6 +3,7 @@ class AttributeValue < Sequel::Model
 
   def validate
     super
-    validates_presence [:attribute, :value, :approved, :created_at, :updated_at]
+    validates_presence [:value, :created_at, :updated_at]
+    validates_presence :attribute, allow_missing: false
   end
 end

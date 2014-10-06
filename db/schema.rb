@@ -144,6 +144,20 @@ Sequel.migration do
       index [:idp_sso_descriptor_id], :name=>:ap_idp_fkey
     end
     
+    create_table(:attributes) do
+      primary_key :id, :type=>"int(11)"
+      column :name, "varchar(255)", :null=>false
+      column :friendly_name, "varchar(255)"
+      column :legacy_name, "varchar(255)"
+      column :oid, "varchar(255)"
+      column :description, "varchar(255)"
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      foreign_key :idp_sso_descriptor_id, :idp_sso_descriptors, :type=>"int(11)", :key=>[:id]
+      
+      index [:idp_sso_descriptor_id], :name=>:idp_attr_fkey
+    end
+    
     create_table(:entity_descriptors) do
       primary_key :id, :type=>"int(11)"
       foreign_key :entities_descriptor_id, :entities_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
@@ -228,6 +242,23 @@ Sequel.migration do
       foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
       
       index [:entity_descriptor_id], :name=>:entity_descriptors_id_key
+    end
+    
+    create_table(:attribute_values) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :attribute_id, :attributes, :type=>"int(11)", :null=>false, :key=>[:id]
+      column :value, "varchar(255)"
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      
+      index [:attribute_id], :name=>:attribute_av_fkey
+    end
+    
+    create_table(:name_formats) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :attribute_id, :attributes, :type=>"int(11)", :key=>[:id]
+      
+      index [:attribute_id], :name=>:nf_attr_fkey
     end
     
     create_table(:requested_attributes) do
@@ -316,21 +347,6 @@ Sequel.migration do
       index [:role_descriptor_id], :name=>:uri_descriptor_id_fkey
     end
     
-    create_table(:attribute_bases) do
-      primary_key :id, :type=>"int(11)"
-      foreign_key :name_format_id, :saml_uris, :type=>"int(11)", :key=>[:id]
-      column :name, "varchar(255)"
-      column :legacy_name, "varchar(255)"
-      column :oid, "varchar(255)"
-      column :description, "varchar(255)"
-      column :admin_restricted, "tinyint(1)"
-      column :specification_required, "tinyint(1)"
-      column :created_at, "datetime"
-      column :updated_at, "datetime"
-      
-      index [:name_format_id], :name=>:name_format_id_fkey
-    end
-    
     create_table(:encryption_methods) do
       primary_key :id, :type=>"int(11)"
       column :algorithm, "varchar(255)", :null=>false
@@ -341,28 +357,6 @@ Sequel.migration do
       foreign_key :key_descriptor_id, :key_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
       
       index [:key_descriptor_id], :name=>:key_descriptors_enc_fkey
-    end
-    
-    create_table(:attributes) do
-      primary_key :id, :type=>"int(11)"
-      foreign_key :attribute_base_id, :attribute_bases, :type=>"int(11)", :null=>false, :key=>[:id]
-      column :created_at, "datetime"
-      column :updated_at, "datetime"
-      foreign_key :idp_sso_descriptor_id, :idp_sso_descriptors, :type=>"int(11)", :key=>[:id]
-      
-      index [:attribute_base_id], :name=>:attribute_base_id_fkey
-      index [:idp_sso_descriptor_id], :name=>:idp_attr_fkey
-    end
-    
-    create_table(:attribute_values) do
-      primary_key :id, :type=>"int(11)"
-      column :value, "varchar(255)"
-      column :approved, "tinyint(1)"
-      column :created_at, "datetime"
-      column :updated_at, "datetime"
-      foreign_key :attribute_id, :attributes, :type=>"int(11)", :key=>[:id]
-      
-      index [:attribute_id], :name=>:attributes_id_fkey
     end
   end
 end
@@ -382,10 +376,8 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140822005711_create_discovery_response_services.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140822031543_create_saml_uris.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140901052651_create_additional_metadata_locations.rb')"
-    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140901054038_create_attribute_bases.rb')"
-    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140903003601_create_attribute_values.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140903010608_create_attributes.rb')"
-    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140903021522_add_attribute_foreign_key_to_attribute_values.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140903011708_create_attribute_values.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140904004949_create_requested_attributes.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140904052630_create_ca_key_infos.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140908032428_create_key_infos.rb')"
@@ -428,5 +420,6 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140929222759_create_protocol_supports.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141003031946_create_name_id_formats.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141003034807_create_attribute_profiles.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141003041456_create_name_formats.rb')"
   end
 end

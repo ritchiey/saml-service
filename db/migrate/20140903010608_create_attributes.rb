@@ -3,8 +3,12 @@ Sequel.migration do
 
     create_table :attributes do
       primary_key :id
-      foreign_key :attribute_base_id, :attribute_bases, null: false,
-                  foreign_key_constraint_name: 'attribute_base_id_fkey'
+
+      String :name, null: false
+      String :friendly_name
+      String :legacy_name
+      String :oid
+      String :description
 
       DateTime :created_at
       DateTime :updated_at

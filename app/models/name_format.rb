@@ -1,3 +1,3 @@
 class NameFormat < SamlURI
-  many_to_one :attribute_base
+  many_to_one :attribute
 end
