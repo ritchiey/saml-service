@@ -11,8 +11,7 @@ class AttributeConsumingService < Sequel::Model
     validates_presence :default, allow_missing: false
     validates_presence :sp_sso_descriptor, allow_missing: false
 
-    return if new?
-    validates_presence :service_names, allow_missing: false
-    validates_presence :requested_attributes, allow_missing: false
+    validates_presence :service_names, allow_missing: new?
+    validates_presence :requested_attributes, allow_missing: new?
   end
 end

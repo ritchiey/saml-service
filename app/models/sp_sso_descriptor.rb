@@ -5,8 +5,6 @@ class SPSSODescriptor < SSODescriptor
   def validate
     super
     validates_presence [:authn_requests_signed, :want_assertions_signed]
-
-    return if new?
-    validates_presence :assertion_consumer_services, allow_missing: false
+    validates_presence :assertion_consumer_services, allow_missing: new?
   end
 end

@@ -10,10 +10,8 @@ class Organization < Sequel::Model
   def validate
     super
     validates_presence [:created_at, :updated_at]
-
-    return if new?
-    validates_presence :organization_names, allow_missing: false
-    validates_presence :organization_display_names, allow_missing: false
-    validates_presence :organization_urls, allow_missing: false
+    validates_presence :organization_names, allow_missing: new?
+    validates_presence :organization_display_names, allow_missing: new?
+    validates_presence :organization_urls, allow_missing: new?
   end
 end
