@@ -6,9 +6,11 @@ class EntityDescriptor < Sequel::Model
   one_to_many :contact_people
   one_to_many :role_descriptors
 
+  one_to_one :entity_id
+
   def validate
     super
-    validates_presence [:entities_descriptor, :entity_id,
-                        :created_at, :updated_at]
+    validates_presence [:entities_descriptor, :created_at, :updated_at]
+    validates_presence :entity_id, allow_missing: new?
   end
 end

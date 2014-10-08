@@ -162,7 +162,6 @@ Sequel.migration do
       primary_key :id, :type=>"int(11)"
       foreign_key :entities_descriptor_id, :entities_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
       foreign_key :organization_id, :organizations, :type=>"int(11)", :key=>[:id]
-      column :entity_id, "varchar(255)", :null=>false
       column :extensions, "text"
       column :created_at, "datetime"
       column :updated_at, "datetime"
@@ -254,6 +253,13 @@ Sequel.migration do
       index [:attribute_id], :name=>:attribute_av_fkey
     end
     
+    create_table(:entity_ids) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
+      
+      index [:entity_descriptor_id], :name=>:eid_ed_fkey
+    end
+    
     create_table(:name_formats) do
       primary_key :id, :type=>"int(11)"
       foreign_key :attribute_id, :attributes, :type=>"int(11)", :key=>[:id]
@@ -338,7 +344,7 @@ Sequel.migration do
     
     create_table(:saml_uris) do
       primary_key :id, :type=>"int(11)"
-      column :uri, "varchar(255)", :null=>false
+      column :uri, "text", :null=>false
       column :description, "varchar(255)"
       column :created_at, "datetime"
       column :updated_at, "datetime"
@@ -389,6 +395,7 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140910045450_create_organizations.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140910052947_create_entities_descriptors.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140910054604_create_entity_descriptors.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140910054700_create_entity_ids.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140910232552_add_entity_descriptor_foreign_key_to_additional_metadata_locations.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140910233606_add_entity_descriptor_foreign_key_to_contact_people.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20140911004429_create_role_descriptors.rb')"

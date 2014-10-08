@@ -8,7 +8,6 @@ Sequel.migration do
       foreign_key :organization_id, :organizations,
                   foreign_key_constraint_name: 'organization_id_key'
 
-      String :entity_id, null: false
       String :extensions, text: true
 
       DateTime :created_at

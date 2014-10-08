@@ -3,7 +3,7 @@ Sequel.migration do
 
     create_table :saml_uris do
       primary_key :id
-      String :uri, null: false
+      String :uri, null: false, text: true
       Integer :type, null: false
 
       String :description
