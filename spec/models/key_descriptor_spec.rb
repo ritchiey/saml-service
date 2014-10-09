@@ -7,5 +7,8 @@ describe KeyDescriptor do
   it { is_expected.to validate_presence :key_type }
   it { is_expected.to validate_includes [:encryption, :signing], :key_type }
 
-  it { is_expected.to validate_presence :key_info }
+  let(:subject) { FactoryGirl.create :key_descriptor }
+  it 'has key info' do
+    expect(subject).to validate_presence :key_info
+  end
 end
