@@ -13,7 +13,6 @@ FactoryGirl.define do
     end
 
     factory :attribute do
-      association :idp_sso_descriptor
     end
 
     factory :requested_attribute, class: 'RequestedAttribute' do

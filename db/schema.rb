@@ -1,6 +1,6 @@
 Sequel.migration do
   change do
-    create_table(:attribute_services) do
+    create_table(:attribute_authority_descriptors) do
       primary_key :id, :type=>"int(11)"
     end
     
@@ -122,7 +122,9 @@ Sequel.migration do
     create_table(:assertion_id_request_services) do
       primary_key :id, :type=>"int(11)"
       foreign_key :idp_sso_descriptor_id, :idp_sso_descriptors, :type=>"int(11)", :key=>[:id]
+      foreign_key :attribute_authority_descriptor_id, :attribute_authority_descriptors, :type=>"int(11)", :key=>[:id]
       
+      index [:attribute_authority_descriptor_id], :name=>:aad_aidrs_fkey
       index [:idp_sso_descriptor_id], :name=>:idp_aidr_fkey
     end
     
@@ -140,8 +142,17 @@ Sequel.migration do
     create_table(:attribute_profiles) do
       primary_key :id, :type=>"int(11)"
       foreign_key :idp_sso_descriptor_id, :idp_sso_descriptors, :type=>"int(11)", :key=>[:id]
+      foreign_key :attribute_authority_descriptor_id, :attribute_authority_descriptors, :type=>"int(11)", :key=>[:id]
       
+      index [:attribute_authority_descriptor_id], :name=>:aad_ap_fkey
       index [:idp_sso_descriptor_id], :name=>:ap_idp_fkey
+    end
+    
+    create_table(:attribute_services) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :attribute_authority_descriptor_id, :attribute_authority_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
+      
+      index [:attribute_authority_descriptor_id], :name=>:aad_as_fkey
     end
     
     create_table(:attributes) do
@@ -154,7 +165,9 @@ Sequel.migration do
       column :created_at, "datetime"
       column :updated_at, "datetime"
       foreign_key :idp_sso_descriptor_id, :idp_sso_descriptors, :type=>"int(11)", :key=>[:id]
+      foreign_key :attribute_authority_descriptor_id, :attribute_authority_descriptors, :type=>"int(11)", :key=>[:id]
       
+      index [:attribute_authority_descriptor_id], :name=>:aad_attr_fkey
       index [:idp_sso_descriptor_id], :name=>:idp_attr_fkey
     end
     
@@ -180,7 +193,9 @@ Sequel.migration do
     create_table(:name_id_formats) do
       primary_key :id, :type=>"int(11)"
       foreign_key :sso_descriptor_id, :sso_descriptors, :type=>"int(11)", :key=>[:id]
+      foreign_key :attribute_authority_descriptor_id, :attribute_authority_descriptors, :type=>"int(11)", :key=>[:id]
       
+      index [:attribute_authority_descriptor_id], :name=>:aad_nidf_fkey
       index [:sso_descriptor_id], :name=>:nidf_sso_fkey
     end
     
@@ -428,5 +443,11 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141003031946_create_name_id_formats.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141003034807_create_attribute_profiles.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141003041456_create_name_formats.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141009013820_create_attribute_authority_descriptors.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141009233538_add_attribute_authority_descriptor_foreign_key_to_attribute_service.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141010012208_add_attribute_authority_descriptor_foreign_key_to_assertion_id_request_service.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141020231401_add_attribute_authority_descriptor_foreign_key_to_name_id_format.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141021004610_add_attribute_authority_descriptor_foreign_key_to_attribute_profile.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141021010219_add_attribute_authority_descriptor_foreign_key_to_attribute.rb')"
   end
 end
