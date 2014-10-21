@@ -3,6 +3,6 @@ class ProtocolSupport < SamlURI
 
   def validate
     super
-    validates_presence :role_descriptor, allow_missing: false
+    validates_presence :role_descriptor
   end
 end

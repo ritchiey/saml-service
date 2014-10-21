@@ -3,6 +3,6 @@ class OrganizationName < LocalizedName
 
   def validate
     super
-    validates_presence :organization, allow_missing: false
+    validates_presence :organization
   end
 end

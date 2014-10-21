@@ -3,7 +3,7 @@ class EntityId < SamlURI
 
   def validate
     super
-    validates_presence :entity_descriptor, allow_missing: false
+    validates_presence :entity_descriptor
     validates_max_length 1024, :uri
   end
 end

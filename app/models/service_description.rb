@@ -3,6 +3,6 @@ class ServiceDescription < LocalizedName
 
   def validate
     super
-    validates_presence :attribute_consuming_service, allow_missing: false
+    validates_presence :attribute_consuming_service
   end
 end

@@ -3,6 +3,6 @@ class AttributeService < Endpoint
 
   def validate
     super
-    validates_presence :attribute_authority_descriptor, allow_missing: false
+    validates_presence :attribute_authority_descriptor
   end
 end

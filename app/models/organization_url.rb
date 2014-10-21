@@ -3,6 +3,6 @@ class OrganizationURL < LocalizedURI
 
   def validate
     super
-    validates_presence :organization, allow_missing: false
+    validates_presence :organization
   end
 end

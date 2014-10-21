@@ -7,9 +7,9 @@ class AttributeConsumingService < Sequel::Model
   def validate
     super
     validates_presence [:created_at, :updated_at]
-    validates_presence :index, allow_missing: false
-    validates_presence :default, allow_missing: false
-    validates_presence :sp_sso_descriptor, allow_missing: false
+    validates_presence :index
+    validates_presence :default
+    validates_presence :sp_sso_descriptor
 
     validates_presence :service_names, allow_missing: new?
     validates_presence :requested_attributes, allow_missing: new?
