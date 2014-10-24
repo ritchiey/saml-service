@@ -7,7 +7,7 @@ describe AttributeConsumingService do
   it { is_expected.to validate_presence :index }
   it { is_expected.to validate_presence :default }
 
-  let(:subject) { FactoryGirl.create :attribute_consuming_service }
+  let(:subject) { create :attribute_consuming_service }
   it 'has at least 1 service name' do
     expect(subject).to validate_presence :service_names
   end

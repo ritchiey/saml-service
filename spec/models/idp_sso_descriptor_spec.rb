@@ -5,7 +5,7 @@ describe IDPSSODescriptor do
     it { is_expected.to validate_presence :want_authn_requests_signed }
     it { is_expected.to have_one_to_many :single_sign_on_services }
 
-    let(:subject) { FactoryGirl.create :idp_sso_descriptor }
+    let(:subject) { create :idp_sso_descriptor }
     it 'has at least 1 single sign on service' do
       expect(subject).to validate_presence :single_sign_on_services
     end

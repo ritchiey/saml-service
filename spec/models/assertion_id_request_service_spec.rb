@@ -5,35 +5,30 @@ describe AssertionIdRequestService do
     it { is_expected.to have_many_to_one :idp_sso_descriptor }
     it { is_expected.to have_many_to_one :attribute_authority_descriptor }
 
-    let(:subject) { FactoryGirl.create :assertion_id_request_service }
+    let(:subject) { create :assertion_id_request_service }
     context 'valid ownership' do
-      after :each do
-        subject.idp_sso_descriptor = nil
-        subject.attribute_authority_descriptor = nil
-      end
-
       it 'must be owned' do
-        expect(subject.valid?).to be false
+        expect(subject).not_to be_valid
       end
 
       it 'owned by idp_sso_descriptor' do
-        subject.idp_sso_descriptor = FactoryGirl.create :idp_sso_descriptor
-        expect(subject.valid?).to be true
+        subject.idp_sso_descriptor = create :idp_sso_descriptor
+        expect(subject).to be_valid
       end
 
       it 'owned by attribute_authority_descriptor' do
         subject.attribute_authority_descriptor =
-        FactoryGirl.create :attribute_authority_descriptor
+        create :attribute_authority_descriptor
 
-        expect(subject.valid?).to be true
+        expect(subject).to be_valid
       end
 
       it 'cant have multiple owners' do
-        subject.idp_sso_descriptor = FactoryGirl.create :idp_sso_descriptor
+        subject.idp_sso_descriptor = create :idp_sso_descriptor
         subject.attribute_authority_descriptor =
-        FactoryGirl.create :attribute_authority_descriptor
+        create :attribute_authority_descriptor
 
-        expect(subject.valid?).to be false
+        expect(subject).not_to be_valid
       end
     end
   end
