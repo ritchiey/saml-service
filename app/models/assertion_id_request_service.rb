@@ -10,10 +10,10 @@ class AssertionIdRequestService < Endpoint
 
     return if owners.one?
     errors.add(:ownership,
-               'must be related to idp_sso_descriptor or
-               attribute_authority_descriptor') && return if owners.none?
+               'must be related to idp_sso_descriptor or ' \
+               'attribute_authority_descriptor') && return if owners.none?
 
-    errors.add(:ownership, 'cannot be owned by both idp_sso_descriptor
-                            and attribute_authority_descriptor')
+    errors.add(:ownership, 'cannot be owned by both idp_sso_descriptor ' \
+                           'and attribute_authority_descriptor')
   end
 end
