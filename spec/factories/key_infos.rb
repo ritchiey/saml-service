@@ -18,16 +18,23 @@ FactoryGirl.define do
 end
 
 def generate_certificate(subject, issuer)
-  key = OpenSSL::PKey::RSA.new 1024
-
   cert = OpenSSL::X509::Certificate.new
   cert.subject = OpenSSL::X509::Name.parse subject
   cert.issuer = OpenSSL::X509::Name.parse issuer
-  cert.not_before = Time.now
-  cert.not_after = Time.now + 3600
-  cert.public_key = key.public_key
-  cert.serial = 0x0
-  cert.version = 2
+  cert.public_key = generate_key.public_key
+
+  specify_certificate_defaults cert
 
   cert.to_pem
+end
+
+def specify_certificate_defaults(cert)
+  cert.not_before = Time.now
+  cert.not_after = Time.now + 3600
+  cert.serial = 0x0
+  cert.version = 2
+end
+
+def generate_key
+  OpenSSL::PKey::RSA.new 1024
 end
