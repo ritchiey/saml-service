@@ -8,7 +8,6 @@ class NameIdFormat < SamlURI
     super
     return if new?
 
-    owners = [sso_descriptor, attribute_authority_descriptor].compact
-    valid_owner owners
+    valid_owner [:sso_descriptor, :attribute_authority_descriptor]
   end
 end

@@ -8,7 +8,6 @@ class AssertionIdRequestService < Endpoint
     super
     return if new?
 
-    owners = [idp_sso_descriptor, attribute_authority_descriptor].compact
-    valid_owner owners
+    valid_owner [:idp_sso_descriptor, :attribute_authority_descriptor]
   end
 end

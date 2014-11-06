@@ -1,13 +1,13 @@
 module DualOwners
   extend ActiveSupport::Concern
 
-  def valid_owner(owners)
+  def valid_owner(parents)
+    owners = parents.map { |parent| send(parent) }.compact
     return if owners.one?
 
-    if owners.none?
-      errors.add(:ownership, "must be owned by #{owners[0]} or #{owners[1]}")
-    else
-      errors.add(:ownership, "cannot be owned by #{owners[0]} and #{owners[1]}")
-    end
+    errors.add(:ownership, "Must be owned by #{parents[0]}" \
+                           " or #{parents[1]}") && return if owners.none?
+    errors.add(:ownership, "Cannot be owned by both #{parents[0]}" \
+                           " and #{parents[1]}")
   end
 end

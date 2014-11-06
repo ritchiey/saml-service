@@ -14,7 +14,6 @@ class Attribute < Sequel::Model
     validates_presence [:name, :created_at, :updated_at]
     return if new?
 
-    owners = [idp_sso_descriptor, attribute_authority_descriptor].compact
-    valid_owner owners
+    valid_owner [:idp_sso_descriptor, :attribute_authority_descriptor]
   end
 end
