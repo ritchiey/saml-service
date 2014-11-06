@@ -1,5 +1,5 @@
 class NameIdFormat < SamlURI
-  include DualOwners
+  include Parents
 
   many_to_one :sso_descriptor
   many_to_one :attribute_authority_descriptor
@@ -8,6 +8,6 @@ class NameIdFormat < SamlURI
     super
     return if new?
 
-    valid_owner [:sso_descriptor, :attribute_authority_descriptor]
+    single_parent [:sso_descriptor, :attribute_authority_descriptor]
   end
 end

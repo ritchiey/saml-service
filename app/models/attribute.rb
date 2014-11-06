@@ -1,5 +1,5 @@
 class Attribute < Sequel::Model
-  include DualOwners
+  include Parents
 
   plugin :class_table_inheritance
 
@@ -14,6 +14,6 @@ class Attribute < Sequel::Model
     validates_presence [:name, :created_at, :updated_at]
     return if new?
 
-    valid_owner [:idp_sso_descriptor, :attribute_authority_descriptor]
+    single_parent [:idp_sso_descriptor, :attribute_authority_descriptor]
   end
 end
