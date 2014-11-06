@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 # Core
-gem 'rails', '4.1.5'
+gem 'rails', '4.1.7'
 gem 'mysql2'
 gem 'sequel-rails'
 
@@ -21,7 +21,7 @@ gem 'bcrypt', '~> 3.1.7'
 gem 'unicorn'
 
 group :development, :test do
-  gem 'rspec-rails', '~> 3.0.0'
+  gem 'rspec-rails', '~> 3.1.0'
   gem 'shoulda-matchers'
   gem 'faker'
   gem 'factory_girl_rails'
