@@ -1,4 +1,6 @@
 class Attribute < Sequel::Model
+  include DualOwners
+
   plugin :class_table_inheritance
 
   one_to_one :name_format
@@ -13,13 +15,6 @@ class Attribute < Sequel::Model
     return if new?
 
     owners = [idp_sso_descriptor, attribute_authority_descriptor].compact
-
-    return if owners.one?
-    errors.add(:ownership,
-               'must be owned by either idp_sso_descriptor or
-               attribute_authority_descriptor') && return if owners.none?
-
-    errors.add(:ownership, 'cannot be owned by both idp_sso_descriptor
-                            and attribute_authority_descriptor')
+    valid_owner owners
   end
 end
