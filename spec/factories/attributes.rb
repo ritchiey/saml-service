@@ -3,7 +3,7 @@ FactoryGirl.define do
     name { Faker::Lorem.word }
 
     trait :with_values do
-      ignore do
+      transient do
         number_of_values 3
       end
 
