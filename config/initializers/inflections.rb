@@ -16,4 +16,5 @@ ActiveSupport::Inflector.inflections(:en) do |inflect|
   inflect.acronym 'SP'
   inflect.acronym 'URI'
   inflect.acronym 'URL'
+  inflect.acronym 'MDUI'
 end
