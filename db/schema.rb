@@ -368,6 +368,13 @@ Sequel.migration do
       index [:role_descriptor_id], :name=>:uri_descriptor_id_fkey
     end
     
+    create_table(:ui_infos) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :role_descriptor_id, :role_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
+      
+      index [:role_descriptor_id], :name=>:mdui_ui_rd_fkey
+    end
+    
     create_table(:encryption_methods) do
       primary_key :id, :type=>"int(11)"
       column :algorithm, "varchar(255)", :null=>false
@@ -449,5 +456,6 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141020231401_add_attribute_authority_descriptor_foreign_key_to_name_id_format.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141021004610_add_attribute_authority_descriptor_foreign_key_to_attribute_profile.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141021010219_add_attribute_authority_descriptor_foreign_key_to_attribute.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141107022909_create_mdui_ui_infos.rb')"
   end
 end

@@ -8,6 +8,8 @@ class RoleDescriptor < Sequel::Model
   one_to_many :key_descriptors
   one_to_many :contact_people
 
+  one_to_one :ui_info, class: 'MDUI::UiInfo'
+
   def validate
     super
     validates_presence [:error_url, :active, :created_at, :updated_at]
