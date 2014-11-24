@@ -2,8 +2,8 @@ module MDUI
   class UiInfo < Sequel::Model
     many_to_one :role_descriptor, class: 'RoleDescriptor'
 
-    one_to_one :display_name
-    one_to_one :description
+    one_to_many :display_name
+    one_to_many :description
 
     def validate
       super
