@@ -5,6 +5,10 @@ SimpleCov.start do
 end
 
 RSpec.configure do |config|
+  config.before(:suite) do
+    load Rails.root.join('db/schema.rb')
+  end
+
   config.filter_run :focus
   config.run_all_when_everything_filtered = true
 
