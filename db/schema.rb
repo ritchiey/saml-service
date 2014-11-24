@@ -375,6 +375,13 @@ Sequel.migration do
       index [:role_descriptor_id], :name=>:mdui_ui_rd_fkey
     end
     
+    create_table(:descriptions) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :ui_info_id, :ui_infos, :type=>"int(11)", :key=>[:id]
+      
+      index [:ui_info_id], :name=>:des_ui_info_fkey
+    end
+    
     create_table(:display_names) do
       primary_key :id, :type=>"int(11)"
       foreign_key :ui_info_id, :ui_infos, :type=>"int(11)", :key=>[:id]
@@ -465,5 +472,6 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141021010219_add_attribute_authority_descriptor_foreign_key_to_attribute.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141107022909_create_mdui_ui_infos.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141117022213_create_mdui_display_names.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141124035915_create_mdui_descriptions.rb')"
   end
 end
