@@ -7,5 +7,6 @@ RSpec.describe MDUI::UiInfo, type: :model do
   context 'optional attributes' do
     it { is_expected.to have_one_to_many :display_name }
     it { is_expected.to have_one_to_many :description }
+    it { is_expected.to have_one_to_many :keywords }
   end
 end

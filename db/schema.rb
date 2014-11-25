@@ -400,6 +400,15 @@ Sequel.migration do
       
       index [:key_descriptor_id], :name=>:key_descriptors_enc_fkey
     end
+    
+    create_table(:keywords) do
+      primary_key :id, :type=>"int(11)"
+      column :lang, "varchar(255)"
+      column :content, "text"
+      foreign_key :ui_info_id, :ui_infos, :type=>"int(11)", :key=>[:id]
+      
+      index [:ui_info_id], :name=>:key_ui_info_fkey
+    end
   end
 end
 Sequel.migration do
@@ -473,5 +482,6 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141107022909_create_mdui_ui_infos.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141117022213_create_mdui_display_names.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141124035915_create_mdui_descriptions.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141124050655_create_mdui_keywords.rb')"
   end
 end

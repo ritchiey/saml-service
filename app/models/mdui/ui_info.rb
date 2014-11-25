@@ -4,6 +4,7 @@ module MDUI
 
     one_to_many :display_name
     one_to_many :description
+    one_to_many :keywords
 
     def validate
       super
