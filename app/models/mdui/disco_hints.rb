@@ -4,6 +4,7 @@ module MDUI
 
     one_to_many :ip_hints
     one_to_many :domain_hints
+    one_to_many :geolocation_hints
 
     def validate
       super
