@@ -10,5 +10,6 @@ RSpec.describe MDUI::UiInfo, type: :model do
     it { is_expected.to have_one_to_many :keywords }
     it { is_expected.to have_one_to_many :logos }
     it { is_expected.to have_one_to_many :information_urls }
+    it { is_expected.to have_one_to_many :privacy_statement_urls }
   end
 end

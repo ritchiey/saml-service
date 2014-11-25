@@ -425,6 +425,13 @@ Sequel.migration do
       
       index [:ui_info_id], :name=>:logo_ui_info_fkey
     end
+    
+    create_table(:privacy_statement_urls) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :ui_info_id, :ui_infos, :type=>"int(11)", :key=>[:id]
+      
+      index [:ui_info_id], :name=>:privurl_ui_info_fkey
+    end
   end
 end
 Sequel.migration do
@@ -501,5 +508,6 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141124050655_create_mdui_keywords.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141125004103_create_mdui_logos.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141125012915_create_mdui_information_urls.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141125015350_create_mdui_privacy_statement_urls.rb')"
   end
 end
