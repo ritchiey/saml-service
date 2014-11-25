@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe MDUI::Keywords, type: :model do
+  it_behaves_like 'a basic model'
+
   it { is_expected.to have_many_to_one :ui_info }
   it { is_expected.to validate_presence :ui_info }
   it { is_expected.to validate_presence :lang }

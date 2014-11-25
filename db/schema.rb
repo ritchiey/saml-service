@@ -371,6 +371,8 @@ Sequel.migration do
     create_table(:ui_infos) do
       primary_key :id, :type=>"int(11)"
       foreign_key :role_descriptor_id, :role_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
       
       index [:role_descriptor_id], :name=>:mdui_ui_rd_fkey
     end
@@ -410,9 +412,11 @@ Sequel.migration do
     
     create_table(:keywords) do
       primary_key :id, :type=>"int(11)"
+      foreign_key :ui_info_id, :ui_infos, :type=>"int(11)", :key=>[:id]
       column :lang, "varchar(255)"
       column :content, "text"
-      foreign_key :ui_info_id, :ui_infos, :type=>"int(11)", :key=>[:id]
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
       
       index [:ui_info_id], :name=>:key_ui_info_fkey
     end

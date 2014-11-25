@@ -11,7 +11,7 @@ module MDUI
 
     def validate
       super
-      validates_presence [:role_descriptor]
+      validates_presence [:role_descriptor, :created_at, :updated_at]
     end
   end
 end
