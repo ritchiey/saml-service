@@ -171,6 +171,15 @@ Sequel.migration do
       index [:idp_sso_descriptor_id], :name=>:idp_attr_fkey
     end
     
+    create_table(:disco_hints) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :idp_sso_descriptor_id, :idp_sso_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      
+      index [:idp_sso_descriptor_id], :name=>:mdui_dh_idp_fkey
+    end
+    
     create_table(:entity_descriptors) do
       primary_key :id, :type=>"int(11)"
       foreign_key :entities_descriptor_id, :entities_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
@@ -513,5 +522,6 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141125004103_create_mdui_logos.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141125012915_create_mdui_information_urls.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141125015350_create_mdui_privacy_statement_urls.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141125034516_create_mdui_disco_hints.rb')"
   end
 end
