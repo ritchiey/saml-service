@@ -5,8 +5,8 @@ RSpec.describe MDUI::UiInfo, type: :model do
   it { is_expected.to validate_presence :role_descriptor }
 
   context 'optional attributes' do
-    it { is_expected.to have_one_to_many :display_name }
-    it { is_expected.to have_one_to_many :description }
+    it { is_expected.to have_one_to_many :display_names }
+    it { is_expected.to have_one_to_many :descriptions }
     it { is_expected.to have_one_to_many :keywords }
     it { is_expected.to have_one_to_many :logos }
     it { is_expected.to have_one_to_many :information_urls }
