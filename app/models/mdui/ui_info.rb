@@ -6,6 +6,7 @@ module MDUI
     one_to_many :description
     one_to_many :keywords
     one_to_many :logos
+    one_to_many :information_urls
 
     def validate
       super
