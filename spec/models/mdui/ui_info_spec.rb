@@ -8,5 +8,7 @@ RSpec.describe MDUI::UiInfo, type: :model do
     it { is_expected.to have_one_to_many :display_name }
     it { is_expected.to have_one_to_many :description }
     it { is_expected.to have_one_to_many :keywords }
+    it { is_expected.to have_one_to_many :logos }
+
   end
 end
