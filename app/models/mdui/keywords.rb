@@ -14,7 +14,7 @@ module MDUI
 
     def add(keyword)
       xml_keyword = keyword.sub ' ', '+'
-      content << " #{xml_keyword}" && return if content
+      (self.content += " #{xml_keyword}") && return if content
       self.content = xml_keyword
     end
   end
