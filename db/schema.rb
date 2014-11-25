@@ -284,6 +284,16 @@ Sequel.migration do
       index [:entity_descriptor_id], :name=>:eid_ed_fkey
     end
     
+    create_table(:ip_hints) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :disco_hints_id, :disco_hints, :type=>"int(11)", :key=>[:id]
+      column :block, "varchar(255)"
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      
+      index [:disco_hints_id], :name=>:ip_disco_hints_fkey
+    end
+    
     create_table(:name_formats) do
       primary_key :id, :type=>"int(11)"
       foreign_key :attribute_id, :attributes, :type=>"int(11)", :key=>[:id]
@@ -523,5 +533,6 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141125012915_create_mdui_information_urls.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141125015350_create_mdui_privacy_statement_urls.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141125034516_create_mdui_disco_hints.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141125043639_create_mdui_ip_hints.rb')"
   end
 end
