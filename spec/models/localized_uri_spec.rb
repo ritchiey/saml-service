@@ -3,32 +3,32 @@ require 'rails_helper'
 describe LocalizedURI do
   it_behaves_like 'a basic model'
 
-  it { is_expected.to validate_presence :value }
+  it { is_expected.to validate_presence :uri }
   it { is_expected.to validate_presence :lang }
 
-  context 'value' do
+  describe '#uri' do
     it 'rejects invalid URL' do
       subject.lang = 'en'
-      subject.value = 'invalid'
+      subject.uri = 'invalid'
       expect(subject).not_to be_valid
     end
 
     context 'valid URL formats' do
-      it 'http' do
+      it 'supports http' do
         subject.lang = 'en'
-        subject.value = 'http://example.org'
+        subject.uri = 'http://example.org'
         expect(subject).to be_valid
       end
 
-      it 'https' do
+      it 'supports https' do
         subject.lang = 'en'
-        subject.value = 'https://example.org'
+        subject.uri = 'https://example.org'
         expect(subject).to be_valid
       end
 
-      it 'with port number' do
+      it 'allows port number' do
         subject.lang = 'en'
-        subject.value = 'https://example.org:8080'
+        subject.uri = 'https://example.org:8080'
         expect(subject).to be_valid
       end
     end

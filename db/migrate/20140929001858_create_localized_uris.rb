@@ -4,7 +4,7 @@ Sequel.migration do
     create_table :localized_uris do
       primary_key :id
 
-      String :value, null: false
+      Text :uri, null: false
       String :lang, null: false
 
       DateTime :created_at

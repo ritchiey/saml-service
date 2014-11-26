@@ -76,7 +76,7 @@ Sequel.migration do
     
     create_table(:localized_uris) do
       primary_key :id, :type=>"int(11)"
-      column :value, "varchar(255)", :null=>false
+      column :uri, "text", :null=>false
       column :lang, "varchar(255)", :null=>false
       column :created_at, "datetime"
       column :updated_at, "datetime"
