@@ -1,5 +1,5 @@
 FactoryGirl.define do
-  factory :mdui_ui_info, class: 'MDUI::UiInfo' do
+  factory :mdui_ui_info, class: 'MDUI::UIInfo' do
     role_descriptor
 
     factory :mdui_ui_info_with_content do

@@ -8,7 +8,7 @@ class RoleDescriptor < Sequel::Model
   one_to_many :key_descriptors
   one_to_many :contact_people
 
-  one_to_one :ui_info, class: 'MDUI::UiInfo'
+  one_to_one :ui_info, class: 'MDUI::UIInfo'
 
   def validate
     super

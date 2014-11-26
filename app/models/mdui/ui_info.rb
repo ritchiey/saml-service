@@ -1,5 +1,5 @@
 module MDUI
-  class UiInfo < Sequel::Model
+  class UIInfo < Sequel::Model
     many_to_one :role_descriptor, class: 'RoleDescriptor'
 
     one_to_many :display_names
