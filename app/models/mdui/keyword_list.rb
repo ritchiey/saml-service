@@ -1,5 +1,5 @@
 module MDUI
-  class Keywords < Sequel::Model
+  class KeywordList < Sequel::Model
     many_to_one :ui_info
 
     def validate

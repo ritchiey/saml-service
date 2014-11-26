@@ -449,7 +449,7 @@ Sequel.migration do
       index [:ui_info_id], :name=>:infourl_ui_info_fkey
     end
     
-    create_table(:keywords) do
+    create_table(:keyword_lists) do
       primary_key :id, :type=>"int(11)"
       foreign_key :ui_info_id, :ui_infos, :type=>"int(11)", :key=>[:id]
       column :lang, "varchar(255)"
@@ -457,7 +457,7 @@ Sequel.migration do
       column :created_at, "datetime"
       column :updated_at, "datetime"
       
-      index [:ui_info_id], :name=>:key_ui_info_fkey
+      index [:ui_info_id], :name=>:keyl_ui_info_fkey
     end
     
     create_table(:logos) do

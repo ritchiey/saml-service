@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe MDUI::Keywords, type: :model do
+RSpec.describe MDUI::KeywordList, type: :model do
   it_behaves_like 'a basic model'
 
   it { is_expected.to have_many_to_one :ui_info }
@@ -8,7 +8,7 @@ RSpec.describe MDUI::Keywords, type: :model do
   it { is_expected.to validate_presence :lang }
 
   describe '#add' do
-    subject { create :mdui_keywords }
+    subject { create :mdui_keyword_list }
 
     context 'first keyword' do
       it 'adds new keyword' do

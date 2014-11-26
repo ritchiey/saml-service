@@ -4,7 +4,7 @@ module MDUI
 
     one_to_many :display_names
     one_to_many :descriptions
-    one_to_many :keywords
+    one_to_many :keyword_lists
     one_to_many :logos
     one_to_many :information_urls
     one_to_many :privacy_statement_urls
