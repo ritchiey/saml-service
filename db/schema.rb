@@ -171,6 +171,15 @@ Sequel.migration do
       index [:idp_sso_descriptor_id], :name=>:idp_attr_fkey
     end
     
+    create_table(:disco_hints) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :idp_sso_descriptor_id, :idp_sso_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      
+      index [:idp_sso_descriptor_id], :name=>:mdui_dh_idp_fkey
+    end
+    
     create_table(:entity_descriptors) do
       primary_key :id, :type=>"int(11)"
       foreign_key :entities_descriptor_id, :entities_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
@@ -268,11 +277,41 @@ Sequel.migration do
       index [:attribute_id], :name=>:attribute_av_fkey
     end
     
+    create_table(:domain_hints) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :disco_hints_id, :disco_hints, :type=>"int(11)", :key=>[:id]
+      column :domain, "varchar(255)", :null=>false
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      
+      index [:disco_hints_id], :name=>:dom_disco_hints_fkey
+    end
+    
     create_table(:entity_ids) do
       primary_key :id, :type=>"int(11)"
       foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
       
       index [:entity_descriptor_id], :name=>:eid_ed_fkey
+    end
+    
+    create_table(:geolocation_hints) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :disco_hints_id, :disco_hints, :type=>"int(11)", :key=>[:id]
+      column :uri, "varchar(255)", :null=>false
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      
+      index [:disco_hints_id], :name=>:geo_disco_hints_fkey
+    end
+    
+    create_table(:ip_hints) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :disco_hints_id, :disco_hints, :type=>"int(11)", :key=>[:id]
+      column :block, "varchar(255)", :null=>false
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      
+      index [:disco_hints_id], :name=>:ip_disco_hints_fkey
     end
     
     create_table(:name_formats) do
@@ -368,6 +407,29 @@ Sequel.migration do
       index [:role_descriptor_id], :name=>:uri_descriptor_id_fkey
     end
     
+    create_table(:ui_infos) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :role_descriptor_id, :role_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      
+      index [:role_descriptor_id], :name=>:mdui_ui_rd_fkey
+    end
+    
+    create_table(:descriptions) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :ui_info_id, :ui_infos, :type=>"int(11)", :key=>[:id]
+      
+      index [:ui_info_id], :name=>:des_ui_info_fkey
+    end
+    
+    create_table(:display_names) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :ui_info_id, :ui_infos, :type=>"int(11)", :key=>[:id]
+      
+      index [:ui_info_id], :name=>:dn_ui_info_fkey
+    end
+    
     create_table(:encryption_methods) do
       primary_key :id, :type=>"int(11)"
       column :algorithm, "varchar(255)", :null=>false
@@ -378,6 +440,44 @@ Sequel.migration do
       foreign_key :key_descriptor_id, :key_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
       
       index [:key_descriptor_id], :name=>:key_descriptors_enc_fkey
+    end
+    
+    create_table(:information_urls) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :ui_info_id, :ui_infos, :type=>"int(11)", :key=>[:id]
+      
+      index [:ui_info_id], :name=>:infourl_ui_info_fkey
+    end
+    
+    create_table(:keyword_lists) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :ui_info_id, :ui_infos, :type=>"int(11)", :key=>[:id]
+      column :lang, "varchar(255)"
+      column :content, "text"
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      
+      index [:ui_info_id], :name=>:keyl_ui_info_fkey
+    end
+    
+    create_table(:logos) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :ui_info_id, :ui_infos, :type=>"int(11)", :key=>[:id]
+      column :uri, "text", :null=>false
+      column :lang, "varchar(255)"
+      column :width, "int(11)"
+      column :height, "int(11)"
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      
+      index [:ui_info_id], :name=>:logo_ui_info_fkey
+    end
+    
+    create_table(:privacy_statement_urls) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :ui_info_id, :ui_infos, :type=>"int(11)", :key=>[:id]
+      
+      index [:ui_info_id], :name=>:privurl_ui_info_fkey
     end
   end
 end
@@ -449,5 +549,16 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141020231401_add_attribute_authority_descriptor_foreign_key_to_name_id_format.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141021004610_add_attribute_authority_descriptor_foreign_key_to_attribute_profile.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141021010219_add_attribute_authority_descriptor_foreign_key_to_attribute.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141107022909_create_mdui_ui_infos.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141117022213_create_mdui_display_names.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141124035915_create_mdui_descriptions.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141124050655_create_mdui_keywords.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141125004103_create_mdui_logos.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141125012915_create_mdui_information_urls.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141125015350_create_mdui_privacy_statement_urls.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141125034516_create_mdui_disco_hints.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141125043639_create_mdui_ip_hints.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141125044914_create_mdui_domain_hints.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141125045756_create_mdui_geolocation_hints.rb')"
   end
 end

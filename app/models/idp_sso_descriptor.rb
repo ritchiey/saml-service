@@ -5,6 +5,8 @@ class IDPSSODescriptor < SSODescriptor
   one_to_many :attribute_profiles
   one_to_many :attributes
 
+  one_to_one :disco_hints, class: 'MDUI::DiscoHints'
+
   def validate
     super
     validates_presence :want_authn_requests_signed
