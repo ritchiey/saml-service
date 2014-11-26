@@ -1,10 +1,12 @@
 module MDUI
-  class Logo < LocalizedURI
+  class Logo < Sequel::Model
     many_to_one :ui_info
 
     def validate
       super
-      validates_presence :ui_info
+      uri_regexp = URI.regexp(%w(http https))
+      validates_presence [:ui_info, :uri, :created_at, :updated_at]
+      validates_format uri_regexp, :uri
 
       validate_width
       validate_height

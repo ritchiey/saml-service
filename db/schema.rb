@@ -463,8 +463,12 @@ Sequel.migration do
     create_table(:logos) do
       primary_key :id, :type=>"int(11)"
       foreign_key :ui_info_id, :ui_infos, :type=>"int(11)", :key=>[:id]
+      column :uri, "text", :null=>false
+      column :lang, "varchar(255)"
       column :width, "int(11)"
       column :height, "int(11)"
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
       
       index [:ui_info_id], :name=>:logo_ui_info_fkey
     end
