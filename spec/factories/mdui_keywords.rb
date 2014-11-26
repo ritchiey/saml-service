@@ -4,10 +4,13 @@ FactoryGirl.define do
     association :ui_info, factory: :mdui_ui_info
 
     factory :mdui_keyword_list_with_content do
-      content do
-        "#{Faker::Lorem.words(6).join(' ')}" \
-        "#{Faker::Lorem.words(2).join('+')}"
-      end
+      content { generate_keyword_list }
     end
   end
+end
+
+def generate_keyword_list
+  keyword_list = Faker::Lorem.words(6)
+  encoded_keyword = Faker::Lorem.words(2).join('+')
+  keyword_list.push(encoded_keyword).join(' ')
 end
