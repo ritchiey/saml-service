@@ -13,8 +13,7 @@ module MDUI
 
     def add(keyword)
       xml_keyword = keyword.sub ' ', '+'
-      (self.content += " #{xml_keyword}") && return if content
-      self.content = xml_keyword
+      self.content = "#{content} #{xml_keyword}".strip
     end
   end
 end
