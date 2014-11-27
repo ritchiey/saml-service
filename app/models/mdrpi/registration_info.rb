@@ -5,6 +5,8 @@ module MDRPI
     many_to_one :entities_descriptor, class: 'EntitiesDescriptor'
     many_to_one :entity_descriptor, class: 'EntityDescriptor'
 
+    one_to_many :registration_policies
+
     def validate
       super
       validates_presence [:registration_authority, :created_at, :updated_at]

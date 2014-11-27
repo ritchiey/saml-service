@@ -8,6 +8,11 @@ RSpec.describe MDRPI::RegistrationInfo, type: :model do
 
   it { is_expected.to validate_presence :registration_authority }
 
+  context 'optional attributes' do
+    it { is_expected.to respond_to :registration_instant }
+    it { is_expected.to have_one_to_many :registration_policies }
+  end
+
   let(:subject) { create :mdrpi_registration_info }
   context 'ownership' do
     it 'must be owned' do
