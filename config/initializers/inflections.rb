@@ -19,4 +19,5 @@ ActiveSupport::Inflector.inflections(:en) do |inflect|
   inflect.acronym 'MDUI'
   inflect.acronym 'IP'
   inflect.acronym 'UI'
+  inflect.acronym 'MDRPI'
 end

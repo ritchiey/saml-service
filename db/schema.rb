@@ -321,6 +321,31 @@ Sequel.migration do
       index [:attribute_id], :name=>:nf_attr_fkey
     end
     
+    create_table(:publication_infos) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :entities_descriptor_id, :entities_descriptors, :type=>"int(11)", :key=>[:id]
+      foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :key=>[:id]
+      column :publisher, "varchar(255)"
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      
+      index [:entity_descriptor_id], :name=>:pi_entdesc_fkey
+      index [:entities_descriptor_id], :name=>:pi_entitiesdesc_fkey
+    end
+    
+    create_table(:registration_infos) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :entities_descriptor_id, :entities_descriptors, :type=>"int(11)", :key=>[:id]
+      foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :key=>[:id]
+      column :registration_authority, "varchar(255)", :null=>false
+      column :registration_instant, "datetime"
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      
+      index [:entity_descriptor_id], :name=>:ri_entdesc_fkey
+      index [:entities_descriptor_id], :name=>:ri_entitiesdesc_fkey
+    end
+    
     create_table(:requested_attributes) do
       primary_key :id, :type=>"int(11)"
       column :reasoning, "varchar(255)", :null=>false
@@ -396,6 +421,13 @@ Sequel.migration do
       index [:role_descriptor_id], :name=>:ps_rd_fkey
     end
     
+    create_table(:registration_policies) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :registration_info_id, :registration_infos, :type=>"int(11)", :null=>false, :key=>[:id]
+      
+      index [:registration_info_id], :name=>:rp_ri_fkey
+    end
+    
     create_table(:saml_uris) do
       primary_key :id, :type=>"int(11)"
       column :uri, "text", :null=>false
@@ -414,6 +446,13 @@ Sequel.migration do
       column :updated_at, "datetime"
       
       index [:role_descriptor_id], :name=>:mdui_ui_rd_fkey
+    end
+    
+    create_table(:usage_policies) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :publication_info_id, :publication_infos, :type=>"int(11)", :null=>false, :key=>[:id]
+      
+      index [:publication_info_id], :name=>:up_pi_fkey
     end
     
     create_table(:descriptions) do
@@ -560,5 +599,9 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141125043639_create_mdui_ip_hints.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141125044914_create_mdui_domain_hints.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141125045756_create_mdui_geolocation_hints.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141126233918_create_mdrpi_registration_infos.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141127010924_create_mdrpi_registration_policies.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141127022054_create_mdrpi_publication_infos.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141127031000_create_mdrpi_usage_policies.rb')"
   end
 end

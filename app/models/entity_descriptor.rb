@@ -8,6 +8,9 @@ class EntityDescriptor < Sequel::Model
 
   one_to_one :entity_id
 
+  one_to_one :registration_info, class: 'MDRPI::RegistrationInfo'
+  one_to_one :publication_info, class: 'MDRPI::PublicationInfo'
+
   def validate
     super
     validates_presence [:entities_descriptor, :created_at, :updated_at]
