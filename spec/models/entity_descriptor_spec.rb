@@ -11,6 +11,7 @@ describe EntityDescriptor do
     it { is_expected.to have_one_to_many :contact_people }
     it { is_expected.to have_one_to_many :additional_metadata_locations }
     it { is_expected.to have_column :extensions, type: :text }
+    it { is_expected.to have_one_to_one :registration_info }
   end
 
 end
