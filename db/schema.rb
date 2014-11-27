@@ -448,6 +448,13 @@ Sequel.migration do
       index [:role_descriptor_id], :name=>:mdui_ui_rd_fkey
     end
     
+    create_table(:usage_policies) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :publication_info_id, :publication_infos, :type=>"int(11)", :null=>false, :key=>[:id]
+      
+      index [:publication_info_id], :name=>:up_pi_fkey
+    end
+    
     create_table(:descriptions) do
       primary_key :id, :type=>"int(11)"
       foreign_key :ui_info_id, :ui_infos, :type=>"int(11)", :key=>[:id]
@@ -595,5 +602,6 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141126233918_create_mdrpi_registration_infos.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141127010924_create_mdrpi_registration_policies.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141127022054_create_mdrpi_publication_infos.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141127031000_create_mdrpi_usage_policies.rb')"
   end
 end

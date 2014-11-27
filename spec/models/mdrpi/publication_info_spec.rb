@@ -9,6 +9,7 @@ RSpec.describe MDRPI::PublicationInfo, type: :model do
   it { is_expected.to validate_presence :publisher }
 
   context 'optional attributes' do
+    it { is_expected.to have_one_to_many :usage_policies }
   end
 
   let(:subject) { create :mdrpi_publication_info }
