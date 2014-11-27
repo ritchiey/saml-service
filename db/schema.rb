@@ -321,6 +321,18 @@ Sequel.migration do
       index [:attribute_id], :name=>:nf_attr_fkey
     end
     
+    create_table(:publication_infos) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :entities_descriptor_id, :entities_descriptors, :type=>"int(11)", :key=>[:id]
+      foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :key=>[:id]
+      column :publisher, "varchar(255)"
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      
+      index [:entity_descriptor_id], :name=>:pi_entdesc_fkey
+      index [:entities_descriptor_id], :name=>:pi_entitiesdesc_fkey
+    end
+    
     create_table(:registration_infos) do
       primary_key :id, :type=>"int(11)"
       foreign_key :entities_descriptor_id, :entities_descriptors, :type=>"int(11)", :key=>[:id]
@@ -582,5 +594,6 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141125045756_create_mdui_geolocation_hints.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141126233918_create_mdrpi_registration_infos.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141127010924_create_mdrpi_registration_policies.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141127022054_create_mdrpi_publication_infos.rb')"
   end
 end
