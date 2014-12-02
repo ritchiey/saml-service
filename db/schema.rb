@@ -155,22 +155,6 @@ Sequel.migration do
       index [:attribute_authority_descriptor_id], :name=>:aad_as_fkey
     end
     
-    create_table(:attributes) do
-      primary_key :id, :type=>"int(11)"
-      column :name, "varchar(255)", :null=>false
-      column :friendly_name, "varchar(255)"
-      column :legacy_name, "varchar(255)"
-      column :oid, "varchar(255)"
-      column :description, "varchar(255)"
-      column :created_at, "datetime"
-      column :updated_at, "datetime"
-      foreign_key :idp_sso_descriptor_id, :idp_sso_descriptors, :type=>"int(11)", :key=>[:id]
-      foreign_key :attribute_authority_descriptor_id, :attribute_authority_descriptors, :type=>"int(11)", :key=>[:id]
-      
-      index [:attribute_authority_descriptor_id], :name=>:aad_attr_fkey
-      index [:idp_sso_descriptor_id], :name=>:idp_attr_fkey
-    end
-    
     create_table(:disco_hints) do
       primary_key :id, :type=>"int(11)"
       foreign_key :idp_sso_descriptor_id, :idp_sso_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
@@ -267,16 +251,6 @@ Sequel.migration do
       index [:entity_descriptor_id], :name=>:entity_descriptors_id_key
     end
     
-    create_table(:attribute_values) do
-      primary_key :id, :type=>"int(11)"
-      foreign_key :attribute_id, :attributes, :type=>"int(11)", :null=>false, :key=>[:id]
-      column :value, "varchar(255)"
-      column :created_at, "datetime"
-      column :updated_at, "datetime"
-      
-      index [:attribute_id], :name=>:attribute_av_fkey
-    end
-    
     create_table(:domain_hints) do
       primary_key :id, :type=>"int(11)"
       foreign_key :disco_hints_id, :disco_hints, :type=>"int(11)", :key=>[:id]
@@ -285,6 +259,17 @@ Sequel.migration do
       column :updated_at, "datetime"
       
       index [:disco_hints_id], :name=>:dom_disco_hints_fkey
+    end
+    
+    create_table(:entity_attributes) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :entities_descriptor_id, :entities_descriptors, :type=>"int(11)", :key=>[:id]
+      foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :key=>[:id]
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      
+      index [:entity_descriptor_id], :name=>:ea_entdesc_fkey
+      index [:entities_descriptor_id], :name=>:ea_entitiesdesc_fkey
     end
     
     create_table(:entity_ids) do
@@ -312,13 +297,6 @@ Sequel.migration do
       column :updated_at, "datetime"
       
       index [:disco_hints_id], :name=>:ip_disco_hints_fkey
-    end
-    
-    create_table(:name_formats) do
-      primary_key :id, :type=>"int(11)"
-      foreign_key :attribute_id, :attributes, :type=>"int(11)", :key=>[:id]
-      
-      index [:attribute_id], :name=>:nf_attr_fkey
     end
     
     create_table(:publication_infos) do
@@ -384,6 +362,24 @@ Sequel.migration do
       foreign_key :attribute_consuming_service_id, :attribute_consuming_services, :type=>"int(11)", :null=>false, :key=>[:id]
       
       index [:attribute_consuming_service_id], :name=>:acs_sn_ln_fkey
+    end
+    
+    create_table(:attributes) do
+      primary_key :id, :type=>"int(11)"
+      column :name, "varchar(255)", :null=>false
+      column :friendly_name, "varchar(255)"
+      column :legacy_name, "varchar(255)"
+      column :oid, "varchar(255)"
+      column :description, "varchar(255)"
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      foreign_key :idp_sso_descriptor_id, :idp_sso_descriptors, :type=>"int(11)", :key=>[:id]
+      foreign_key :attribute_authority_descriptor_id, :attribute_authority_descriptors, :type=>"int(11)", :key=>[:id]
+      foreign_key :entity_attribute_id, :entity_attributes, :type=>"int(11)", :key=>[:id]
+      
+      index [:attribute_authority_descriptor_id], :name=>:aad_attr_fkey
+      index [:entity_attribute_id], :name=>:ea_attr_fkey
+      index [:idp_sso_descriptor_id], :name=>:idp_attr_fkey
     end
     
     create_table(:contact_people) do
@@ -455,6 +451,16 @@ Sequel.migration do
       index [:publication_info_id], :name=>:up_pi_fkey
     end
     
+    create_table(:attribute_values) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :attribute_id, :attributes, :type=>"int(11)", :null=>false, :key=>[:id]
+      column :value, "varchar(255)"
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      
+      index [:attribute_id], :name=>:attribute_av_fkey
+    end
+    
     create_table(:descriptions) do
       primary_key :id, :type=>"int(11)"
       foreign_key :ui_info_id, :ui_infos, :type=>"int(11)", :key=>[:id]
@@ -510,6 +516,13 @@ Sequel.migration do
       column :updated_at, "datetime"
       
       index [:ui_info_id], :name=>:logo_ui_info_fkey
+    end
+    
+    create_table(:name_formats) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :attribute_id, :attributes, :type=>"int(11)", :key=>[:id]
+      
+      index [:attribute_id], :name=>:nf_attr_fkey
     end
     
     create_table(:privacy_statement_urls) do
@@ -603,5 +616,7 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141127010924_create_mdrpi_registration_policies.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141127022054_create_mdrpi_publication_infos.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141127031000_create_mdrpi_usage_policies.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141130223957_create_mdattr_entity_attributes.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141201035241_add_entity_attribute_to_attribute.rb')"
   end
 end

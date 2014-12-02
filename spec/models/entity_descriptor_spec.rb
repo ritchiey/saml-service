@@ -14,6 +14,8 @@ describe EntityDescriptor do
 
     it { is_expected.to have_one_to_one :registration_info }
     it { is_expected.to have_one_to_one :publication_info }
+    it { is_expected.to have_one_to_one :entity_attribute }
+
   end
 
 end

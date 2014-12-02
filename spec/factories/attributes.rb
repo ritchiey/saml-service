@@ -13,6 +13,9 @@ FactoryGirl.define do
     end
 
     factory :attribute do
+      after :create do | a |
+        a.name_format = create(:name_format, :uri, attribute: a)
+      end
     end
 
     factory :requested_attribute, class: 'RequestedAttribute' do
