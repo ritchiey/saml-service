@@ -2,6 +2,9 @@ require 'rails_helper'
 
 describe IDPSSODescriptor do
   context 'extends sso_descriptor' do
+    it { is_expected.to validate_presence :entity_descriptor }
+    it { is_expected.to have_many_to_one :entity_descriptor }
+
     it { is_expected.to validate_presence :want_authn_requests_signed }
     it { is_expected.to have_one_to_many :single_sign_on_services }
 

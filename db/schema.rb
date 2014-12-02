@@ -1,9 +1,5 @@
 Sequel.migration do
   change do
-    create_table(:attribute_authority_descriptors) do
-      primary_key :id, :type=>"int(11)"
-    end
-    
     create_table(:authz_services) do
       primary_key :id, :type=>"int(11)"
     end
@@ -42,11 +38,6 @@ Sequel.migration do
       column :extensions, "text"
       column :created_at, "datetime"
       column :updated_at, "datetime"
-    end
-    
-    create_table(:idp_sso_descriptors) do
-      primary_key :id, :type=>"int(11)"
-      column :want_authn_requests_signed, "tinyint(1)", :null=>false
     end
     
     create_table(:indexed_endpoints) do
@@ -95,12 +86,6 @@ Sequel.migration do
       primary_key [:filename]
     end
     
-    create_table(:sp_sso_descriptors) do
-      primary_key :id, :type=>"int(11)"
-      column :authn_requests_signed, "tinyint(1)", :null=>false
-      column :want_assertions_signed, "tinyint(1)", :null=>false
-    end
-    
     create_table(:sso_descriptors) do
       primary_key :id, :type=>"int(11)"
     end
@@ -110,6 +95,151 @@ Sequel.migration do
       foreign_key :sso_descriptor_id, :sso_descriptors, :type=>"int(11)", :key=>[:id]
       
       index [:sso_descriptor_id], :name=>:sso_ars_fkey
+    end
+    
+    create_table(:entity_descriptors) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :entities_descriptor_id, :entities_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
+      foreign_key :organization_id, :organizations, :type=>"int(11)", :key=>[:id]
+      column :extensions, "text"
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      
+      index [:entities_descriptor_id], :name=>:entities_descriptors_id_key
+      index [:organization_id], :name=>:organization_id_key
+    end
+    
+    create_table(:manage_name_id_services) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :sso_descriptor_id, :sso_descriptors, :type=>"int(11)", :key=>[:id]
+      
+      index [:sso_descriptor_id], :name=>:sso_mnid_fkey
+    end
+    
+    create_table(:organization_display_names) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :organization_id, :organizations, :type=>"int(11)", :null=>false, :key=>[:id]
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      
+      index [:organization_id], :name=>:org_odn_ln_fkey
+    end
+    
+    create_table(:organization_names) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :organization_id, :organizations, :type=>"int(11)", :null=>false, :key=>[:id]
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      
+      index [:organization_id], :name=>:org_on_ln_fkey
+    end
+    
+    create_table(:organization_urls) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :organization_id, :organizations, :type=>"int(11)", :null=>false, :key=>[:id]
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      
+      index [:organization_id], :name=>:org_ou_lu_fkey
+    end
+    
+    create_table(:single_logout_services) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :sso_descriptor_id, :sso_descriptors, :type=>"int(11)", :key=>[:id]
+      
+      index [:sso_descriptor_id], :name=>:sso_slo_fkey
+    end
+    
+    create_table(:additional_metadata_locations) do
+      primary_key :id, :type=>"int(11)"
+      column :uri, "varchar(255)", :null=>false
+      column :namespace, "varchar(255)", :null=>false
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
+      
+      index [:entity_descriptor_id], :name=>:entity_descriptors_id_key
+    end
+    
+    create_table(:attribute_authority_descriptors) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :key=>[:id]
+      
+      index [:entity_descriptor_id], :name=>:ed_aad_fkey
+    end
+    
+    create_table(:entity_attributes) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :entities_descriptor_id, :entities_descriptors, :type=>"int(11)", :key=>[:id]
+      foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :key=>[:id]
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      
+      index [:entity_descriptor_id], :name=>:ea_entdesc_fkey
+      index [:entities_descriptor_id], :name=>:ea_entitiesdesc_fkey
+    end
+    
+    create_table(:entity_ids) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
+      
+      index [:entity_descriptor_id], :name=>:eid_ed_fkey
+    end
+    
+    create_table(:idp_sso_descriptors) do
+      primary_key :id, :type=>"int(11)"
+      column :want_authn_requests_signed, "tinyint(1)", :null=>false
+      foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :key=>[:id]
+      
+      index [:entity_descriptor_id], :name=>:ed_idp_fkey
+    end
+    
+    create_table(:publication_infos) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :entities_descriptor_id, :entities_descriptors, :type=>"int(11)", :key=>[:id]
+      foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :key=>[:id]
+      column :publisher, "varchar(255)"
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      
+      index [:entity_descriptor_id], :name=>:pi_entdesc_fkey
+      index [:entities_descriptor_id], :name=>:pi_entitiesdesc_fkey
+    end
+    
+    create_table(:registration_infos) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :entities_descriptor_id, :entities_descriptors, :type=>"int(11)", :key=>[:id]
+      foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :key=>[:id]
+      column :registration_authority, "varchar(255)", :null=>false
+      column :registration_instant, "datetime"
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      
+      index [:entity_descriptor_id], :name=>:ri_entdesc_fkey
+      index [:entities_descriptor_id], :name=>:ri_entitiesdesc_fkey
+    end
+    
+    create_table(:role_descriptors) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
+      foreign_key :organization_id, :organizations, :type=>"int(11)", :key=>[:id]
+      column :error_url, "varchar(255)"
+      column :active, "tinyint(1)"
+      column :extensions, "text"
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      
+      index [:entity_descriptor_id], :name=>:ed_rd_key
+      index [:organization_id], :name=>:o_rd_key
+    end
+    
+    create_table(:sp_sso_descriptors) do
+      primary_key :id, :type=>"int(11)"
+      column :authn_requests_signed, "tinyint(1)", :null=>false
+      column :want_assertions_signed, "tinyint(1)", :null=>false
+      foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :key=>[:id]
+      
+      index [:entity_descriptor_id], :name=>:ed_sp_fkey
     end
     
     create_table(:assertion_consumer_services) do
@@ -155,215 +285,6 @@ Sequel.migration do
       index [:attribute_authority_descriptor_id], :name=>:aad_as_fkey
     end
     
-    create_table(:disco_hints) do
-      primary_key :id, :type=>"int(11)"
-      foreign_key :idp_sso_descriptor_id, :idp_sso_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
-      column :created_at, "datetime"
-      column :updated_at, "datetime"
-      
-      index [:idp_sso_descriptor_id], :name=>:mdui_dh_idp_fkey
-    end
-    
-    create_table(:entity_descriptors) do
-      primary_key :id, :type=>"int(11)"
-      foreign_key :entities_descriptor_id, :entities_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
-      foreign_key :organization_id, :organizations, :type=>"int(11)", :key=>[:id]
-      column :extensions, "text"
-      column :created_at, "datetime"
-      column :updated_at, "datetime"
-      
-      index [:entities_descriptor_id], :name=>:entities_descriptors_id_key
-      index [:organization_id], :name=>:organization_id_key
-    end
-    
-    create_table(:manage_name_id_services) do
-      primary_key :id, :type=>"int(11)"
-      foreign_key :sso_descriptor_id, :sso_descriptors, :type=>"int(11)", :key=>[:id]
-      
-      index [:sso_descriptor_id], :name=>:sso_mnid_fkey
-    end
-    
-    create_table(:name_id_formats) do
-      primary_key :id, :type=>"int(11)"
-      foreign_key :sso_descriptor_id, :sso_descriptors, :type=>"int(11)", :key=>[:id]
-      foreign_key :attribute_authority_descriptor_id, :attribute_authority_descriptors, :type=>"int(11)", :key=>[:id]
-      
-      index [:attribute_authority_descriptor_id], :name=>:aad_nidf_fkey
-      index [:sso_descriptor_id], :name=>:nidf_sso_fkey
-    end
-    
-    create_table(:name_id_mapping_services) do
-      primary_key :id, :type=>"int(11)"
-      foreign_key :idp_sso_descriptor_id, :idp_sso_descriptors, :type=>"int(11)", :key=>[:id]
-      
-      index [:idp_sso_descriptor_id], :name=>:idp_nidms_fkey
-    end
-    
-    create_table(:organization_display_names) do
-      primary_key :id, :type=>"int(11)"
-      foreign_key :organization_id, :organizations, :type=>"int(11)", :null=>false, :key=>[:id]
-      column :created_at, "datetime"
-      column :updated_at, "datetime"
-      
-      index [:organization_id], :name=>:org_odn_ln_fkey
-    end
-    
-    create_table(:organization_names) do
-      primary_key :id, :type=>"int(11)"
-      foreign_key :organization_id, :organizations, :type=>"int(11)", :null=>false, :key=>[:id]
-      column :created_at, "datetime"
-      column :updated_at, "datetime"
-      
-      index [:organization_id], :name=>:org_on_ln_fkey
-    end
-    
-    create_table(:organization_urls) do
-      primary_key :id, :type=>"int(11)"
-      foreign_key :organization_id, :organizations, :type=>"int(11)", :null=>false, :key=>[:id]
-      column :created_at, "datetime"
-      column :updated_at, "datetime"
-      
-      index [:organization_id], :name=>:org_ou_lu_fkey
-    end
-    
-    create_table(:single_logout_services) do
-      primary_key :id, :type=>"int(11)"
-      foreign_key :sso_descriptor_id, :sso_descriptors, :type=>"int(11)", :key=>[:id]
-      
-      index [:sso_descriptor_id], :name=>:sso_slo_fkey
-    end
-    
-    create_table(:single_sign_on_services) do
-      primary_key :id, :type=>"int(11)"
-      foreign_key :idp_sso_descriptor_id, :idp_sso_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
-      
-      index [:idp_sso_descriptor_id], :name=>:idp_ssos_fkey
-    end
-    
-    create_table(:additional_metadata_locations) do
-      primary_key :id, :type=>"int(11)"
-      column :uri, "varchar(255)", :null=>false
-      column :namespace, "varchar(255)", :null=>false
-      column :created_at, "datetime"
-      column :updated_at, "datetime"
-      foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
-      
-      index [:entity_descriptor_id], :name=>:entity_descriptors_id_key
-    end
-    
-    create_table(:domain_hints) do
-      primary_key :id, :type=>"int(11)"
-      foreign_key :disco_hints_id, :disco_hints, :type=>"int(11)", :key=>[:id]
-      column :domain, "varchar(255)", :null=>false
-      column :created_at, "datetime"
-      column :updated_at, "datetime"
-      
-      index [:disco_hints_id], :name=>:dom_disco_hints_fkey
-    end
-    
-    create_table(:entity_attributes) do
-      primary_key :id, :type=>"int(11)"
-      foreign_key :entities_descriptor_id, :entities_descriptors, :type=>"int(11)", :key=>[:id]
-      foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :key=>[:id]
-      column :created_at, "datetime"
-      column :updated_at, "datetime"
-      
-      index [:entity_descriptor_id], :name=>:ea_entdesc_fkey
-      index [:entities_descriptor_id], :name=>:ea_entitiesdesc_fkey
-    end
-    
-    create_table(:entity_ids) do
-      primary_key :id, :type=>"int(11)"
-      foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
-      
-      index [:entity_descriptor_id], :name=>:eid_ed_fkey
-    end
-    
-    create_table(:geolocation_hints) do
-      primary_key :id, :type=>"int(11)"
-      foreign_key :disco_hints_id, :disco_hints, :type=>"int(11)", :key=>[:id]
-      column :uri, "varchar(255)", :null=>false
-      column :created_at, "datetime"
-      column :updated_at, "datetime"
-      
-      index [:disco_hints_id], :name=>:geo_disco_hints_fkey
-    end
-    
-    create_table(:ip_hints) do
-      primary_key :id, :type=>"int(11)"
-      foreign_key :disco_hints_id, :disco_hints, :type=>"int(11)", :key=>[:id]
-      column :block, "varchar(255)", :null=>false
-      column :created_at, "datetime"
-      column :updated_at, "datetime"
-      
-      index [:disco_hints_id], :name=>:ip_disco_hints_fkey
-    end
-    
-    create_table(:publication_infos) do
-      primary_key :id, :type=>"int(11)"
-      foreign_key :entities_descriptor_id, :entities_descriptors, :type=>"int(11)", :key=>[:id]
-      foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :key=>[:id]
-      column :publisher, "varchar(255)"
-      column :created_at, "datetime"
-      column :updated_at, "datetime"
-      
-      index [:entity_descriptor_id], :name=>:pi_entdesc_fkey
-      index [:entities_descriptor_id], :name=>:pi_entitiesdesc_fkey
-    end
-    
-    create_table(:registration_infos) do
-      primary_key :id, :type=>"int(11)"
-      foreign_key :entities_descriptor_id, :entities_descriptors, :type=>"int(11)", :key=>[:id]
-      foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :key=>[:id]
-      column :registration_authority, "varchar(255)", :null=>false
-      column :registration_instant, "datetime"
-      column :created_at, "datetime"
-      column :updated_at, "datetime"
-      
-      index [:entity_descriptor_id], :name=>:ri_entdesc_fkey
-      index [:entities_descriptor_id], :name=>:ri_entitiesdesc_fkey
-    end
-    
-    create_table(:requested_attributes) do
-      primary_key :id, :type=>"int(11)"
-      column :reasoning, "varchar(255)", :null=>false
-      column :required, "tinyint(1)", :null=>false
-      column :approved, "tinyint(1)"
-      column :created_at, "datetime"
-      column :updated_at, "datetime"
-      foreign_key :attribute_consuming_service_id, :attribute_consuming_services, :type=>"int(11)", :null=>false, :key=>[:id]
-      
-      index [:attribute_consuming_service_id], :name=>:attrcs_ra_fkey
-    end
-    
-    create_table(:role_descriptors) do
-      primary_key :id, :type=>"int(11)"
-      foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
-      foreign_key :organization_id, :organizations, :type=>"int(11)", :key=>[:id]
-      column :error_url, "varchar(255)"
-      column :active, "tinyint(1)"
-      column :extensions, "text"
-      column :created_at, "datetime"
-      column :updated_at, "datetime"
-      
-      index [:entity_descriptor_id], :name=>:ed_rd_key
-      index [:organization_id], :name=>:o_rd_key
-    end
-    
-    create_table(:service_descriptions) do
-      primary_key :id, :type=>"int(11)"
-      foreign_key :attribute_consuming_service_id, :attribute_consuming_services, :type=>"int(11)", :null=>false, :key=>[:id]
-      
-      index [:attribute_consuming_service_id], :name=>:acs_sd_ln_fkey
-    end
-    
-    create_table(:service_names) do
-      primary_key :id, :type=>"int(11)"
-      foreign_key :attribute_consuming_service_id, :attribute_consuming_services, :type=>"int(11)", :null=>false, :key=>[:id]
-      
-      index [:attribute_consuming_service_id], :name=>:acs_sn_ln_fkey
-    end
-    
     create_table(:attributes) do
       primary_key :id, :type=>"int(11)"
       column :name, "varchar(255)", :null=>false
@@ -397,6 +318,15 @@ Sequel.migration do
       index [:role_descriptor_id], :name=>:rd_cp_fkey
     end
     
+    create_table(:disco_hints) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :idp_sso_descriptor_id, :idp_sso_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      
+      index [:idp_sso_descriptor_id], :name=>:mdui_dh_idp_fkey
+    end
+    
     create_table(:key_descriptors) do
       primary_key :id, :type=>"int(11)"
       foreign_key :key_info_id, :key_infos, :type=>"int(11)", :key=>[:id]
@@ -408,6 +338,22 @@ Sequel.migration do
       
       index [:key_info_id], :name=>:key_info_id_fkey
       index [:role_descriptor_id], :name=>:rd_kd_fkey
+    end
+    
+    create_table(:name_id_formats) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :sso_descriptor_id, :sso_descriptors, :type=>"int(11)", :key=>[:id]
+      foreign_key :attribute_authority_descriptor_id, :attribute_authority_descriptors, :type=>"int(11)", :key=>[:id]
+      
+      index [:attribute_authority_descriptor_id], :name=>:aad_nidf_fkey
+      index [:sso_descriptor_id], :name=>:nidf_sso_fkey
+    end
+    
+    create_table(:name_id_mapping_services) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :idp_sso_descriptor_id, :idp_sso_descriptors, :type=>"int(11)", :key=>[:id]
+      
+      index [:idp_sso_descriptor_id], :name=>:idp_nidms_fkey
     end
     
     create_table(:protocol_supports) do
@@ -433,6 +379,13 @@ Sequel.migration do
       foreign_key :role_descriptor_id, :role_descriptors, :type=>"int(11)", :key=>[:id]
       
       index [:role_descriptor_id], :name=>:uri_descriptor_id_fkey
+    end
+    
+    create_table(:single_sign_on_services) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :idp_sso_descriptor_id, :idp_sso_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
+      
+      index [:idp_sso_descriptor_id], :name=>:idp_ssos_fkey
     end
     
     create_table(:ui_infos) do
@@ -475,6 +428,16 @@ Sequel.migration do
       index [:ui_info_id], :name=>:dn_ui_info_fkey
     end
     
+    create_table(:domain_hints) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :disco_hints_id, :disco_hints, :type=>"int(11)", :key=>[:id]
+      column :domain, "varchar(255)", :null=>false
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      
+      index [:disco_hints_id], :name=>:dom_disco_hints_fkey
+    end
+    
     create_table(:encryption_methods) do
       primary_key :id, :type=>"int(11)"
       column :algorithm, "varchar(255)", :null=>false
@@ -487,11 +450,31 @@ Sequel.migration do
       index [:key_descriptor_id], :name=>:key_descriptors_enc_fkey
     end
     
+    create_table(:geolocation_hints) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :disco_hints_id, :disco_hints, :type=>"int(11)", :key=>[:id]
+      column :uri, "varchar(255)", :null=>false
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      
+      index [:disco_hints_id], :name=>:geo_disco_hints_fkey
+    end
+    
     create_table(:information_urls) do
       primary_key :id, :type=>"int(11)"
       foreign_key :ui_info_id, :ui_infos, :type=>"int(11)", :key=>[:id]
       
       index [:ui_info_id], :name=>:infourl_ui_info_fkey
+    end
+    
+    create_table(:ip_hints) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :disco_hints_id, :disco_hints, :type=>"int(11)", :key=>[:id]
+      column :block, "varchar(255)", :null=>false
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      
+      index [:disco_hints_id], :name=>:ip_disco_hints_fkey
     end
     
     create_table(:keyword_lists) do
@@ -530,6 +513,32 @@ Sequel.migration do
       foreign_key :ui_info_id, :ui_infos, :type=>"int(11)", :key=>[:id]
       
       index [:ui_info_id], :name=>:privurl_ui_info_fkey
+    end
+    
+    create_table(:requested_attributes) do
+      primary_key :id, :type=>"int(11)"
+      column :reasoning, "varchar(255)", :null=>false
+      column :required, "tinyint(1)", :null=>false
+      column :approved, "tinyint(1)"
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      foreign_key :attribute_consuming_service_id, :attribute_consuming_services, :type=>"int(11)", :null=>false, :key=>[:id]
+      
+      index [:attribute_consuming_service_id], :name=>:attrcs_ra_fkey
+    end
+    
+    create_table(:service_descriptions) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :attribute_consuming_service_id, :attribute_consuming_services, :type=>"int(11)", :null=>false, :key=>[:id]
+      
+      index [:attribute_consuming_service_id], :name=>:acs_sd_ln_fkey
+    end
+    
+    create_table(:service_names) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :attribute_consuming_service_id, :attribute_consuming_services, :type=>"int(11)", :null=>false, :key=>[:id]
+      
+      index [:attribute_consuming_service_id], :name=>:acs_sn_ln_fkey
     end
   end
 end
@@ -618,5 +627,8 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141127031000_create_mdrpi_usage_policies.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141130223957_create_mdattr_entity_attributes.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141201035241_add_entity_attribute_to_attribute.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141202034305_add_entity_descriptor_to_sp_sso_descriptor.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141202045814_add_entity_descriptor_to_idp_sso_descriptor.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141202051116_add_entity_descriptor_to_attribute_authority_descriptor.rb')"
   end
 end

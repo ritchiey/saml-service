@@ -1,6 +1,9 @@
 require 'rails_helper'
 
 RSpec.describe AttributeAuthorityDescriptor, type: :model do
+  it { is_expected.to validate_presence :entity_descriptor }
+  it { is_expected.to have_many_to_one :entity_descriptor }
+
   context 'Extends RoleDescriptor' do
     it { is_expected.to have_one_to_many :attribute_services }
     it { is_expected.to have_one_to_many :assertion_id_request_services }

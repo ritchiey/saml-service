@@ -5,6 +5,9 @@ class EntityDescriptor < Sequel::Model
   one_to_many :additional_metadata_locations
   one_to_many :contact_people
   one_to_many :role_descriptors
+  one_to_many :idp_sso_descriptors
+  one_to_many :sp_sso_descriptors
+  one_to_many :attribute_authority_descriptors
 
   one_to_one :entity_id
 
@@ -16,5 +19,6 @@ class EntityDescriptor < Sequel::Model
     super
     validates_presence [:entities_descriptor, :created_at, :updated_at]
     validates_presence :entity_id, allow_missing: new?
+    validates_presence :role_descriptors, allow_missing: new?
   end
 end

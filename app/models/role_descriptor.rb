@@ -12,6 +12,7 @@ class RoleDescriptor < Sequel::Model
 
   def validate
     super
-    validates_presence [:error_url, :active, :created_at, :updated_at]
+    validates_presence [:entity_descriptor, :error_url,
+                        :active, :created_at, :updated_at]
   end
 end

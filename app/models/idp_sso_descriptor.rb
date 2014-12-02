@@ -9,7 +9,7 @@ class IDPSSODescriptor < SSODescriptor
 
   def validate
     super
-    validates_presence :want_authn_requests_signed
+    validates_presence [:want_authn_requests_signed]
     validates_presence :single_sign_on_services, allow_missing: new?
   end
 end
