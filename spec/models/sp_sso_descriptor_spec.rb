@@ -2,6 +2,9 @@ require 'rails_helper'
 
 describe SPSSODescriptor do
   context 'extends sso_descriptor' do
+    it { is_expected.to validate_presence :entity_descriptor }
+    it { is_expected.to have_many_to_one :entity_descriptor }
+
     it { is_expected.to validate_presence :authn_requests_signed }
     it { is_expected.to validate_presence :want_assertions_signed }
     it { is_expected.to have_one_to_many :attribute_consuming_services }
