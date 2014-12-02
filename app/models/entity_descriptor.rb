@@ -16,5 +16,6 @@ class EntityDescriptor < Sequel::Model
     super
     validates_presence [:entities_descriptor, :created_at, :updated_at]
     validates_presence :entity_id, allow_missing: new?
+    validates_presence :role_descriptors, allow_missing: new?
   end
 end

@@ -5,6 +5,7 @@ describe EntityDescriptor do
 
   it { is_expected.to validate_presence :entities_descriptor }
   it { is_expected.to validate_presence :entity_id }
+  it { is_expected.to validate_presence :role_descriptors }
 
   context 'optional attributes' do
     it { is_expected.to have_many_to_one :organization }
