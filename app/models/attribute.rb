@@ -8,12 +8,14 @@ class Attribute < Sequel::Model
 
   many_to_one :idp_sso_descriptor
   many_to_one :attribute_authority_descriptor
+  many_to_one :entity_attribute, class: 'MDATTR::EntityAttribute'
 
   def validate
     super
     validates_presence [:name, :created_at, :updated_at]
     return if new?
 
-    single_parent [:idp_sso_descriptor, :attribute_authority_descriptor]
+    single_parent [:idp_sso_descriptor, :attribute_authority_descriptor,
+                   :entity_attribute]
   end
 end

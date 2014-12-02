@@ -10,6 +10,7 @@ describe EntitiesDescriptor do
   context 'optional attributes' do
     it { is_expected.to have_one_to_one :registration_info }
     it { is_expected.to have_one_to_one :publication_info }
+    it { is_expected.to have_one_to_one :entity_attribute }
 
     it { is_expected.to have_column :extensions, type: :text }
   end

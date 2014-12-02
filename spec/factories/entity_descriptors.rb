@@ -17,5 +17,11 @@ FactoryGirl.define do
         ed.registration_info = create :mdrpi_registration_info, :with_policy
       end
     end
+
+    trait :with_entity_attribute do
+      after(:create) do | ed |
+        ed.entity_attribute = create :mdattr_entity_attribute, :with_attribute
+      end
+    end
   end
 end
