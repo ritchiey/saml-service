@@ -33,7 +33,7 @@ Sequel.migration do
     
     create_table(:entities_descriptors) do
       primary_key :id, :type=>"int(11)"
-      column :identifier, "varchar(255)", :null=>false
+      column :identifier, "varchar(255)"
       column :name, "varchar(255)", :null=>false
       column :extensions, "text"
       column :created_at, "datetime"

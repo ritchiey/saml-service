@@ -5,8 +5,6 @@ describe RoleDescriptor do
 
   it { is_expected.to validate_presence :entity_descriptor }
   it { is_expected.to have_many_to_one :entity_descriptor }
-
-  it { is_expected.to validate_presence :error_url }
   it { is_expected.to validate_presence :active }
 
   context 'optional attributes' do
