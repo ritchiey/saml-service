@@ -5,8 +5,6 @@ RSpec.describe 'BasicFederation' do
     create :basic_federation
   end
 
-  subject { run }
-
   it 'creates a single EntitiesDescriptor' do
     expect { run }.to change(EntitiesDescriptor, :count).by(1)
   end
@@ -27,10 +25,14 @@ RSpec.describe 'BasicFederation' do
     expect { run }.to change(SPSSODescriptor, :count).by(2)
   end
 
-  it { is_expected.to be_valid }
+  before :all do
+    @entities_descriptor = run
+  end
 
   context 'RoleDescriptors' do
-    subject { run.entity_descriptors.flat_map(&:role_descriptors) }
+    subject do
+      @entities_descriptor.entity_descriptors.flat_map(&:role_descriptors)
+    end
 
     it 'has protocol supports' do
       subject.each { |rd| expect(rd.protocol_supports).not_to be_empty }
@@ -46,7 +48,9 @@ RSpec.describe 'BasicFederation' do
   end
 
   context 'IDPSSODescriptors' do
-    subject { run.entity_descriptors.flat_map(&:idp_sso_descriptors) }
+    subject do
+      @entities_descriptor.entity_descriptors.flat_map(&:idp_sso_descriptors)
+    end
 
     it 'has single sign on service' do
       subject.each { |idp| expect(idp.single_sign_on_services).not_to be_empty }
@@ -54,7 +58,9 @@ RSpec.describe 'BasicFederation' do
   end
 
   context 'SPSSODescriptors' do
-    subject { run.entity_descriptors.flat_map(&:sp_sso_descriptors) }
+    subject do
+      @entities_descriptor.entity_descriptors.flat_map(&:sp_sso_descriptors)
+    end
 
     it 'has assertion consumer services' do
       subject.each do |sp|
@@ -65,7 +71,8 @@ RSpec.describe 'BasicFederation' do
 
   context 'AttributeAuthorityDescriptors' do
     subject do
-      run.entity_descriptors.flat_map(&:attribute_authority_descriptors)
+      @entities_descriptor.entity_descriptors
+        .flat_map(&:attribute_authority_descriptors)
     end
 
     it 'has attribute_services' do
@@ -75,7 +82,8 @@ RSpec.describe 'BasicFederation' do
 
   context 'REFEDS entity category' do
     subject do
-      run.entity_descriptors.find_all { |ed| ed.sp_sso_descriptors.any? }
+      @entities_descriptor.entity_descriptors
+        .find_all { |ed| ed.sp_sso_descriptors.any? }
     end
     context 'Research and Scholarship' do
       it 'is created for each SPSSODescriptor' do
@@ -103,7 +111,7 @@ RSpec.describe 'BasicFederation' do
 
   context 'eduGAIN metadata profile v3' do
     context 'PublicationInfo' do
-      subject { run.publication_info }
+      subject { @entities_descriptor.publication_info }
       it { is_expected.to be_valid }
       it 'has a publisher' do
         expect(subject.publisher).not_to be nil
@@ -111,7 +119,9 @@ RSpec.describe 'BasicFederation' do
     end
 
     context 'RegistrationInfo' do
-      subject { run.entity_descriptors.map(&:registration_info) }
+      subject do
+        @entities_descriptor.entity_descriptors.map(&:registration_info)
+      end
 
       it 'is created for each EntityDescriptor' do
         subject.each { |ri| expect(ri).to be_valid }
@@ -127,7 +137,7 @@ RSpec.describe 'BasicFederation' do
     end
 
     context 'Organization' do
-      subject { run.entity_descriptors.map(&:organization) }
+      subject { @entities_descriptor.entity_descriptors.map(&:organization) }
 
       it 'is created for each EntityDescriptor' do
         subject.each { |o| expect(o).to be_valid }
@@ -147,7 +157,9 @@ RSpec.describe 'BasicFederation' do
     end
 
     context 'ContactPerson' do
-      subject { run.entity_descriptors.flat_map(&:contact_people) }
+      subject do
+        @entities_descriptor.entity_descriptors.flat_map(&:contact_people)
+      end
 
       it 'has contact_person' do
         subject.each { |cp| expect(cp.contact_type).to eq(:technical) }
@@ -159,7 +171,9 @@ RSpec.describe 'BasicFederation' do
     end
 
     context 'SPSSODescriptor' do
-      subject { run.entity_descriptors.flat_map(&:sp_sso_descriptors) }
+      subject do
+        @entities_descriptor.entity_descriptors.flat_map(&:sp_sso_descriptors)
+      end
 
       context 'mdui' do
         it 'has mdui:display_name' do
