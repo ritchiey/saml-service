@@ -13,6 +13,10 @@ describe SPSSODescriptor do
     it 'has at least 1 assertion consumer service' do
       expect(subject).to validate_presence :assertion_consumer_services
     end
+    it 'is invalid without assertion consumer services' do
+      subject.assertion_consumer_services.clear
+      expect(subject).not_to be_valid
+    end
     it 'can store attribute consumer services' do
       expect(subject).to have_one_to_many :attribute_consuming_services
     end
