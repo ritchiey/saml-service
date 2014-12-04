@@ -31,7 +31,7 @@ group :development, :test do
   gem 'guard-bundler'
   gem 'guard-rubocop'
   gem 'guard-rspec'
+  gem 'guard-brakeman'
   gem 'pry-rails'
-  gem 'brakeman'
   gem 'rspec_sequel_matchers', git: 'https://github.com/bradleybeddoes/rspec_sequel_matchers.git'
 end
