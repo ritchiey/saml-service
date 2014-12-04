@@ -12,7 +12,10 @@ describe IDPSSODescriptor do
     it 'has at least 1 single sign on service' do
       expect(subject).to validate_presence :single_sign_on_services
     end
-
+    it 'is invalid without single sign on services' do
+      subject.single_sign_on_services.clear
+      expect(subject).not_to be_valid
+    end
     context 'optional attributes' do
       it { is_expected.to have_one_to_many :name_id_mapping_services }
       it { is_expected.to have_one_to_many :assertion_id_request_services }

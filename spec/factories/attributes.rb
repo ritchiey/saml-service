@@ -2,6 +2,16 @@ FactoryGirl.define do
   factory :_attribute, class: 'Attribute' do
     name { Faker::Lorem.word }
 
+    trait :with_value do
+      transient do
+        value Faker::Lorem.word
+      end
+
+      after :create do |attr, eval|
+        attr.add_attribute_value create :attribute_value, value: eval.value
+      end
+    end
+
     trait :with_values do
       transient do
         number_of_values 3

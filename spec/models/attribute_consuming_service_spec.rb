@@ -14,4 +14,8 @@ describe AttributeConsumingService do
   it 'has at least 1 requested attribute' do
     expect(subject).to validate_presence :requested_attributes
   end
+  it 'is invalid when no requested attributes' do
+    subject.requested_attributes.clear
+    expect(subject).not_to be_valid
+  end
 end

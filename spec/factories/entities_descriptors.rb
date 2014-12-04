@@ -1,7 +1,6 @@
 FactoryGirl.define do
   factory :entities_descriptor do
-    identifier { Faker::Internet.domain_name }
-    name { Faker::Lorem.sentence }
+    name { Faker::Internet.domain_name }
 
     trait :with_publication_info do
       after(:create) do | ed |

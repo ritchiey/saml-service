@@ -4,7 +4,7 @@ Sequel.migration do
     create_table :entities_descriptors do
       primary_key :id
 
-      String :identifier, null: false
+      String :identifier, null: true
       String :name, null: false
       String :extensions, text: true
 

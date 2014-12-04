@@ -1,9 +1,11 @@
 FactoryGirl.define do
   factory :entity_descriptor do
     association :entities_descriptor
+    association :organization
 
     after :create do |ed|
       ed.entity_id = create :entity_id, entity_descriptor: ed
+      ed.add_contact_person create :contact_person
     end
 
     trait :with_publication_info do
@@ -21,6 +23,13 @@ FactoryGirl.define do
     trait :with_entity_attribute do
       after(:create) do | ed |
         ed.entity_attribute = create :mdattr_entity_attribute, :with_attribute
+      end
+    end
+
+    trait :with_refeds_rs_entity_category do
+      after(:create) do | ed |
+        ed.entity_attribute = create :mdattr_entity_attribute,
+                                     :with_refeds_rs_entity_category
       end
     end
   end
