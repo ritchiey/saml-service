@@ -34,5 +34,6 @@ group :development, :test do
   gem 'pry-theme'
   gem 'pry-rails'
   gem 'brakeman'
+  gem 'coveralls'
   gem 'rspec_sequel_matchers', git: 'https://github.com/bradleybeddoes/rspec_sequel_matchers.git'
 end
