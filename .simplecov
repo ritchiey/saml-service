@@ -6,5 +6,5 @@ SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
 ]
 
 SimpleCov.start do
-  add_filter('rails')
+  add_filter('spec')
 end
