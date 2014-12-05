@@ -9,6 +9,7 @@
 /coverage
 **.orig
 rerun.txt
+.ruby-version
 
 config/initializers/secret_token.rb
 config/secrets.yml
@@ -16,10 +17,6 @@ config/secrets.yml
 ## Environment normalisation:
 /.bundle
 /vendor/bundle
-
-## Allow developers to store a non commited list
-## of personal activities
-TODO.md
 
 # these should all be checked in to normalise the environment:
 # Gemfile.lock, .ruby-version, .ruby-gemset

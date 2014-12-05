@@ -10,8 +10,8 @@ test:
   adapter: mysql2
   encoding: utf8
   database: saml_test
-  username: saml_app
-  password: password
+  username: <%= ENV['TRAVIS'] ? 'travis' : 'saml_app' %>
+  password: <%= ENV['TRAVIS'] ? '' : 'password' %>
   host: localhost
 
 production:
