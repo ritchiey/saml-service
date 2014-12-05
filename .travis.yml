@@ -5,3 +5,5 @@ branches:
   only:
     - master
     - develop
+before_script:
+  - mysql -e 'create database saml_test;'

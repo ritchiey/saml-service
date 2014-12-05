@@ -11,7 +11,7 @@ test:
   encoding: utf8
   database: saml_test
   username: saml_app
-  password: password
+  password: <%= ENV['TRAVIS'] ? '' : 'password' %>
   host: localhost
 
 production:
