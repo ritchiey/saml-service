@@ -27,6 +27,7 @@ group :development, :test do
   gem 'factory_girl_rails'
   gem 'simplecov'
   gem 'rubocop'
+  gem 'coveralls'
   gem 'guard'
   gem 'guard-bundler'
   gem 'guard-rubocop'
