@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 # Core
-gem 'rails', '4.1.7'
+gem 'rails', '4.1.8'
 gem 'mysql2'
 gem 'sequel-rails'
 
@@ -11,11 +11,11 @@ gem 'therubyracer',  platforms: :ruby
 gem 'turbolinks'
 
 # JSON
-gem 'jbuilder', '~> 2.0'
+gem 'jbuilder'
 
 # Security
 # Use ActiveModel has_secure_password
-gem 'bcrypt', '~> 3.1.7'
+gem 'bcrypt', '~> 3.1'
 
 # Deployment
 gem 'unicorn'
