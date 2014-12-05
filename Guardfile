@@ -20,7 +20,7 @@ guard :rspec, cmd: 'bundle exec rspec' do
   watch(%r{^app/controllers/(.+)_(controller)\.rb$})  { |m| ["spec/routing/#{m[1]}_routing_spec.rb", "spec/#{m[2]}s/#{m[1]}_#{m[2]}_spec.rb", "spec/acceptance/#{m[1]}_spec.rb"] }
 end
 
-guard 'brakeman' do
+guard :brakeman, quiet: true do
   watch(%r{^app/.+\.(erb|haml|rhtml|rb)$})
   watch(%r{^config/.+\.rb$})
   watch(%r{^lib/.+\.rb$})
