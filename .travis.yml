@@ -7,3 +7,5 @@ branches:
     - develop
 before_script:
   - mysql -e 'create database saml_test;'
+script:
+  - RAILS_ENV=test bundle exec rake --trace db:migrate test
