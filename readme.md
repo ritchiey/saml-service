@@ -18,5 +18,3 @@ AAF service responsible for SAML data storage, metadata generation and inter-fed
 License: Apache 2.0
 
 TODO: Complete this document.
-
-[![Coverage Status](https://coveralls.io/repos/ausaccessfed/saml-service/badge.png?branch=develop)](https://coveralls.io/r/ausaccessfed/saml-service?branch=develop)
