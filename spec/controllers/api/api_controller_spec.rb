@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe API::APIController, type: :controller do
-    controller do
+    controller(API::APIController) do
       def good
         check_access!('permit')
         render nothing: true
@@ -29,11 +29,11 @@ RSpec.describe API::APIController, type: :controller do
   context 'after_action hook' do
     before do
       @routes.draw do
-        get '/anonymous/good' => 'anonymous#good'
-        get '/anonymous/bad' => 'anonymous#bad'
-        get '/anonymous/public' => 'anonymous#public'
-        get '/anonymous/failed' => 'anonymous#failed'
-        get '/anonymous/force_authn' => 'anonymous#force_authn'
+        get '/anonymous/good' => 'api/api#good'
+        get '/anonymous/bad' => 'api/api#bad'
+        get '/anonymous/public' => 'api/api#public'
+        get '/anonymous/failed' => 'api/api#failed'
+        get '/anonymous/force_authn' => 'api/api#force_authn'
       end
     end
 
