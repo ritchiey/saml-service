@@ -5,12 +5,10 @@ RSpec.describe Permission, type: :model do
   it 'has a valid factory' do
     expect(subject).to be_valid
   end
-
   it 'is invalid without a role' do
     subject.role = nil
     expect(subject).not_to be_valid
   end
-
   it 'is invalid without a value' do
     subject.value = nil
     expect(subject).not_to be_valid

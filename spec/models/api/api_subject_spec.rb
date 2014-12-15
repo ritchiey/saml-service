@@ -9,4 +9,7 @@ RSpec.describe API::APISubject, type: :model do
     subject.x509_dn = nil
     expect(subject).not_to be_valid
   end
+  it 'has a relationship to roles' do
+    expect(subject).to respond_to(:roles)
+  end
 end

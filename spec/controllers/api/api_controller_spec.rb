@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe API::APIController, type: :controller do
   controller(API::APIController) do
     def an_action
-      check_access!('permit')
+      check_access!('required:permission')
       render nothing: true
     end
 
@@ -30,7 +30,8 @@ RSpec.describe API::APIController, type: :controller do
   end
 
   context '#after_action' do
-    let(:api_subject) { create :api_subject }
+
+    subject(:api_subject) { create :api_subject }
 
     before do
       request.env['HTTP_X509_DN'] = api_subject.x509_dn
@@ -58,7 +59,15 @@ RSpec.describe API::APIController, type: :controller do
     end
 
     context 'subject with invalid permissions' do
+      subject(:api_subject) do
+        create :api_subject, :authorized, permission: 'invalid:permission'
+      end
+
       has_behavior '#after_action base'
+
+      it 'has an invalid permission' do
+        expect(subject.permissions).to eq(['invalid:permission'])
+      end
 
       it 'fails request when permissions checked' do
         get :an_action
@@ -67,7 +76,15 @@ RSpec.describe API::APIController, type: :controller do
     end
 
     context 'subject with valid permission' do
+      subject(:api_subject) do
+        create :api_subject, :authorized, permission: 'required:permission'
+      end
+
       has_behavior '#after_action base'
+
+      it 'has the valid permission' do
+        expect(subject.permissions).to eq(['required:permission'])
+      end
 
       it 'completes request after permissions checked' do
         get :an_action

@@ -104,6 +104,14 @@ Sequel.migration do
       primary_key :id, :type=>"int(11)"
     end
     
+    create_table(:api_subjects_roles) do
+      foreign_key :role_id, :roles, :type=>"int(11)", :null=>false, :key=>[:id]
+      foreign_key :api_subject_id, :api_subjects, :type=>"int(11)", :null=>false, :key=>[:id]
+      
+      index [:role_id], :name=>:api_subject_role_fkey
+      index [:api_subject_id], :name=>:role_api_subject_fkey
+    end
+    
     create_table(:artifact_resolution_services) do
       primary_key :id, :type=>"int(11)"
       foreign_key :sso_descriptor_id, :sso_descriptors, :type=>"int(11)", :key=>[:id]
@@ -657,5 +665,6 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141212022130_create_api_subjects.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141215022306_create_roles.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141215034636_create_permissions.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141215043512_join_api_subjects_to_roles.rb')"
   end
 end

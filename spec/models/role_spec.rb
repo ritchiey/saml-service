@@ -9,4 +9,7 @@ RSpec.describe Role, type: :model do
     subject.name = nil
     expect(subject).not_to be_valid
   end
+  it 'has a relationship to api_subjects' do
+    expect(subject).to respond_to(:api_subjects)
+  end
 end
