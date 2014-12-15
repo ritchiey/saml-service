@@ -16,6 +16,7 @@ gem 'jbuilder'
 # Security
 # Use ActiveModel has_secure_password
 gem 'bcrypt', '~> 3.1'
+gem 'accession'
 
 # Deployment
 gem 'unicorn', require: false

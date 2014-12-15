@@ -8,6 +8,7 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
+    accession (0.0.2)
     actionmailer (4.1.8)
       actionpack (= 4.1.8)
       actionview (= 4.1.8)
@@ -251,6 +252,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  accession
   bcrypt (~> 3.1)
   coveralls
   factory_girl_rails

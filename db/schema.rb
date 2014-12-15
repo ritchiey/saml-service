@@ -1,5 +1,12 @@
 Sequel.migration do
   change do
+    create_table(:api_subjects) do
+      primary_key :id, :type=>"int(11)"
+      column :x509_dn, "varchar(255)", :null=>false
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+    end
+    
     create_table(:authz_services) do
       primary_key :id, :type=>"int(11)"
     end
@@ -630,5 +637,6 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141202034305_add_entity_descriptor_to_sp_sso_descriptor.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141202045814_add_entity_descriptor_to_idp_sso_descriptor.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141202051116_add_entity_descriptor_to_attribute_authority_descriptor.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141212022130_create_api_api_subjects.rb')"
   end
 end
