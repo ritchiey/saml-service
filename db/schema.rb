@@ -157,6 +157,16 @@ Sequel.migration do
       index [:organization_id], :name=>:org_ou_lu_fkey
     end
     
+    create_table(:permissions) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :role_id, :roles, :type=>"int(11)", :null=>false, :key=>[:id]
+      column :value, "varchar(255)", :null=>false
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      
+      index [:role_id], :name=>:perm_role_fkey
+    end
+    
     create_table(:single_logout_services) do
       primary_key :id, :type=>"int(11)"
       foreign_key :sso_descriptor_id, :sso_descriptors, :type=>"int(11)", :key=>[:id]
@@ -646,5 +656,6 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141202051116_add_entity_descriptor_to_attribute_authority_descriptor.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141212022130_create_api_subjects.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141215022306_create_roles.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141215034636_create_permissions.rb')"
   end
 end
