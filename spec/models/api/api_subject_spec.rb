@@ -1,5 +1,12 @@
 require 'rails_helper'
 
 RSpec.describe API::APISubject, type: :model do
-  it_behaves_like 'a basic model'
+  subject { create :api_subject }
+  it 'has a valid factory' do
+    expect(subject).to be_valid
+  end
+  it 'is invalid without an x509_dn' do
+    subject.x509_dn = nil
+    expect(subject).not_to be_valid
+  end
 end
