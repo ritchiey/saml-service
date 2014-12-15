@@ -87,6 +87,13 @@ Sequel.migration do
       column :updated_at, "datetime"
     end
     
+    create_table(:roles) do
+      primary_key :id, :type=>"int(11)"
+      column :name, "varchar(255)", :null=>false
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+    end
+    
     create_table(:schema_migrations) do
       column :filename, "varchar(255)", :null=>false
       
@@ -637,6 +644,7 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141202034305_add_entity_descriptor_to_sp_sso_descriptor.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141202045814_add_entity_descriptor_to_idp_sso_descriptor.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141202051116_add_entity_descriptor_to_attribute_authority_descriptor.rb')"
-    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141212022130_create_api_api_subjects.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141212022130_create_api_subjects.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141215022306_create_roles.rb')"
   end
 end
