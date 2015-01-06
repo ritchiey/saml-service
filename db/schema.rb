@@ -2,7 +2,11 @@ Sequel.migration do
   change do
     create_table(:api_subjects) do
       primary_key :id, :type=>"int(11)"
-      column :x509_dn, "varchar(255)", :null=>false
+      column :x509_cn, "varchar(255)", :null=>false
+      column :description, "varchar(255)", :null=>false
+      column :contact_name, "varchar(255)", :null=>false
+      column :contact_mail, "varchar(255)", :null=>false
+      column :enabled, "tinyint(1)"
       column :created_at, "datetime"
       column :updated_at, "datetime"
     end
@@ -104,6 +108,18 @@ Sequel.migration do
       primary_key :id, :type=>"int(11)"
     end
     
+    create_table(:subjects) do
+      primary_key :id, :type=>"int(11)"
+      column :targeted_id, "varchar(255)"
+      column :shared_token, "varchar(255)"
+      column :name, "varchar(255)"
+      column :mail, "varchar(255)"
+      column :enabled, "tinyint(1)"
+      column :complete, "tinyint(1)"
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+    end
+    
     create_table(:api_subjects_roles) do
       foreign_key :role_id, :roles, :type=>"int(11)", :null=>false, :key=>[:id]
       foreign_key :api_subject_id, :api_subjects, :type=>"int(11)", :null=>false, :key=>[:id]
@@ -173,6 +189,14 @@ Sequel.migration do
       column :updated_at, "datetime"
       
       index [:role_id], :name=>:perm_role_fkey
+    end
+    
+    create_table(:roles_subjects) do
+      foreign_key :role_id, :roles, :type=>"int(11)", :null=>false, :key=>[:id]
+      foreign_key :subject_id, :subjects, :type=>"int(11)", :null=>false, :key=>[:id]
+      
+      index [:subject_id], :name=>:role_subject_fkey
+      index [:role_id], :name=>:subject_role_fkey
     end
     
     create_table(:single_logout_services) do
@@ -666,5 +690,7 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141215022306_create_roles.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141215034636_create_permissions.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141215043512_join_api_subjects_to_roles.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150105231504_create_subjects.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150105234007_join_subjects_to_roles.rb')"
   end
 end

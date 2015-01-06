@@ -5,13 +5,17 @@ module API
     many_to_many :roles, class: 'Role'
 
     def permissions
-      # This should be extended to gather permissions from role membership
-      # and any other data sources providing input to api_subject identity
       roles.flat_map { |role| role.permissions.map(&:value) }
     end
 
+    def functioning?
+      enabled
+    end
+
     def validate
-      validates_presence [:x509_dn, :created_at, :updated_at]
+      validates_presence [:x509_cn, :description,
+                          :contact_name, :contact_mail, :enabled,
+                          :created_at, :updated_at]
     end
   end
 end
