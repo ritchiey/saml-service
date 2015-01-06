@@ -4,6 +4,8 @@ source 'https://rubygems.org'
 gem 'rails', '4.1.8'
 gem 'mysql2'
 gem 'sequel-rails'
+gem 'aaf-gumboot', git: 'https://github.com/ausaccessfed/aaf-gumboot.git',
+                   branch: 'develop'
 
 # Web
 gem 'uglifier', '>= 1.3.0'

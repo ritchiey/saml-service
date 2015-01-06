@@ -1,4 +1,12 @@
 GIT
+  remote: https://github.com/ausaccessfed/aaf-gumboot.git
+  revision: 08bc25445630e8fce89c67b1c98d5e52937dd65a
+  branch: develop
+  specs:
+    aaf-gumboot (0.0.1)
+      accession
+
+GIT
   remote: https://github.com/bradleybeddoes/rspec_sequel_matchers.git
   revision: 2db08f6b2ee0b8bf8f767ceb19c0919379544405
   specs:
@@ -252,6 +260,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  aaf-gumboot!
   accession
   bcrypt (~> 3.1)
   coveralls
