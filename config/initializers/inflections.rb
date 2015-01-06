@@ -21,4 +21,5 @@ ActiveSupport::Inflector.inflections(:en) do |inflect|
   inflect.acronym 'UI'
   inflect.acronym 'MDRPI'
   inflect.acronym 'MDATTR'
+  inflect.acronym 'API'
 end

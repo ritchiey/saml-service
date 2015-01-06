@@ -1,4 +1,12 @@
 GIT
+  remote: https://github.com/ausaccessfed/aaf-gumboot.git
+  revision: 08bc25445630e8fce89c67b1c98d5e52937dd65a
+  branch: develop
+  specs:
+    aaf-gumboot (0.0.1)
+      accession
+
+GIT
   remote: https://github.com/bradleybeddoes/rspec_sequel_matchers.git
   revision: 2db08f6b2ee0b8bf8f767ceb19c0919379544405
   specs:
@@ -8,6 +16,7 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
+    accession (0.0.2)
     actionmailer (4.1.8)
       actionpack (= 4.1.8)
       actionview (= 4.1.8)
@@ -251,6 +260,8 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  aaf-gumboot!
+  accession
   bcrypt (~> 3.1)
   coveralls
   factory_girl_rails
