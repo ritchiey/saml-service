@@ -22,10 +22,9 @@ class ApplicationController < ActionController::Base
   def ensure_authenticated
     return redirect_to('/auth/login') unless session[:subject_id]
 
-    @subject = Subject.with_pk!(session[:subject_id])
+    @subject = Subject[session[:subject_id]]
+    fail(Unauthorized, 'Subject invalid') unless @subject
     fail(Unauthorized, 'Subject not functional') unless @subject.functioning?
-  rescue Sequel::NoMatchingRow
-    raise(Unauthorized, 'Subject invalid')
   end
 
   def ensure_access_checked
