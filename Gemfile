@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 # Core
-gem 'rails', '4.1.8'
+gem 'rails', '4.2.0'
 gem 'mysql2'
 gem 'sequel-rails'
 gem 'aaf-gumboot', git: 'https://github.com/ausaccessfed/aaf-gumboot.git',

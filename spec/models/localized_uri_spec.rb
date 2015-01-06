@@ -33,5 +33,4 @@ describe LocalizedURI do
       end
     end
   end
-
 end

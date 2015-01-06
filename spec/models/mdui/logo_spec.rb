@@ -73,5 +73,4 @@ RSpec.describe MDUI::Logo, type: :model do
       end
     end
   end
-
 end

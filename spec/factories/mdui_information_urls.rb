@@ -3,5 +3,4 @@ FactoryGirl.define do
                                  parent: :localized_uri do
     association :ui_info, factory: :mdui_ui_info
   end
-
 end
