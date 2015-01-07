@@ -36,5 +36,4 @@ RSpec.describe MDRPI::RegistrationInfo, type: :model do
       expect(subject).not_to be_valid
     end
   end
-
 end

@@ -51,7 +51,5 @@ describe EntityDescriptor do
       subject.add_role_descriptor create :sp_sso_descriptor
       expect(subject).to be_valid
     end
-
   end
-
 end

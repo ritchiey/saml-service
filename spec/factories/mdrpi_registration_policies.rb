@@ -3,5 +3,4 @@ FactoryGirl.define do
                                       parent: :localized_uri do
     registration_info factory: :mdrpi_registration_info
   end
-
 end

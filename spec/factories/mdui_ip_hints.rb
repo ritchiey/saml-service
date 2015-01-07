@@ -3,5 +3,4 @@ FactoryGirl.define do
     block { "#{Faker::Internet.ip_v4_address}/32" }
     association :disco_hints, factory: :mdui_disco_hint
   end
-
 end

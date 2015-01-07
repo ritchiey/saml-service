@@ -3,5 +3,4 @@ FactoryGirl.define do
     domain { Faker::Internet.domain_name }
     association :disco_hints, factory: :mdui_disco_hint
   end
-
 end
