@@ -7,6 +7,8 @@ require 'capybara/rails'
 
 Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require f }
 
+Timecop.safe_mode = true
+
 RSpec.configure do |config|
   config.fixture_path = "#{::Rails.root}/spec/fixtures"
   config.include FactoryGirl::Syntax::Methods

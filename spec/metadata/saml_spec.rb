@@ -46,8 +46,7 @@ RSpec.describe Metadata::SAML do
       context 'has valid attributes' do
         let(:node) { xml.find(:xpath, '/EntitiesDescriptor') }
 
-        before { Timecop.freeze }
-        after { Timecop.return }
+        around { |example| Timecop.freeze { example.run } }
 
         it 'sets ID' do
           expect(node['ID']).to start_with(federation_identifier)
