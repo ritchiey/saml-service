@@ -1,4 +1,8 @@
 class EntitiesDescriptor < Sequel::Model
+  many_to_one :parent_entities_descriptor, class: self
+  one_to_many :entities_descriptors, key: :parent_entities_descriptor_id,
+                                     class: self
+
   one_to_many :entity_descriptors
 
   one_to_one :registration_info, class: 'MDRPI::RegistrationInfo'

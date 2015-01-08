@@ -49,6 +49,9 @@ Sequel.migration do
       column :extensions, "text"
       column :created_at, "datetime"
       column :updated_at, "datetime"
+      foreign_key :parent_entities_descriptor_id, :entities_descriptors, :type=>"int(11)", :key=>[:id]
+      
+      index [:parent_entities_descriptor_id], :name=>:enities_des_parent_fkey
     end
     
     create_table(:indexed_endpoints) do
@@ -692,5 +695,6 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20141215043512_join_api_subjects_to_roles.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150105231504_create_subjects.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150105234007_join_subjects_to_roles.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150108055454_add_self_reference_to_entities_descriptor.rb')"
   end
 end
