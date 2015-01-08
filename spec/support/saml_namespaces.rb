@@ -26,7 +26,7 @@ RSpec.shared_examples 'SAML namespaces' do
     end
     it 'supports SAML SSO IdP discovery profile' do
       expect(ns['xmlns:idpdisc'])
-      .to eq('urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol')
+        .to eq('urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol')
     end
     it 'supports SAML Metadata RPI' do
       expect(ns['xmlns:mdrpi']).to eq('urn:oasis:names:tc:SAML:metadata:rpi')
