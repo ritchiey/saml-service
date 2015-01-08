@@ -40,4 +40,5 @@ group :development, :test do
   gem 'guard-brakeman', require: false
   gem 'pry-rails', require: false
   gem 'capybara', '~> 2.4.4'
+  gem 'timecop', '~>0.7.1'
 end
