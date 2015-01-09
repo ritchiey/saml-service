@@ -1,4 +1,7 @@
 class KeyInfo < Sequel::Model
+  ANCHOR_BEGIN = '-----BEGIN CERTIFICATE-----'
+  ANCHOR_END = '-----END CERTIFICATE-----'
+
   plugin :class_table_inheritance
 
   one_to_one :key_descriptor
@@ -12,5 +15,18 @@ class KeyInfo < Sequel::Model
   def validate
     super
     validates_presence [:data, :created_at, :updated_at]
+  end
+
+  def data=(data)
+    OpenSSL::X509::Certificate.new(data)
+    self[:data] = data
+  end
+
+  def certificate
+    data
+  end
+
+  def certificate_without_anchors
+    data.sub(ANCHOR_BEGIN, '').sub(ANCHOR_END, '')
   end
 end

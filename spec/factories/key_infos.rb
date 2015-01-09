@@ -8,23 +8,28 @@ FactoryGirl.define do
     expiry Time.now + 3600
     subject { subject }
     issuer { issuer }
-    data { generate_certificate subject, issuer }
+    data { generate_certificate subject }
   end
 
-  factory :ca_key_info, class: 'CaKeyInfo', traits: [:base_key_info]
+  factory :ca_key_info, class: 'CaKeyInfo' do
+    base_key_info
+    entities_descriptor
+  end
   factory :key_info do
     base_key_info
   end
 end
 
-def generate_certificate(subject, issuer)
-  cert = OpenSSL::X509::Certificate.new
-  cert.subject = OpenSSL::X509::Name.parse subject
-  cert.issuer = OpenSSL::X509::Name.parse issuer
-  cert.public_key = generate_key.public_key
+def generate_certificate(subject)
+  key = OpenSSL::PKey::RSA.new(1024)
+  public_key = key.public_key
 
+  cert = OpenSSL::X509::Certificate.new
+  cert.subject = cert.issuer = OpenSSL::X509::Name.parse(subject)
+  cert.public_key = public_key
   specify_certificate_defaults cert
 
+  cert.sign key, OpenSSL::Digest::SHA1.new
   cert.to_pem
 end
 
