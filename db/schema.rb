@@ -15,10 +15,6 @@ Sequel.migration do
       primary_key :id, :type=>"int(11)"
     end
     
-    create_table(:ca_key_infos) do
-      primary_key :id, :type=>"int(11)"
-    end
-    
     create_table(:contacts) do
       primary_key :id, :type=>"int(11)"
       column :given_name, "varchar(255)"
@@ -50,6 +46,7 @@ Sequel.migration do
       column :created_at, "datetime"
       column :updated_at, "datetime"
       foreign_key :parent_entities_descriptor_id, :entities_descriptors, :type=>"int(11)", :key=>[:id]
+      column :ca_verify_depth, "int(11)"
       
       index [:parent_entities_descriptor_id], :name=>:enities_des_parent_fkey
     end
@@ -136,6 +133,13 @@ Sequel.migration do
       foreign_key :sso_descriptor_id, :sso_descriptors, :type=>"int(11)", :key=>[:id]
       
       index [:sso_descriptor_id], :name=>:sso_ars_fkey
+    end
+    
+    create_table(:ca_key_infos) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :entities_descriptor_id, :entities_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
+      
+      index [:entities_descriptor_id], :name=>:enities_des_caki_fkey
     end
     
     create_table(:entity_descriptors) do
@@ -696,5 +700,7 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150105231504_create_subjects.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150105234007_join_subjects_to_roles.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150108055454_add_self_reference_to_entities_descriptor.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150109010735_add_entities_descriptor_foreign_key_to_ca_key_infos.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150109011330_add_ca_verify_depth_to_entities_descriptor.rb')"
   end
 end
