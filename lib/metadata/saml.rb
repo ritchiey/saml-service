@@ -42,7 +42,7 @@ module Metadata
         ds.KeyName ki.key_name if ki.key_name
         ds.X509Data do |_|
           ds.X509SubjectName ki.subject if ki.subject
-          ds.X509Certificate ki.certificate_without_anchors.strip
+          ds.X509Certificate ki.certificate_without_anchors
         end
       end
     end
