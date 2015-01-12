@@ -8,3 +8,7 @@ AllCops:
     - bin/**/*
     - db/**/*
     - Guardfile
+
+AbcSize:
+  Exclude:
+    - lib/metadata/**/*
