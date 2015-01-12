@@ -17,6 +17,10 @@ class EntitiesDescriptor < Sequel::Model
   end
 
   def ca_keys?
-    ca_key_infos.try(:any?)
+    ca_key_infos.try(:present?)
+  end
+
+  def publication_info?
+    publication_info.try(:present?)
   end
 end

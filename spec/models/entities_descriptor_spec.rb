@@ -34,12 +34,25 @@ describe EntitiesDescriptor do
     subject { create :entities_descriptor }
 
     it 'is true if ca_key_infos is populated' do
-      subject.add_ca_key_info create :ca_key_info
+      subject.add_ca_key_info(create :ca_key_info)
       expect(subject.ca_keys?).to be
     end
     it 'is false if ca_key_infos is empty' do
       subject.ca_key_infos.clear
       expect(subject.ca_keys?).not_to be
+    end
+  end
+
+  context '#publication_info' do
+    subject { create :entities_descriptor }
+
+    it 'is true if publication_info is populated' do
+      subject.publication_info = create :mdrpi_publication_info
+      expect(subject.publication_info?).to be
+    end
+    it 'is false if ca_key_infos is empty' do
+      subject.publication_info = nil
+      expect(subject.publication_info?).not_to be
     end
   end
 end
