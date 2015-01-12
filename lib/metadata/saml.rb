@@ -29,10 +29,14 @@ module Metadata
       return unless ed.ca_keys?
 
       root.Extensions do |_|
-        shibmd.KeyAuthority(VerifyDepth: ed.ca_verify_depth) do |_|
-          ed.ca_key_infos.each do |ca|
-            key_info(ca)
-          end
+        key_authority(ed) if ed.ca_keys?
+      end
+    end
+
+    def key_authority(ed)
+      shibmd.KeyAuthority(VerifyDepth: ed.ca_verify_depth) do |_|
+        ed.ca_key_infos.each do |ca|
+          key_info(ca)
         end
       end
     end
