@@ -6,18 +6,19 @@ module Metadata
 
     attr_reader :builder
     attr_accessor :federation_identifier, :metadata_name,
-                  :metadata_validity_period, :ca_key_infos, :ca_verify_depth
+                  :metadata_validity_period
 
     def initialize
       @builder = Nokogiri::XML::Builder.new(encoding: 'UTF-8')
     end
 
     def root_entities_descriptor
+      created_at = Time.now.utc
+      expires_at = created_at + metadata_validity_period
       attrs = { ID: "#{federation_identifier}"\
-                    "#{Time.now.utc.to_formatted_s(:number)}",
+                    "#{created_at.to_formatted_s(:number)}",
                 Name: metadata_name,
-                validUntil: (Time.now.utc + metadata_validity_period)
-                            .xmlschema }
+                validUntil: expires_at.xmlschema }
 
       root.EntitiesDescriptor(ns, attrs) do |_|
       end
