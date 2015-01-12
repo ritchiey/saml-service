@@ -12,6 +12,7 @@ module MDRPI
       validates_presence [:publisher, :created_at, :updated_at]
       return if new?
 
+      validates_presence :usage_policies
       single_parent [:entities_descriptor, :entity_descriptor]
     end
   end

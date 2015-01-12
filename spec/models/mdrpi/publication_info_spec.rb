@@ -5,20 +5,24 @@ RSpec.describe MDRPI::PublicationInfo, type: :model do
 
   it { is_expected.to have_many_to_one :entities_descriptor }
   it { is_expected.to have_many_to_one :entity_descriptor }
+  it { is_expected.to have_one_to_many :usage_policies }
 
   it { is_expected.to validate_presence :publisher }
 
-  context 'optional attributes' do
-    it { is_expected.to have_one_to_many :usage_policies }
+  context 'usage policies' do
+    let(:subject) { create :mdrpi_publication_info }
+    it { is_expected.to validate_presence :usage_policies }
   end
 
-  let(:subject) { create :mdrpi_publication_info }
   context 'ownership' do
+    let(:subject) { create :mdrpi_publication_info }
+
     it 'must be owned' do
       expect(subject).not_to be_valid
     end
 
     it 'owned by entities_descriptor' do
+      subject.reload
       subject.entities_descriptor = create :entities_descriptor
       expect(subject).to be_valid
     end
