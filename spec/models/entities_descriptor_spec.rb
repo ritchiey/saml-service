@@ -29,4 +29,17 @@ describe EntitiesDescriptor do
       expect(subject).not_to validate_presence :ca_verify_depth
     end
   end
+
+  context '#ca_keys?' do
+    subject { create :entities_descriptor }
+
+    it 'is true if ca_key_infos is populated' do
+      subject.add_ca_key_info create :ca_key_info
+      expect(subject.ca_keys?).to be
+    end
+    it 'is false if ca_key_infos is empty' do
+      subject.ca_key_infos.clear
+      expect(subject.ca_keys?).not_to be
+    end
+  end
 end

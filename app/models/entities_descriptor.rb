@@ -13,6 +13,10 @@ class EntitiesDescriptor < Sequel::Model
   def validate
     super
     validates_presence [:name, :created_at, :updated_at]
-    validates_presence :ca_verify_depth if ca_key_infos.try(:size) > 0
+    validates_presence :ca_verify_depth if ca_keys?
+  end
+
+  def ca_keys?
+    ca_key_infos.try(:any?)
   end
 end
