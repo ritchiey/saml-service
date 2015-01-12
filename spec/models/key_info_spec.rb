@@ -33,6 +33,7 @@ describe KeyInfo do
       data = subject.certificate
              .sub('-----BEGIN CERTIFICATE-----', '')
              .sub('-----END CERTIFICATE-----', '')
+             .strip
       expect(data).to eq(cert)
     end
   end

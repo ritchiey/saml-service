@@ -23,10 +23,10 @@ class KeyInfo < Sequel::Model
   end
 
   def certificate
-    data
+    data.strip
   end
 
   def certificate_without_anchors
-    data.sub(ANCHOR_BEGIN, '').sub(ANCHOR_END, '')
+    data.sub(ANCHOR_BEGIN, '').sub(ANCHOR_END, '').strip
   end
 end
