@@ -114,7 +114,7 @@ RSpec.describe 'BasicFederation' do
       subject { @entities_descriptor.publication_info }
       it { is_expected.to be_valid }
       it 'has a publisher' do
-         expect(subject.publisher).to be
+        expect(subject.publisher).to be
       end
     end
 
