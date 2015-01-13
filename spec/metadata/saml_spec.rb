@@ -286,4 +286,56 @@ RSpec.describe Metadata::SAML do
       end
     end
   end
+
+  context 'EntityDescriptors', focus: true do
+    let(:entity_descriptor) { create :entity_descriptor }
+    let(:entity_descriptor_path) { '/EntityDescriptor' }
+
+    RSpec.shared_examples 'entity descriptor xml' do
+      it 'is created' do
+        expect(xml).to have_xpath(entity_descriptor_path)
+      end
+
+      context 'attributes' do
+        let(:node) { xml.find(:xpath, entity_descriptor_path) }
+        it 'has correct entityID' do
+          expect(node['entityID']).to eq(entity_descriptor.entity_id.uri)
+        end
+      end
+    end
+
+    context 'Root EntityDescriptor' do
+      before { subject.root_entity_descriptor(entity_descriptor) }
+      include_examples 'entity descriptor xml'
+
+      context 'attributes' do
+        let(:node) { xml.find(:xpath, entity_descriptor_path) }
+
+        it 'sets ID' do
+          expect(node['ID']).to eq(subject.instance_id)
+            .and start_with(federation_identifier)
+        end
+        it 'sets validUntil' do
+          expect(node['validUntil'])
+            .to eq((Time.now.utc + metadata_validity_period).xmlschema)
+        end
+      end
+    end
+
+    context 'Child EntityDescriptor' do
+      before { subject.entity_descriptor(entity_descriptor) }
+      include_examples 'entity descriptor xml'
+
+      context 'attributes' do
+        let(:node) { xml.find(:xpath, entity_descriptor_path) }
+
+        it 'sets ID' do
+          expect(node['ID']).not_to be
+        end
+        it 'sets validUntil' do
+          expect(node['validUntil']).not_to be
+        end
+      end
+    end
+  end
 end
