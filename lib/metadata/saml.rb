@@ -21,13 +21,11 @@ module Metadata
     end
 
     def root_entities_descriptor(entities_descriptor)
-      attrs = { ID: instance_id,
-                Name: metadata_name,
-                validUntil: expires_at.xmlschema }
+      attributes = { ID: instance_id,
+                     Name: metadata_name,
+                     validUntil: expires_at.xmlschema }
 
-      root.EntitiesDescriptor(ns, attrs) do |_|
-        entities_descriptor_extensions(entities_descriptor)
-      end
+      entities_descriptor(entities_descriptor, attributes)
     end
 
     def entities_descriptor_extensions(ed)
@@ -66,6 +64,23 @@ module Metadata
             root.text up.uri
           end
         end
+      end
+    end
+
+    def entities_descriptor(entities_descriptor, attributes = {})
+      root.EntitiesDescriptor(ns, attributes) do |_|
+        entities_descriptor_extensions(entities_descriptor)
+        entities_descriptor.entities_descriptors.each do |ed|
+          entities_descriptor(ed)
+        end
+        entities_descriptor.entity_descriptors.each do |ed|
+          entity_descriptor(ed)
+        end
+      end
+    end
+
+    def entity_descriptor(ed)
+      root.EntityDescriptor(ns, entityID: ed.entity_id.uri) do |_|
       end
     end
 
