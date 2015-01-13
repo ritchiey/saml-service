@@ -3,6 +3,16 @@ require 'rails_helper'
 require 'metadata/saml'
 
 RSpec.describe Metadata::SAML do
+  subject do
+    Metadata::SAML.new(federation_identifier: federation_identifier,
+                       metadata_name: metadata_name,
+                       metadata_validity_period: metadata_validity_period)
+  end
+
+  let(:federation_identifier) { Faker::Internet.domain_word }
+  let(:metadata_name) { "urn:mace:#{federation_identifier}.edu:test" }
+  let(:metadata_validity_period) { 1.weeks }
+
   let(:builder) { subject.builder }
   let(:raw_xml) { builder.to_xml }
   let(:xml) do
@@ -20,25 +30,30 @@ RSpec.describe Metadata::SAML do
 
   context 'Root EntitiesDescriptor' do
     let(:entities_descriptor) { create :basic_federation }
-    let(:add_ca_keys) { true }
-
-    let(:federation_identifier) { Faker::Internet.domain_word }
-    let(:metadata_name) { "urn:mace:#{federation_identifier}.edu:test" }
-    let(:metadata_validity_period) { 1.weeks }
-
+    let(:add_ca_keys) { false }
+    let(:add_publisher_info) { false }
     let(:namespaces) { Nokogiri::XML.parse(raw_xml).collect_namespaces }
 
     let(:entities_descriptor_path) { '/EntitiesDescriptor' }
     let(:extensions_path) { '/EntitiesDescriptor/Extensions' }
     let(:key_authority_path) { "#{extensions_path}/shibmd:KeyAuthority" }
     let(:key_info_path) { "#{key_authority_path}/ds:KeyInfo" }
+    let(:publication_info_path) { "#{extensions_path}/mdrpi:PublicationInfo" }
+    let(:usage_policy_path) { "#{publication_info_path}/mdrpi:UsagePolicy" }
 
     before :each do
-      subject.federation_identifier = federation_identifier
-      subject.metadata_name = metadata_name
-      subject.metadata_validity_period = metadata_validity_period
       create_list(:ca_key_info, 2,
                   entities_descriptor: entities_descriptor) if add_ca_keys
+      if add_publisher_info
+        entities_descriptor.publication_info =
+        create(:mdrpi_publication_info,
+               entities_descriptor: entities_descriptor)
+
+        entities_descriptor.publication_info
+          .add_usage_policy(create :mdrpi_usage_policy,
+                                   publication_info:
+                                     entities_descriptor.publication_info)
+      end
 
       subject.root_entities_descriptor(entities_descriptor)
     end
@@ -57,7 +72,8 @@ RSpec.describe Metadata::SAML do
       around { |example| Timecop.freeze { example.run } }
 
       it 'sets ID' do
-        expect(node['ID']).to start_with(federation_identifier)
+        expect(node['ID']).to eq(subject.instance_id)
+          .and start_with(federation_identifier)
       end
       it 'sets Name' do
         expect(node['Name']).to eq(metadata_name)
@@ -70,13 +86,13 @@ RSpec.describe Metadata::SAML do
 
     context 'CA keys' do
       context 'without CA keys' do
-        let(:add_ca_keys) { false }
         it 'does not populate Extensions node' do
           expect(xml).not_to have_xpath(extensions_path)
         end
       end
 
       context 'with CA keys' do
+        let(:add_ca_keys) { true }
         context 'Extensions' do
           it 'is created' do
             expect(xml).to have_xpath(extensions_path)
@@ -95,6 +111,55 @@ RSpec.describe Metadata::SAML do
             context 'KeyInfo' do
               it 'creates two instances' do
                 expect(xml).to have_xpath(key_info_path, count: 2)
+              end
+            end
+          end
+        end
+      end
+    end
+
+    context 'MDRPI Publisher Info' do
+      let(:add_publisher_info) { true }
+      context 'Extensions' do
+        it 'is created' do
+          expect(xml).to have_xpath(extensions_path)
+        end
+        context 'PublisherInfo' do
+          it 'is created' do
+            expect(xml).to have_xpath(publication_info_path)
+          end
+          context 'attributes' do
+            let(:node) { xml.find(:xpath, publication_info_path) }
+            it 'sets publisher' do
+              expect(node['publisher'])
+                .to eq(entities_descriptor.publication_info.publisher)
+            end
+            it 'sets creationInstant' do
+              expect(node['creationInstant'])
+                .to eq(subject.created_at.xmlschema)
+            end
+            it 'sets publicationId' do
+              expect(node['publicationId']).to eq(subject.instance_id)
+                .and start_with(federation_identifier)
+            end
+          end
+          context 'UsagePolicy' do
+            it 'is created' do
+              expect(xml).to have_xpath(usage_policy_path, count: 2)
+            end
+            context 'attributes' do
+              let(:node) { xml.first(:xpath, usage_policy_path) }
+              it 'sets lang' do
+                expect(node['lang'])
+                  .to eq(entities_descriptor.publication_info
+                         .usage_policies.first.lang)
+              end
+            end
+            context 'value' do
+              let(:node) { xml.first(:xpath, usage_policy_path) }
+              it 'stores expected URL' do
+                expect(node.text).to eq(entities_descriptor.publication_info
+                                        .usage_policies.first.uri)
               end
             end
           end
