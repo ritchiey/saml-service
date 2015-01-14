@@ -10,8 +10,9 @@ module MDRPI
     def validate
       super
       validates_presence [:registration_authority, :created_at, :updated_at]
-      return if new?
 
+      return if new?
+      validates_presence :registration_policies
       single_parent [:entities_descriptor, :entity_descriptor]
     end
   end
