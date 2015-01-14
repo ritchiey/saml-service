@@ -6,17 +6,12 @@ FactoryGirl.define do
     after :create do |ed|
       ed.entity_id = create :entity_id, entity_descriptor: ed
       ed.add_contact_person create :contact_person, entity_descriptor: ed
+      ed.registration_info = create :mdrpi_registration_info
     end
 
     trait :with_publication_info do
       after(:create) do | ed |
         ed.publication_info = create :mdrpi_publication_info, :with_usage_policy
-      end
-    end
-
-    trait :with_registration_info do
-      after(:create) do | ed |
-        ed.registration_info = create :mdrpi_registration_info, :with_policy
       end
     end
 

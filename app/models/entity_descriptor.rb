@@ -21,6 +21,7 @@ class EntityDescriptor < Sequel::Model
     validates_presence :entity_id, allow_missing: new?
     validates_presence :role_descriptors, allow_missing: new?
     validates_presence :organization, allow_missing: new?
+    validates_presence :registration_info, allow_missing: new?
 
     technical_contact?
   end
