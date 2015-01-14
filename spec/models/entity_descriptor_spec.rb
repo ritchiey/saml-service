@@ -25,28 +25,28 @@ describe EntityDescriptor do
     it { is_expected.to have_one_to_one :entity_attribute }
   end
 
-  context 'ensure descriptor validation' do
+  context 'validation' do
     subject { create :entity_descriptor }
 
+    it 'invalid without organization' do
+      subject.organization = nil
+      expect(subject).not_to be_valid
+    end
     it 'invalid when no descriptors' do
       expect(subject).not_to be_valid
     end
-
     it 'valid with role_descriptor' do
       subject.add_role_descriptor create :role_descriptor
       expect(subject).to be_valid
     end
-
     it 'valid with idp_sso_descriptor' do
       subject.add_role_descriptor create :idp_sso_descriptor
       expect(subject).to be_valid
     end
-
     it 'valid with attribute_authority_descriptor' do
       subject.add_role_descriptor create :attribute_authority_descriptor
       expect(subject).to be_valid
     end
-
     it 'valid with sp_sso_descriptor' do
       subject.add_role_descriptor create :sp_sso_descriptor
       expect(subject).to be_valid
