@@ -28,26 +28,67 @@ describe EntityDescriptor do
   context 'validation' do
     subject { create :entity_descriptor }
 
-    it 'invalid without organization' do
-      subject.organization = nil
+    context 'with a valid descriptor' do
+      before { subject.add_role_descriptor create :role_descriptor }
+
+      it 'is invalid without organization' do
+        subject.organization = nil
+        expect(subject).not_to be_valid
+      end
+      it 'is invalid without contacts' do
+        subject.contact_people.first.delete
+        expect(subject).not_to be_valid
+      end
+      it 'is invalid without a technical contact' do
+        subject.contact_people.first.delete
+        subject.add_contact_person(create :contact_person,
+                                          contact_type: :support)
+        expect(subject).not_to be_valid
+      end
+      context 'only a technical contact' do
+        before { subject.add_role_descriptor create :role_descriptor }
+        it { is_expected.to be_valid }
+        it 'has one contact person' do
+          expect(subject.contact_people.size).to eq(1)
+        end
+        it 'has a technical contact person' do
+          expect(subject.contact_people.first.contact_type).to eq(:technical)
+        end
+      end
+      context 'multiple contacts' do
+        before do
+          subject.add_contact_person(create :contact_person,
+                                            contact_type: :support)
+        end
+        it { is_expected.to be_valid }
+        it 'has two contact people' do
+          expect(subject.contact_people.size).to eq(2)
+        end
+        it 'has a technical contact person' do
+          expect(subject.contact_people.first.contact_type).to eq(:technical)
+        end
+        it 'has a support contact person' do
+          expect(subject.contact_people.last.contact_type).to eq(:support)
+        end
+      end
+    end
+
+    it 'is invalid when no descriptors' do
       expect(subject).not_to be_valid
     end
-    it 'invalid when no descriptors' do
-      expect(subject).not_to be_valid
-    end
-    it 'valid with role_descriptor' do
+    it 'is valid with role_descriptor' do
       subject.add_role_descriptor create :role_descriptor
       expect(subject).to be_valid
     end
-    it 'valid with idp_sso_descriptor' do
+    it 'is valid with idp_sso_descriptor' do
       subject.add_role_descriptor create :idp_sso_descriptor
       expect(subject).to be_valid
     end
-    it 'valid with attribute_authority_descriptor' do
+    it 'is valid with attribute_authority_descriptor' do
       subject.add_role_descriptor create :attribute_authority_descriptor
       expect(subject).to be_valid
     end
-    it 'valid with sp_sso_descriptor' do
+    it 'is valid with sp_sso_descriptor' do
       subject.add_role_descriptor create :sp_sso_descriptor
       expect(subject).to be_valid
     end

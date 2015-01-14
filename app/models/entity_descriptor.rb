@@ -21,5 +21,23 @@ class EntityDescriptor < Sequel::Model
     validates_presence :entity_id, allow_missing: new?
     validates_presence :role_descriptors, allow_missing: new?
     validates_presence :organization, allow_missing: new?
+
+    technical_contact?
+  end
+
+  def technical_contact?
+    return if new?
+    error_message = 'must specify a technical contact'
+    errors.add(:contact_people, error_message) if technical_contact_count == 0
+  end
+
+  protected
+
+  def technical_contact_count
+    ContactPerson.join(:entity_descriptors, id: :entity_descriptor_id)
+      .where(Sequel.qualify(:entity_descriptors, :id) => id)
+      .and(Sequel.qualify(:contact_people, :contact_type_id) =>
+           ContactPerson::TYPE[:technical])
+      .count
   end
 end
