@@ -11,7 +11,6 @@ describe EntitiesDescriptor do
 
   context 'optional attributes' do
     it { is_expected.to have_one_to_one :registration_info }
-    it { is_expected.to have_one_to_one :publication_info }
     it { is_expected.to have_one_to_one :entity_attribute }
 
     it { is_expected.to have_column :extensions, type: :text }
@@ -30,6 +29,24 @@ describe EntitiesDescriptor do
     end
   end
 
+  context 'publication_info' do
+    subject { create :entities_descriptor }
+
+    context 'as parent/singular entities_descriptor' do
+      it 'validates publication_info is present' do
+        expect(subject).to validate_presence :publication_info
+      end
+    end
+    context 'as child entities_descriptor' do
+      before do
+        subject.parent_entities_descriptor = create :entities_descriptor
+      end
+      it 'does not validate publication_info is present' do
+        expect(subject).not_to validate_presence :publication_info
+      end
+    end
+  end
+
   context '#ca_keys?' do
     subject { create :entities_descriptor }
 
@@ -43,16 +60,27 @@ describe EntitiesDescriptor do
     end
   end
 
-  context '#publication_info' do
+  context '#publication_info?' do
     subject { create :entities_descriptor }
 
     it 'is true if publication_info is populated' do
-      subject.publication_info = create :mdrpi_publication_info
       expect(subject.publication_info?).to be
     end
-    it 'is false if ca_key_infos is empty' do
+    it 'is false if publication_info is empty' do
       subject.publication_info = nil
       expect(subject.publication_info?).not_to be
+    end
+  end
+
+  context '#sibling?' do
+    subject { create :entities_descriptor }
+
+    it 'is true if parent_entities_descriptor is populated' do
+      subject.parent_entities_descriptor = create :entities_descriptor
+      expect(subject.sibling?).to be
+    end
+    it 'is false if parent_entities_descriptor is not populated' do
+      expect(subject.sibling?).not_to be
     end
   end
 end

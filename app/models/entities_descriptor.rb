@@ -14,6 +14,7 @@ class EntitiesDescriptor < Sequel::Model
     super
     validates_presence [:name, :created_at, :updated_at]
     validates_presence :ca_verify_depth if ca_keys?
+    validates_presence :publication_info unless new? || sibling?
   end
 
   def ca_keys?
@@ -22,5 +23,9 @@ class EntitiesDescriptor < Sequel::Model
 
   def publication_info?
     publication_info.try(:present?)
+  end
+
+  def sibling?
+    parent_entities_descriptor.try(:present?)
   end
 end
