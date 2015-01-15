@@ -198,10 +198,31 @@ RSpec.describe Metadata::SAML do
     end
   end
 
-  context 'EntityDescriptors' do
+  context 'EntityDescriptors', focus: true do
     let(:entity_descriptor) { create :entity_descriptor }
     let(:entity_descriptor_path) { '/EntityDescriptor' }
     let(:extensions_path) { "#{entity_descriptor_path}/Extensions" }
+    let(:idp_path) { "#{entity_descriptor_path}/IDPSSODescriptor" }
+    let(:sp_path) { "#{entity_descriptor_path}/SPSSODescriptor" }
+    let(:aad_path) { "#{entity_descriptor_path}/AttributeAuthorityDescriptor" }
+    let(:organization_path) { "#{entity_descriptor_path}/Organization" }
+
+    let(:create_idp) { false }
+    let(:create_sp) { false }
+    let(:create_aa) { false }
+
+    before do
+      if create_idp
+        create(:idp_sso_descriptor, entity_descriptor: entity_descriptor)
+      end
+      if create_sp
+        create(:sp_sso_descriptor, entity_descriptor: entity_descriptor)
+      end
+      if create_aa
+        create(:attribute_authority_descriptor,
+               entity_descriptor: entity_descriptor)
+      end
+    end
 
     RSpec.shared_examples 'md:EntityDescriptor xml' do
       it 'is created' do
@@ -213,6 +234,41 @@ RSpec.describe Metadata::SAML do
         it 'has correct entityID' do
           expect(node['entityID']).to eq(entity_descriptor.entity_id.uri)
         end
+      end
+
+      context 'RoleDescriptors' do
+        context 'IDPSSODescriptor' do
+          let(:create_idp) { true }
+          it 'creates IDPSSODescriptor node' do
+            expect(xml).to have_xpath(idp_path, count: 1)
+          end
+        end
+        context 'SPSSODescriptor' do
+          let(:create_sp) { true }
+          it 'creates SPSSODescriptor node' do
+            expect(xml).to have_xpath(sp_path, count: 1)
+          end
+        end
+        context 'AttributeAuthorityDescriptor' do
+          let(:create_aa) { true }
+          it 'creates AttributeAuthorityDescriptor node' do
+            expect(xml).to have_xpath(aad_path, count: 1)
+          end
+        end
+        context 'IDPSSODescriptor and AttributeAuthorityDescriptor pairing' do
+          let(:create_idp) { true }
+          let(:create_aa) { true }
+          it 'creates IDPSSODescriptor node' do
+            expect(xml).to have_xpath(idp_path, count: 1)
+          end
+          it 'creates AttributeAuthorityDescriptor node' do
+            expect(xml).to have_xpath(aad_path, count: 1)
+          end
+        end
+      end
+
+      it 'creates an Organization' do
+        expect(xml).to have_xpath(organization_path, count: 1)
       end
     end
 

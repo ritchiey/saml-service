@@ -80,6 +80,16 @@ module Metadata
       end
     end
 
+    def organization(_org)
+      root.Organization(ns) do |_|
+      end
+    end
+
+    def contact_person(_cp)
+      root.ContactPerson(ns) do |_|
+      end
+    end
+
     def root_entity_descriptor(ed)
       attributes = { ID: instance_id,
                      validUntil: expires_at.xmlschema }
@@ -89,12 +99,42 @@ module Metadata
     def entity_descriptor(ed, attributes = {}, root_node = false)
       root.EntityDescriptor(ns, attributes, entityID: ed.entity_id.uri) do |_|
         entity_descriptor_extensions(ed, root_node)
+
+        ed.idp_sso_descriptors.each do |idp|
+          idp_sso_descriptor(idp)
+        end
+        ed.sp_sso_descriptors.each do |sp|
+          sp_sso_descriptor(sp)
+        end
+        ed.attribute_authority_descriptors.each do |aad|
+          attribute_authority_descriptor(aad)
+        end
+
+        organization(ed.organization)
+        ed.contact_people.each do |cp|
+          contact_person(cp)
+        end
       end
     end
 
     def entity_descriptor_extensions(ed, root_node)
       root.Extensions do |_|
         publication_info(ed) if root_node
+      end
+    end
+
+    def idp_sso_descriptor(_idp)
+      root.IDPSSODescriptor(ns) do |_|
+      end
+    end
+
+    def sp_sso_descriptor(_idp)
+      root.SPSSODescriptor(ns) do |_|
+      end
+    end
+
+    def attribute_authority_descriptor(_aad)
+      root.AttributeAuthorityDescriptor(ns) do |_|
       end
     end
 
