@@ -25,15 +25,27 @@ module Metadata
                      Name: metadata_name,
                      validUntil: expires_at.xmlschema }
 
-      entities_descriptor(entities_descriptor, attributes)
+      entities_descriptor(entities_descriptor, attributes, true)
     end
 
-    def entities_descriptor_extensions(ed)
-      return unless ed.ca_keys? || ed.publication_info?
+    def entities_descriptor(entities_descriptor, attributes = {},
+                            root_node = false)
+      root.EntitiesDescriptor(ns, attributes) do |_|
+        entities_descriptor_extensions(entities_descriptor, root_node)
+        entities_descriptor.entities_descriptors.each do |ed|
+          entities_descriptor(ed)
+        end
+        entities_descriptor.entity_descriptors.each do |ed|
+          entity_descriptor(ed)
+        end
+      end
+    end
 
+    def entities_descriptor_extensions(ed, root_node)
+      return unless ed.ca_keys? || root_node
       root.Extensions do |_|
+        publication_info(ed) if root_node
         key_authority(ed) if ed.ca_keys?
-        publication_info(ed) if ed.publication_info?
       end
     end
 
@@ -56,25 +68,14 @@ module Metadata
     end
 
     def publication_info(ed)
-      mdrpi.PublicationInfo(publisher: ed.publication_info.publisher,
+      publication_info = ed.locate_publication_info
+      mdrpi.PublicationInfo(publisher: publication_info.publisher,
                             creationInstant: created_at.xmlschema,
                             publicationId: instance_id) do |_|
-        ed.publication_info.usage_policies.each do |up|
+        publication_info.usage_policies.each do |up|
           mdrpi.UsagePolicy(lang: up.lang) do |_|
             root.text up.uri
           end
-        end
-      end
-    end
-
-    def entities_descriptor(entities_descriptor, attributes = {})
-      root.EntitiesDescriptor(ns, attributes) do |_|
-        entities_descriptor_extensions(entities_descriptor)
-        entities_descriptor.entities_descriptors.each do |ed|
-          entities_descriptor(ed)
-        end
-        entities_descriptor.entity_descriptors.each do |ed|
-          entity_descriptor(ed)
         end
       end
     end
