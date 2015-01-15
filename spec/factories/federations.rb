@@ -1,6 +1,5 @@
 FactoryGirl.define do
-  factory :basic_federation, parent: :entities_descriptor,
-                             traits: [:with_publication_info] do
+  factory :basic_federation, parent: :entities_descriptor do
     # Services
     after :create do | ed |
       ed.add_entity_descriptor create_idp(ed)

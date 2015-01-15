@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe 'BasicFederation' do
   def run
-    create :basic_federation
+    create :basic_federation, :with_publication_info
   end
 
   it 'creates a single EntitiesDescriptor' do
@@ -114,7 +114,7 @@ RSpec.describe 'BasicFederation' do
       subject { @entities_descriptor.publication_info }
       it { is_expected.to be_valid }
       it 'has a publisher' do
-        expect(subject.publisher).not_to be nil
+        expect(subject.publisher).to be
       end
     end
 

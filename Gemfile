@@ -6,6 +6,8 @@ gem 'mysql2'
 gem 'sequel-rails'
 gem 'aaf-gumboot', git: 'https://github.com/ausaccessfed/aaf-gumboot.git',
                    branch: 'develop'
+gem 'accession'
+gem 'nokogiri', '~> 1.6.5'
 
 # Web
 gem 'uglifier', '>= 1.3.0'
@@ -18,7 +20,6 @@ gem 'jbuilder'
 # Security
 # Use ActiveModel has_secure_password
 gem 'bcrypt', '~> 3.1'
-gem 'accession'
 
 # Deployment
 gem 'unicorn', require: false
@@ -37,5 +38,7 @@ group :development, :test do
   gem 'guard-rubocop', require: false
   gem 'guard-rspec', require: false
   gem 'guard-brakeman', require: false
-  gem 'pry-rails', require: false
+  gem 'pry-rails'
+  gem 'capybara', '~> 2.4.4'
+  gem 'timecop', '~>0.7.1'
 end

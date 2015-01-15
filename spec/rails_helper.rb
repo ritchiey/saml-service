@@ -3,8 +3,11 @@ require 'spec_helper'
 require 'factory_girl_rails'
 require File.expand_path('../../config/environment', __FILE__)
 require 'rspec/rails'
+require 'capybara/rails'
 
 Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require f }
+
+Timecop.safe_mode = true
 
 RSpec.configure do |config|
   config.fixture_path = "#{::Rails.root}/spec/fixtures"
