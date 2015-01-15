@@ -21,8 +21,8 @@ class EntitiesDescriptor < Sequel::Model
     ca_key_infos.try(:present?)
   end
 
-  def publication_info?
-    publication_info.try(:present?)
+  def locate_publication_info
+    publication_info || parent_entities_descriptor.locate_publication_info
   end
 
   def sibling?

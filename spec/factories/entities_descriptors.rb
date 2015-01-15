@@ -13,4 +13,9 @@ FactoryGirl.define do
       end
     end
   end
+
+  factory :child_entities_descriptor, class: EntitiesDescriptor do
+    name { Faker::Internet.domain_name }
+    association :parent_entities_descriptor, factory: :entities_descriptor
+  end
 end

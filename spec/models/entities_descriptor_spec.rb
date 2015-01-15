@@ -30,19 +30,31 @@ describe EntitiesDescriptor do
   end
 
   context 'publication_info' do
-    subject { create :entities_descriptor }
-
     context 'as parent/singular entities_descriptor' do
+      subject { create :entities_descriptor }
       it 'validates publication_info is present' do
         expect(subject).to validate_presence :publication_info
       end
     end
     context 'as child entities_descriptor' do
-      before do
-        subject.parent_entities_descriptor = create :entities_descriptor
-      end
+      subject { create :child_entities_descriptor }
       it 'does not validate publication_info is present' do
         expect(subject).not_to validate_presence :publication_info
+      end
+    end
+    context '#locate_publication_info' do
+      subject { create :child_entities_descriptor }
+      let(:local_publication_info) do
+        build :mdrpi_publication_info
+      end
+
+      it 'returns local publication_info if present' do
+        subject.publication_info = local_publication_info
+        expect(subject.locate_publication_info).to eq(local_publication_info)
+      end
+      it 'returns parent entities_descriptor publication_info if not present' do
+        expect(subject.locate_publication_info).to be
+          .and eq(subject.parent_entities_descriptor.publication_info)
       end
     end
   end
@@ -60,27 +72,18 @@ describe EntitiesDescriptor do
     end
   end
 
-  context '#publication_info?' do
-    subject { create :entities_descriptor }
-
-    it 'is true if publication_info is populated' do
-      expect(subject.publication_info?).to be
-    end
-    it 'is false if publication_info is empty' do
-      subject.publication_info = nil
-      expect(subject.publication_info?).not_to be
-    end
-  end
-
   context '#sibling?' do
-    subject { create :entities_descriptor }
-
-    it 'is true if parent_entities_descriptor is populated' do
-      subject.parent_entities_descriptor = create :entities_descriptor
-      expect(subject.sibling?).to be
+    context 'with parent entities descriptor' do
+      subject { create :child_entities_descriptor }
+      it 'is true' do
+        expect(subject.sibling?).to be
+      end
     end
-    it 'is false if parent_entities_descriptor is not populated' do
-      expect(subject.sibling?).not_to be
+    context 'without parent entities descriptor' do
+      subject { create :entities_descriptor }
+      it 'is false' do
+        expect(subject.sibling?).not_to be
+      end
     end
   end
 end
