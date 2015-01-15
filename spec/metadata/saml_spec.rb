@@ -38,7 +38,7 @@ RSpec.describe Metadata::SAML do
     let(:namespaces) { Nokogiri::XML.parse(raw_xml).collect_namespaces }
 
     let(:entities_descriptor_path) { '/EntitiesDescriptor' }
-    let(:extensions_path) { '/EntitiesDescriptor/Extensions' }
+    let(:extensions_path) { "#{entities_descriptor_path}/Extensions" }
 
     let(:entity_descriptor_path) do
       "#{entities_descriptor_path}/EntityDescriptor"
@@ -201,8 +201,9 @@ RSpec.describe Metadata::SAML do
   context 'EntityDescriptors' do
     let(:entity_descriptor) { create :entity_descriptor }
     let(:entity_descriptor_path) { '/EntityDescriptor' }
+    let(:extensions_path) { "#{entity_descriptor_path}/Extensions" }
 
-    RSpec.shared_examples 'entity descriptor xml' do
+    RSpec.shared_examples 'md:EntityDescriptor xml' do
       it 'is created' do
         expect(xml).to have_xpath(entity_descriptor_path)
       end
@@ -217,7 +218,10 @@ RSpec.describe Metadata::SAML do
 
     context 'Root EntityDescriptor' do
       before { subject.root_entity_descriptor(entity_descriptor) }
-      include_examples 'entity descriptor xml'
+      include_examples 'md:EntityDescriptor xml'
+      include_examples 'mdrpi:PublisherInfo xml' do
+        let(:root_node) { entity_descriptor }
+      end
 
       context 'attributes' do
         let(:node) { xml.find(:xpath, entity_descriptor_path) }
@@ -237,7 +241,7 @@ RSpec.describe Metadata::SAML do
 
     context 'EntityDescriptor' do
       before { subject.entity_descriptor(entity_descriptor) }
-      include_examples 'entity descriptor xml'
+      include_examples 'md:EntityDescriptor xml'
 
       context 'attributes' do
         let(:node) { xml.find(:xpath, entity_descriptor_path) }
@@ -248,6 +252,10 @@ RSpec.describe Metadata::SAML do
         it 'sets validUntil' do
           expect(node['validUntil']).not_to be
         end
+      end
+
+      it 'does not create mdrpi:PublisherInfo' do
+        expect(xml).to have_xpath(all_publication_infos, count: 0)
       end
     end
   end
