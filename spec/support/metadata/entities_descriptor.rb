@@ -1,12 +1,14 @@
 RSpec.shared_examples 'EntitiesDescriptor xml' do
   let(:add_ca_keys) { false }
   let(:add_registration_info) { false }
+  let(:add_entity_attributes) { false }
   let(:add_child_entities_descriptors) { false }
   let(:namespaces) { Nokogiri::XML.parse(raw_xml).collect_namespaces }
 
   let(:entities_descriptor_path) { '/EntitiesDescriptor' }
   let(:extensions_path) { "#{entities_descriptor_path}/Extensions" }
   let(:registration_info_path) { "#{extensions_path}/mdrpi:RegistrationInfo" }
+  let(:entity_attributes_path) { "#{extensions_path}/mdattr:EntityAttributes" }
 
   let(:entity_descriptor_path) do
     "#{entities_descriptor_path}/EntityDescriptor"
@@ -21,6 +23,9 @@ RSpec.shared_examples 'EntitiesDescriptor xml' do
     end
     if add_registration_info
       create(:mdrpi_registration_info, entities_descriptor: entities_descriptor)
+    end
+    if add_entity_attributes
+      create(:mdattr_entity_attribute, entities_descriptor: entities_descriptor)
     end
     if add_child_entities_descriptors
       create_list(:child_entities_descriptor, 2,
@@ -63,6 +68,18 @@ RSpec.shared_examples 'EntitiesDescriptor xml' do
       context 'RegistrationInfo not set' do
         it 'does not create RegistrationInfo node' do
           expect(xml).to have_xpath(registration_info_path, count: 0)
+        end
+      end
+
+      context 'with EntityAttributes' do
+        let(:add_entity_attributes) { true }
+        it 'creates EntityAttributes node' do
+          expect(xml).to have_xpath(entity_attributes_path, count: 1)
+        end
+      end
+      context 'without EntityAttributes' do
+        it 'does not create EntityAttributes node' do
+          expect(xml).to have_xpath(entity_attributes_path, count: 0)
         end
       end
     end

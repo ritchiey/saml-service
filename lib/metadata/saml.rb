@@ -42,11 +42,13 @@ module Metadata
     end
 
     def entities_descriptor_extensions(ed, root_node)
-      return unless ed.ca_keys? || ed.registration_info? || root_node
+      return unless ed.ca_keys? || ed.registration_info? ||
+                    ed.entity_attribute? || root_node
       root.Extensions do |_|
         publication_info(ed) if root_node
         registration_info(ed) if ed.registration_info?
         key_authority(ed) if ed.ca_keys?
+        entity_attribute(ed) if ed.entity_attribute?
       end
     end
 
@@ -82,6 +84,10 @@ module Metadata
       end
     end
 
+    def entity_attribute(_ed)
+      mdattr.EntityAttributes(ns)
+    end
+
     def root_entity_descriptor(ed)
       attributes = { ID: instance_id,
                      validUntil: expires_at.xmlschema }
@@ -113,6 +119,7 @@ module Metadata
       root.Extensions do |_|
         publication_info(ed) if root_node
         registration_info(ed)
+        entity_attribute(ed) if ed.entity_attribute?
       end
     end
 

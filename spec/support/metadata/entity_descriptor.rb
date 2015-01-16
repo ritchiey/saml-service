@@ -3,6 +3,7 @@ RSpec.shared_examples 'EntityDescriptor xml' do
   let(:entity_descriptor_path) { '/EntityDescriptor' }
   let(:extensions_path) { "#{entity_descriptor_path}/Extensions" }
   let(:registration_info_path) { "#{extensions_path}/mdrpi:RegistrationInfo" }
+  let(:entity_attributes_path) { "#{extensions_path}/mdattr:EntityAttributes" }
   let(:idp_path) { "#{entity_descriptor_path}/IDPSSODescriptor" }
   let(:sp_path) { "#{entity_descriptor_path}/SPSSODescriptor" }
   let(:aad_path) { "#{entity_descriptor_path}/AttributeAuthorityDescriptor" }
@@ -14,6 +15,7 @@ RSpec.shared_examples 'EntityDescriptor xml' do
   let(:create_idp) { false }
   let(:create_sp) { false }
   let(:create_aa) { false }
+  let(:add_entity_attributes) { false }
 
   before do
     if create_idp
@@ -25,6 +27,9 @@ RSpec.shared_examples 'EntityDescriptor xml' do
     if create_aa
       create(:attribute_authority_descriptor,
              entity_descriptor: entity_descriptor)
+    end
+    if add_entity_attributes
+      create(:mdattr_entity_attribute, entity_descriptor: entity_descriptor)
     end
   end
 
@@ -43,6 +48,18 @@ RSpec.shared_examples 'EntityDescriptor xml' do
     context 'Extensions' do
       it 'creates RegistrationInfo node' do
         expect(xml).to have_xpath(registration_info_path, count: 1)
+      end
+
+      context 'with EntityAttributes' do
+        let(:add_entity_attributes) { true }
+        it 'creates EntityAttributes node' do
+          expect(xml).to have_xpath(entity_attributes_path, count: 1)
+        end
+      end
+      context 'without EntityAttributes' do
+        it 'does not create EntityAttributes node' do
+          expect(xml).to have_xpath(entity_attributes_path, count: 0)
+        end
       end
     end
 
