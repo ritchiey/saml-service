@@ -89,6 +89,15 @@ describe EntityDescriptor do
           expect(subject.contact_people.last.contact_type).to eq(:support)
         end
       end
+      context '#entity_attribute?' do
+        it 'is true when an entity_attribute is set' do
+          subject.entity_attribute = create :mdattr_entity_attribute
+          expect(subject.entity_attribute?).to be
+        end
+        it 'is false when an entity_attribute is not set' do
+          expect(subject.entity_attribute?).not_to be
+        end
+      end
     end
 
     it 'is invalid when no descriptors' do

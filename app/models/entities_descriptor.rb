@@ -25,11 +25,15 @@ class EntitiesDescriptor < Sequel::Model
     registration_info.try(:present?)
   end
 
-  def locate_publication_info
-    publication_info || parent_entities_descriptor.locate_publication_info
+  def entity_attribute?
+    entity_attribute.try(:present?)
   end
 
   def sibling?
     parent_entities_descriptor.try(:present?)
+  end
+
+  def locate_publication_info
+    publication_info || parent_entities_descriptor.locate_publication_info
   end
 end

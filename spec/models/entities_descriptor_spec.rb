@@ -85,6 +85,18 @@ describe EntitiesDescriptor do
     end
   end
 
+  context '#entity_attribute?' do
+    subject { create :entities_descriptor }
+
+    it 'is true when an entity_attribute is set' do
+      subject.entity_attribute = create :mdattr_entity_attribute
+      expect(subject.entity_attribute?).to be
+    end
+    it 'is false when an entity_attribute is not set' do
+      expect(subject.entity_attribute?).not_to be
+    end
+  end
+
   context '#sibling?' do
     context 'with parent entities descriptor' do
       subject { create :child_entities_descriptor }

@@ -36,6 +36,10 @@ class EntityDescriptor < Sequel::Model
     publication_info || entities_descriptor.locate_publication_info
   end
 
+  def entity_attribute?
+    entity_attribute.try(:present?)
+  end
+
   protected
 
   def technical_contact_count
