@@ -82,7 +82,7 @@ RSpec.describe Metadata::SAML do
     end
   end
 
-  context 'Organization', focus: true do
+  context 'Organization' do
     let(:organization) do
       create :organization, :with_multiple_organization_languages
     end
