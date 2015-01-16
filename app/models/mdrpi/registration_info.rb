@@ -15,5 +15,10 @@ module MDRPI
       validates_presence :registration_policies
       single_parent [:entities_descriptor, :entity_descriptor]
     end
+
+    def registration_instant_utc
+      return created_at.utc unless registration_instant
+      registration_instant.utc
+    end
   end
 end

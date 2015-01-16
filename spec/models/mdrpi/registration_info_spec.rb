@@ -40,4 +40,19 @@ RSpec.describe MDRPI::RegistrationInfo, type: :model do
       end
     end
   end
+
+  context '#registration_instant_utc' do
+    let(:subject) { create :mdrpi_registration_info }
+
+    around { |example| Timecop.freeze { example.run } }
+
+    it 'uses created_at if registration_instant not explicitly set' do
+      expect(subject.registration_instant_utc).to eq(subject.created_at.utc)
+    end
+    it 'uses registration_instant if set' do
+      subject.registration_instant = Time.now - 2.months
+      expect(subject.registration_instant_utc)
+        .to eq(subject.registration_instant.utc)
+    end
+  end
 end
