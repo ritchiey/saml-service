@@ -81,7 +81,15 @@ RSpec.describe Metadata::SAML do
       end
     end
   end
-  it 'Organization'
+
+  context 'Organization', focus: true do
+    let(:organization) do
+      create :organization, :with_multiple_organization_languages
+    end
+    before { subject.organization(organization) }
+    include_examples 'Organization xml'
+  end
+
   it 'ContactPerson'
   it 'EntityAttribute'
 end

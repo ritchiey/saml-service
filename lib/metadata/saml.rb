@@ -138,8 +138,23 @@ module Metadata
       end
     end
 
-    def organization(_org)
+    def organization(org)
       root.Organization(ns) do |_|
+        org.organization_names.each do |name|
+          root.OrganizationName(lang: name.lang) do |_|
+            root.text name.value
+          end
+        end
+        org.organization_display_names.each do |dname|
+          root.OrganizationDisplayName(lang: dname.lang) do |_|
+            root.text dname.value
+          end
+        end
+        org.organization_urls.each do |url|
+          root.OrganizationURL(lang: url.lang) do |_|
+            root.text url.uri
+          end
+        end
       end
     end
 
