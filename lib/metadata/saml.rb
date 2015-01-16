@@ -42,9 +42,10 @@ module Metadata
     end
 
     def entities_descriptor_extensions(ed, root_node)
-      return unless ed.ca_keys? || root_node
+      return unless ed.ca_keys? || ed.registration_info? || root_node
       root.Extensions do |_|
         publication_info(ed) if root_node
+        registration_info(ed) if ed.registration_info?
         key_authority(ed) if ed.ca_keys?
       end
     end

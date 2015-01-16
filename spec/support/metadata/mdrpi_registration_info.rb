@@ -13,11 +13,11 @@ RSpec.shared_examples 'mdrpi:RegistrationInfo xml' do
       let(:node) { xml.find(:xpath, registration_info_path) }
       it 'sets registration authority' do
         expect(node['registrationAuthority'])
-          .to eq(entity_descriptor.registration_info.registration_authority)
+          .to eq(root_node.registration_info.registration_authority)
       end
       it 'sets registration instant' do
         expect(node['registrationInstant'])
-          .to eq(entity_descriptor.registration_info
+          .to eq(root_node.registration_info
                    .registration_instant_utc.xmlschema)
       end
     end
@@ -25,7 +25,7 @@ RSpec.shared_examples 'mdrpi:RegistrationInfo xml' do
     context 'Registration Policies' do
       let(:node) { xml.find(:xpath, registration_policies_path) }
       let(:rp) do
-        entity_descriptor.registration_info.registration_policies.first
+        root_node.registration_info.registration_policies.first
       end
       it 'is created' do
         expect(xml).to have_xpath(registration_policies_path, count: 1)

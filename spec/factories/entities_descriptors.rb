@@ -9,7 +9,7 @@ FactoryGirl.define do
 
     trait :with_registration_info do
       after :create do | ed |
-        ed.registration_info = create :mdrpi_registration_info, :with_policy
+        ed.registration_info = create :mdrpi_registration_info
       end
     end
   end
