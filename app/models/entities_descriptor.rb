@@ -21,6 +21,10 @@ class EntitiesDescriptor < Sequel::Model
     ca_key_infos.try(:present?)
   end
 
+  def registration_info?
+    registration_info.try(:present?)
+  end
+
   def locate_publication_info
     publication_info || parent_entities_descriptor.locate_publication_info
   end

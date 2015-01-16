@@ -72,6 +72,19 @@ describe EntitiesDescriptor do
     end
   end
 
+  context '#registration_info?' do
+    subject { create :entities_descriptor }
+
+    it 'is true if registration_info is populated' do
+      subject.registration_info = create(:mdrpi_registration_info)
+      expect(subject.registration_info?).to be
+    end
+    it 'is false if registration_info is empty' do
+      subject.registration_info = nil
+      expect(subject.registration_info?).not_to be
+    end
+  end
+
   context '#sibling?' do
     context 'with parent entities descriptor' do
       subject { create :child_entities_descriptor }
