@@ -20,3 +20,11 @@ ClassLength:
 MethodLength:
   Exclude:
     - lib/metadata/saml.rb
+
+CyclomaticComplexity:
+  Exclude:
+    - lib/metadata/saml.rb
+
+PerceivedComplexity:
+  Exclude:
+    - lib/metadata/saml.rb
