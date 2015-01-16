@@ -69,7 +69,8 @@ module Metadata
 
     def publication_info(ed)
       publication_info = ed.locate_publication_info
-      mdrpi.PublicationInfo(publisher: publication_info.publisher,
+      mdrpi.PublicationInfo(ns,
+                            publisher: publication_info.publisher,
                             creationInstant: created_at.xmlschema,
                             publicationId: instance_id) do |_|
         publication_info.usage_policies.each do |up|
@@ -77,16 +78,6 @@ module Metadata
             root.text up.uri
           end
         end
-      end
-    end
-
-    def organization(_org)
-      root.Organization(ns) do |_|
-      end
-    end
-
-    def contact_person(_cp)
-      root.ContactPerson(ns) do |_|
       end
     end
 
@@ -120,6 +111,23 @@ module Metadata
     def entity_descriptor_extensions(ed, root_node)
       root.Extensions do |_|
         publication_info(ed) if root_node
+        registration_info(ed)
+      end
+    end
+
+    def registration_info(_ed)
+      mdrpi.RegistrationInfo(ns) do |_|
+      end
+    end
+
+    def organization(_org)
+      root.Organization(ns) do |_|
+      end
+    end
+
+    def contact_person(cp)
+      attributes = { contactType: cp.contact_type }
+      root.ContactPerson(ns, attributes) do |_|
       end
     end
 
@@ -136,10 +144,6 @@ module Metadata
     def attribute_authority_descriptor(_aad)
       root.AttributeAuthorityDescriptor(ns) do |_|
       end
-    end
-
-    def to_xml
-      builder.to_xml
     end
   end
 end

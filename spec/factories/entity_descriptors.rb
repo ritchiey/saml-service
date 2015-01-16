@@ -11,7 +11,7 @@ FactoryGirl.define do
 
     trait :with_publication_info do
       after(:create) do | ed |
-        ed.publication_info = create :mdrpi_publication_info, :with_usage_policy
+        ed.publication_info = create :mdrpi_publication_info
       end
     end
 

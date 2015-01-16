@@ -1,8 +1,6 @@
 RSpec.shared_examples 'mdrpi:PublisherInfo xml' do
   context 'MDRPI Publisher Info' do
-    # let(:add_publisher_info) { true }
-
-    let(:publication_info_path) { "#{extensions_path}/mdrpi:PublicationInfo" }
+    let(:publication_info_path) { '/mdrpi:PublicationInfo' }
     let(:usage_policy_path) { "#{publication_info_path}/mdrpi:UsagePolicy" }
 
     context 'PublisherInfo' do
