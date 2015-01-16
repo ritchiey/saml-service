@@ -63,7 +63,11 @@ RSpec.describe Metadata::SAML do
     include_examples 'EntityDescriptor xml'
   end
 
-  it 'RegistrationInfo'
+  context 'RegistrationInfo', focus: true do
+    let(:entity_descriptor) { create(:entity_descriptor) }
+    before { subject.registration_info(entity_descriptor) }
+    include_examples 'mdrpi:RegistrationInfo xml'
+  end
   it 'Organization'
   it 'ContactPerson'
 end

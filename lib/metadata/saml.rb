@@ -115,8 +115,18 @@ module Metadata
       end
     end
 
-    def registration_info(_ed)
-      mdrpi.RegistrationInfo(ns) do |_|
+    def registration_info(ed)
+      attributes = {
+        registrationAuthority: ed.registration_info.registration_authority,
+        registrationInstant: ed.registration_info
+                             .registration_instant_utc.xmlschema
+      }
+      mdrpi.RegistrationInfo(ns, attributes) do |_|
+        ed.registration_info.registration_policies.each do |rp|
+          mdrpi.RegistrationPolicy(lang: rp.lang) do |_|
+            root.text rp.uri
+          end
+        end
       end
     end
 
