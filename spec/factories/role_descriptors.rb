@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :role_descriptor do
-    association :entity_descriptor
+    entity_descriptor
     active true
 
     after :create do |rd|

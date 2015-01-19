@@ -13,5 +13,8 @@ class RoleDescriptor < Sequel::Model
   def validate
     super
     validates_presence [:entity_descriptor, :active, :created_at, :updated_at]
+    return if new?
+
+    validates_presence :protocol_supports
   end
 end

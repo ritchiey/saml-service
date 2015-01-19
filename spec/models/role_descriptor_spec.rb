@@ -3,9 +3,16 @@ require 'rails_helper'
 describe RoleDescriptor do
   it_behaves_like 'a basic model'
 
-  it { is_expected.to validate_presence :entity_descriptor }
-  it { is_expected.to have_many_to_one :entity_descriptor }
-  it { is_expected.to validate_presence :active }
+  context 'validations' do
+    it { is_expected.to validate_presence :entity_descriptor }
+    it { is_expected.to have_many_to_one :entity_descriptor }
+    it { is_expected.to validate_presence :active }
+
+    context 'instance validations' do
+      subject { create :role_descriptor }
+      it { is_expected.to validate_presence :protocol_supports }
+    end
+  end
 
   context 'optional attributes' do
     it { is_expected.to have_many_to_one :organization }
