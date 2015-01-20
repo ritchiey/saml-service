@@ -107,4 +107,18 @@ RSpec.describe Metadata::SAML do
     before { subject.attribute(attribute) }
     include_examples 'saml:Attribute xml'
   end
+
+  context 'RoleDescriptor' do
+    include_examples 'RoleDescriptor xml' do
+      let(:parent_node) { :role_descriptor }
+      let(:role_descriptor_path) { '/RoleDescriptor' }
+      before do
+        subject.root.RoleDescriptor(subject.ns) do |idp|
+          subject.role_descriptor(role_descriptor, idp)
+        end
+      end
+    end
+  end
+
+  it 'KeyDescriptor'
 end

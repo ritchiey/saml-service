@@ -17,4 +17,16 @@ class RoleDescriptor < Sequel::Model
 
     validates_presence :protocol_supports
   end
+
+  def extensions?
+    extensions.try(:present?)
+  end
+
+  def key_descriptors?
+    key_descriptors.try(:present?)
+  end
+
+  def contact_people?
+    contact_people.try(:present?)
+  end
 end

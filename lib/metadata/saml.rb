@@ -198,8 +198,45 @@ module Metadata
       end
     end
 
-    def idp_sso_descriptor(_idp)
-      root.IDPSSODescriptor(ns) do |_|
+    def role_descriptor(rd, scope)
+      scope.parent[:protocolSupportEnumeration] =
+        rd.protocol_supports.map(&:uri).join(',')
+      scope.parent[:errorURL] = rd.error_url if rd.error_url
+
+      if rd.extensions?
+        scope.Extensions do |_|
+          root.text rd.extensions
+        end
+      end
+      if rd.key_descriptors?
+        rd.key_descriptors.each do |kd|
+          key_descriptor(kd)
+        end
+      end
+
+      organization(rd.organization) if rd.organization
+
+      if rd.contact_people?
+        rd.contact_people.each do |cp|
+          contact_person(cp)
+        end
+      end
+    end
+
+    def key_descriptor(_kd)
+      root.KeyDescriptor
+    end
+
+    def sso_descriptor(sso, scope)
+      role_descriptor(sso, scope)
+      scope.NameIDFormat do |_|
+        root.text 'some nameid shit'
+      end
+    end
+
+    def idp_sso_descriptor(idp)
+      root.IDPSSODescriptor(ns) do |idp_node|
+        sso_descriptor(idp, idp_node)
       end
     end
 
