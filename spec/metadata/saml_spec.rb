@@ -37,7 +37,7 @@ RSpec.describe Metadata::SAML do
   context 'KeyInfo' do
     let(:key_info) { create :key_info }
     before { subject.key_info(key_info) }
-    include_examples 'KeyInfo xml'
+    include_examples 'ds:KeyInfo xml'
   end
 
   context 'PublisherInfo' do
