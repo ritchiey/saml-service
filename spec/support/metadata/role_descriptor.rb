@@ -9,7 +9,7 @@ RSpec.shared_examples 'RoleDescriptor xml' do
 
   context 'attributes' do
     context 'protocol supports' do
-      it 'adds as attribute' do
+      it 'is rendered' do
         expect(node['protocolSupportEnumeration'])
           .to eq(role_descriptor.protocol_supports.map(&:uri).join(','))
       end

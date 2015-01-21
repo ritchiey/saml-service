@@ -113,12 +113,16 @@ RSpec.describe Metadata::SAML do
       let(:parent_node) { :role_descriptor }
       let(:role_descriptor_path) { '/RoleDescriptor' }
       before do
-        subject.root.RoleDescriptor(subject.ns) do |idp|
-          subject.role_descriptor(role_descriptor, idp)
+        subject.root.RoleDescriptor(subject.ns) do |rd|
+          subject.role_descriptor(role_descriptor, rd)
         end
       end
     end
   end
 
-  it 'KeyDescriptor'
+  context 'KeyDescriptor' do
+    let(:key_descriptor) { create :key_descriptor }
+    before { subject.key_descriptor(key_descriptor) }
+    include_examples 'KeyDescriptor xml'
+  end
 end

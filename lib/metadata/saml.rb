@@ -215,16 +215,15 @@ module Metadata
       end
 
       organization(rd.organization) if rd.organization
-
-      if rd.contact_people?
-        rd.contact_people.each do |cp|
-          contact_person(cp)
-        end
-      end
+      rd.contact_people.each { |cp| contact_person(cp) } if rd.contact_people?
     end
 
-    def key_descriptor(_kd)
-      root.KeyDescriptor
+    def key_descriptor(kd)
+      attributes = {}
+      attributes[:use] = kd.key_type if kd.key_type?
+      root.KeyDescriptor(ns, attributes) do |_|
+        key_info(kd.key_info)
+      end
     end
 
     def sso_descriptor(sso, scope)
