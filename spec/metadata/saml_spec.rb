@@ -108,7 +108,7 @@ RSpec.describe Metadata::SAML do
     include_examples 'saml:Attribute xml'
   end
 
-  context 'RoleDescriptor' do
+  context 'RoleDescriptors' do
     include_examples 'RoleDescriptor xml' do
       let(:parent_node) { :role_descriptor }
       let(:role_descriptor_path) { '/RoleDescriptor' }
@@ -120,9 +120,26 @@ RSpec.describe Metadata::SAML do
     end
   end
 
-  context 'KeyDescriptor' do
+  context 'KeyDescriptors' do
     let(:key_descriptor) { create :key_descriptor }
     before { subject.key_descriptor(key_descriptor) }
     include_examples 'KeyDescriptor xml'
   end
+
+  context 'SSODescriptors' do
+    include_examples 'SSODescriptor xml' do
+      # In reality this XML path is not valid, but utilising it
+      # here makes for finer grained tests
+      let(:sso_descriptor_path) { '/SSODescriptor' }
+      let(:parent_node) { :sso_descriptor }
+      before do
+        subject.root.SSODescriptor(subject.ns) do |ssod|
+          subject.sso_descriptor(sso_descriptor, ssod)
+        end
+      end
+    end
+  end
+
+  it 'Endpoint'
+  it 'IndexedEndpoint'
 end

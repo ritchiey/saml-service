@@ -22,9 +22,7 @@ FactoryGirl.define do
   factory :_endpoint, class: 'Endpoint', traits: [:endpoint]
   factory :assertion_id_request_service, traits: [:endpoint]
   factory :authz_service, traits: [:endpoint]
-  factory :manage_name_id_service, traits: [:endpoint]
   factory :name_id_mapping_service, traits: [:endpoint]
-  factory :single_logout_service, traits: [:endpoint]
   factory :single_sign_on_service, traits: [:endpoint]
 
   factory :_indexed_endpoint, class: 'IndexedEndpoint',
@@ -32,8 +30,19 @@ FactoryGirl.define do
   factory :assertion_consumer_service, traits: [:indexed_endpoint]
   factory :discovery_response_service, traits: [:indexed_endpoint]
 
+  # SSODescriptor
   factory :artifact_resolution_service do
     indexed_endpoint
+    sso_descriptor
+  end
+
+  factory :single_logout_service do
+    endpoint
+    sso_descriptor
+  end
+
+  factory :manage_name_id_service do
+    endpoint
     sso_descriptor
   end
 

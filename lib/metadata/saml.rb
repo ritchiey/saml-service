@@ -228,8 +228,61 @@ module Metadata
 
     def sso_descriptor(sso, scope)
       role_descriptor(sso, scope)
-      scope.NameIDFormat do |_|
-        root.text 'some nameid shit'
+      if sso.artifact_resolution_services?
+        sso.artifact_resolution_services.each do |ars|
+          artifact_resolution_service(ars)
+        end
+      end
+
+      if sso.single_logout_services?
+        sso.single_logout_services.each do |slo|
+          single_logout_service(slo)
+        end
+      end
+
+      if sso.manage_name_id_services?
+        sso.manage_name_id_services.each do |slo|
+          manage_name_id_service(slo)
+        end
+      end
+
+      return unless sso.name_id_formats?
+      sso.name_id_formats.each do |ndif|
+        root.NameIDFormat do |_|
+          root.text ndif.uri
+        end
+      end
+    end
+
+    def endpoint(ep, scope)
+      scope.parent[:Binding] = ep.binding
+      scope.parent[:Location] = ep.location
+
+      return unless ep.response_location?
+      scope.parent[:ResponseLocation] = ep.response_location
+    end
+
+    def indexed_endpoint(ep, scope)
+      scope.parent[:index] = ep.index
+      scope.parent[:isDefault] = ep.is_default
+      endpoint(ep, scope)
+    end
+
+    def artifact_resolution_service(endpoint)
+      root.ArtifactResolutionService do |ars_node|
+        indexed_endpoint(endpoint, ars_node)
+      end
+    end
+
+    def single_logout_service(ep)
+      root.SingleLogoutService do |slo_node|
+        endpoint(ep, slo_node)
+      end
+    end
+
+    def manage_name_id_service(ep)
+      root.ManageNameIDService do |mnid_node|
+        endpoint(ep, mnid_node)
       end
     end
 

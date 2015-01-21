@@ -7,6 +7,10 @@ RSpec.shared_examples 'RoleDescriptor xml' do
   let(:role_descriptor) { create parent_node }
   let(:node) { xml.first(:xpath, role_descriptor_path) }
 
+  it 'is created' do
+    expect(xml).to have_xpath(role_descriptor_path)
+  end
+
   context 'attributes' do
     context 'protocol supports' do
       it 'is rendered' do
