@@ -20,14 +20,10 @@ FactoryGirl.define do
   end
 
   factory :_endpoint, class: 'Endpoint', traits: [:endpoint]
-  factory :assertion_id_request_service, traits: [:endpoint]
-  factory :authz_service, traits: [:endpoint]
-  factory :name_id_mapping_service, traits: [:endpoint]
-  factory :single_sign_on_service, traits: [:endpoint]
-
   factory :_indexed_endpoint, class: 'IndexedEndpoint',
                               traits: [:indexed_endpoint]
-  factory :assertion_consumer_service, traits: [:indexed_endpoint]
+
+  factory :authz_service, traits: [:endpoint]
   factory :discovery_response_service, traits: [:indexed_endpoint]
 
   # SSODescriptor
@@ -46,8 +42,29 @@ FactoryGirl.define do
     sso_descriptor
   end
 
+  # IDPSSODescriptor
+  factory :single_sign_on_service do
+    endpoint
+    idp_sso_descriptor
+  end
+
+  factory :name_id_mapping_service do
+    endpoint
+    idp_sso_descriptor
+  end
+
+  # AttributeAuthorityDescriptor
   factory :attribute_service do
     endpoint
     association :attribute_authority_descriptor
+  end
+
+  # IDPSSODescriptor or AttributeAuthorityDescriptor
+  factory :assertion_id_request_service, traits: [:endpoint]
+
+  # SPSSODescritpor
+  factory :assertion_consumer_service do
+    indexed_endpoint
+    sp_sso_descriptor
   end
 end
