@@ -1,5 +1,6 @@
 FactoryGirl.define do
   trait :endpoint do
+    binding { "urn:oasis:names:tc:SAML:2.0:bindings:#{Faker::Lorem.word}" }
     location { Faker::Internet.url 'example.com' }
   end
 
@@ -28,9 +29,13 @@ FactoryGirl.define do
 
   factory :_indexed_endpoint, class: 'IndexedEndpoint',
                               traits: [:indexed_endpoint]
-  factory :artifact_resolution_service, traits: [:indexed_endpoint]
   factory :assertion_consumer_service, traits: [:indexed_endpoint]
   factory :discovery_response_service, traits: [:indexed_endpoint]
+
+  factory :artifact_resolution_service do
+    indexed_endpoint
+    sso_descriptor
+  end
 
   factory :attribute_service do
     endpoint
