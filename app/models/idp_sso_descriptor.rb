@@ -12,4 +12,24 @@ class IDPSSODescriptor < SSODescriptor
     validates_presence [:want_authn_requests_signed]
     validates_presence :single_sign_on_services, allow_missing: new?
   end
+
+  def name_id_mapping_services?
+    name_id_mapping_services.try(:present?)
+  end
+
+  def assertion_id_request_services?
+    assertion_id_request_services.try(:present?)
+  end
+
+  def attribute_profiles?
+    attribute_profiles.try(:present?)
+  end
+
+  def attributes?
+    attributes.try(:present?)
+  end
+
+  def disco_hints?
+    disco_hints.try(:present?)
+  end
 end
