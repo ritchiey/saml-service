@@ -165,4 +165,31 @@ RSpec.describe Metadata::SAML do
       end
     end
   end
+
+  context 'ArtifactResolutionService' do
+    include_examples 'IndexedEndpoint xml' do
+      let(:endpoint_path) { '/ArtifactResolutionService' }
+      let(:parent_node) { :artifact_resolution_service }
+      let(:endpoint) { create parent_node }
+      before { subject.artifact_resolution_service(endpoint) }
+    end
+  end
+
+  context 'SingleLogoutService' do
+    include_examples 'Endpoint xml' do
+      let(:endpoint_path) { '/SingleLogoutService' }
+      let(:parent_node) { :single_logout_service }
+      let(:endpoint) { create parent_node }
+      before { subject.single_logout_service(endpoint) }
+    end
+  end
+
+  context 'ManagenameIDService' do
+    include_examples 'Endpoint xml' do
+      let(:endpoint_path) { '/ManageNameIDService' }
+      let(:parent_node) { :manage_name_id_service }
+      let(:endpoint) { create parent_node }
+      before { subject.manage_name_id_service(endpoint) }
+    end
+  end
 end
