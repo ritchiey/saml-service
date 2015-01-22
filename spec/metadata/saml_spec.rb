@@ -140,6 +140,29 @@ RSpec.describe Metadata::SAML do
     end
   end
 
-  it 'Endpoint'
-  it 'IndexedEndpoint'
+  context 'Endpoint' do
+    include_examples 'Endpoint xml' do
+      let(:endpoint_path) { '/Endpoint' }
+      let(:parent_node) { :_endpoint }
+      let(:endpoint) { create parent_node }
+      before do
+        subject.root.Endpoint(subject.ns) do |ep|
+          subject.endpoint(endpoint, ep)
+        end
+      end
+    end
+  end
+
+  context 'IndexedEndpoint' do
+    include_examples 'IndexedEndpoint xml' do
+      let(:endpoint_path) { '/IndexedEndpoint' }
+      let(:parent_node) { :_indexed_endpoint }
+      let(:endpoint) { create parent_node }
+      before do
+        subject.root.IndexedEndpoint(subject.ns) do |ep|
+          subject.indexed_endpoint(endpoint, ep)
+        end
+      end
+    end
+  end
 end
