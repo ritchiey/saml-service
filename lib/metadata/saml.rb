@@ -342,9 +342,33 @@ module Metadata
       end
     end
 
-    def sp_sso_descriptor(_idp)
-      root.SPSSODescriptor(ns) do |_|
+    def sp_sso_descriptor(sp)
+      attributes = {}
+      attributes[:AuthnRequestsSigned] = sp.authn_requests_signed
+      attributes[:WantAssertionsSigned] = sp.want_assertions_signed
+      root.SPSSODescriptor(ns, attributes) do |sp_node|
+        sso_descriptor(sp, sp_node)
+
+        sp.assertion_consumer_services.each do |acs|
+          assertion_consumer_service(acs)
+        end
+
+        if sp.attribute_consuming_services?
+          sp.attribute_consuming_services.each do |attrcs|
+            attribute_consuming_service(attrcs)
+          end
+        end
       end
+    end
+
+    def assertion_consumer_service(ep)
+      root.AssertionConsumerService do |acs_node|
+        indexed_endpoint(ep, acs_node)
+      end
+    end
+
+    def attribute_consuming_service(_acs)
+      root.AttributeConsumingService(ns)
     end
 
     def attribute_authority_descriptor(_aad)

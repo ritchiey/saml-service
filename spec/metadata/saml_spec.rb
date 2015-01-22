@@ -249,4 +249,43 @@ RSpec.describe Metadata::SAML do
       before { subject.assertion_id_request_service(endpoint) }
     end
   end
+
+  context 'SPSSODescriptor' do
+    let(:sp_sso_descriptor_path) { '/SPSSODescriptor' }
+
+    context 'Parent nodes and abstract types' do
+      let(:parent_node) { :sp_sso_descriptor }
+
+      context 'RoleDescriptorType' do
+        let(:role_descriptor_path) { sp_sso_descriptor_path }
+        let(:role_descriptor) { create parent_node }
+        before { subject.sp_sso_descriptor(role_descriptor) }
+        include_examples 'RoleDescriptor xml'
+      end
+
+      context 'SSODescriptorType' do
+        let(:sso_descriptor_path) { sp_sso_descriptor_path }
+        let(:sso_descriptor) { create parent_node }
+        before { subject.sp_sso_descriptor(sso_descriptor) }
+        include_examples 'SSODescriptor xml'
+      end
+    end
+
+    context 'SPSSODescriptorType' do
+      let(:sp_sso_descriptor) { create :sp_sso_descriptor }
+      before { subject.sp_sso_descriptor(sp_sso_descriptor) }
+      include_examples 'SPSSODescriptor xml'
+    end
+  end
+
+  context 'AssertionConsumerService' do
+    include_examples 'IndexedEndpoint xml' do
+      let(:endpoint_path) { '/AssertionConsumerService' }
+      let(:parent_node) { :assertion_consumer_service }
+      let(:endpoint) { create parent_node }
+      before { subject.assertion_consumer_service(endpoint) }
+    end
+  end
+
+  it 'AttributeConsumingService'
 end
