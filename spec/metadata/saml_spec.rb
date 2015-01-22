@@ -287,5 +287,17 @@ RSpec.describe Metadata::SAML do
     end
   end
 
-  it 'AttributeConsumingService'
+  context 'AttributeConsumingService' do
+    let(:attribute_consuming_service_path) { '/AttributeConsumingService' }
+    let(:attribute_consuming_service) { create :attribute_consuming_service }
+    before { subject.attribute_consuming_service(attribute_consuming_service) }
+    include_examples 'AttributeConsumingService xml'
+  end
+
+  context 'RequestedAttributes' do
+    let(:requested_attribute_path) { '/RequestedAttribute' }
+    let(:requested_attribute) { create :requested_attribute }
+    before { subject.requested_attribute(requested_attribute) }
+    include_examples 'RequestedAttribute xml'
+  end
 end

@@ -1,0 +1,80 @@
+RSpec.shared_examples 'AttributeConsumingService xml' do
+  let(:service_name_path) { "#{attribute_consuming_service_path}/ServiceName" }
+  let(:requested_attribute_path) do
+    "#{attribute_consuming_service_path}/RequestedAttribute"
+  end
+  it 'is created' do
+    expect(xml).to have_xpath(attribute_consuming_service_path)
+  end
+
+  context 'attributes' do
+    let(:node) { xml.first(:xpath, attribute_consuming_service_path) }
+
+    context 'index' do
+      it 'is rendered' do
+        expect(node['index']).to be
+      end
+      it 'has expected value' do
+        expect(node['index']).to eq(attribute_consuming_service.index.to_s)
+      end
+    end
+
+    context 'isDefault' do
+      it 'is rendered' do
+        expect(node['isDefault']).to be
+      end
+      it 'has expected value' do
+        expect(node['isDefault'])
+          .to eq(attribute_consuming_service.default.to_s)
+      end
+    end
+  end
+
+  context 'ServiceNames' do
+    let(:node) { xml.first(:xpath, service_name_path) }
+    it 'is created' do
+      expect(xml).to have_xpath(service_name_path)
+    end
+
+    context 'attributes' do
+      context 'lang' do
+        it 'is rendered' do
+          expect(node['lang']).to be
+        end
+        it 'has expected value' do
+          expect(node['lang'])
+            .to eq(attribute_consuming_service.service_names.first.lang)
+        end
+      end
+    end
+
+    it 'has expected value' do
+      expect(node.text)
+        .to eq(attribute_consuming_service.service_names.first.value)
+    end
+
+    context 'multiple names' do
+      let(:attribute_consuming_service) do
+        create :attribute_consuming_service, :with_multiple_service_names
+      end
+      it 'renders multiple' do
+        expect(xml).to have_xpath(service_name_path, count: 3)
+      end
+    end
+  end
+
+  context 'RequestedAttributes' do
+    it 'is created' do
+      expect(xml).to have_xpath(requested_attribute_path)
+    end
+
+    context 'multiple attributes' do
+      let(:attribute_consuming_service) do
+        create :attribute_consuming_service, :with_multiple_requested_attributes
+      end
+      it 'renders multiple' do
+        expect(xml).to have_xpath(requested_attribute_path, count: 3)
+      end
+    end
+  end
+end

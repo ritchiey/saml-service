@@ -8,6 +8,23 @@ module Metadata
                 :federation_identifier, :metadata_name,
                 :metadata_validity_period
 
+    protected
+
+    # Prevent NoMethodError by defining before any usage
+    def attribute_base(attr, scope)
+      scope.parent[:Name] = attr.name
+      scope.parent[:NameFormat] = attr.name_format.uri if attr.name_format
+      scope.parent[:FriendlyName] = attr.friendly_name if attr.friendly_name
+
+      return unless attr.attribute_values
+
+      attr.attribute_values.each do |attr_val|
+        attribute_value(attr_val)
+      end
+    end
+
+    public
+
     def initialize(params)
       params.each do |k, v|
         instance_variable_set("@#{k}", v)
@@ -93,15 +110,8 @@ module Metadata
     end
 
     def attribute(attr)
-      attributes = { Name: attr.name }
-      attributes[:NameFormat] = attr.name_format.uri if attr.name_format
-      attributes[:FriendlyName] = attr.friendly_name if attr.friendly_name
-      saml.Attribute(ns, attributes) do |_|
-        if attr.attribute_values
-          attr.attribute_values.each do |attr_val|
-            attribute_value(attr_val)
-          end
-        end
+      saml.Attribute(ns) do |a|
+        attribute_base(attr, a)
       end
     end
 
@@ -367,8 +377,28 @@ module Metadata
       end
     end
 
-    def attribute_consuming_service(_acs)
-      root.AttributeConsumingService(ns)
+    def attribute_consuming_service(acs)
+      attributes = {
+        index: acs.index,
+        isDefault: acs.default
+      }
+      root.AttributeConsumingService(ns, attributes) do |_acs_node|
+        acs.service_names.each do |service_name|
+          root.ServiceName(lang: service_name.lang) do |_|
+            root.text service_name.value
+          end
+        end
+        acs.requested_attributes.each do |ra|
+          requested_attribute(ra)
+        end
+      end
+    end
+
+    def requested_attribute(attr)
+      attributes = { isRequired: attr.required }
+      root.RequestedAttribute(ns, attributes) do |ra|
+        attribute_base(attr, ra)
+      end
     end
 
     def attribute_authority_descriptor(_aad)

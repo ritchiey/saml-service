@@ -56,7 +56,7 @@ RSpec.shared_examples 'saml:Attribute xml' do
       end
       context 'Attribute has attribute_values' do
         let(:attribute) { create :attribute, :with_values }
-        it 'is not created' do
+        it 'is created' do
           expect(xml).to have_xpath(attribute_value_path, count: 3)
         end
 
