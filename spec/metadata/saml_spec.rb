@@ -110,8 +110,9 @@ RSpec.describe Metadata::SAML do
 
   context 'RoleDescriptors' do
     include_examples 'RoleDescriptor xml' do
-      let(:parent_node) { :role_descriptor }
       let(:role_descriptor_path) { '/RoleDescriptor' }
+      let(:parent_node) { :role_descriptor }
+      let(:role_descriptor) { create parent_node }
       before do
         subject.root.RoleDescriptor(subject.ns) do |rd|
           subject.role_descriptor(role_descriptor, rd)
@@ -132,6 +133,7 @@ RSpec.describe Metadata::SAML do
       # here makes for finer grained tests
       let(:sso_descriptor_path) { '/SSODescriptor' }
       let(:parent_node) { :sso_descriptor }
+      let(:sso_descriptor) { create parent_node }
       before do
         subject.root.SSODescriptor(subject.ns) do |ssod|
           subject.sso_descriptor(sso_descriptor, ssod)
@@ -184,12 +186,67 @@ RSpec.describe Metadata::SAML do
     end
   end
 
-  context 'ManagenameIDService' do
+  context 'ManageNameIDService' do
     include_examples 'Endpoint xml' do
       let(:endpoint_path) { '/ManageNameIDService' }
       let(:parent_node) { :manage_name_id_service }
       let(:endpoint) { create parent_node }
       before { subject.manage_name_id_service(endpoint) }
+    end
+  end
+
+  context 'IDPSSODescriptor' do
+    let(:idp_sso_descriptor_path) { '/IDPSSODescriptor' }
+
+    context 'Parent nodes and abstract types' do
+      let(:parent_node) { :idp_sso_descriptor }
+
+      context 'RoleDescriptorType' do
+        let(:role_descriptor_path) { idp_sso_descriptor_path }
+        let(:role_descriptor) { create parent_node }
+        before { subject.idp_sso_descriptor(role_descriptor) }
+        include_examples 'RoleDescriptor xml'
+      end
+
+      context 'SSODescriptorType' do
+        let(:sso_descriptor_path) { idp_sso_descriptor_path }
+        let(:sso_descriptor) { create parent_node }
+        before { subject.idp_sso_descriptor(sso_descriptor) }
+        include_examples 'SSODescriptor xml'
+      end
+    end
+
+    context 'IDPSSODescriptorType' do
+      let(:idp_sso_descriptor) { create :idp_sso_descriptor }
+      before { subject.idp_sso_descriptor(idp_sso_descriptor) }
+      include_examples 'IDPSSODescriptor xml'
+    end
+  end
+
+  context 'SingleSignOnService' do
+    include_examples 'Endpoint xml' do
+      let(:endpoint_path) { '/SingleSignOnService' }
+      let(:parent_node) { :single_sign_on_service }
+      let(:endpoint) { create parent_node }
+      before { subject.single_sign_on_service(endpoint) }
+    end
+  end
+
+  context 'NameIDMappingService' do
+    include_examples 'Endpoint xml' do
+      let(:endpoint_path) { '/NameIDMappingService' }
+      let(:parent_node) { :name_id_mapping_service }
+      let(:endpoint) { create parent_node }
+      before { subject.name_id_mapping_service(endpoint) }
+    end
+  end
+
+  context 'AssertionIDRequestService' do
+    include_examples 'Endpoint xml' do
+      let(:endpoint_path) { '/AssertionIDRequestService' }
+      let(:parent_node) { :assertion_id_request_service }
+      let(:endpoint) { create parent_node }
+      before { subject.assertion_id_request_service(endpoint) }
     end
   end
 end

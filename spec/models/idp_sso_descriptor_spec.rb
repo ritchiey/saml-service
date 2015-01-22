@@ -89,5 +89,22 @@ describe IDPSSODescriptor do
         end
       end
     end
+
+    describe '#disco_hints?' do
+      context 'when populated' do
+        subject do
+          create(:idp_sso_descriptor, :with_disco_hints)
+        end
+        it 'is true' do
+          expect(subject.disco_hints?).to be
+        end
+      end
+      context 'when unpopulated' do
+        subject { create :idp_sso_descriptor }
+        it 'is false' do
+          expect(subject.disco_hints?).not_to be
+        end
+      end
+    end
   end
 end

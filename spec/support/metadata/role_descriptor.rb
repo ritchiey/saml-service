@@ -4,7 +4,6 @@ RSpec.shared_examples 'RoleDescriptor xml' do
   let(:organization_path) { "#{role_descriptor_path}/Organization" }
   let(:contacts_path) { "#{role_descriptor_path}/ContactPerson" }
 
-  let(:role_descriptor) { create parent_node }
   let(:node) { xml.first(:xpath, role_descriptor_path) }
 
   it 'is created' do
@@ -54,7 +53,7 @@ RSpec.shared_examples 'RoleDescriptor xml' do
 
   context 'KeyDescriptors' do
     context 'when populated' do
-      let(:role_descriptor) { create :role_descriptor, :with_key_descriptors }
+      let(:role_descriptor) { create parent_node, :with_key_descriptors }
       it 'is rendered' do
         expect(xml).to have_xpath(key_descriptors_path, count: 2)
       end
@@ -68,7 +67,7 @@ RSpec.shared_examples 'RoleDescriptor xml' do
 
   context 'Organization' do
     context 'when populated' do
-      let(:role_descriptor) { create :role_descriptor, :with_organization }
+      let(:role_descriptor) { create parent_node, :with_organization }
       it 'is rendered when present' do
         expect(xml).to have_xpath(organization_path, count: 1)
       end
@@ -82,7 +81,7 @@ RSpec.shared_examples 'RoleDescriptor xml' do
 
   context 'Contacts' do
     context 'when populated' do
-      let(:role_descriptor) { create :role_descriptor, :with_contacts }
+      let(:role_descriptor) { create parent_node, :with_contacts }
       it 'is rendered when present' do
         expect(xml).to have_xpath(contacts_path, count: 2)
       end

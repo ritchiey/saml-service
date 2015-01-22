@@ -11,7 +11,6 @@ RSpec.shared_examples 'SSODescriptor xml' do
   let(:name_id_format_path) do
     "#{sso_descriptor_path}/NameIDFormat"
   end
-  let(:sso_descriptor) { create parent_node }
 
   it 'is created' do
     expect(xml).to have_xpath(sso_descriptor_path)

@@ -47,5 +47,11 @@ FactoryGirl.define do
         idp.ui_info = create :mdui_ui_info, :with_content, role_descriptor: idp
       end
     end
+
+    trait :with_disco_hints do
+      after(:create) do |idp|
+        idp.disco_hints = create :mdui_disco_hint
+      end
+    end
   end
 end

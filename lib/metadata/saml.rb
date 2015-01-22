@@ -287,8 +287,58 @@ module Metadata
     end
 
     def idp_sso_descriptor(idp)
-      root.IDPSSODescriptor(ns) do |idp_node|
+      attributes = {}
+      attributes[:WantAuthnRequestsSigned] = idp.want_authn_requests_signed
+      root.IDPSSODescriptor(ns, attributes) do |idp_node|
         sso_descriptor(idp, idp_node)
+
+        idp.single_sign_on_services.each do |ssos|
+          single_sign_on_service(ssos)
+        end
+
+        if idp.name_id_mapping_services?
+          idp.name_id_mapping_services.each do |nidms|
+            name_id_mapping_service(nidms)
+          end
+        end
+
+        if idp.assertion_id_request_services?
+          idp.assertion_id_request_services.each do |aidrs|
+            assertion_id_request_service(aidrs)
+          end
+        end
+
+        if idp.attribute_profiles?
+          idp.attribute_profiles.each do |ap|
+            root.AttributeProfile do |_|
+              root.text ap.uri
+            end
+          end
+        end
+
+        if idp.attributes?
+          idp.attributes.each do |a|
+            attribute(a)
+          end
+        end
+      end
+    end
+
+    def single_sign_on_service(ep)
+      root.SingleSignOnService do |ssos_node|
+        endpoint(ep, ssos_node)
+      end
+    end
+
+    def name_id_mapping_service(ep)
+      root.NameIDMappingService do |nidms_node|
+        endpoint(ep, nidms_node)
+      end
+    end
+
+    def assertion_id_request_service(ep)
+      root.AssertionIDRequestService do |aidrs_node|
+        endpoint(ep, aidrs_node)
       end
     end
 
