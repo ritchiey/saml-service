@@ -401,8 +401,47 @@ module Metadata
       end
     end
 
-    def attribute_authority_descriptor(_aad)
-      root.AttributeAuthorityDescriptor(ns) do |_|
+    def attribute_authority_descriptor(aad)
+      root.AttributeAuthorityDescriptor(ns) do |aad_node|
+        role_descriptor(aad, aad_node)
+
+        aad.attribute_services.each do |as|
+          attribute_service(as)
+        end
+
+        if aad.assertion_id_request_services?
+          aad.assertion_id_request_services.each do |aidrs|
+            assertion_id_request_service(aidrs)
+          end
+        end
+
+        if aad.name_id_formats?
+          aad.name_id_formats.each do |nidf|
+            root.NameIDFormat do |_|
+              root.text nidf.uri
+            end
+          end
+        end
+
+        if aad.attribute_profiles?
+          aad.attribute_profiles.each do |ap|
+            root.AttributeProfile do |_|
+              root.text ap.uri
+            end
+          end
+        end
+
+        if aad.attributes?
+          aad.attributes.each do |attr|
+            attribute(attr)
+          end
+        end
+      end
+    end
+
+    def attribute_service(ep)
+      root.AttributeService do |as_node|
+        endpoint(ep, as_node)
       end
     end
   end

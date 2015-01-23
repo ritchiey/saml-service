@@ -300,4 +300,37 @@ RSpec.describe Metadata::SAML do
     before { subject.requested_attribute(requested_attribute) }
     include_examples 'RequestedAttribute xml'
   end
+
+  context 'AttributeAuthorityDescriptor' do
+    let(:attribute_authority_descriptor_path) do
+      '/AttributeAuthorityDescriptor'
+    end
+
+    context 'RoleDescriptorType' do
+      let(:parent_node) { :attribute_authority_descriptor }
+      let(:role_descriptor_path) { attribute_authority_descriptor_path }
+      let(:role_descriptor) { create parent_node }
+      before { subject.attribute_authority_descriptor(role_descriptor) }
+      include_examples 'RoleDescriptor xml'
+    end
+
+    context 'AttributeAuthorityDescriptorType' do
+      let(:attribute_authority_descriptor) do
+        create :attribute_authority_descriptor
+      end
+      before do
+        subject.attribute_authority_descriptor(attribute_authority_descriptor)
+      end
+      include_examples 'AttributeAuthorityDescriptor xml'
+    end
+  end
+
+  context 'AttributeService' do
+    include_examples 'Endpoint xml' do
+      let(:endpoint_path) { '/AttributeService' }
+      let(:parent_node) { :attribute_service }
+      let(:endpoint) { create parent_node }
+      before { subject.attribute_service(endpoint) }
+    end
+  end
 end
