@@ -94,9 +94,7 @@ module Metadata
                             creationInstant: created_at.xmlschema,
                             publicationId: instance_id) do |_|
         publication_info.usage_policies.each do |up|
-          mdrpi.UsagePolicy(lang: up.lang) do |_|
-            root.text up.uri
-          end
+          mdrpi.UsagePolicy(up.uri, lang: up.lang)
         end
       end
     end
@@ -116,9 +114,7 @@ module Metadata
     end
 
     def attribute_value(attr_val)
-      saml.AttributeValue(ns) do |_|
-        root.text attr_val.value
-      end
+      saml.AttributeValue(ns, attr_val.value)
     end
 
     def root_entity_descriptor(ed)
@@ -164,9 +160,7 @@ module Metadata
       }
       mdrpi.RegistrationInfo(ns, attributes) do |_|
         ed.registration_info.registration_policies.each do |rp|
-          mdrpi.RegistrationPolicy(lang: rp.lang) do |_|
-            root.text rp.uri
-          end
+          mdrpi.RegistrationPolicy(rp.uri, lang: rp.lang)
         end
       end
     end
@@ -174,19 +168,13 @@ module Metadata
     def organization(org)
       root.Organization(ns) do |_|
         org.organization_names.each do |name|
-          root.OrganizationName(lang: name.lang) do |_|
-            root.text name.value
-          end
+          root.OrganizationName(name.value, lang: name.lang)
         end
         org.organization_display_names.each do |dname|
-          root.OrganizationDisplayName(lang: dname.lang) do |_|
-            root.text dname.value
-          end
+          root.OrganizationDisplayName(dname.value, lang: dname.lang)
         end
         org.organization_urls.each do |url|
-          root.OrganizationURL(lang: url.lang) do |_|
-            root.text url.uri
-          end
+          root.OrganizationURL(url.uri, lang: url.lang)
         end
       end
     end
@@ -195,16 +183,11 @@ module Metadata
       attributes = { contactType: cp.contact_type }
       c = cp.contact
       root.ContactPerson(ns, attributes) do |_|
-        root.Company { root.text c.company } if c.company
-        root.GivenName { root.text c.given_name } if c.given_name
-        root.SurName { root.text c.surname } if c.surname
-
-        if c.email_address
-          root.EmailAddress { root.text "mailto:#{c.email_address}" }
-        end
-        if c.telephone_number
-          root.TelephoneNumber { root.text c.telephone_number }
-        end
+        root.Company(c.company) if c.company
+        root.GivenName(c.given_name) if c.given_name
+        root.SurName(c.surname) if c.surname
+        root.EmailAddress("mailto:#{c.email_address}") if c.email_address
+        root.TelephoneNumber(c.telephone_number) if c.telephone_number
       end
     end
 
@@ -213,11 +196,8 @@ module Metadata
         rd.protocol_supports.map(&:uri).join(',')
       scope.parent[:errorURL] = rd.error_url if rd.error_url
 
-      if rd.extensions?
-        scope.Extensions do |_|
-          root.text rd.extensions
-        end
-      end
+      scope.Extensions(rd.extensions) if rd.extensions?
+
       if rd.key_descriptors?
         rd.key_descriptors.each do |kd|
           key_descriptor(kd)
@@ -258,9 +238,7 @@ module Metadata
 
       return unless sso.name_id_formats?
       sso.name_id_formats.each do |ndif|
-        root.NameIDFormat do |_|
-          root.text ndif.uri
-        end
+        root.NameIDFormat(ndif.uri)
       end
     end
 
@@ -320,9 +298,7 @@ module Metadata
 
         if idp.attribute_profiles?
           idp.attribute_profiles.each do |ap|
-            root.AttributeProfile do |_|
-              root.text ap.uri
-            end
+            root.AttributeProfile(ap.uri)
           end
         end
 
@@ -384,9 +360,7 @@ module Metadata
       }
       root.AttributeConsumingService(ns, attributes) do |_acs_node|
         acs.service_names.each do |service_name|
-          root.ServiceName(lang: service_name.lang) do |_|
-            root.text service_name.value
-          end
+          root.ServiceName(service_name.value, lang: service_name.lang)
         end
         acs.requested_attributes.each do |ra|
           requested_attribute(ra)
@@ -417,17 +391,13 @@ module Metadata
 
         if aad.name_id_formats?
           aad.name_id_formats.each do |nidf|
-            root.NameIDFormat do |_|
-              root.text nidf.uri
-            end
+            root.NameIDFormat(nidf.uri)
           end
         end
 
         if aad.attribute_profiles?
           aad.attribute_profiles.each do |ap|
-            root.AttributeProfile do |_|
-              root.text ap.uri
-            end
+            root.AttributeProfile(ap.uri)
           end
         end
 
