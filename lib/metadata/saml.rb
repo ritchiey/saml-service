@@ -349,6 +349,11 @@ module Metadata
           root.ServiceName(service_name.value, lang: service_name.lang)
         end
 
+        acs.service_descriptions.each do |service_description|
+          root.ServiceDescription(service_description.value,
+                                  lang: service_description.lang)
+        end
+
         acs.requested_attributes.each do |ra|
           requested_attribute(ra)
         end
