@@ -4,11 +4,20 @@ FactoryGirl.define do
   subject = "CN=#{Faker::Lorem.word}/DC=#{Faker::Lorem.word}"
   issuer = "CN=#{Faker::Lorem.word}/DC=#{Faker::Lorem.word}"
   trait :base_key_info do
-    key_name { Faker::Lorem.word }
     expiry Time.now + 3600
-    subject { subject }
-    issuer { issuer }
     data { generate_certificate subject }
+  end
+
+  trait :with_name do
+    key_name { Faker::Lorem.word }
+  end
+
+  trait :with_subject do
+    subject { subject }
+  end
+
+  trait :with_issuer do
+    issuer { issuer }
   end
 
   factory :ca_key_info, class: 'CaKeyInfo' do

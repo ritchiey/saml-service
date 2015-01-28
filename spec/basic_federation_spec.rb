@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe 'BasicFederation' do
   def run
-    create :basic_federation, :with_publication_info
+    create :basic_federation
   end
 
   it 'creates a single EntitiesDescriptor' do

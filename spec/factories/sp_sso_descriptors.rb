@@ -9,10 +9,30 @@ FactoryGirl.define do
                                                sp_sso_descriptor: sp)
     end
 
+    trait :with_authn_requests_signed do
+      authn_requests_signed true
+    end
+
+    trait :with_want_assertions_signed do
+      want_assertions_signed true
+    end
+
+    trait :with_multiple_assertion_consumer_services do
+      after(:create) do |sp|
+        create_list(:assertion_consumer_service, 2, sp_sso_descriptor: sp)
+      end
+    end
+
     trait :request_attributes do
       after(:create) do |sp|
         sp.add_attribute_consuming_service(create :attribute_consuming_service,
                                                   sp_sso_descriptor: sp)
+      end
+    end
+
+    trait :with_attribute_consuming_services do
+      after(:create) do |sp|
+        create_list(:attribute_consuming_service, 2, sp_sso_descriptor: sp)
       end
     end
 

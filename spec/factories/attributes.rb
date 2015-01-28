@@ -22,9 +22,12 @@ FactoryGirl.define do
       end
     end
 
+    factory :minimal_attribute do
+    end
+
     factory :attribute do
       after :create do | a |
-        a.name_format = create(:name_format, :uri, attribute: a)
+        create(:name_format, :uri, attribute: a)
       end
     end
 
@@ -33,6 +36,16 @@ FactoryGirl.define do
       required false
 
       association :attribute_consuming_service
+
+      trait :with_name_format do
+        after(:create) do |ra|
+          create(:name_format, :uri, attribute: ra)
+        end
+      end
+
+      trait :is_required do
+        required true
+      end
     end
   end
 end

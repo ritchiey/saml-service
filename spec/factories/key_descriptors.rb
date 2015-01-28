@@ -1,7 +1,12 @@
 FactoryGirl.define do
   factory :key_descriptor do
-    key_type :signing
-    disabled false
-    association :key_info
+    key_info
+
+    trait :signing do
+      key_type :signing
+    end
+    trait :encryption do
+      key_type :encryption
+    end
   end
 end

@@ -3,6 +3,7 @@ Sequel.migration do
 
     create_table :endpoints do
       primary_key :id
+      String :binding, null: false
       String :location, null: false
       String :response_location
 

@@ -1,5 +1,6 @@
 FactoryGirl.define do
   trait :endpoint do
+    binding { "urn:oasis:names:tc:SAML:2.0:bindings:#{Faker::Lorem.word}" }
     location { Faker::Internet.url 'example.com' }
   end
 
@@ -19,21 +20,51 @@ FactoryGirl.define do
   end
 
   factory :_endpoint, class: 'Endpoint', traits: [:endpoint]
-  factory :assertion_id_request_service, traits: [:endpoint]
-  factory :authz_service, traits: [:endpoint]
-  factory :manage_name_id_service, traits: [:endpoint]
-  factory :name_id_mapping_service, traits: [:endpoint]
-  factory :single_logout_service, traits: [:endpoint]
-  factory :single_sign_on_service, traits: [:endpoint]
-
   factory :_indexed_endpoint, class: 'IndexedEndpoint',
                               traits: [:indexed_endpoint]
-  factory :artifact_resolution_service, traits: [:indexed_endpoint]
-  factory :assertion_consumer_service, traits: [:indexed_endpoint]
+
+  factory :authz_service, traits: [:endpoint]
   factory :discovery_response_service, traits: [:indexed_endpoint]
 
+  # SSODescriptor
+  factory :artifact_resolution_service do
+    indexed_endpoint
+    sso_descriptor
+  end
+
+  factory :single_logout_service do
+    endpoint
+    sso_descriptor
+  end
+
+  factory :manage_name_id_service do
+    endpoint
+    sso_descriptor
+  end
+
+  # IDPSSODescriptor
+  factory :single_sign_on_service do
+    endpoint
+    idp_sso_descriptor
+  end
+
+  factory :name_id_mapping_service do
+    endpoint
+    idp_sso_descriptor
+  end
+
+  # AttributeAuthorityDescriptor
   factory :attribute_service do
     endpoint
     association :attribute_authority_descriptor
+  end
+
+  # IDPSSODescriptor or AttributeAuthorityDescriptor
+  factory :assertion_id_request_service, traits: [:endpoint]
+
+  # SPSSODescritpor
+  factory :assertion_consumer_service do
+    indexed_endpoint
+    sp_sso_descriptor
   end
 end

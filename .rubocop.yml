@@ -12,3 +12,19 @@ AllCops:
 AbcSize:
   Exclude:
     - lib/metadata/**/*
+
+ClassLength:
+  Exclude:
+    - lib/metadata/saml.rb
+
+MethodLength:
+  Exclude:
+    - lib/metadata/saml.rb
+
+CyclomaticComplexity:
+  Exclude:
+    - lib/metadata/saml.rb
+
+PerceivedComplexity:
+  Exclude:
+    - lib/metadata/saml.rb

@@ -32,6 +32,7 @@ Sequel.migration do
     
     create_table(:endpoints) do
       primary_key :id, :type=>"int(11)"
+      column :binding, "varchar(255)", :null=>false
       column :location, "varchar(255)", :null=>false
       column :response_location, "varchar(255)"
       column :created_at, "datetime"

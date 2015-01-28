@@ -20,5 +20,22 @@ describe SPSSODescriptor do
     it 'can store attribute consumer services' do
       expect(subject).to have_one_to_many :attribute_consuming_services
     end
+
+    describe '#attribute_consuming_services?' do
+      context 'when populated' do
+        subject do
+          create(:sp_sso_descriptor, :with_attribute_consuming_services)
+        end
+        it 'is true' do
+          expect(subject.attribute_consuming_services?).to be
+        end
+      end
+      context 'when unpopulated' do
+        subject { create :sp_sso_descriptor }
+        it 'is false' do
+          expect(subject.attribute_consuming_services?).not_to be
+        end
+      end
+    end
   end
 end

@@ -4,7 +4,7 @@ class KeyDescriptor < Sequel::Model
 
   many_to_one :role_descriptor
 
-  KEY_TYPE = { encryption: 0, signing: 1 }
+  KEY_TYPE = { encryption: 1, signing: 2 }
 
   def key_type
     KEY_TYPE.key(key_type_id)
@@ -16,8 +16,12 @@ class KeyDescriptor < Sequel::Model
 
   def validate
     super
-    validates_presence [:key_type_id, :key_type, :created_at, :updated_at]
+    validates_presence [:created_at, :updated_at]
     validates_presence :key_info, allow_missing: new?
-    validates_includes [:encryption, :signing], :key_type
+    validates_includes [:encryption, :signing], :key_type if key_type?
+  end
+
+  def key_type?
+    key_type_id && key_type_id > 0
   end
 end

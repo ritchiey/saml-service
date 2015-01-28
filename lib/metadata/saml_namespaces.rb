@@ -7,6 +7,7 @@ module Metadata
       'urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol',
       'xmlns:mdrpi' => 'urn:oasis:names:tc:SAML:metadata:rpi',
       'xmlns:mdui' => 'urn:oasis:names:tc:SAML:metadata:ui',
+      'xmlns:mdattr' => 'urn:oasis:names:tc:SAML:metadata:attribute',
       'xmlns:shibmd' => 'urn:mace:shibboleth:metadata:1.0',
       'xmlns:ds' => 'http://www.w3.org/2000/09/xmldsig#',
       'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance'
@@ -30,6 +31,10 @@ module Metadata
 
     def mdui
       builder['mdui']
+    end
+
+    def mdattr
+      builder['mdattr']
     end
 
     def shibmd

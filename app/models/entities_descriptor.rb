@@ -14,13 +14,26 @@ class EntitiesDescriptor < Sequel::Model
     super
     validates_presence [:name, :created_at, :updated_at]
     validates_presence :ca_verify_depth if ca_keys?
+    validates_presence :publication_info unless new? || sibling?
   end
 
   def ca_keys?
     ca_key_infos.try(:present?)
   end
 
-  def publication_info?
-    publication_info.try(:present?)
+  def registration_info?
+    registration_info.try(:present?)
+  end
+
+  def entity_attribute?
+    entity_attribute.try(:present?)
+  end
+
+  def sibling?
+    parent_entities_descriptor.try(:present?)
+  end
+
+  def locate_publication_info
+    publication_info || parent_entities_descriptor.locate_publication_info
   end
 end

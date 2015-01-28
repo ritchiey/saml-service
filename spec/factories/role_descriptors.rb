@@ -1,11 +1,36 @@
 FactoryGirl.define do
   factory :role_descriptor do
-    association :entity_descriptor
+    entity_descriptor
     active true
 
-    after :create do |rd|
+    after(:create) do |rd|
       rd.add_protocol_support(create :protocol_support, role_descriptor: rd)
-      rd.add_key_descriptor(create :key_descriptor, role_descriptor: rd)
+    end
+
+    trait :with_error_url do
+      error_url { Faker::Internet.url }
+    end
+
+    trait :with_key_descriptors do
+      after(:create) do |rd|
+        create_list(:key_descriptor, 2, role_descriptor: rd)
+      end
+    end
+
+    trait :with_extensions do
+      extensions { Faker::Lorem.paragraph }
+    end
+
+    trait :with_organization do
+      after(:create) do |rd|
+        rd.organization = create :organization
+      end
+    end
+
+    trait :with_contacts do
+      after(:create) do |rd|
+        create_list(:contact_person, 2, role_descriptor: rd)
+      end
     end
   end
 end

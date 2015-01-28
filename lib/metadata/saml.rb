@@ -8,6 +8,23 @@ module Metadata
                 :federation_identifier, :metadata_name,
                 :metadata_validity_period
 
+    protected
+
+    # Prevent NoMethodError by defining before any usage
+    def attribute_base(attr, scope)
+      scope.parent[:Name] = attr.name
+      scope.parent[:NameFormat] = attr.name_format.uri if attr.name_format
+      scope.parent[:FriendlyName] = attr.friendly_name if attr.friendly_name
+
+      return unless attr.attribute_values
+
+      attr.attribute_values.each do |attr_val|
+        attribute_value(attr_val)
+      end
+    end
+
+    public
+
     def initialize(params)
       params.each do |k, v|
         instance_variable_set("@#{k}", v)
@@ -25,15 +42,30 @@ module Metadata
                      Name: metadata_name,
                      validUntil: expires_at.xmlschema }
 
-      entities_descriptor(entities_descriptor, attributes)
+      entities_descriptor(entities_descriptor, attributes, true)
     end
 
-    def entities_descriptor_extensions(ed)
-      return unless ed.ca_keys? || ed.publication_info?
+    def entities_descriptor(entities_descriptor, attributes = {},
+                            root_node = false)
+      root.EntitiesDescriptor(ns, attributes) do |_|
+        entities_descriptor_extensions(entities_descriptor, root_node)
+        entities_descriptor.entities_descriptors.each do |ed|
+          entities_descriptor(ed)
+        end
+        entities_descriptor.entity_descriptors.each do |ed|
+          entity_descriptor(ed)
+        end
+      end
+    end
 
+    def entities_descriptor_extensions(ed, root_node)
+      return unless ed.ca_keys? || ed.registration_info? ||
+                    ed.entity_attribute? || root_node
       root.Extensions do |_|
+        publication_info(ed) if root_node
+        registration_info(ed) if ed.registration_info?
         key_authority(ed) if ed.ca_keys?
-        publication_info(ed) if ed.publication_info?
+        entity_attribute(ed.entity_attribute) if ed.entity_attribute?
       end
     end
 
@@ -56,10 +88,12 @@ module Metadata
     end
 
     def publication_info(ed)
-      mdrpi.PublicationInfo(publisher: ed.publication_info.publisher,
+      publication_info = ed.locate_publication_info
+      mdrpi.PublicationInfo(ns,
+                            publisher: publication_info.publisher,
                             creationInstant: created_at.xmlschema,
                             publicationId: instance_id) do |_|
-        ed.publication_info.usage_policies.each do |up|
+        publication_info.usage_policies.each do |up|
           mdrpi.UsagePolicy(lang: up.lang) do |_|
             root.text up.uri
           end
@@ -67,25 +101,348 @@ module Metadata
       end
     end
 
-    def entities_descriptor(entities_descriptor, attributes = {})
-      root.EntitiesDescriptor(ns, attributes) do |_|
-        entities_descriptor_extensions(entities_descriptor)
-        entities_descriptor.entities_descriptors.each do |ed|
-          entities_descriptor(ed)
-        end
-        entities_descriptor.entity_descriptors.each do |ed|
-          entity_descriptor(ed)
+    def entity_attribute(ea)
+      mdattr.EntityAttributes(ns) do |_|
+        ea.attributes.each do |attr|
+          attribute(attr)
         end
       end
     end
 
-    def entity_descriptor(ed)
-      root.EntityDescriptor(ns, entityID: ed.entity_id.uri) do |_|
+    def attribute(attr)
+      saml.Attribute(ns) do |a|
+        attribute_base(attr, a)
       end
     end
 
-    def to_xml
-      builder.to_xml
+    def attribute_value(attr_val)
+      saml.AttributeValue(ns) do |_|
+        root.text attr_val.value
+      end
+    end
+
+    def root_entity_descriptor(ed)
+      attributes = { ID: instance_id,
+                     validUntil: expires_at.xmlschema }
+      entity_descriptor(ed, attributes, true)
+    end
+
+    def entity_descriptor(ed, attributes = {}, root_node = false)
+      root.EntityDescriptor(ns, attributes, entityID: ed.entity_id.uri) do |_|
+        entity_descriptor_extensions(ed, root_node)
+
+        ed.idp_sso_descriptors.each do |idp|
+          idp_sso_descriptor(idp)
+        end
+        ed.sp_sso_descriptors.each do |sp|
+          sp_sso_descriptor(sp)
+        end
+        ed.attribute_authority_descriptors.each do |aad|
+          attribute_authority_descriptor(aad)
+        end
+
+        organization(ed.organization)
+        ed.contact_people.each do |cp|
+          contact_person(cp)
+        end
+      end
+    end
+
+    def entity_descriptor_extensions(ed, root_node)
+      root.Extensions do |_|
+        publication_info(ed) if root_node
+        registration_info(ed)
+        entity_attribute(ed.entity_attribute) if ed.entity_attribute?
+      end
+    end
+
+    def registration_info(ed)
+      attributes = {
+        registrationAuthority: ed.registration_info.registration_authority,
+        registrationInstant: ed.registration_info
+                             .registration_instant_utc.xmlschema
+      }
+      mdrpi.RegistrationInfo(ns, attributes) do |_|
+        ed.registration_info.registration_policies.each do |rp|
+          mdrpi.RegistrationPolicy(lang: rp.lang) do |_|
+            root.text rp.uri
+          end
+        end
+      end
+    end
+
+    def organization(org)
+      root.Organization(ns) do |_|
+        org.organization_names.each do |name|
+          root.OrganizationName(lang: name.lang) do |_|
+            root.text name.value
+          end
+        end
+        org.organization_display_names.each do |dname|
+          root.OrganizationDisplayName(lang: dname.lang) do |_|
+            root.text dname.value
+          end
+        end
+        org.organization_urls.each do |url|
+          root.OrganizationURL(lang: url.lang) do |_|
+            root.text url.uri
+          end
+        end
+      end
+    end
+
+    def contact_person(cp)
+      attributes = { contactType: cp.contact_type }
+      c = cp.contact
+      root.ContactPerson(ns, attributes) do |_|
+        root.Company { root.text c.company } if c.company
+        root.GivenName { root.text c.given_name } if c.given_name
+        root.SurName { root.text c.surname } if c.surname
+
+        if c.email_address
+          root.EmailAddress { root.text "mailto:#{c.email_address}" }
+        end
+        if c.telephone_number
+          root.TelephoneNumber { root.text c.telephone_number }
+        end
+      end
+    end
+
+    def role_descriptor(rd, scope)
+      scope.parent[:protocolSupportEnumeration] =
+        rd.protocol_supports.map(&:uri).join(',')
+      scope.parent[:errorURL] = rd.error_url if rd.error_url
+
+      if rd.extensions?
+        scope.Extensions do |_|
+          root.text rd.extensions
+        end
+      end
+      if rd.key_descriptors?
+        rd.key_descriptors.each do |kd|
+          key_descriptor(kd)
+        end
+      end
+
+      organization(rd.organization) if rd.organization
+      rd.contact_people.each { |cp| contact_person(cp) } if rd.contact_people?
+    end
+
+    def key_descriptor(kd)
+      attributes = {}
+      attributes[:use] = kd.key_type if kd.key_type?
+      root.KeyDescriptor(ns, attributes) do |_|
+        key_info(kd.key_info)
+      end
+    end
+
+    def sso_descriptor(sso, scope)
+      role_descriptor(sso, scope)
+      if sso.artifact_resolution_services?
+        sso.artifact_resolution_services.each do |ars|
+          artifact_resolution_service(ars)
+        end
+      end
+
+      if sso.single_logout_services?
+        sso.single_logout_services.each do |slo|
+          single_logout_service(slo)
+        end
+      end
+
+      if sso.manage_name_id_services?
+        sso.manage_name_id_services.each do |slo|
+          manage_name_id_service(slo)
+        end
+      end
+
+      return unless sso.name_id_formats?
+      sso.name_id_formats.each do |ndif|
+        root.NameIDFormat do |_|
+          root.text ndif.uri
+        end
+      end
+    end
+
+    def endpoint(ep, scope)
+      scope.parent[:Binding] = ep.binding
+      scope.parent[:Location] = ep.location
+
+      return unless ep.response_location?
+      scope.parent[:ResponseLocation] = ep.response_location
+    end
+
+    def indexed_endpoint(ep, scope)
+      scope.parent[:index] = ep.index
+      scope.parent[:isDefault] = ep.is_default
+      endpoint(ep, scope)
+    end
+
+    def artifact_resolution_service(endpoint)
+      root.ArtifactResolutionService do |ars_node|
+        indexed_endpoint(endpoint, ars_node)
+      end
+    end
+
+    def single_logout_service(ep)
+      root.SingleLogoutService do |slo_node|
+        endpoint(ep, slo_node)
+      end
+    end
+
+    def manage_name_id_service(ep)
+      root.ManageNameIDService do |mnid_node|
+        endpoint(ep, mnid_node)
+      end
+    end
+
+    def idp_sso_descriptor(idp)
+      attributes = {}
+      attributes[:WantAuthnRequestsSigned] = idp.want_authn_requests_signed
+      root.IDPSSODescriptor(ns, attributes) do |idp_node|
+        sso_descriptor(idp, idp_node)
+
+        idp.single_sign_on_services.each do |ssos|
+          single_sign_on_service(ssos)
+        end
+
+        if idp.name_id_mapping_services?
+          idp.name_id_mapping_services.each do |nidms|
+            name_id_mapping_service(nidms)
+          end
+        end
+
+        if idp.assertion_id_request_services?
+          idp.assertion_id_request_services.each do |aidrs|
+            assertion_id_request_service(aidrs)
+          end
+        end
+
+        if idp.attribute_profiles?
+          idp.attribute_profiles.each do |ap|
+            root.AttributeProfile do |_|
+              root.text ap.uri
+            end
+          end
+        end
+
+        if idp.attributes?
+          idp.attributes.each do |a|
+            attribute(a)
+          end
+        end
+      end
+    end
+
+    def single_sign_on_service(ep)
+      root.SingleSignOnService do |ssos_node|
+        endpoint(ep, ssos_node)
+      end
+    end
+
+    def name_id_mapping_service(ep)
+      root.NameIDMappingService do |nidms_node|
+        endpoint(ep, nidms_node)
+      end
+    end
+
+    def assertion_id_request_service(ep)
+      root.AssertionIDRequestService do |aidrs_node|
+        endpoint(ep, aidrs_node)
+      end
+    end
+
+    def sp_sso_descriptor(sp)
+      attributes = {}
+      attributes[:AuthnRequestsSigned] = sp.authn_requests_signed
+      attributes[:WantAssertionsSigned] = sp.want_assertions_signed
+      root.SPSSODescriptor(ns, attributes) do |sp_node|
+        sso_descriptor(sp, sp_node)
+
+        sp.assertion_consumer_services.each do |acs|
+          assertion_consumer_service(acs)
+        end
+
+        if sp.attribute_consuming_services?
+          sp.attribute_consuming_services.each do |attrcs|
+            attribute_consuming_service(attrcs)
+          end
+        end
+      end
+    end
+
+    def assertion_consumer_service(ep)
+      root.AssertionConsumerService do |acs_node|
+        indexed_endpoint(ep, acs_node)
+      end
+    end
+
+    def attribute_consuming_service(acs)
+      attributes = {
+        index: acs.index,
+        isDefault: acs.default
+      }
+      root.AttributeConsumingService(ns, attributes) do |_acs_node|
+        acs.service_names.each do |service_name|
+          root.ServiceName(lang: service_name.lang) do |_|
+            root.text service_name.value
+          end
+        end
+        acs.requested_attributes.each do |ra|
+          requested_attribute(ra)
+        end
+      end
+    end
+
+    def requested_attribute(attr)
+      attributes = { isRequired: attr.required }
+      root.RequestedAttribute(ns, attributes) do |ra|
+        attribute_base(attr, ra)
+      end
+    end
+
+    def attribute_authority_descriptor(aad)
+      root.AttributeAuthorityDescriptor(ns) do |aad_node|
+        role_descriptor(aad, aad_node)
+
+        aad.attribute_services.each do |as|
+          attribute_service(as)
+        end
+
+        if aad.assertion_id_request_services?
+          aad.assertion_id_request_services.each do |aidrs|
+            assertion_id_request_service(aidrs)
+          end
+        end
+
+        if aad.name_id_formats?
+          aad.name_id_formats.each do |nidf|
+            root.NameIDFormat do |_|
+              root.text nidf.uri
+            end
+          end
+        end
+
+        if aad.attribute_profiles?
+          aad.attribute_profiles.each do |ap|
+            root.AttributeProfile do |_|
+              root.text ap.uri
+            end
+          end
+        end
+
+        if aad.attributes?
+          aad.attributes.each do |attr|
+            attribute(attr)
+          end
+        end
+      end
+    end
+
+    def attribute_service(ep)
+      root.AttributeService do |as_node|
+        endpoint(ep, as_node)
+      end
     end
   end
 end

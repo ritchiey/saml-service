@@ -9,12 +9,13 @@ RSpec.shared_examples 'SAML namespaces' do
     it { is_expected.to respond_to(:idpdisc) }
     it { is_expected.to respond_to(:mdrpi) }
     it { is_expected.to respond_to(:mdui) }
+    it { is_expected.to respond_to(:mdattr) }
     it { is_expected.to respond_to(:shibmd) }
     it { is_expected.to respond_to(:ds) }
     it { is_expected.to respond_to(:ns) }
 
-    it 'has 8 namespaces defined' do
-      expect(subject.ns.size).to eq(8)
+    it 'has 9 namespaces defined' do
+      expect(subject.ns.size).to eq(9)
     end
 
     let(:ns) { subject.ns }
@@ -33,6 +34,10 @@ RSpec.shared_examples 'SAML namespaces' do
     end
     it 'supports SAML Metadata UI' do
       expect(ns['xmlns:mdui']).to eq('urn:oasis:names:tc:SAML:metadata:ui')
+    end
+    it 'supports SAML Metadata Attributes' do
+      expect(ns['xmlns:mdattr'])
+        .to eq('urn:oasis:names:tc:SAML:metadata:attribute')
     end
     it 'supports Shibboleth 1.0 Metadata' do
       expect(ns['xmlns:shibmd']).to eq('urn:mace:shibboleth:metadata:1.0')

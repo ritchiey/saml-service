@@ -15,7 +15,6 @@ end
 
 def create_idp(entities_descriptor)
   ed = create :entity_descriptor,
-              :with_registration_info,
               :with_entity_attribute,
               entities_descriptor: entities_descriptor
 
@@ -30,7 +29,6 @@ end
 
 def create_sp(entities_descriptor)
   ed = create :entity_descriptor,
-              :with_registration_info,
               :with_refeds_rs_entity_category,
               entities_descriptor: entities_descriptor
 
@@ -42,7 +40,6 @@ end
 
 def create_aa(entities_descriptor)
   ed = create :entity_descriptor,
-              :with_registration_info,
               :with_entity_attribute,
               entities_descriptor: entities_descriptor
 
