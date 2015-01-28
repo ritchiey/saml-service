@@ -16,8 +16,6 @@ module Metadata
       scope.parent[:NameFormat] = attr.name_format.uri if attr.name_format
       scope.parent[:FriendlyName] = attr.friendly_name if attr.friendly_name
 
-      return unless attr.attribute_values
-
       attr.attribute_values.each do |attr_val|
         attribute_value(attr_val)
       end
@@ -52,6 +50,7 @@ module Metadata
         entities_descriptor.entities_descriptors.each do |ed|
           entities_descriptor(ed)
         end
+
         entities_descriptor.entity_descriptors.each do |ed|
           entity_descriptor(ed)
         end
@@ -130,14 +129,17 @@ module Metadata
         ed.idp_sso_descriptors.each do |idp|
           idp_sso_descriptor(idp)
         end
+
         ed.sp_sso_descriptors.each do |sp|
           sp_sso_descriptor(sp)
         end
+
         ed.attribute_authority_descriptors.each do |aad|
           attribute_authority_descriptor(aad)
         end
 
         organization(ed.organization)
+
         ed.contact_people.each do |cp|
           contact_person(cp)
         end
@@ -170,9 +172,11 @@ module Metadata
         org.organization_names.each do |name|
           root.OrganizationName(name.value, lang: name.lang)
         end
+
         org.organization_display_names.each do |dname|
           root.OrganizationDisplayName(dname.value, lang: dname.lang)
         end
+
         org.organization_urls.each do |url|
           root.OrganizationURL(url.uri, lang: url.lang)
         end
@@ -198,14 +202,12 @@ module Metadata
 
       scope.Extensions(rd.extensions) if rd.extensions?
 
-      if rd.key_descriptors?
-        rd.key_descriptors.each do |kd|
-          key_descriptor(kd)
-        end
+      rd.key_descriptors.each do |kd|
+        key_descriptor(kd)
       end
 
       organization(rd.organization) if rd.organization
-      rd.contact_people.each { |cp| contact_person(cp) } if rd.contact_people?
+      rd.contact_people.each { |cp| contact_person(cp) }
     end
 
     def key_descriptor(kd)
@@ -218,25 +220,19 @@ module Metadata
 
     def sso_descriptor(sso, scope)
       role_descriptor(sso, scope)
-      if sso.artifact_resolution_services?
-        sso.artifact_resolution_services.each do |ars|
-          artifact_resolution_service(ars)
-        end
+
+      sso.artifact_resolution_services.each do |ars|
+        artifact_resolution_service(ars)
       end
 
-      if sso.single_logout_services?
-        sso.single_logout_services.each do |slo|
-          single_logout_service(slo)
-        end
+      sso.single_logout_services.each do |slo|
+        single_logout_service(slo)
       end
 
-      if sso.manage_name_id_services?
-        sso.manage_name_id_services.each do |slo|
-          manage_name_id_service(slo)
-        end
+      sso.manage_name_id_services.each do |slo|
+        manage_name_id_service(slo)
       end
 
-      return unless sso.name_id_formats?
       sso.name_id_formats.each do |ndif|
         root.NameIDFormat(ndif.uri)
       end
@@ -284,28 +280,20 @@ module Metadata
           single_sign_on_service(ssos)
         end
 
-        if idp.name_id_mapping_services?
-          idp.name_id_mapping_services.each do |nidms|
-            name_id_mapping_service(nidms)
-          end
+        idp.name_id_mapping_services.each do |nidms|
+          name_id_mapping_service(nidms)
         end
 
-        if idp.assertion_id_request_services?
-          idp.assertion_id_request_services.each do |aidrs|
-            assertion_id_request_service(aidrs)
-          end
+        idp.assertion_id_request_services.each do |aidrs|
+          assertion_id_request_service(aidrs)
         end
 
-        if idp.attribute_profiles?
-          idp.attribute_profiles.each do |ap|
-            root.AttributeProfile(ap.uri)
-          end
+        idp.attribute_profiles.each do |ap|
+          root.AttributeProfile(ap.uri)
         end
 
-        if idp.attributes?
-          idp.attributes.each do |a|
-            attribute(a)
-          end
+        idp.attributes.each do |a|
+          attribute(a)
         end
       end
     end
@@ -339,10 +327,8 @@ module Metadata
           assertion_consumer_service(acs)
         end
 
-        if sp.attribute_consuming_services?
-          sp.attribute_consuming_services.each do |attrcs|
-            attribute_consuming_service(attrcs)
-          end
+        sp.attribute_consuming_services.each do |attrcs|
+          attribute_consuming_service(attrcs)
         end
       end
     end
@@ -362,6 +348,7 @@ module Metadata
         acs.service_names.each do |service_name|
           root.ServiceName(service_name.value, lang: service_name.lang)
         end
+
         acs.requested_attributes.each do |ra|
           requested_attribute(ra)
         end
@@ -383,28 +370,20 @@ module Metadata
           attribute_service(as)
         end
 
-        if aad.assertion_id_request_services?
-          aad.assertion_id_request_services.each do |aidrs|
-            assertion_id_request_service(aidrs)
-          end
+        aad.assertion_id_request_services.each do |aidrs|
+          assertion_id_request_service(aidrs)
         end
 
-        if aad.name_id_formats?
-          aad.name_id_formats.each do |nidf|
-            root.NameIDFormat(nidf.uri)
-          end
+        aad.name_id_formats.each do |nidf|
+          root.NameIDFormat(nidf.uri)
         end
 
-        if aad.attribute_profiles?
-          aad.attribute_profiles.each do |ap|
-            root.AttributeProfile(ap.uri)
-          end
+        aad.attribute_profiles.each do |ap|
+          root.AttributeProfile(ap.uri)
         end
 
-        if aad.attributes?
-          aad.attributes.each do |attr|
-            attribute(attr)
-          end
+        aad.attributes.each do |attr|
+          attribute(attr)
         end
       end
     end
