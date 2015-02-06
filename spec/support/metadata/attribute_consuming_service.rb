@@ -1,5 +1,10 @@
 RSpec.shared_examples 'AttributeConsumingService xml' do
   let(:service_name_path) { "#{attribute_consuming_service_path}/ServiceName" }
+
+  let(:service_description_path) do
+    "#{attribute_consuming_service_path}/ServiceDescription"
+  end
+
   let(:requested_attribute_path) do
     "#{attribute_consuming_service_path}/RequestedAttribute"
   end
@@ -59,6 +64,39 @@ RSpec.shared_examples 'AttributeConsumingService xml' do
       end
       it 'renders multiple' do
         expect(xml).to have_xpath(service_name_path, count: 3)
+      end
+    end
+  end
+
+  context 'ServiceDescriptions' do
+    let(:node) { xml.first(:xpath, service_description_path) }
+    it 'is created' do
+      expect(xml).to have_xpath(service_description_path)
+    end
+
+    context 'attributes' do
+      context 'lang' do
+        it 'is rendered' do
+          expect(node['lang']).to be
+        end
+        it 'has expected value' do
+          expect(node['lang'])
+            .to eq(attribute_consuming_service.service_descriptions.first.lang)
+        end
+      end
+    end
+
+    it 'has expected value' do
+      expect(node.text)
+        .to eq(attribute_consuming_service.service_descriptions.first.value)
+    end
+
+    context 'multiple names' do
+      let(:attribute_consuming_service) do
+        create :attribute_consuming_service, :with_multiple_service_descriptions
+      end
+      it 'renders multiple' do
+        expect(xml).to have_xpath(service_description_path, count: 3)
       end
     end
   end
