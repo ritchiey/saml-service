@@ -42,4 +42,54 @@ RSpec.describe Tag, type: :model do
       end
     end
   end
+
+  describe '#entity_descriptors' do
+    let(:tag_name) { Faker::Lorem.word }
+    subject { Tag.entity_descriptors(tag_name) }
+
+    context 'with no tags' do
+      it { is_expected.to eq([]) }
+    end
+
+    context 'with no associated tags' do
+      before do
+        create(:tag, role_descriptor: rd, entity_descriptor: nil,
+                     name: tag_name)
+      end
+      it { is_expected.to eq([]) }
+    end
+
+    context 'with an existing associated tag' do
+      let!(:tag) do
+        create(:tag, role_descriptor: nil, entity_descriptor: ed,
+                     name: tag_name)
+      end
+      it { is_expected.to contain_exactly(tag) }
+    end
+  end
+
+  describe '#role_descriptors' do
+    let(:tag_name) { Faker::Lorem.word }
+    subject { Tag.role_descriptors(tag_name) }
+
+    context 'with no tags' do
+      it { is_expected.to eq([]) }
+    end
+
+    context 'with no associated tags' do
+      before do
+        create(:tag, role_descriptor: nil, entity_descriptor: ed,
+                     name: tag_name)
+      end
+      it { is_expected.to eq([]) }
+    end
+
+    context 'with an existing associated tag' do
+      let!(:tag) do
+        create(:tag, role_descriptor: rd, entity_descriptor:
+                                  nil, name: tag_name)
+      end
+      it { is_expected.to contain_exactly(tag) }
+    end
+  end
 end
