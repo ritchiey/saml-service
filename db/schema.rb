@@ -452,6 +452,18 @@ Sequel.migration do
       index [:idp_sso_descriptor_id], :name=>:idp_ssos_fkey
     end
     
+    create_table(:tags) do
+      primary_key :id, :type=>"int(11)"
+      column :name, "varchar(255)", :null=>false
+      foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :key=>[:id]
+      foreign_key :role_descriptor_id, :role_descriptors, :type=>"int(11)", :key=>[:id]
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      
+      index [:entity_descriptor_id], :name=>:entity_descriptor_id
+      index [:role_descriptor_id], :name=>:role_descriptor_id
+    end
+    
     create_table(:ui_infos) do
       primary_key :id, :type=>"int(11)"
       foreign_key :role_descriptor_id, :role_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
@@ -703,5 +715,6 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150108055454_add_self_reference_to_entities_descriptor.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150109010735_add_entities_descriptor_foreign_key_to_ca_key_infos.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150109011330_add_ca_verify_depth_to_entities_descriptor.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150212012240_create_tags.rb')"
   end
 end
