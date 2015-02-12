@@ -7,6 +7,9 @@ RSpec.describe Tag, type: :model do
   it { is_expected.to have_many_to_one :entity_descriptor }
   it { is_expected.to have_many_to_one :role_descriptor }
 
+  let(:rd) { create(:role_descriptor) }
+  let(:ed) { create(:entity_descriptor) }
+
   context 'with no owner' do
     let(:tag) { build(:tag, entity_descriptor: nil, role_descriptor: nil) }
     subject { tag }
@@ -22,12 +25,12 @@ RSpec.describe Tag, type: :model do
   end
 
   context 'with one owner' do
-    subject { build(:tag, role_descriptor: nil) }
+    subject { build(:tag, role_descriptor: rd, entity_descriptor: nil) }
     it { is_expected.to be_valid }
   end
 
   context 'with more than one owner' do
-    let(:tag) { build(:tag) }
+    let(:tag) { build(:tag, role_descriptor: rd, entity_descriptor: ed) }
     subject { tag }
     it { is_expected.to_not be_valid }
     context 'the error message' do
