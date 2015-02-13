@@ -9,6 +9,7 @@ RSpec.describe Tag, type: :model do
 
   let(:rd) { create(:role_descriptor) }
   let(:ed) { create(:entity_descriptor) }
+  let(:tag_name) { Faker::Lorem.word }
 
   context 'with no owner' do
     let(:tag) { build(:tag, entity_descriptor: nil, role_descriptor: nil) }
@@ -44,7 +45,6 @@ RSpec.describe Tag, type: :model do
   end
 
   describe '#entity_descriptors' do
-    let(:tag_name) { Faker::Lorem.word }
     subject { Tag.entity_descriptors(tag_name) }
 
     context 'with no tags' do
@@ -69,7 +69,6 @@ RSpec.describe Tag, type: :model do
   end
 
   describe '#role_descriptors' do
-    let(:tag_name) { Faker::Lorem.word }
     subject { Tag.role_descriptors(tag_name) }
 
     context 'with no tags' do
@@ -90,6 +89,67 @@ RSpec.describe Tag, type: :model do
                                   nil, name: tag_name)
       end
       it { is_expected.to contain_exactly(tag) }
+    end
+  end
+
+  context '[name, role_descriptor] uniqueness' do
+    before do
+      create(:tag, role_descriptor: rd, entity_descriptor: nil, name: tag_name)
+    end
+
+    let(:tag) do
+      build(:tag, role_descriptor: rd, entity_descriptor: nil,
+                  name: tag_name)
+    end
+
+    subject { tag }
+    before { tag.valid? }
+    it { is_expected.to_not be_valid }
+
+    context 'the error message' do
+      subject { tag.errors }
+      it do
+        is_expected.to eq([:name, :role_descriptor] => ['is already taken'])
+      end
+    end
+
+    context 'entity_descriptor tag with same name' do
+      subject do
+        build(:tag, role_descriptor: nil, entity_descriptor: ed,
+                    name: tag_name)
+      end
+      before { tag.valid? }
+      it { is_expected.to be_valid }
+    end
+  end
+
+  context '[name, entity_descriptor] uniqueness' do
+    before do
+      create(:tag, role_descriptor: nil, entity_descriptor: ed, name: tag_name)
+    end
+
+    let(:tag) do
+      build(:tag, role_descriptor: nil, entity_descriptor: ed, name: tag_name)
+    end
+
+    subject { tag }
+    before { tag.valid? }
+    it { is_expected.to_not be_valid }
+
+    context 'the error message' do
+      subject { tag.errors }
+      it do
+        is_expected.to eq([:name, :entity_descriptor] => ['is already taken'])
+      end
+    end
+
+    context 'role_descriptor tag with same name' do
+      subject do
+        build(:tag, role_descriptor: rd, entity_descriptor: nil,
+                    name: tag_name)
+      end
+      before { tag.valid? }
+      it { is_expected.to be_valid }
     end
   end
 end

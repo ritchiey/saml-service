@@ -461,6 +461,8 @@ Sequel.migration do
       column :updated_at, "datetime"
       
       index [:entity_descriptor_id], :name=>:entity_descriptor_id
+      index [:name, :entity_descriptor_id], :name=>:name_entity_descriptor_id_un, :unique=>true
+      index [:name, :role_descriptor_id], :name=>:name_role_descriptor_id_un, :unique=>true
       index [:role_descriptor_id], :name=>:role_descriptor_id
     end
     
@@ -716,5 +718,6 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150109010735_add_entities_descriptor_foreign_key_to_ca_key_infos.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150109011330_add_ca_verify_depth_to_entities_descriptor.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150212012240_create_tags.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150213002521_add_unique_constraints_to_tag.rb')"
   end
 end
