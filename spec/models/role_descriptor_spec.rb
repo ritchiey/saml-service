@@ -76,10 +76,7 @@ describe RoleDescriptor do
     end
 
     context 'with an existing associated tag' do
-      before do
-        create(:tag, role_descriptor: rd, entity_descriptor: nil,
-                     name: tag_name)
-      end
+      before { create(:rd_tag, role_descriptor: rd, name: tag_name) }
       it { is_expected.to contain_exactly(rd) }
     end
 
@@ -87,10 +84,8 @@ describe RoleDescriptor do
       let!(:another_rd) { create(:role_descriptor) }
 
       before do
-        create(:tag, role_descriptor: rd, entity_descriptor: nil,
-                     name: tag_name)
-        create(:tag, role_descriptor: another_rd, entity_descriptor: nil,
-                     name: tag_name)
+        create(:rd_tag, role_descriptor: rd, name: tag_name)
+        create(:rd_tag, role_descriptor: another_rd, name: tag_name)
       end
       it { is_expected.to contain_exactly(rd, another_rd) }
     end
@@ -101,10 +96,8 @@ describe RoleDescriptor do
       subject { RoleDescriptor.with_tag([tag_name, another_tag_name]) }
 
       before do
-        create(:tag, role_descriptor: rd, entity_descriptor: nil,
-                     name: tag_name)
-        create(:tag, role_descriptor: rd, entity_descriptor: nil,
-                     name: another_tag_name)
+        create(:rd_tag, role_descriptor: rd, name: tag_name)
+        create(:rd_tag, role_descriptor: rd, name: another_tag_name)
       end
 
       it { is_expected.to contain_exactly(rd) }

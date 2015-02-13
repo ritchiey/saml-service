@@ -132,10 +132,7 @@ describe EntityDescriptor do
     end
 
     context 'with an existing associated tag' do
-      before do
-        create(:tag, role_descriptor: nil, entity_descriptor: ed,
-                     name: tag_name)
-      end
+      before { create(:ed_tag, entity_descriptor: ed, name: tag_name) }
       it { is_expected.to contain_exactly(ed) }
     end
 
@@ -143,10 +140,8 @@ describe EntityDescriptor do
       let!(:another_ed) { create(:entity_descriptor) }
 
       before do
-        create(:tag, role_descriptor: nil, entity_descriptor: ed,
-                     name: tag_name)
-        create(:tag, role_descriptor: nil, entity_descriptor: another_ed,
-                     name: tag_name)
+        create(:ed_tag, entity_descriptor: ed, name: tag_name)
+        create(:ed_tag, entity_descriptor: another_ed, name: tag_name)
       end
       it { is_expected.to contain_exactly(ed, another_ed) }
     end
@@ -157,10 +152,8 @@ describe EntityDescriptor do
       subject { EntityDescriptor.with_tag([tag_name, another_tag_name]) }
 
       before do
-        create(:tag, role_descriptor: nil, entity_descriptor: ed,
-                     name: tag_name)
-        create(:tag, role_descriptor: nil, entity_descriptor: ed,
-                     name: another_tag_name)
+        create(:ed_tag, entity_descriptor: ed, name: tag_name)
+        create(:ed_tag, entity_descriptor: ed, name: another_tag_name)
       end
 
       it { is_expected.to contain_exactly(ed) }
