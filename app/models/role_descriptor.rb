@@ -29,4 +29,10 @@ class RoleDescriptor < Sequel::Model
   def contact_people?
     contact_people.try(:present?)
   end
+
+  def self.with_tag(tags)
+    Tag.where(name: tags).exclude(role_descriptor_id: nil)
+      .group(:role_descriptor_id)
+      .map(&:role_descriptor)
+  end
 end

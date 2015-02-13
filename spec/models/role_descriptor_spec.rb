@@ -64,4 +64,50 @@ describe RoleDescriptor do
       end
     end
   end
+
+  describe '#with_tag' do
+    let(:tag_name) { Faker::Lorem.word }
+    let(:rd) { create(:role_descriptor) }
+
+    subject { RoleDescriptor.with_tag(tag_name) }
+
+    context 'with no tags' do
+      it { is_expected.to eq([]) }
+    end
+
+    context 'with an existing associated tag' do
+      before do
+        create(:tag, role_descriptor: rd, entity_descriptor: nil,
+                     name: tag_name)
+      end
+      it { is_expected.to contain_exactly(rd) }
+    end
+
+    context 'with multiple role descriptors for a tag' do
+      let!(:another_rd) { create(:role_descriptor) }
+
+      before do
+        create(:tag, role_descriptor: rd, entity_descriptor: nil,
+                     name: tag_name)
+        create(:tag, role_descriptor: another_rd, entity_descriptor: nil,
+                     name: tag_name)
+      end
+      it { is_expected.to contain_exactly(rd, another_rd) }
+    end
+
+    context 'with multiple tags for an role descriptor' do
+      let(:another_tag_name) { Faker::Lorem.word }
+
+      subject { RoleDescriptor.with_tag([tag_name, another_tag_name]) }
+
+      before do
+        create(:tag, role_descriptor: rd, entity_descriptor: nil,
+                     name: tag_name)
+        create(:tag, role_descriptor: rd, entity_descriptor: nil,
+                     name: another_tag_name)
+      end
+
+      it { is_expected.to contain_exactly(rd) }
+    end
+  end
 end
