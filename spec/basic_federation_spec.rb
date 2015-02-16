@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe 'BasicFederation' do
   def run
+    skip 'Not ready yet'
     create :basic_federation
   end
 
