@@ -32,10 +32,6 @@ class EntityDescriptor < Sequel::Model
     errors.add(:contact_people, error_message) if technical_contact_count == 0
   end
 
-  def locate_publication_info
-    publication_info || entities_descriptor.locate_publication_info
-  end
-
   def entity_attribute?
     entity_attribute.try(:present?)
   end
