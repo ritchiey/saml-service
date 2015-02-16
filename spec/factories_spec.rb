@@ -22,8 +22,8 @@ describe 'Factory Girl' do
                                          auto_savepoint: true) do
               factory = FactoryGirl.build(factory_name, trait_name)
               if factory.respond_to?(:valid?)
-                expect(factory).to be_valid,
-                                   -> { factory.errors.full_messages.join('\n') } # rubocop:disable Metrics/LineLength
+                expect(factory)
+                  .to be_valid, -> { factory.errors.full_messages.join('\n') }
               end
             end
           end
