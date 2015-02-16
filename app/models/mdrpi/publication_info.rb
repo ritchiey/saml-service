@@ -2,7 +2,7 @@ module MDRPI
   class PublicationInfo < Sequel::Model
     include Parents
 
-    many_to_one :entities_descriptor, class: 'EntitiesDescriptor'
+    many_to_one :metadata_instance, class: 'MetadataInstance'
     many_to_one :entity_descriptor, class: 'EntityDescriptor'
 
     one_to_many :usage_policies
@@ -13,7 +13,7 @@ module MDRPI
       return if new?
 
       validates_presence :usage_policies
-      single_parent [:entities_descriptor, :entity_descriptor]
+      single_parent [:metadata_instance, :entity_descriptor]
     end
   end
 end

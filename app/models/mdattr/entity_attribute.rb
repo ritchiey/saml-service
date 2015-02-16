@@ -2,7 +2,7 @@ module MDATTR
   class EntityAttribute < Sequel::Model
     include Parents
 
-    many_to_one :entities_descriptor, class: 'EntitiesDescriptor'
+    many_to_one :metadata_instance, class: 'MetadataInstance'
     many_to_one :entity_descriptor, class: 'EntityDescriptor'
 
     one_to_many :attributes, class: 'Attribute'
@@ -13,7 +13,7 @@ module MDATTR
       return if new?
 
       validates_presence :attributes
-      single_parent [:entities_descriptor, :entity_descriptor]
+      single_parent [:metadata_instance, :entity_descriptor]
     end
   end
 end

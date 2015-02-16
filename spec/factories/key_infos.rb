@@ -22,8 +22,9 @@ FactoryGirl.define do
 
   factory :ca_key_info, class: 'CaKeyInfo' do
     base_key_info
-    entities_descriptor
+    metadata_instance
   end
+
   factory :key_info do
     base_key_info
   end

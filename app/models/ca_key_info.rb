@@ -1,8 +1,8 @@
 class CaKeyInfo < KeyInfo
-  many_to_one :entities_descriptor
+  many_to_one :metadata_instance
 
   def validate
     super
-    validates_presence [:entities_descriptor]
+    validates_presence [:metadata_instance]
   end
 end
