@@ -65,11 +65,11 @@ describe RoleDescriptor do
     end
   end
 
-  describe '#with_tag' do
+  describe '#with_any_tag' do
     let(:tag_name) { Faker::Lorem.word }
     let(:rd) { create(:role_descriptor) }
 
-    subject { RoleDescriptor.with_tag(tag_name) }
+    subject { RoleDescriptor.with_any_tag(tag_name) }
 
     context 'with no tags' do
       it { is_expected.to eq([]) }
@@ -93,7 +93,7 @@ describe RoleDescriptor do
     context 'with multiple tags for an role descriptor' do
       let(:another_tag_name) { Faker::Lorem.word }
 
-      subject { RoleDescriptor.with_tag([tag_name, another_tag_name]) }
+      subject { RoleDescriptor.with_any_tag([tag_name, another_tag_name]) }
 
       before do
         create(:rd_tag, role_descriptor: rd, name: tag_name)

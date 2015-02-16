@@ -121,11 +121,11 @@ describe EntityDescriptor do
     end
   end
 
-  describe '#with_tag' do
+  describe '#with_any_tag' do
     let(:tag_name) { Faker::Lorem.word }
     let(:ed) { create(:entity_descriptor) }
 
-    subject { EntityDescriptor.with_tag(tag_name) }
+    subject { EntityDescriptor.with_any_tag(tag_name) }
 
     context 'with no tags' do
       it { is_expected.to eq([]) }
@@ -149,7 +149,7 @@ describe EntityDescriptor do
     context 'with multiple tags for an entity descriptor' do
       let(:another_tag_name) { Faker::Lorem.word }
 
-      subject { EntityDescriptor.with_tag([tag_name, another_tag_name]) }
+      subject { EntityDescriptor.with_any_tag([tag_name, another_tag_name]) }
 
       before do
         create(:ed_tag, entity_descriptor: ed, name: tag_name)

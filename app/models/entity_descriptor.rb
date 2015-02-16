@@ -40,7 +40,7 @@ class EntityDescriptor < Sequel::Model
     entity_attribute.try(:present?)
   end
 
-  def self.with_tag(tags)
+  def self.with_any_tag(tags)
     Tag.where(name: tags).exclude(entity_descriptor_id: nil)
       .group(:entity_descriptor_id)
       .map(&:entity_descriptor)
