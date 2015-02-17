@@ -3,7 +3,7 @@ require 'rails_helper'
 describe EntityDescriptor do
   it_behaves_like 'a basic model'
 
-  it { is_expected.to validate_presence :entity_source }
+  it { is_expected.to validate_presence :known_entity }
   it { is_expected.to validate_presence :entity_id }
   it { is_expected.to validate_presence :role_descriptors }
 

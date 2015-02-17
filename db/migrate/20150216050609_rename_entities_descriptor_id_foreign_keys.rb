@@ -10,8 +10,8 @@ Sequel.migration do
     alter_table :entity_descriptors do
       drop_foreign_key :entities_descriptor_id,
                        name: 'entities_descriptors_id_key'
-      add_foreign_key :entity_source_id, :entity_sources, null: false,
-                      foreign_key_constraint_name: 'entity_sources_id_key'
+      add_foreign_key :known_entity_id, :known_entities, null: false,
+                      foreign_key_constraint_name: 'known_entities_id_key'
     end
   end
 end
