@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 describe IDPSSODescriptor do
+  it_behaves_like 'a tagged model'
+
   context 'extends sso_descriptor' do
     it { is_expected.to have_many_to_one :entity_descriptor }
     it { is_expected.to have_one_to_many :single_sign_on_services }

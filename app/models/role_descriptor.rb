@@ -29,4 +29,8 @@ class RoleDescriptor < Sequel::Model
   def contact_people?
     contact_people.try(:present?)
   end
+
+  def self.with_any_tag(tags)
+    join(:tags, role_descriptor_id: :id, name: tags).distinct.all
+  end
 end

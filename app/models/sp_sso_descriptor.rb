@@ -11,12 +11,4 @@ class SPSSODescriptor < SSODescriptor
   def attribute_consuming_services?
     attribute_consuming_services.try(:present?)
   end
-
-  def self.with_any_tag(tags)
-    Tag.where(name: tags).exclude(role_descriptor_id: nil).all
-      .select do |tag|
-        tag.role_descriptor && tag.role_descriptor.is_a?(SPSSODescriptor)
-      end
-      .map(&:role_descriptor).uniq
-  end
 end
