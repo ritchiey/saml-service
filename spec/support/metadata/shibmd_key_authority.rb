@@ -19,7 +19,7 @@ RSpec.shared_examples 'shibmd:KeyAuthority xml' do
           let(:node) { xml.find(:xpath, key_authority_path) }
           it 'sets VerifyDepth' do
             expect(node['VerifyDepth'])
-              .to eq(entities_descriptor.ca_verify_depth.to_s)
+              .to eq(metadata_instance.ca_verify_depth.to_s)
           end
         end
         context 'KeyInfo' do

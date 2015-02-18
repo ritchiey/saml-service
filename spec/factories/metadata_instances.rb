@@ -3,8 +3,8 @@ FactoryGirl.define do
     name { Faker::Internet.domain_name }
 
     after :create do | mi |
-      mi.publication_info = create :mdrpi_publication_info,
-                                   metadata_instance: mi
+      create(:mdrpi_publication_info, metadata_instance: mi)
+      mi.reload
     end
 
     trait :with_registration_info do

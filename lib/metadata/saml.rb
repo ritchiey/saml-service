@@ -5,7 +5,7 @@ module Metadata
     include SAMLNamespaces
 
     attr_reader :builder, :created_at, :expires_at, :instance_id,
-                :federation_identifier, :metadata_name,
+                :federation_identifier, :metadata_name, :metadata_instance,
                 :metadata_validity_period
 
     protected
@@ -19,6 +19,11 @@ module Metadata
       attr.attribute_values.each do |attr_val|
         attribute_value(attr_val)
       end
+    end
+
+    def extensions?(mi)
+      [mi.ca_key_infos, mi.registration_info, mi.entity_attribute]
+        .any?(&:present?)
     end
 
     public
@@ -35,36 +40,35 @@ module Metadata
                      "#{created_at.to_formatted_s(:number)}"
     end
 
-    def root_entities_descriptor(entities_descriptor)
+    def root_entities_descriptor(entity_descriptors)
       attributes = { ID: instance_id,
                      Name: metadata_name,
                      validUntil: expires_at.xmlschema }
 
-      entities_descriptor(entities_descriptor, attributes, true)
+      entities_descriptor(entity_descriptors, attributes, true)
     end
 
-    def entities_descriptor(entities_descriptor, attributes = {},
-                            root_node = false)
+    def entities_descriptor(entity_descriptors,
+                            attributes = {}, root_node = false)
       root.EntitiesDescriptor(ns, attributes) do |_|
-        entities_descriptor_extensions(entities_descriptor, root_node)
-        entities_descriptor.entities_descriptors.each do |ed|
-          entities_descriptor(ed)
-        end
+        entities_descriptor_extensions(root_node)
 
-        entities_descriptor.entity_descriptors.each do |ed|
+        entity_descriptors.each do |ed|
           entity_descriptor(ed)
         end
       end
     end
 
-    def entities_descriptor_extensions(ed, root_node)
-      return unless ed.ca_keys? || ed.registration_info? ||
-                    ed.entity_attribute? || root_node
+    def entities_descriptor_extensions(root_node)
+      mi = metadata_instance
+
+      return unless extensions?(mi) || root_node
+
       root.Extensions do |_|
-        publication_info(ed) if root_node
-        registration_info(ed) if ed.registration_info?
-        key_authority(ed) if ed.ca_keys?
-        entity_attribute(ed.entity_attribute) if ed.entity_attribute?
+        publication_info if root_node && mi.publication_info.present?
+        registration_info(mi) if mi.registration_info.present?
+        key_authority(mi) if mi.ca_key_infos.present?
+        entity_attribute(mi.entity_attribute) if mi.entity_attribute.present?
       end
     end
 
@@ -86,12 +90,15 @@ module Metadata
       end
     end
 
-    def publication_info(ed)
-      publication_info = ed.locate_publication_info
-      mdrpi.PublicationInfo(ns,
-                            publisher: publication_info.publisher,
-                            creationInstant: created_at.xmlschema,
-                            publicationId: instance_id) do |_|
+    def publication_info(ed = nil)
+      publication_info = ed.try(:publication_info) ||
+                         metadata_instance.publication_info
+
+      attrs = { publisher: publication_info.publisher,
+                creationInstant: created_at.xmlschema,
+                publicationId: instance_id }
+
+      mdrpi.PublicationInfo(ns, attrs) do |_|
         publication_info.usage_policies.each do |up|
           mdrpi.UsagePolicy(up.uri, lang: up.lang)
         end
@@ -154,14 +161,14 @@ module Metadata
       end
     end
 
-    def registration_info(ed)
+    def registration_info(mi)
       attributes = {
-        registrationAuthority: ed.registration_info.registration_authority,
-        registrationInstant: ed.registration_info
+        registrationAuthority: mi.registration_info.registration_authority,
+        registrationInstant: mi.registration_info
                              .registration_instant_utc.xmlschema
       }
       mdrpi.RegistrationInfo(ns, attributes) do |_|
-        ed.registration_info.registration_policies.each do |rp|
+        mi.registration_info.registration_policies.each do |rp|
           mdrpi.RegistrationPolicy(rp.uri, lang: rp.lang)
         end
       end
