@@ -21,11 +21,6 @@ module Metadata
       end
     end
 
-    def extensions?(mi)
-      [mi.ca_key_infos, mi.registration_info, mi.entity_attribute]
-        .any?(&:present?)
-    end
-
     public
 
     def initialize(params)
@@ -40,18 +35,13 @@ module Metadata
                      "#{created_at.to_formatted_s(:number)}"
     end
 
-    def root_entities_descriptor(entity_descriptors)
+    def entities_descriptor(entity_descriptors)
       attributes = { ID: instance_id,
                      Name: metadata_name,
                      validUntil: expires_at.xmlschema }
 
-      entities_descriptor(entity_descriptors, attributes, true)
-    end
-
-    def entities_descriptor(entity_descriptors,
-                            attributes = {}, root_node = false)
       root.EntitiesDescriptor(ns, attributes) do |_|
-        entities_descriptor_extensions(root_node)
+        entities_descriptor_extensions
 
         entity_descriptors.each do |ed|
           entity_descriptor(ed)
@@ -59,13 +49,11 @@ module Metadata
       end
     end
 
-    def entities_descriptor_extensions(root_node)
+    def entities_descriptor_extensions
       mi = metadata_instance
 
-      return unless extensions?(mi) || root_node
-
       root.Extensions do |_|
-        publication_info if root_node && mi.publication_info.present?
+        publication_info
         registration_info(mi) if mi.registration_info.present?
         key_authority(mi) if mi.ca_key_infos.present?
         entity_attribute(mi.entity_attribute) if mi.entity_attribute.present?

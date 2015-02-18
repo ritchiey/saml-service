@@ -65,7 +65,7 @@ RSpec.shared_examples 'EntitiesDescriptor xml' do
   end
 
   context 'Root EntitiesDescriptor' do
-    before { subject.root_entities_descriptor(entity_descriptors) }
+    before { subject.entities_descriptor(entity_descriptors) }
     include_examples 'shibmd:KeyAuthority xml'
     include_examples 'md:EntitiesDescriptor xml'
 
@@ -94,34 +94,6 @@ RSpec.shared_examples 'EntitiesDescriptor xml' do
     context 'Extensions' do
       it 'creates a mdrpi:PublisherInfo' do
         expect(xml).to have_xpath(all_publication_infos, count: 1)
-      end
-    end
-  end
-
-  context 'EntitiesDescriptor' do
-    before { subject.entities_descriptor(entity_descriptors) }
-    include_examples 'shibmd:KeyAuthority xml'
-    include_examples 'md:EntitiesDescriptor xml'
-
-    context 'attributes' do
-      let(:node) { xml.find(:xpath, entities_descriptor_path) }
-
-      around { |example| Timecop.freeze { example.run } }
-
-      it 'does not set ID' do
-        expect(node['ID']).not_to be
-      end
-      it 'does not set Name' do
-        expect(node['Name']).not_to be
-      end
-      it 'does not set validUntil' do
-        expect(node['validUntil']).not_to be
-      end
-    end
-
-    context 'Extensions' do
-      it 'does not create mdrpi:PublisherInfo' do
-        expect(xml).to have_xpath(all_publication_infos, count: 0)
       end
     end
   end
