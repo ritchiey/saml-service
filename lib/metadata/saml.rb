@@ -35,7 +35,7 @@ module Metadata
                      "#{created_at.to_formatted_s(:number)}"
     end
 
-    def entities_descriptor(entity_descriptors)
+    def entities_descriptor(known_entities)
       attributes = { ID: instance_id,
                      Name: metadata_name,
                      validUntil: expires_at.xmlschema }
@@ -43,8 +43,8 @@ module Metadata
       root.EntitiesDescriptor(ns, attributes) do |_|
         entities_descriptor_extensions
 
-        entity_descriptors.each do |ed|
-          entity_descriptor(ed)
+        known_entities.each do |ke|
+          entity_descriptor(ke.entity_descriptor)
         end
       end
     end

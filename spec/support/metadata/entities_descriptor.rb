@@ -65,7 +65,7 @@ RSpec.shared_examples 'EntitiesDescriptor xml' do
   end
 
   context 'Root EntitiesDescriptor' do
-    before { subject.entities_descriptor(entity_descriptors) }
+    before { subject.entities_descriptor(entity_source.known_entities) }
     include_examples 'shibmd:KeyAuthority xml'
     include_examples 'md:EntitiesDescriptor xml'
 
