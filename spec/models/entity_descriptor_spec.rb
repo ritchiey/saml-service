@@ -120,43 +120,4 @@ describe EntityDescriptor do
       expect(subject).to be_valid
     end
   end
-
-  describe '#with_any_tag' do
-    let(:tag_name) { Faker::Lorem.word }
-    let(:ed) { create(:entity_descriptor) }
-
-    subject { EntityDescriptor.with_any_tag(tag_name) }
-
-    context 'with no tags' do
-      it { is_expected.to eq([]) }
-    end
-
-    context 'with an existing associated tag' do
-      before { create(:ed_tag, entity_descriptor: ed, name: tag_name) }
-      it { is_expected.to contain_exactly(ed) }
-    end
-
-    context 'with multiple entity descriptors for a tag' do
-      let!(:another_ed) { create(:entity_descriptor) }
-
-      before do
-        create(:ed_tag, entity_descriptor: ed, name: tag_name)
-        create(:ed_tag, entity_descriptor: another_ed, name: tag_name)
-      end
-      it { is_expected.to contain_exactly(ed, another_ed) }
-    end
-
-    context 'with multiple tags for an entity descriptor' do
-      let(:another_tag_name) { Faker::Lorem.word }
-
-      subject { EntityDescriptor.with_any_tag([tag_name, another_tag_name]) }
-
-      before do
-        create(:ed_tag, entity_descriptor: ed, name: tag_name)
-        create(:ed_tag, entity_descriptor: ed, name: another_tag_name)
-      end
-
-      it { is_expected.to contain_exactly(ed) }
-    end
-  end
 end

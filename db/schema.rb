@@ -292,6 +292,7 @@ Sequel.migration do
       column :extensions, "text"
       column :created_at, "datetime"
       column :updated_at, "datetime"
+      column :kind, "varchar(255)"
       
       index [:entity_descriptor_id], :name=>:ed_rd_key
       index [:organization_id], :name=>:o_rd_key
@@ -719,5 +720,6 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150109011330_add_ca_verify_depth_to_entities_descriptor.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150212012240_create_tags.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150213002521_add_unique_constraints_to_tag.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150217053637_add_kind_to_role_descriptor.rb')"
   end
 end

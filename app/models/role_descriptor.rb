@@ -1,5 +1,5 @@
 class RoleDescriptor < Sequel::Model
-  plugin :class_table_inheritance
+  plugin :class_table_inheritance, key: :kind
 
   many_to_one :entity_descriptor
   many_to_one :organization
@@ -28,11 +28,5 @@ class RoleDescriptor < Sequel::Model
 
   def contact_people?
     contact_people.try(:present?)
-  end
-
-  def self.with_any_tag(tags)
-    Tag.where(name: tags).exclude(role_descriptor_id: nil)
-      .group(:role_descriptor_id)
-      .map(&:role_descriptor)
   end
 end

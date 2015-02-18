@@ -38,4 +38,74 @@ describe SPSSODescriptor do
       end
     end
   end
+
+  describe '#with_any_tag' do
+    let(:tag_name) { Faker::Lorem.word }
+    let(:sp_sso_descriptor) { create(:sp_sso_descriptor) }
+
+    subject { SPSSODescriptor.with_any_tag(tag_name) }
+
+    context 'with no existing tags' do
+      it { is_expected.to eq([]) }
+    end
+
+    context 'with an existing associated sp sso descriptor tag' do
+      before do
+        create(:role_descriptor_tag, role_descriptor: sp_sso_descriptor,
+                                     name: tag_name)
+      end
+      it { is_expected.to contain_exactly(sp_sso_descriptor) }
+      it { is_expected.to contain_exactly(an_instance_of(SPSSODescriptor)) }
+    end
+
+    context 'with multiple sp sso descriptors existing for a tag' do
+      let!(:another_sp_sso_descriptor) { create(:sp_sso_descriptor) }
+
+      before do
+        create(:role_descriptor_tag, role_descriptor: sp_sso_descriptor,
+                                     name: tag_name)
+        create(:role_descriptor_tag, role_descriptor:
+                                         another_sp_sso_descriptor,
+                                     name: tag_name)
+      end
+      it do
+        is_expected.to contain_exactly(sp_sso_descriptor,
+                                       another_sp_sso_descriptor)
+      end
+      it do
+        is_expected.to contain_exactly(an_instance_of(SPSSODescriptor),
+                                       an_instance_of(SPSSODescriptor))
+      end
+    end
+
+    context 'with multiple tags existing for a sp sso descriptor' do
+      let(:another_tag_name) { Faker::Lorem.word }
+
+      subject { SPSSODescriptor.with_any_tag([tag_name, another_tag_name]) }
+
+      before do
+        create(:role_descriptor_tag, role_descriptor: sp_sso_descriptor,
+                                     name: tag_name)
+        create(:role_descriptor_tag, role_descriptor: sp_sso_descriptor,
+                                     name: another_tag_name)
+      end
+
+      it { is_expected.to contain_exactly(sp_sso_descriptor) }
+      it { is_expected.to contain_exactly(an_instance_of(SPSSODescriptor)) }
+    end
+
+    context 'with multiple unrelated sp sso descriptor tags already existing' do
+      let(:another_tag_name) { Faker::Lorem.word }
+      let(:role_descriptor) { create(:role_descriptor) }
+
+      subject { SPSSODescriptor.with_any_tag([tag_name, another_tag_name]) }
+
+      before do
+        create(:role_descriptor_tag, name: tag_name)
+        create(:role_descriptor_tag, name: another_tag_name)
+      end
+
+      it { is_expected.to eq([]) }
+    end
+  end
 end
