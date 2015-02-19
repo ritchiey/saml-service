@@ -1,5 +1,12 @@
-shared_examples 'a tagged model' do
+shared_examples 'a taggable model' do | tag_factory, association |
   let(:klass) { described_class.name.underscore.to_sym }
+
+  def factory_args(tag_name, instance, association)
+    factory_args = {}
+    factory_args[:name] = tag_name
+    factory_args[association] = instance
+    factory_args
+  end
 
   describe '#with_any_tag' do
     let(:tag_name) { Faker::Lorem.word }
@@ -13,8 +20,8 @@ shared_examples 'a tagged model' do
 
     context 'when an associated tag exists' do
       before do
-        create(:role_descriptor_tag, role_descriptor: instance,
-                                     name: tag_name)
+        create(tag_factory,
+               factory_args(tag_name, instance, association))
       end
       it { is_expected.to contain_exactly(instance) }
       it { is_expected.to contain_exactly(an_instance_of(described_class)) }
@@ -24,10 +31,9 @@ shared_examples 'a tagged model' do
       let!(:another_instance) { create(klass) }
 
       before do
-        create(:role_descriptor_tag, role_descriptor: instance,
-                                     name: tag_name)
-        create(:role_descriptor_tag, role_descriptor: another_instance,
-                                     name: tag_name)
+        create(tag_factory, factory_args(tag_name, instance, association))
+        create(tag_factory, factory_args(tag_name,
+                                         another_instance, association))
       end
       it do
         is_expected.to contain_exactly(instance, another_instance)
@@ -44,28 +50,29 @@ shared_examples 'a tagged model' do
       subject { described_class.with_any_tag([tag_name, another_tag_name]) }
 
       before do
-        create(:role_descriptor_tag, role_descriptor: instance,
-                                     name: tag_name)
-        create(:role_descriptor_tag, role_descriptor: instance,
-                                     name: another_tag_name)
+        create(tag_factory, factory_args(tag_name, instance, association))
+        create(tag_factory, factory_args(another_tag_name, instance,
+                                         association))
       end
 
       it { is_expected.to contain_exactly(instance) }
       it { is_expected.to contain_exactly(an_instance_of(described_class)) }
     end
 
-    context 'with multiple unrelated tags already existing' do
+    context "with a tag exists amongst many #{described_class.name}" do
       let(:another_tag_name) { Faker::Lorem.word }
-      let(:role_descriptor) { create(:role_descriptor) }
+      let!(:another_instance) { create(klass) }
 
-      subject { described_class.with_any_tag([tag_name, another_tag_name]) }
+      subject { described_class.with_any_tag(tag_name) }
 
       before do
-        create(:role_descriptor_tag, name: tag_name)
-        create(:role_descriptor_tag, name: another_tag_name)
+        create(tag_factory, factory_args(tag_name, instance, association))
+        create(tag_factory, factory_args(another_tag_name, another_instance,
+                                         association))
       end
 
-      it { is_expected.to eq([]) }
+      it { is_expected.to contain_exactly(instance) }
+      it { is_expected.to contain_exactly(an_instance_of(described_class)) }
     end
   end
 end

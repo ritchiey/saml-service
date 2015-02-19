@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe IDPSSODescriptor do
-  it_behaves_like 'a tagged model'
+  it_behaves_like 'a taggable model', :role_descriptor_tag, :role_descriptor
 
   context 'extends sso_descriptor' do
     it { is_expected.to have_many_to_one :entity_descriptor }

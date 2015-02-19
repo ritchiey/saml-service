@@ -40,6 +40,14 @@ class EntityDescriptor < Sequel::Model
     entity_attribute.try(:present?)
   end
 
+  def self.with_any_tag(tags)
+    Tag.where(name: tags).exclude(entity_descriptor_id: nil).all
+      .select do |tag|
+        tag.entity_descriptor && tag.entity_descriptor.is_a?(EntityDescriptor)
+      end
+      .map(&:entity_descriptor).uniq
+  end
+
   protected
 
   def technical_contact_count
