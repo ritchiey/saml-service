@@ -6,9 +6,12 @@ RSpec.describe Tag, type: :model do
   it { is_expected.to validate_presence :name }
   it { is_expected.to have_many_to_one :entity_descriptor }
   it { is_expected.to have_many_to_one :role_descriptor }
+  it { is_expected.to have_many_to_one :entities_descriptor }
 
-  let(:rd) { create(:role_descriptor) }
-  let(:ed) { create(:entity_descriptor) }
+  let(:role_descriptor) { create(:role_descriptor) }
+  let(:entity_descriptor) { create(:entity_descriptor) }
+  let(:entities_descriptor) { create(:entities_descriptor) }
+
   let(:tag_name) { Faker::Lorem.word }
 
   context 'with no owner' do
@@ -20,18 +23,25 @@ RSpec.describe Tag, type: :model do
       subject { tag.errors }
       it do
         is_expected.to eq(ownership: ['Must be owned by one of' \
-                                      ' entity_descriptor, role_descriptor'])
+                                      ' entity_descriptor, role_descriptor,' \
+                                      ' entities_descriptor'])
       end
     end
   end
 
   context 'with one owner' do
-    subject { build(:tag, role_descriptor: rd, entity_descriptor: nil) }
+    subject do
+      build(:tag, role_descriptor: role_descriptor,
+                  entity_descriptor: nil)
+    end
     it { is_expected.to be_valid }
   end
 
   context 'with more than one owner' do
-    let(:tag) { build(:tag, role_descriptor: rd, entity_descriptor: ed) }
+    let(:tag) do
+      build(:tag, role_descriptor: role_descriptor,
+                  entity_descriptor: entity_descriptor)
+    end
     subject { tag }
     it { is_expected.to_not be_valid }
     context 'the error message' do
@@ -39,19 +49,20 @@ RSpec.describe Tag, type: :model do
       subject { tag.errors }
       it do
         is_expected.to eq(ownership: ['Cannot be owned by more than one of' \
-                                      ' entity_descriptor, role_descriptor'])
+                                      ' entity_descriptor, role_descriptor,' \
+                                      ' entities_descriptor'])
       end
     end
   end
 
   context '[name, role_descriptor] uniqueness' do
     before do
-      create(:tag, role_descriptor: rd, entity_descriptor: nil, name: tag_name)
+      create(:role_descriptor_tag, role_descriptor:
+                                            role_descriptor, name: tag_name)
     end
-
     let(:tag) do
-      build(:tag, role_descriptor: rd, entity_descriptor: nil,
-                  name: tag_name)
+      build(:role_descriptor_tag, role_descriptor:
+                                    role_descriptor, name: tag_name)
     end
 
     subject { tag }
@@ -67,8 +78,8 @@ RSpec.describe Tag, type: :model do
 
     context 'entity_descriptor tag with same name' do
       subject do
-        build(:tag, role_descriptor: nil, entity_descriptor: ed,
-                    name: tag_name)
+        build(:entity_descriptor_tag,
+              entity_descriptor: entity_descriptor, name: tag_name)
       end
       before { tag.valid? }
       it { is_expected.to be_valid }
@@ -77,11 +88,13 @@ RSpec.describe Tag, type: :model do
 
   context '[name, entity_descriptor] uniqueness' do
     before do
-      create(:tag, role_descriptor: nil, entity_descriptor: ed, name: tag_name)
+      create(:entity_descriptor_tag,
+             entity_descriptor: entity_descriptor, name: tag_name)
     end
 
     let(:tag) do
-      build(:tag, role_descriptor: nil, entity_descriptor: ed, name: tag_name)
+      build(:entity_descriptor_tag,
+            entity_descriptor: entity_descriptor, name: tag_name)
     end
 
     subject { tag }
@@ -97,8 +110,40 @@ RSpec.describe Tag, type: :model do
 
     context 'role_descriptor tag with same name' do
       subject do
-        build(:tag, role_descriptor: rd, entity_descriptor: nil,
-                    name: tag_name)
+        build(:role_descriptor_tag,
+              role_descriptor: role_descriptor, name: tag_name)
+      end
+      before { tag.valid? }
+      it { is_expected.to be_valid }
+    end
+  end
+
+  context '[name, entities_descriptor] uniqueness' do
+    before do
+      create(:entities_descriptor_tag,
+             entities_descriptor: entities_descriptor, name: tag_name)
+    end
+
+    let(:tag) do
+      build(:entities_descriptor_tag,
+            entities_descriptor: entities_descriptor, name: tag_name)
+    end
+
+    subject { tag }
+    before { tag.valid? }
+    it { is_expected.to_not be_valid }
+
+    context 'the error message' do
+      subject { tag.errors }
+      it do
+        is_expected.to eq([:name, :entities_descriptor] => ['is already taken'])
+      end
+    end
+
+    context 'role_descriptor tag with same name' do
+      subject do
+        build(:role_descriptor_tag,
+              role_descriptor: role_descriptor, name: tag_name)
       end
       before { tag.valid? }
       it { is_expected.to be_valid }

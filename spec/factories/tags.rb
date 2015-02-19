@@ -13,4 +13,9 @@ FactoryGirl.define do
     name { Faker::Lorem.word }
     association :role_descriptor
   end
+
+  factory :entities_descriptor_tag, class: 'Tag' do
+    name { Faker::Lorem.word }
+    association :entities_descriptor
+  end
 end

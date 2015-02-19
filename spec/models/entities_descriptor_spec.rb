@@ -2,6 +2,8 @@ require 'rails_helper'
 
 describe EntitiesDescriptor do
   it_behaves_like 'a basic model'
+  it_behaves_like 'a taggable model', :entities_descriptor_tag,
+                  :entities_descriptor
 
   it { is_expected.to have_many_to_one :parent_entities_descriptor }
   it { is_expected.to have_one_to_many :entities_descriptors }

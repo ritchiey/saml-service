@@ -41,10 +41,8 @@ class EntityDescriptor < Sequel::Model
   end
 
   def self.with_any_tag(tags)
-    Tag.where(name: tags).exclude(entity_descriptor_id: nil).all
-      .select do |tag|
-        tag.entity_descriptor && tag.entity_descriptor.is_a?(EntityDescriptor)
-      end
+    Tag.where(name: tags).all
+      .select(&:entity_descriptor)
       .map(&:entity_descriptor).uniq
   end
 

@@ -36,4 +36,10 @@ class EntitiesDescriptor < Sequel::Model
   def locate_publication_info
     publication_info || parent_entities_descriptor.locate_publication_info
   end
+
+  def self.with_any_tag(tags)
+    Tag.where(name: tags).all
+      .select(&:entities_descriptor)
+      .map(&:entities_descriptor).uniq
+  end
 end
