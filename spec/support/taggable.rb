@@ -35,12 +35,10 @@ shared_examples 'a taggable model' do | tag_factory, association |
         create(tag_factory, factory_args(tag_name,
                                          another_instance, association))
       end
-      it do
-        is_expected.to contain_exactly(instance, another_instance)
-      end
-      it do
-        is_expected.to contain_exactly(an_instance_of(described_class),
-                                       an_instance_of(described_class))
+      it { is_expected.to contain_exactly(instance, another_instance) }
+      it "should contain two instances of #{described_class}" do
+        expect(subject).to contain_exactly(an_instance_of(described_class),
+                                           an_instance_of(described_class))
       end
     end
 
