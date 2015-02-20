@@ -9,7 +9,7 @@ shared_examples 'a taggable model' do | tag_factory, association |
   end
 
   describe '#with_any_tag' do
-    let(:tag_name) { Faker::Lorem.word }
+    let(:tag_name) { Faker::Lorem.characters }
     let(:instance) { create(klass) }
 
     subject { described_class.with_any_tag(tag_name) }
@@ -45,7 +45,7 @@ shared_examples 'a taggable model' do | tag_factory, association |
     end
 
     context "with multiple tags existing for a #{described_class.name}" do
-      let(:another_tag_name) { Faker::Lorem.word }
+      let(:another_tag_name) { Faker::Lorem.characters }
 
       subject { described_class.with_any_tag([tag_name, another_tag_name]) }
 
@@ -60,7 +60,7 @@ shared_examples 'a taggable model' do | tag_factory, association |
     end
 
     context "with a tag exists amongst many #{described_class.name}" do
-      let(:another_tag_name) { Faker::Lorem.word }
+      let(:another_tag_name) { Faker::Lorem.characters }
       let!(:another_instance) { create(klass) }
 
       subject { described_class.with_any_tag(tag_name) }
