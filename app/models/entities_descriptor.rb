@@ -38,8 +38,6 @@ class EntitiesDescriptor < Sequel::Model
   end
 
   def self.with_any_tag(tags)
-    Tag.where(name: tags).all
-      .select(&:entities_descriptor)
-      .map(&:entities_descriptor).uniq
+    qualify.distinct.join(:tags, entities_descriptor_id: :id, name: tags).all
   end
 end
