@@ -7,5 +7,29 @@ class RawEntityDescriptor < Sequel::Model
     validates_unique :known_entity
     # Any more than 65535, the column type needs to be upgraded.
     validates_max_length 65_535, :xml
+    validate_xml
+  end
+
+  def validate_xml
+    return if xml.blank?
+
+    doc = Nokogiri::XML.parse(xml)
+    validate_document_contents(doc)
+
+    file = Rails.root.join('schema', 'top.xsd')
+    schema = Nokogiri::XML::Schema.new(file.open)
+
+    return if schema.valid?(doc)
+    errors.add(:xml, 'is not valid per the XML Schema')
+  end
+
+  def validate_document_contents(doc)
+    unless doc.root.name == 'EntityDescriptor'
+      errors.add(:xml, 'must have <EntityDescriptor> as the root')
+    end
+
+    ns = doc.root.namespace.try(:href)
+    return if ns == 'urn:oasis:names:tc:SAML:2.0:metadata'
+    errors.add(:xml, 'must have SAML 2.0 metadata namespace on root element')
   end
 end
