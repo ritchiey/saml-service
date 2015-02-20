@@ -31,6 +31,7 @@ group :development, :test do
   gem 'factory_girl_rails'
   gem 'faker'
   gem 'coveralls'
+  gem 'webmock', require: false
   gem 'rubocop', require: false
   gem 'simplecov', require: false
   gem 'guard', require: false
