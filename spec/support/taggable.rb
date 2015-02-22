@@ -163,14 +163,14 @@ shared_examples 'a taggable model' do | tag_factory, association |
                                            association))
         end
 
-        it do
-          is_expected.to contain_exactly(instance, another_instance_1,
-                                         another_instance_2)
+        it "should contain all #{described_class} instances" do
+          expect(subject).to contain_exactly(instance, another_instance_1,
+                                             another_instance_2)
         end
-        it do
-          is_expected.to contain_exactly(an_instance_of(described_class),
-                                         an_instance_of(described_class),
-                                         an_instance_of(described_class))
+        it "should contain three instances of #{described_class}" do
+          expect(subject).to contain_exactly(an_instance_of(described_class),
+                                             an_instance_of(described_class),
+                                             an_instance_of(described_class))
         end
       end
     end
