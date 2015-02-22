@@ -41,7 +41,16 @@ class EntityDescriptor < Sequel::Model
   end
 
   def self.with_any_tag(tags)
-    qualify.distinct.join(:tags, entity_descriptor_id: :id, name: tags).all
+    join_tags(tags).all
+  end
+
+  def self.with_all_tags(tags)
+    join_tags(tags).having { "count(*) = #{[tags].flatten.length}" }.all
+  end
+
+  def self.join_tags(tags)
+    qualify.join(:tags, entity_descriptor_id: :id, name: tags)
+      .group(:entity_descriptor_id)
   end
 
   protected
