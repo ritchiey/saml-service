@@ -2,6 +2,7 @@ require 'rails_helper'
 
 describe RoleDescriptor do
   it_behaves_like 'a basic model'
+  it_behaves_like 'a taggable model', :role_descriptor_tag, :role_descriptor
 
   context 'validations' do
     it { is_expected.to validate_presence :entity_descriptor }

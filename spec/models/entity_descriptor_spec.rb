@@ -2,6 +2,7 @@ require 'rails_helper'
 
 describe EntityDescriptor do
   it_behaves_like 'a basic model'
+  it_behaves_like 'a taggable model', :entity_descriptor_tag, :entity_descriptor
 
   it { is_expected.to validate_presence :known_entity }
   it { is_expected.to validate_presence :entity_id }
