@@ -460,11 +460,8 @@ Sequel.migration do
       foreign_key :role_descriptor_id, :role_descriptors, :type=>"int(11)", :key=>[:id]
       column :created_at, "datetime"
       column :updated_at, "datetime"
-      foreign_key :entities_descriptor_id, :entities_descriptors, :type=>"int(11)", :key=>[:id]
       
-      index [:entities_descriptor_id], :name=>:entities_descriptor_id
       index [:entity_descriptor_id], :name=>:entity_descriptor_id
-      index [:name, :entities_descriptor_id], :name=>:name_entities_descriptor_id_un, :unique=>true
       index [:name, :entity_descriptor_id], :name=>:name_entity_descriptor_id_un, :unique=>true
       index [:name, :role_descriptor_id], :name=>:name_role_descriptor_id_un, :unique=>true
       index [:role_descriptor_id], :name=>:role_descriptor_id
@@ -724,6 +721,5 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150212012240_create_tags.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150213002521_add_unique_constraints_to_tag.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150217053637_add_kind_to_role_descriptor.rb')"
-    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150219080707_add_entities_descriptor_to_tags.rb')"
   end
 end

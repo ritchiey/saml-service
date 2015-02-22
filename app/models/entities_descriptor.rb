@@ -36,17 +36,4 @@ class EntitiesDescriptor < Sequel::Model
   def locate_publication_info
     publication_info || parent_entities_descriptor.locate_publication_info
   end
-
-  def self.with_any_tag(tags)
-    join_tags(tags).all
-  end
-
-  def self.with_all_tags(tags)
-    join_tags(tags).having { "count(*) = #{[tags].flatten.length}" }.all
-  end
-
-  def self.join_tags(tags)
-    qualify.join(:tags, entities_descriptor_id: :id, name: tags)
-      .group(:entities_descriptor_id)
-  end
 end
