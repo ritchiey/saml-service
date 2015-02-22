@@ -1,5 +1,5 @@
 class RoleDescriptor < Sequel::Model
-  plugin :class_table_inheritance
+  plugin :class_table_inheritance, key: :kind
 
   many_to_one :entity_descriptor
   many_to_one :organization
@@ -28,5 +28,17 @@ class RoleDescriptor < Sequel::Model
 
   def contact_people?
     contact_people.try(:present?)
+  end
+
+  def self.with_any_tag(tags)
+    join_tags(tags).all
+  end
+
+  def self.with_all_tags(tags)
+    join_tags(tags).having { "count(*) = #{[tags].flatten.length}" }.all
+  end
+
+  def self.join_tags(tags)
+    join(:tags, role_descriptor_id: :id, name: tags).group(:role_descriptor_id)
   end
 end

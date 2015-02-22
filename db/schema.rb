@@ -292,6 +292,7 @@ Sequel.migration do
       column :extensions, "text"
       column :created_at, "datetime"
       column :updated_at, "datetime"
+      column :kind, "varchar(255)"
       
       index [:entity_descriptor_id], :name=>:ed_rd_key
       index [:organization_id], :name=>:o_rd_key
@@ -450,6 +451,20 @@ Sequel.migration do
       foreign_key :idp_sso_descriptor_id, :idp_sso_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
       
       index [:idp_sso_descriptor_id], :name=>:idp_ssos_fkey
+    end
+    
+    create_table(:tags) do
+      primary_key :id, :type=>"int(11)"
+      column :name, "varchar(255)", :null=>false
+      foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :key=>[:id]
+      foreign_key :role_descriptor_id, :role_descriptors, :type=>"int(11)", :key=>[:id]
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      
+      index [:entity_descriptor_id], :name=>:entity_descriptor_id
+      index [:name, :entity_descriptor_id], :name=>:name_entity_descriptor_id_un, :unique=>true
+      index [:name, :role_descriptor_id], :name=>:name_role_descriptor_id_un, :unique=>true
+      index [:role_descriptor_id], :name=>:role_descriptor_id
     end
     
     create_table(:ui_infos) do
@@ -703,5 +718,8 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150108055454_add_self_reference_to_entities_descriptor.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150109010735_add_entities_descriptor_foreign_key_to_ca_key_infos.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150109011330_add_ca_verify_depth_to_entities_descriptor.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150212012240_create_tags.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150213002521_add_unique_constraints_to_tag.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150217053637_add_kind_to_role_descriptor.rb')"
   end
 end
