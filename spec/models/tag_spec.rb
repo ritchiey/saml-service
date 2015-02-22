@@ -19,8 +19,8 @@ RSpec.describe Tag, type: :model do
     context 'the error message' do
       before { tag.valid? }
       subject { tag.errors }
-      it do
-        is_expected.to eq(ownership: ['Must be owned by one of' \
+      it 'is expected to be a single owner validation' do
+        expect(subject).to eq(ownership: ['Must be owned by one of' \
                                       ' entity_descriptor, role_descriptor'])
       end
     end
@@ -44,9 +44,9 @@ RSpec.describe Tag, type: :model do
     context 'the error message' do
       before { tag.valid? }
       subject { tag.errors }
-      it do
-        is_expected.to eq(ownership: ['Cannot be owned by more than one of' \
-                                      ' entity_descriptor, role_descriptor'])
+      it 'is expected to be a single owner validation' do
+        expect(subject).to eq(ownership: ['Cannot be owned by more than one' \
+                                      ' of entity_descriptor, role_descriptor'])
       end
     end
   end
@@ -67,8 +67,8 @@ RSpec.describe Tag, type: :model do
 
     context 'the error message' do
       subject { tag.errors }
-      it do
-        is_expected.to eq([:name, :role_descriptor] => ['is already taken'])
+      it 'is expected to be a uniqueness validation' do
+        expect(subject).to eq([:name, :role_descriptor] => ['is already taken'])
       end
     end
 
@@ -99,8 +99,9 @@ RSpec.describe Tag, type: :model do
 
     context 'the error message' do
       subject { tag.errors }
-      it do
-        is_expected.to eq([:name, :entity_descriptor] => ['is already taken'])
+      it 'is expected to be a uniqueness validation' do
+        expect(subject)
+          .to eq([:name, :entity_descriptor] => ['is already taken'])
       end
     end
 
