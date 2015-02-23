@@ -9,6 +9,10 @@ gem 'aaf-gumboot', git: 'https://github.com/ausaccessfed/aaf-gumboot.git',
 gem 'accession'
 gem 'nokogiri', '~> 1.6.5'
 
+gem 'resque'
+gem 'resque-retry'
+gem 'redis'
+
 # Web
 gem 'uglifier', '>= 1.3.0'
 gem 'therubyracer',  platforms: :ruby
@@ -31,6 +35,7 @@ group :development, :test do
   gem 'factory_girl_rails'
   gem 'faker'
   gem 'coveralls'
+  gem 'fakeredis', require: 'fakeredis/rspec'
   gem 'webmock', require: false
   gem 'rubocop', require: false
   gem 'simplecov', require: false
