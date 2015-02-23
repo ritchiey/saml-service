@@ -11,7 +11,7 @@ RSpec.shared_examples 'mdrpi:PublisherInfo xml' do
         let(:node) { xml.find(:xpath, publication_info_path) }
         it 'sets publisher' do
           expect(node['publisher'])
-            .to eq(root_node.locate_publication_info.publisher)
+            .to eq(root_node.publication_info.publisher)
         end
         it 'sets creationInstant' do
           expect(node['creationInstant'])
@@ -30,14 +30,14 @@ RSpec.shared_examples 'mdrpi:PublisherInfo xml' do
           let(:node) { xml.first(:xpath, usage_policy_path) }
           it 'sets lang' do
             expect(node['lang'])
-              .to eq(root_node.locate_publication_info
+              .to eq(root_node.publication_info
                      .usage_policies.first.lang)
           end
         end
         context 'value' do
           let(:node) { xml.first(:xpath, usage_policy_path) }
           it 'stores expected URL' do
-            expect(node.text).to eq(root_node.locate_publication_info
+            expect(node.text).to eq(root_node.publication_info
                                     .usage_policies.first.uri)
           end
         end

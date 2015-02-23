@@ -4,7 +4,8 @@ require 'metadata/saml'
 
 RSpec.describe Metadata::SAML do
   subject do
-    Metadata::SAML.new(federation_identifier: federation_identifier,
+    Metadata::SAML.new(metadata_instance: metadata_instance,
+                       federation_identifier: federation_identifier,
                        metadata_name: metadata_name,
                        metadata_validity_period: metadata_validity_period)
   end
@@ -12,6 +13,8 @@ RSpec.describe Metadata::SAML do
   let(:federation_identifier) { Faker::Internet.domain_word }
   let(:metadata_name) { "urn:mace:#{federation_identifier}.edu:test" }
   let(:metadata_validity_period) { 1.weeks }
+  let(:metadata_instance) { create(:metadata_instance) }
+  let(:entity_descriptors) { entity_source.entity_descriptors }
 
   let(:builder) { subject.builder }
   let(:raw_xml) { builder.to_xml }
@@ -30,7 +33,7 @@ RSpec.describe Metadata::SAML do
   end
 
   context 'EntitiesDescriptors' do
-    let(:entities_descriptor) { create :basic_federation }
+    let(:entity_source) { create :basic_federation }
     include_examples 'EntitiesDescriptor xml'
   end
 
@@ -41,14 +44,14 @@ RSpec.describe Metadata::SAML do
   end
 
   context 'PublisherInfo' do
-    let(:entities_descriptor) { create(:basic_federation) }
+    let(:entity_source) { create(:basic_federation) }
     let(:entity_descriptor) do
       create(:entity_descriptor, :with_publication_info)
     end
     context 'EntitiesDescriptor' do
-      before { subject.publication_info(entities_descriptor) }
+      before { subject.publication_info(metadata_instance) }
       include_examples 'mdrpi:PublisherInfo xml' do
-        let(:root_node) { entities_descriptor }
+        let(:root_node) { metadata_instance }
       end
     end
     context 'EntityDescriptor' do
@@ -64,14 +67,14 @@ RSpec.describe Metadata::SAML do
   end
 
   context 'RegistrationInfo' do
-    let(:entities_descriptor) do
-      create(:entities_descriptor, :with_registration_info)
+    let(:metadata_instance) do
+      create(:metadata_instance, :with_registration_info)
     end
     let(:entity_descriptor) { create(:entity_descriptor) }
     context 'EntitiesDescriptor' do
-      before { subject.registration_info(entities_descriptor) }
+      before { subject.registration_info(metadata_instance) }
       include_examples 'mdrpi:RegistrationInfo xml' do
-        let(:root_node) { entities_descriptor }
+        let(:root_node) { metadata_instance }
       end
     end
     context 'EntityDescriptor' do

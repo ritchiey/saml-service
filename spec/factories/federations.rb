@@ -1,50 +1,50 @@
 FactoryGirl.define do
-  factory :basic_federation, parent: :entities_descriptor do
+  factory :basic_federation, parent: :entity_source do
     # Services
-    after :create do | ed |
-      ed.add_entity_descriptor create_idp(ed)
-      ed.add_entity_descriptor create_idp(ed)
-
-      ed.add_entity_descriptor create_sp(ed)
-      ed.add_entity_descriptor create_sp(ed)
-
-      ed.add_entity_descriptor create_aa(ed)
+    after :create do | es |
+      create_list(:basic_federation_entity, 2, :idp, entity_source: es)
+      create_list(:basic_federation_entity, 2, :sp, entity_source: es)
+      create(:basic_federation_entity, :aa, entity_source: es)
     end
   end
-end
 
-def create_idp(entities_descriptor)
-  ed = create :entity_descriptor,
-              :with_entity_attribute,
-              entities_descriptor: entities_descriptor
+  factory :basic_federation_entity, parent: :known_entity do
+    association :entity_source
 
-  ed.add_idp_sso_descriptor create :idp_sso_descriptor,
-                                   :with_ui_info, entity_descriptor: ed
+    trait :idp do
+      after(:create) do |entity|
+        ed = create(:entity_descriptor,
+                    :with_entity_attribute,
+                    known_entity: entity)
 
-  ed.add_attribute_authority_descriptor create :attribute_authority_descriptor,
-                                               entity_descriptor: ed
+        create(:idp_sso_descriptor, :with_ui_info,
+               entity_descriptor: ed)
 
-  ed
-end
+        create(:attribute_authority_descriptor,
+               entity_descriptor: ed)
+      end
+    end
 
-def create_sp(entities_descriptor)
-  ed = create :entity_descriptor,
-              :with_refeds_rs_entity_category,
-              entities_descriptor: entities_descriptor
+    trait :sp do
+      after(:create) do |entity|
+        ed = create(:entity_descriptor,
+                    :with_refeds_rs_entity_category,
+                    known_entity: entity)
 
-  ed.add_sp_sso_descriptor create :sp_sso_descriptor, :request_attributes,
-                                  :with_ui_info, entity_descriptor: ed
+        create(:sp_sso_descriptor, :request_attributes, :with_ui_info,
+               entity_descriptor: ed)
+      end
+    end
 
-  ed
-end
+    trait :aa do
+      after(:create) do |entity|
+        ed = create(:entity_descriptor,
+                    :with_entity_attribute,
+                    known_entity: entity)
 
-def create_aa(entities_descriptor)
-  ed = create :entity_descriptor,
-              :with_entity_attribute,
-              entities_descriptor: entities_descriptor
-
-  ed.add_attribute_authority_descriptor create :attribute_authority_descriptor,
-                                               entity_descriptor: ed
-
-  ed
+        create(:attribute_authority_descriptor,
+               entity_descriptor: ed)
+      end
+    end
+  end
 end

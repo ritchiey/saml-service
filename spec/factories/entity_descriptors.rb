@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :entity_descriptor do
-    association :entities_descriptor
+    association :known_entity
     association :organization
 
     after :create do |ed|

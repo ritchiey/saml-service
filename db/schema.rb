@@ -39,17 +39,12 @@ Sequel.migration do
       column :updated_at, "datetime"
     end
     
-    create_table(:entities_descriptors) do
+    create_table(:entity_sources) do
       primary_key :id, :type=>"int(11)"
-      column :identifier, "varchar(255)"
-      column :name, "varchar(255)", :null=>false
-      column :extensions, "text"
-      column :created_at, "datetime"
-      column :updated_at, "datetime"
-      foreign_key :parent_entities_descriptor_id, :entities_descriptors, :type=>"int(11)", :key=>[:id]
-      column :ca_verify_depth, "int(11)"
-      
-      index [:parent_entities_descriptor_id], :name=>:enities_des_parent_fkey
+      column :rank, "int(11)", :null=>false
+      column :active, "tinyint(1)", :null=>false
+      column :created_at, "datetime", :null=>false
+      column :updated_at, "datetime", :null=>false
     end
     
     create_table(:indexed_endpoints) do
@@ -69,6 +64,15 @@ Sequel.migration do
       column :updated_at, "datetime"
     end
     
+    create_table(:known_entities) do
+      primary_key :id, :type=>"int(11)"
+      column :entity_id, "varchar(255)", :null=>false
+      column :active, "tinyint(1)", :null=>false
+      column :entity_source_id, "int(11)", :null=>false
+      column :created_at, "datetime", :null=>false
+      column :updated_at, "datetime", :null=>false
+    end
+    
     create_table(:localized_names) do
       primary_key :id, :type=>"int(11)"
       column :value, "varchar(255)", :null=>false
@@ -83,6 +87,16 @@ Sequel.migration do
       column :lang, "varchar(255)", :null=>false
       column :created_at, "datetime"
       column :updated_at, "datetime"
+    end
+    
+    create_table(:metadata_instances) do
+      primary_key :id, :type=>"int(11)"
+      column :identifier, "varchar(255)"
+      column :name, "varchar(255)", :null=>false
+      column :extensions, "text"
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      column :ca_verify_depth, "int(11)"
     end
     
     create_table(:organizations) do
@@ -138,20 +152,20 @@ Sequel.migration do
     
     create_table(:ca_key_infos) do
       primary_key :id, :type=>"int(11)"
-      foreign_key :entities_descriptor_id, :entities_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
+      foreign_key :metadata_instance_id, :metadata_instances, :type=>"int(11)", :key=>[:id]
       
-      index [:entities_descriptor_id], :name=>:enities_des_caki_fkey
+      index [:metadata_instance_id], :name=>:ca_key_infos_mi_id_fk
     end
     
     create_table(:entity_descriptors) do
       primary_key :id, :type=>"int(11)"
-      foreign_key :entities_descriptor_id, :entities_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
       foreign_key :organization_id, :organizations, :type=>"int(11)", :key=>[:id]
       column :extensions, "text"
       column :created_at, "datetime"
       column :updated_at, "datetime"
+      foreign_key :known_entity_id, :known_entities, :type=>"int(11)", :null=>false, :key=>[:id]
       
-      index [:entities_descriptor_id], :name=>:entities_descriptors_id_key
+      index [:known_entity_id], :name=>:known_entity_id_key
       index [:organization_id], :name=>:organization_id_key
     end
     
@@ -234,13 +248,13 @@ Sequel.migration do
     
     create_table(:entity_attributes) do
       primary_key :id, :type=>"int(11)"
-      foreign_key :entities_descriptor_id, :entities_descriptors, :type=>"int(11)", :key=>[:id]
       foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :key=>[:id]
       column :created_at, "datetime"
       column :updated_at, "datetime"
+      foreign_key :metadata_instance_id, :metadata_instances, :type=>"int(11)", :key=>[:id]
       
       index [:entity_descriptor_id], :name=>:ea_entdesc_fkey
-      index [:entities_descriptor_id], :name=>:ea_entitiesdesc_fkey
+      index [:metadata_instance_id], :name=>:entity_attributes_mi_id_fk
     end
     
     create_table(:entity_ids) do
@@ -260,27 +274,27 @@ Sequel.migration do
     
     create_table(:publication_infos) do
       primary_key :id, :type=>"int(11)"
-      foreign_key :entities_descriptor_id, :entities_descriptors, :type=>"int(11)", :key=>[:id]
       foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :key=>[:id]
       column :publisher, "varchar(255)"
       column :created_at, "datetime"
       column :updated_at, "datetime"
+      foreign_key :metadata_instance_id, :metadata_instances, :type=>"int(11)", :key=>[:id]
       
       index [:entity_descriptor_id], :name=>:pi_entdesc_fkey
-      index [:entities_descriptor_id], :name=>:pi_entitiesdesc_fkey
+      index [:metadata_instance_id], :name=>:publication_infos_mi_id_fk
     end
     
     create_table(:registration_infos) do
       primary_key :id, :type=>"int(11)"
-      foreign_key :entities_descriptor_id, :entities_descriptors, :type=>"int(11)", :key=>[:id]
       foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :key=>[:id]
       column :registration_authority, "varchar(255)", :null=>false
       column :registration_instant, "datetime"
       column :created_at, "datetime"
       column :updated_at, "datetime"
+      foreign_key :metadata_instance_id, :metadata_instances, :type=>"int(11)", :key=>[:id]
       
+      index [:metadata_instance_id], :name=>:registration_infos_mi_id_fk
       index [:entity_descriptor_id], :name=>:ri_entdesc_fkey
-      index [:entities_descriptor_id], :name=>:ri_entitiesdesc_fkey
     end
     
     create_table(:role_descriptors) do
@@ -720,6 +734,10 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150109011330_add_ca_verify_depth_to_entities_descriptor.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150212012240_create_tags.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150213002521_add_unique_constraints_to_tag.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150216031859_rename_entities_descriptor_to_metadata_instance.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150216035106_create_entity_sources.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150216043207_create_known_entities.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150216050609_rename_entities_descriptor_id_foreign_keys.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150217053637_add_kind_to_role_descriptor.rb')"
   end
 end

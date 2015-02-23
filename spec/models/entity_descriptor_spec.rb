@@ -4,7 +4,7 @@ describe EntityDescriptor do
   it_behaves_like 'a basic model'
   it_behaves_like 'a taggable model', :entity_descriptor_tag, :entity_descriptor
 
-  it { is_expected.to validate_presence :entities_descriptor }
+  it { is_expected.to validate_presence :known_entity }
   it { is_expected.to validate_presence :entity_id }
   it { is_expected.to validate_presence :role_descriptors }
 
@@ -24,24 +24,6 @@ describe EntityDescriptor do
     it { is_expected.to have_one_to_one :registration_info }
     it { is_expected.to have_one_to_one :publication_info }
     it { is_expected.to have_one_to_one :entity_attribute }
-  end
-
-  context 'publication info' do
-    subject { create :entity_descriptor }
-    let(:local_publication_info) do
-      build :mdrpi_publication_info
-    end
-
-    context '#locate_publication_info' do
-      it 'returns local publication_info if present' do
-        subject.publication_info = local_publication_info
-        expect(subject.locate_publication_info).to eq(local_publication_info)
-      end
-      it 'returns parent entities_descriptor publication_info if not present' do
-        expect(subject.locate_publication_info).to be
-          .and eq(subject.entities_descriptor.publication_info)
-      end
-    end
   end
 
   context 'validation' do
