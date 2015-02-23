@@ -32,4 +32,14 @@ describe MetadataInstance do
     subject { create(:metadata_instance) }
     it { is_expected.to validate_presence :publication_info }
   end
+
+  context 'PublicationInfo' do
+    subject { create(:metadata_instance).publication_info }
+
+    it { is_expected.to be_valid }
+
+    it 'has a publisher' do
+      expect(subject.publisher).not_to be_nil
+    end
+  end
 end

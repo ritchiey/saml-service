@@ -111,15 +111,6 @@ RSpec.describe 'BasicFederation' do
   end
 
   context 'eduGAIN metadata profile v3' do
-    context 'PublicationInfo' do
-      before { skip 'Not the correct place to test this' }
-      subject { @entity_source.publication_info }
-      it { is_expected.to be_valid }
-      it 'has a publisher' do
-        expect(subject.publisher).to be
-      end
-    end
-
     context 'RegistrationInfo' do
       subject do
         @entity_source.entity_descriptors.map(&:registration_info)
