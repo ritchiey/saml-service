@@ -12,6 +12,9 @@ module MDUI
     def validate
       super
       validates_presence [:role_descriptor, :created_at, :updated_at]
+      return if new?
+
+      validates_presence [:display_names, :descriptions]
     end
   end
 end

@@ -6,9 +6,15 @@ RSpec.describe MDUI::UIInfo, type: :model do
   it { is_expected.to have_many_to_one :role_descriptor }
   it { is_expected.to validate_presence :role_descriptor }
 
+  context 'validations' do
+    context 'instance validations' do
+      subject { create :mdui_ui_info }
+      it { is_expected.to validate_presence :display_names }
+      it { is_expected.to validate_presence :descriptions }
+    end
+  end
+
   context 'optional attributes' do
-    it { is_expected.to have_one_to_many :display_names }
-    it { is_expected.to have_one_to_many :descriptions }
     it { is_expected.to have_one_to_many :keyword_lists }
     it { is_expected.to have_one_to_many :logos }
     it { is_expected.to have_one_to_many :information_urls }
