@@ -12,7 +12,7 @@ module MDUI
     end
 
     def add(keyword)
-      xml_keyword = keyword.sub ' ', '+'
+      xml_keyword = keyword.gsub ' ', '+'
       self.content = "#{content} #{xml_keyword}".strip
     end
   end

@@ -11,6 +11,6 @@ end
 
 def generate_keyword_list
   keyword_list = Faker::Lorem.words(6)
-  encoded_keyword = Faker::Lorem.words(2).join('+')
+  encoded_keyword = Faker::Lorem.words(4).join('+')
   keyword_list.push(encoded_keyword).join(' ')
 end
