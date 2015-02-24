@@ -195,7 +195,12 @@ module Metadata
         rd.protocol_supports.map(&:uri).join(',')
       scope.parent[:errorURL] = rd.error_url if rd.error_url
 
-      scope.Extensions(rd.extensions) if rd.extensions?
+      if rd.extensions?
+        scope.Extensions do |_|
+          ui_info(rd.ui_info) if rd.ui_info.present?
+          scope << rd.extensions if rd.extensions.present?
+        end
+      end
 
       rd.key_descriptors.each do |kd|
         key_descriptor(kd)
@@ -391,6 +396,36 @@ module Metadata
     def attribute_service(ep)
       root.AttributeService do |as_node|
         endpoint(ep, as_node)
+      end
+    end
+
+    def ui_info(info)
+      mdui.UIInfo(ns) do |_|
+        info.display_names.each do |display_name|
+          mdui.DisplayName(display_name.value, lang: display_name.lang)
+        end
+
+        info.descriptions.each do |description|
+          mdui.Description(description.value, lang: description.lang)
+        end
+
+        info.keyword_lists.each do |keywords|
+          mdui.Keywords(keywords.content, lang: keywords.lang)
+        end
+
+        info.logos.each do |logo|
+          attributes = { height: logo.height, width: logo.width }
+          attributes[:lang] = logo.lang if logo.lang.present?
+          mdui.Logo(logo.uri, attributes)
+        end
+
+        info.information_urls.each do |url|
+          mdui.InformationURL(url.uri, lang: url.lang)
+        end
+
+        info.privacy_statement_urls.each do |url|
+          mdui.PrivacyStatementURL(url.uri, lang: url.lang)
+        end
       end
     end
   end

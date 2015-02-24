@@ -7,6 +7,18 @@ FactoryGirl.define do
       ui_info.add_description create :mdui_description, ui_info: ui_info
     end
 
+    trait :with_multiple_display_names do
+      after(:create) do | ui_info |
+        ui_info.add_display_name create :mdui_display_name, ui_info: ui_info
+      end
+    end
+
+    trait :with_multiple_descriptions do
+      after(:create) do | ui_info |
+        ui_info.add_description create :mdui_description, ui_info: ui_info
+      end
+    end
+
     trait :with_content do
       after(:create) do | ui_info |
         ui_info.add_keyword_list create :mdui_keyword_list_with_content,

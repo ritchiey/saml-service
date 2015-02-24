@@ -122,6 +122,4 @@ RSpec.shared_examples 'IDPSSODescriptor xml' do
   end
 
   it 'MDUI:DiscoHints'
-  it 'MDUI:DisplayName'
-  it 'MDUI:Description'
 end
