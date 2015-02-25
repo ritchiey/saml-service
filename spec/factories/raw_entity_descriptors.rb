@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :raw_entity_descriptor do
-    transient { hostname "raw.#{Faker::Internet.domain_name}" }
+    transient { hostname { "raw.#{Faker::Internet.domain_name}" } }
 
     association :known_entity
     xml do

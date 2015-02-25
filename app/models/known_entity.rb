@@ -3,6 +3,8 @@ class KnownEntity < Sequel::Model
   one_to_one :entity_descriptor
   one_to_one :raw_entity_descriptor
 
+  alias_method :active?, :active
+
   def validate
     super
     validates_presence [:entity_source, :active, :created_at, :updated_at]
