@@ -1,4 +1,8 @@
+require 'metadata/schema'
+
 class RawEntityDescriptor < Sequel::Model
+  include Metadata::Schema
+
   many_to_one :known_entity
 
   def validate
@@ -16,10 +20,7 @@ class RawEntityDescriptor < Sequel::Model
     doc = Nokogiri::XML.parse(xml)
     validate_document_contents(doc)
 
-    file = Rails.root.join('schema', 'top.xsd')
-    schema = Nokogiri::XML::Schema.new(file.open)
-
-    return if schema.valid?(doc)
+    return if metadata_schema.valid?(doc)
     errors.add(:xml, 'is not valid per the XML Schema')
   end
 
