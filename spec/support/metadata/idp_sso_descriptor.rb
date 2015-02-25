@@ -14,6 +14,9 @@ RSpec.shared_examples 'IDPSSODescriptor xml' do
   let(:attribute_path) do
     "#{idp_sso_descriptor_path}/saml:Attribute"
   end
+  let(:mdui_disco_hints_path) do
+    "#{idp_sso_descriptor_path}/Extensions/mdui:DiscoHints"
+  end
 
   it 'is created' do
     expect(xml).to have_xpath(idp_sso_descriptor_path)
@@ -121,5 +124,19 @@ RSpec.shared_examples 'IDPSSODescriptor xml' do
     end
   end
 
-  it 'MDUI:DiscoHints'
+  context 'mdui:DiscoHints' do
+    context 'when not populated' do
+      it 'is not rendered' do
+        expect(xml).not_to have_xpath(mdui_disco_hints_path)
+      end
+    end
+    context 'when populated' do
+      let(:idp_sso_descriptor) do
+        create :idp_sso_descriptor, :with_disco_hints
+      end
+      it 'is rendered' do
+        expect(xml).to have_xpath(mdui_disco_hints_path)
+      end
+    end
+  end
 end

@@ -337,9 +337,15 @@ RSpec.describe Metadata::SAML do
     end
   end
 
-  context 'mdui:UIInfo', focus: true do
+  context 'mdui:UIInfo' do
     let(:ui_info) { create :mdui_ui_info }
     before { subject.ui_info(ui_info) }
     include_examples 'mdui:UIInfo xml'
+  end
+
+  context 'mdui:DiscoHints' do
+    let(:disco_hints) { create :mdui_disco_hints_with_content }
+    before { subject.disco_hints(disco_hints) }
+    include_examples 'mdui:DiscoHints xml'
   end
 end
