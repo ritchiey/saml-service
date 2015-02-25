@@ -37,6 +37,10 @@ RSpec.describe Metadata::SAML do
     include_examples 'EntitiesDescriptor xml'
   end
 
+  context 'RawEntityDescriptor' do
+    include_examples 'RawEntityDescriptor xml'
+  end
+
   context 'KeyInfo' do
     let(:key_info) { create :key_info }
     before { subject.key_info(key_info) }

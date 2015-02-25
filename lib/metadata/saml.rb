@@ -44,7 +44,7 @@ module Metadata
         entities_descriptor_extensions
 
         known_entities.each do |ke|
-          entity_descriptor(ke.entity_descriptor)
+          known_entity(ke)
         end
       end
     end
@@ -115,6 +115,17 @@ module Metadata
       attributes = { ID: instance_id,
                      validUntil: expires_at.xmlschema }
       entity_descriptor(ed, attributes, true)
+    end
+
+    def known_entity(entity)
+      if entity.entity_descriptor
+        return entity_descriptor(entity.entity_descriptor)
+      end
+      raw_entity_descriptor(entity.raw_entity_descriptor)
+    end
+
+    def raw_entity_descriptor(red)
+      root << red.xml
     end
 
     def entity_descriptor(ed, attributes = {}, root_node = false)
