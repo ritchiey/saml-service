@@ -41,5 +41,11 @@ FactoryGirl.define do
         sp.ui_info = create :mdui_ui_info, :with_content, role_descriptor: sp
       end
     end
+
+    trait :with_discovery_response_services do
+      after(:create) do |sp|
+        create(:discovery_response_service, sp_sso_descriptor: sp)
+      end
+    end
   end
 end

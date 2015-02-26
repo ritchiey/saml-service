@@ -1,6 +1,7 @@
 class SPSSODescriptor < SSODescriptor
   one_to_many :assertion_consumer_services
   one_to_many :attribute_consuming_services
+  one_to_many :discovery_response_services
 
   def validate
     super
@@ -10,5 +11,10 @@ class SPSSODescriptor < SSODescriptor
 
   def attribute_consuming_services?
     attribute_consuming_services.try(:present?)
+  end
+
+  def extensions?
+    extensions.try(:present?) || ui_info.present? ||
+      discovery_response_services.present?
   end
 end
