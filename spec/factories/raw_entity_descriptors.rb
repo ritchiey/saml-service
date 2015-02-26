@@ -2,11 +2,14 @@ FactoryGirl.define do
   factory :raw_entity_descriptor do
     transient { hostname { "raw.#{Faker::Internet.domain_name}" } }
 
-    association :known_entity
+    known_entity do
+      create(:known_entity, entity_id: "https://#{hostname}/idp/shibboleth")
+    end
+
     xml do
       <<-EOF.strip_heredoc
         <EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata"
-            entityID="https://#{hostname}/idp/shibboleth">
+            entityID="#{known_entity.entity_id}">
           <AttributeAuthorityDescriptor
               protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
             <AttributeService
