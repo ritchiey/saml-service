@@ -11,6 +11,7 @@ class EntitySource < Sequel::Model
     validates_integer :rank
     validates_unique :rank
     validate_url
+    validate_certificate
   end
 
   def validate_url
@@ -20,5 +21,13 @@ class EntitySource < Sequel::Model
     URI.parse(url)
   rescue URI::InvalidURIError
     errors.add(:url, 'could not be parsed as a valid URI')
+  end
+
+  def validate_certificate
+    return if certificate.nil?
+
+    OpenSSL::X509::Certificate.new(certificate)
+  rescue OpenSSL::X509::CertificateError
+    errors.add(:certificate, 'is not a valid PEM format X.509 certificate')
   end
 end
