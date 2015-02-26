@@ -15,10 +15,16 @@ class UpdateEntitySource
 
   def perform(id: id)
     source = EntitySource[id]
+    untouched = source.known_entities.to_a
+
     document(source).xpath(ENTITY_DESCRIPTOR_XPATH).each do |node|
       entity = known_entity(source, node)
       update_raw_entity_descriptor(entity, node)
+
+      untouched.reject! { |e| e.id == entity.id }
     end
+
+    sweep(untouched)
   end
 
   private
@@ -51,5 +57,12 @@ class UpdateEntitySource
     red = entity.raw_entity_descriptor ||
           RawEntityDescriptor.new(known_entity: entity)
     red.update(xml: node.canonicalize)
+  end
+
+  def sweep(untouched)
+    KnownEntity.where(id: untouched.map(&:id)).each do |ke|
+      ke.raw_entity_descriptor.try(:destroy)
+      ke.destroy
+    end
   end
 end

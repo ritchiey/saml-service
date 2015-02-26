@@ -147,6 +147,56 @@ RSpec.describe UpdateEntitySource do
     end
   end
 
+  context 'when an entity is removed' do
+    let(:xml) { entities_descriptor(entities: 1) }
+    let!(:entity) { create(:known_entity, entity_source: subject) }
+    let!(:red) { create(:raw_entity_descriptor, known_entity: entity) }
+
+    let(:old_xml) do
+      hostname = URI.parse(entity_ids[0]).host
+      <<-EOF.strip_heredoc
+        <EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata"
+            entityID="https://#{hostname}/idp/shibboleth">
+          <AttributeAuthorityDescriptor
+              protocolSupportEnumeration="nope">
+            <AttributeService
+                Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
+                Location="https://#{hostname}/invalid"/>
+          </AttributeAuthorityDescriptor>
+        </EntityDescriptor>
+      EOF
+    end
+
+    let!(:other_entity) do
+      KnownEntity.create(entity_source: subject, active: true,
+                         entity_id: entity_ids[0])
+    end
+
+    let!(:other_red) do
+      RawEntityDescriptor.create(xml: old_xml, known_entity: other_entity)
+    end
+
+    it 'removes the known entity' do
+      expect { run }.to change(KnownEntity, :count).by(-1)
+      expect { entity.reload }.to raise_error
+    end
+
+    it 'removes the raw entity descriptor' do
+      expect { run }.to change(RawEntityDescriptor, :count).by(-1)
+      expect { red.reload }.to raise_error
+    end
+
+    it 'leaves the other entity intact' do
+      run
+      expect { other_entity.reload }.not_to raise_error
+    end
+
+    it 'leaves the other raw entity descriptor intact' do
+      run
+      expect { other_red.reload }.not_to raise_error
+    end
+  end
+
   context 'with invalid xml' do
     let(:xml) do
       entities_descriptor(entities: 1)
