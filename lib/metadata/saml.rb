@@ -216,6 +216,15 @@ module Metadata
           disco_hints(rd.disco_hints) if rd.disco_hints.present?
         end
 
+        # SPSSODescriptor specific
+        if rd.is_a? SPSSODescriptor
+          rd.discovery_response_services.each do |rds|
+            idpdisc.DiscoveryResponse do |rds_node|
+              indexed_endpoint(rds, rds_node)
+            end
+          end
+        end
+
         # General extensions text data supplied by RoleDescriptor
         scope << rd.extensions if rd.extensions.present?
       end
