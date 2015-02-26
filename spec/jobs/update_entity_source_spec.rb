@@ -246,4 +246,19 @@ RSpec.describe UpdateEntitySource do
         .and match('471 Test Error')
     end
   end
+
+  context 'with an invalid signature', pending: 'Not implemented yet' do
+    let(:signature) { '' } # TODO
+    let(:xml) do
+      entities_descriptor(fore: signature, entities: 1)
+    end
+
+    it 'raises an informative message' do
+      swallow { run }
+      expect(@exception.message)
+        .to match('Unable to update EntitySource')
+        .and match(subject.url)
+        .and match('Signature validation failed')
+    end
+  end
 end
