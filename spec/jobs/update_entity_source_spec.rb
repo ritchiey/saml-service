@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe UpdateEntitySource do
-  subject { create(:entity_source) }
+  subject { create(:entity_source, :external) }
   before { stub_request(:get, subject.url).to_return(response) }
   let(:response) { { status: 200, headers: {}, body: xml } }
   let(:doc) { Nokogiri::XML.parse(xml) }

@@ -9,9 +9,14 @@ RSpec.describe EntitySource do
   it { is_expected.to validate_integer(:rank) }
   it { is_expected.to validate_unique(:rank) }
   it { is_expected.to validate_presence(:active) }
-  it { is_expected.to validate_presence(:url) }
+  it { is_expected.not_to validate_presence(:url) }
 
   context 'url validation' do
+    it 'accepts a nil url' do
+      subject.url = nil
+      expect(subject).to be_valid
+    end
+
     it 'accepts a valid https url' do
       subject.url = 'https://fed.example.com/metadata/full.xml'
       expect(subject).to be_valid
