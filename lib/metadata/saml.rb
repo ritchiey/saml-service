@@ -433,29 +433,29 @@ module Metadata
     def ui_info(info)
       mdui.UIInfo(ns) do |_|
         info.display_names.each do |display_name|
-          mdui.DisplayName(display_name.value, lang: display_name.lang)
+          mdui.DisplayName(display_name.value, 'xml:lang' => display_name.lang)
         end
 
         info.descriptions.each do |description|
-          mdui.Description(description.value, lang: description.lang)
+          mdui.Description(description.value, 'xml:lang' => description.lang)
         end
 
         info.keyword_lists.each do |keywords|
-          mdui.Keywords(keywords.content, lang: keywords.lang)
+          mdui.Keywords(keywords.content, 'xml:lang' => keywords.lang)
         end
 
         info.logos.each do |logo|
           attributes = { height: logo.height, width: logo.width }
-          attributes[:lang] = logo.lang if logo.lang.present?
+          attributes['xml:lang'] = logo.lang if logo.lang.present?
           mdui.Logo(logo.uri, attributes)
         end
 
         info.information_urls.each do |url|
-          mdui.InformationURL(url.uri, lang: url.lang)
+          mdui.InformationURL(url.uri, 'xml:lang' => url.lang)
         end
 
         info.privacy_statement_urls.each do |url|
-          mdui.PrivacyStatementURL(url.uri, lang: url.lang)
+          mdui.PrivacyStatementURL(url.uri, 'xml:lang' => url.lang)
         end
       end
     end
