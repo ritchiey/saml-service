@@ -26,10 +26,6 @@ Sequel.migration do
       column :updated_at, "datetime"
     end
     
-    create_table(:discovery_response_services) do
-      primary_key :id, :type=>"int(11)"
-    end
-    
     create_table(:endpoints) do
       primary_key :id, :type=>"int(11)"
       column :binding, "varchar(255)", :null=>false
@@ -46,6 +42,7 @@ Sequel.migration do
       column :created_at, "datetime", :null=>false
       column :updated_at, "datetime", :null=>false
       column :url, "varchar(255)"
+      column :certificate, "varchar(4096)"
     end
     
     create_table(:indexed_endpoints) do
@@ -417,6 +414,13 @@ Sequel.migration do
       index [:idp_sso_descriptor_id], :name=>:mdui_dh_idp_fkey
     end
     
+    create_table(:discovery_response_services) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :sp_sso_descriptor_id, :sp_sso_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
+      
+      index [:sp_sso_descriptor_id], :name=>:sp_drs_fkey
+    end
+    
     create_table(:key_descriptors) do
       primary_key :id, :type=>"int(11)"
       foreign_key :key_info_id, :key_infos, :type=>"int(11)", :key=>[:id]
@@ -752,5 +756,7 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150217053637_add_kind_to_role_descriptor.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150219021123_create_raw_entity_descriptors.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150223223047_add_url_to_entity_source.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150226001416_add_sp_sso_descriptor_foreign_key_to_discovery_response_services.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150226030540_add_certificate_to_entity_sources.rb')"
   end
 end

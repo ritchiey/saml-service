@@ -26,6 +26,41 @@ describe IDPSSODescriptor do
       end
     end
 
+    describe '#extensions?' do
+      context 'without extensions, ui_info or disco_hints' do
+        it 'is false' do
+          expect(subject.extensions?).not_to be
+        end
+      end
+      context 'with extensions' do
+        subject { create :idp_sso_descriptor, :with_extensions }
+        it 'is true' do
+          expect(subject.extensions?).to be
+        end
+      end
+      context 'with ui_info' do
+        subject { create :idp_sso_descriptor, :with_ui_info }
+        it 'is true' do
+          expect(subject.extensions?).to be
+        end
+      end
+      context 'with disco_hints' do
+        subject { create :idp_sso_descriptor, :with_disco_hints }
+        it 'is true' do
+          expect(subject.extensions?).to be
+        end
+      end
+      context 'with extensions, ui_info and disco_hints' do
+        subject do
+          create :idp_sso_descriptor,
+                 :with_ui_info, :with_disco_hints, :with_extensions
+        end
+        it 'is true' do
+          expect(subject.extensions?).to be
+        end
+      end
+    end
+
     describe '#name_id_mapping_services?' do
       context 'when populated' do
         subject { create(:idp_sso_descriptor, :with_name_id_mapping_services) }

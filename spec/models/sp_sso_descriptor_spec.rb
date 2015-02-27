@@ -39,5 +39,41 @@ describe SPSSODescriptor do
         end
       end
     end
+
+    describe '#extensions?' do
+      context 'without extensions, ui_info or discovery_response_services' do
+        it 'is false' do
+          expect(subject.extensions?).not_to be
+        end
+      end
+      context 'with extensions' do
+        subject { create :sp_sso_descriptor, :with_extensions }
+        it 'is true' do
+          expect(subject.extensions?).to be
+        end
+      end
+      context 'with ui_info' do
+        subject { create :sp_sso_descriptor, :with_ui_info }
+        it 'is true' do
+          expect(subject.extensions?).to be
+        end
+      end
+      context 'with discovery_response_services' do
+        subject { create :sp_sso_descriptor, :with_discovery_response_services }
+        it 'is true' do
+          expect(subject.extensions?).to be
+        end
+      end
+      context 'with extensions, ui_info and discovery_response_services' do
+        subject do
+          create :sp_sso_descriptor,
+                 :with_ui_info, :with_discovery_response_services,
+                 :with_extensions
+        end
+        it 'is true' do
+          expect(subject.extensions?).to be
+        end
+      end
+    end
   end
 end

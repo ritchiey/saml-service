@@ -23,9 +23,6 @@ FactoryGirl.define do
   factory :_indexed_endpoint, class: 'IndexedEndpoint',
                               traits: [:indexed_endpoint]
 
-  factory :authz_service, traits: [:endpoint]
-  factory :discovery_response_service, traits: [:indexed_endpoint]
-
   # SSODescriptor
   factory :artifact_resolution_service do
     indexed_endpoint
@@ -64,6 +61,12 @@ FactoryGirl.define do
 
   # SPSSODescritpor
   factory :assertion_consumer_service do
+    indexed_endpoint
+    sp_sso_descriptor
+  end
+
+  factory :discovery_response_service do
+    binding { 'urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol' }
     indexed_endpoint
     sp_sso_descriptor
   end

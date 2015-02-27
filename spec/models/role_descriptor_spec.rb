@@ -31,9 +31,21 @@ describe RoleDescriptor do
         expect(subject.extensions?).to be
       end
     end
-    context 'without extensions' do
+    context 'without extensions or ui_info' do
       it 'is false' do
         expect(subject.extensions?).not_to be
+      end
+    end
+    context 'with ui_info' do
+      subject { create :role_descriptor, :with_ui_info }
+      it 'is true' do
+        expect(subject.extensions?).to be
+      end
+    end
+    context 'with ui_info and extensions' do
+      subject { create :role_descriptor, :with_ui_info, :with_extensions }
+      it 'is true' do
+        expect(subject.extensions?).to be
       end
     end
   end

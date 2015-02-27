@@ -117,7 +117,4 @@ RSpec.shared_examples 'AttributeAuthorityDescriptor xml' do
       end
     end
   end
-
-  it 'MDUI:DisplayName'
-  it 'MDUI:Description'
 end

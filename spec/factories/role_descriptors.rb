@@ -18,7 +18,7 @@ FactoryGirl.define do
     end
 
     trait :with_extensions do
-      extensions { Faker::Lorem.paragraph }
+      extensions { "<some-node>#{Faker::Lorem.paragraph}</some-node>" }
     end
 
     trait :with_organization do
@@ -30,6 +30,12 @@ FactoryGirl.define do
     trait :with_contacts do
       after(:create) do |rd|
         create_list(:contact_person, 2, role_descriptor: rd)
+      end
+    end
+
+    trait :with_ui_info do
+      after(:create) do |rd|
+        rd.ui_info = create :mdui_ui_info, :with_content, role_descriptor: rd
       end
     end
   end
