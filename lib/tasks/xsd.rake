@@ -41,6 +41,6 @@ namespace :xsd do
     response.value
 
     File.open(t.name, 'w').write(response.body)
-    puts ' done.'
+    puts "done.\n(sha256sum: #{OpenSSL::Digest::SHA256.hexdigest(response.body)})"
   end
 end
