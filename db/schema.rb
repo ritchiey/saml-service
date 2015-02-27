@@ -26,10 +26,6 @@ Sequel.migration do
       column :updated_at, "datetime"
     end
     
-    create_table(:discovery_response_services) do
-      primary_key :id, :type=>"int(11)"
-    end
-    
     create_table(:endpoints) do
       primary_key :id, :type=>"int(11)"
       column :binding, "varchar(255)", :null=>false
@@ -406,6 +402,13 @@ Sequel.migration do
       index [:idp_sso_descriptor_id], :name=>:mdui_dh_idp_fkey
     end
     
+    create_table(:discovery_response_services) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :sp_sso_descriptor_id, :sp_sso_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
+      
+      index [:sp_sso_descriptor_id], :name=>:sp_drs_fkey
+    end
+    
     create_table(:key_descriptors) do
       primary_key :id, :type=>"int(11)"
       foreign_key :key_info_id, :key_infos, :type=>"int(11)", :key=>[:id]
@@ -739,5 +742,6 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150216043207_create_known_entities.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150216050609_rename_entities_descriptor_id_foreign_keys.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150217053637_add_kind_to_role_descriptor.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150226001416_add_sp_sso_descriptor_foreign_key_to_discovery_response_services.rb')"
   end
 end
