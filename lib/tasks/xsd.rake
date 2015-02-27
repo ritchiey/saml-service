@@ -40,7 +40,9 @@ namespace :xsd do
     response = Net::HTTP.get_response(URI.parse(uri))
     response.value
 
-    File.open(t.name, 'w').write(response.body)
-    puts "done.\n(sha256sum: #{OpenSSL::Digest::SHA256.hexdigest(response.body)})"
+    File.open(t.name, 'w') { |f| f.write(response.body) }
+    puts 'done.'
+    puts "(sha256sum: #{OpenSSL::Digest::SHA256.hexdigest(response.body)})"
+    puts
   end
 end
