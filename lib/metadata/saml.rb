@@ -195,7 +195,7 @@ module Metadata
         rd.protocol_supports.map(&:uri).join(',')
       scope.parent[:errorURL] = rd.error_url if rd.error_url
 
-      scope.Extensions(rd.extensions) if rd.extensions?
+      role_descriptor_extensions(rd, scope)
 
       rd.key_descriptors.each do |kd|
         key_descriptor(kd)
@@ -203,6 +203,22 @@ module Metadata
 
       organization(rd.organization) if rd.organization
       rd.contact_people.each { |cp| contact_person(cp) }
+    end
+
+    def role_descriptor_extensions(rd, scope)
+      return unless rd.extensions?
+
+      scope.Extensions do |_|
+        ui_info(rd.ui_info) if rd.ui_info.present?
+
+        # IDPSSODescriptor specific
+        if rd.is_a? IDPSSODescriptor
+          disco_hints(rd.disco_hints) if rd.disco_hints.present?
+        end
+
+        # General extensions text data supplied by RoleDescriptor
+        scope << rd.extensions if rd.extensions.present?
+      end
     end
 
     def key_descriptor(kd)
@@ -391,6 +407,52 @@ module Metadata
     def attribute_service(ep)
       root.AttributeService do |as_node|
         endpoint(ep, as_node)
+      end
+    end
+
+    def ui_info(info)
+      mdui.UIInfo(ns) do |_|
+        info.display_names.each do |display_name|
+          mdui.DisplayName(display_name.value, lang: display_name.lang)
+        end
+
+        info.descriptions.each do |description|
+          mdui.Description(description.value, lang: description.lang)
+        end
+
+        info.keyword_lists.each do |keywords|
+          mdui.Keywords(keywords.content, lang: keywords.lang)
+        end
+
+        info.logos.each do |logo|
+          attributes = { height: logo.height, width: logo.width }
+          attributes[:lang] = logo.lang if logo.lang.present?
+          mdui.Logo(logo.uri, attributes)
+        end
+
+        info.information_urls.each do |url|
+          mdui.InformationURL(url.uri, lang: url.lang)
+        end
+
+        info.privacy_statement_urls.each do |url|
+          mdui.PrivacyStatementURL(url.uri, lang: url.lang)
+        end
+      end
+    end
+
+    def disco_hints(disco)
+      mdui.DiscoHints(ns) do |_|
+        disco.ip_hints.each do |ip_hint|
+          mdui.IPHint(ip_hint.block)
+        end
+
+        disco.domain_hints.each do |domain_hint|
+          mdui.DomainHint(domain_hint.domain)
+        end
+
+        disco.geolocation_hints.each do |geolocation_hint|
+          mdui.GeolocationHint(geolocation_hint.uri)
+        end
       end
     end
   end

@@ -19,7 +19,7 @@ class RoleDescriptor < Sequel::Model
   end
 
   def extensions?
-    extensions.try(:present?)
+    extensions.try(:present?) || ui_info.try(:present?)
   end
 
   def key_descriptors?

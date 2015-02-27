@@ -75,7 +75,4 @@ RSpec.shared_examples 'SPSSODescriptor xml' do
       end
     end
   end
-
-  it 'MDUI:DisplayName'
-  it 'MDUI:Description'
 end
