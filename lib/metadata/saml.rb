@@ -44,7 +44,7 @@ module Metadata
         entities_descriptor_extensions
 
         known_entities.each do |ke|
-          entity_descriptor(ke.entity_descriptor)
+          known_entity(ke)
         end
       end
     end
@@ -88,7 +88,7 @@ module Metadata
 
       mdrpi.PublicationInfo(ns, attrs) do |_|
         publication_info.usage_policies.each do |up|
-          mdrpi.UsagePolicy(up.uri, lang: up.lang)
+          mdrpi.UsagePolicy(up.uri, 'xml:lang' => up.lang)
         end
       end
     end
@@ -115,6 +115,17 @@ module Metadata
       attributes = { ID: instance_id,
                      validUntil: expires_at.xmlschema }
       entity_descriptor(ed, attributes, true)
+    end
+
+    def known_entity(entity)
+      if entity.entity_descriptor
+        return entity_descriptor(entity.entity_descriptor)
+      end
+      raw_entity_descriptor(entity.raw_entity_descriptor)
+    end
+
+    def raw_entity_descriptor(red)
+      root << red.xml
     end
 
     def entity_descriptor(ed, attributes = {}, root_node = false)
@@ -157,7 +168,7 @@ module Metadata
       }
       mdrpi.RegistrationInfo(ns, attributes) do |_|
         mi.registration_info.registration_policies.each do |rp|
-          mdrpi.RegistrationPolicy(rp.uri, lang: rp.lang)
+          mdrpi.RegistrationPolicy(rp.uri, 'xml:lang' => rp.lang)
         end
       end
     end
@@ -165,15 +176,15 @@ module Metadata
     def organization(org)
       root.Organization(ns) do |_|
         org.organization_names.each do |name|
-          root.OrganizationName(name.value, lang: name.lang)
+          root.OrganizationName(name.value, 'xml:lang' => name.lang)
         end
 
         org.organization_display_names.each do |dname|
-          root.OrganizationDisplayName(dname.value, lang: dname.lang)
+          root.OrganizationDisplayName(dname.value, 'xml:lang' => dname.lang)
         end
 
         org.organization_urls.each do |url|
-          root.OrganizationURL(url.uri, lang: url.lang)
+          root.OrganizationURL(url.uri, 'xml:lang' => url.lang)
         end
       end
     end
@@ -366,12 +377,12 @@ module Metadata
       }
       root.AttributeConsumingService(ns, attributes) do |_acs_node|
         acs.service_names.each do |service_name|
-          root.ServiceName(service_name.value, lang: service_name.lang)
+          root.ServiceName(service_name.value, 'xml:lang' => service_name.lang)
         end
 
         acs.service_descriptions.each do |service_description|
           root.ServiceDescription(service_description.value,
-                                  lang: service_description.lang)
+                                  'xml:lang' => service_description.lang)
         end
 
         acs.requested_attributes.each do |ra|
@@ -422,29 +433,29 @@ module Metadata
     def ui_info(info)
       mdui.UIInfo(ns) do |_|
         info.display_names.each do |display_name|
-          mdui.DisplayName(display_name.value, lang: display_name.lang)
+          mdui.DisplayName(display_name.value, 'xml:lang' => display_name.lang)
         end
 
         info.descriptions.each do |description|
-          mdui.Description(description.value, lang: description.lang)
+          mdui.Description(description.value, 'xml:lang' => description.lang)
         end
 
         info.keyword_lists.each do |keywords|
-          mdui.Keywords(keywords.content, lang: keywords.lang)
+          mdui.Keywords(keywords.content, 'xml:lang' => keywords.lang)
         end
 
         info.logos.each do |logo|
           attributes = { height: logo.height, width: logo.width }
-          attributes[:lang] = logo.lang if logo.lang.present?
+          attributes['xml:lang'] = logo.lang if logo.lang.present?
           mdui.Logo(logo.uri, attributes)
         end
 
         info.information_urls.each do |url|
-          mdui.InformationURL(url.uri, lang: url.lang)
+          mdui.InformationURL(url.uri, 'xml:lang' => url.lang)
         end
 
         info.privacy_statement_urls.each do |url|
-          mdui.PrivacyStatementURL(url.uri, lang: url.lang)
+          mdui.PrivacyStatementURL(url.uri, 'xml:lang' => url.lang)
         end
       end
     end

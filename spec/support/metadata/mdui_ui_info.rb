@@ -21,7 +21,7 @@ RSpec.shared_examples 'mdui:UIInfo xml' do
     context 'rendered node' do
       let(:node) { xml.first(:xpath, mdui_display_name_path) }
       it 'sets language' do
-        expect(node['lang']).to eq(ui_info.display_names.first.lang)
+        expect(node['xml:lang']).to eq(ui_info.display_names.first.lang)
       end
       it 'sets correct value' do
         expect(node.text).to eq(ui_info.display_names.first.value)
@@ -44,7 +44,7 @@ RSpec.shared_examples 'mdui:UIInfo xml' do
     context 'rendered node' do
       let(:node) { xml.first(:xpath, mdui_description_path) }
       it 'sets language' do
-        expect(node['lang']).to eq(ui_info.descriptions.first.lang)
+        expect(node['xml:lang']).to eq(ui_info.descriptions.first.lang)
       end
       it 'sets correct value' do
         expect(node.text).to eq(ui_info.descriptions.first.value)
@@ -69,7 +69,7 @@ RSpec.shared_examples 'mdui:UIInfo xml' do
     context 'rendered node' do
       let(:node) { xml.first(:xpath, mdui_keywords_path) }
       it 'sets language' do
-        expect(node['lang']).to eq(ui_info.keyword_lists.first.lang)
+        expect(node['xml:lang']).to eq(ui_info.keyword_lists.first.lang)
       end
       it 'sets correct value' do
         expect(node.text).to eq(ui_info.keyword_lists.first.content)
@@ -87,7 +87,7 @@ RSpec.shared_examples 'mdui:UIInfo xml' do
     context 'rendered node' do
       let(:node) { xml.first(:xpath, mdui_logo_path) }
       it 'sets language' do
-        expect(node['lang']).to eq(ui_info.logos.first.lang)
+        expect(node['xml:lang']).to eq(ui_info.logos.first.lang)
       end
       it 'sets height' do
         expect(node['height']).to eq(ui_info.logos.first.height.to_s)
@@ -111,7 +111,7 @@ RSpec.shared_examples 'mdui:UIInfo xml' do
     context 'rendered node' do
       let(:node) { xml.first(:xpath, mdui_informationurl_path) }
       it 'sets language' do
-        expect(node['lang']).to eq(ui_info.information_urls.first.lang)
+        expect(node['xml:lang']).to eq(ui_info.information_urls.first.lang)
       end
       it 'sets correct value' do
         expect(node.text).to eq(ui_info.information_urls.first.uri)
@@ -129,7 +129,8 @@ RSpec.shared_examples 'mdui:UIInfo xml' do
     context 'rendered node' do
       let(:node) { xml.first(:xpath, mdui_privacystatementurl_path) }
       it 'sets language' do
-        expect(node['lang']).to eq(ui_info.privacy_statement_urls.first.lang)
+        expect(node['xml:lang'])
+          .to eq(ui_info.privacy_statement_urls.first.lang)
       end
       it 'sets correct value' do
         expect(node.text).to eq(ui_info.privacy_statement_urls.first.uri)

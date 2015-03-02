@@ -41,6 +41,8 @@ Sequel.migration do
       column :active, "tinyint(1)", :null=>false
       column :created_at, "datetime", :null=>false
       column :updated_at, "datetime", :null=>false
+      column :url, "varchar(255)"
+      column :certificate, "varchar(4096)"
     end
     
     create_table(:indexed_endpoints) do
@@ -207,6 +209,16 @@ Sequel.migration do
       column :updated_at, "datetime"
       
       index [:role_id], :name=>:perm_role_fkey
+    end
+    
+    create_table(:raw_entity_descriptors) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :known_entity_id, :known_entities, :type=>"int(11)", :null=>false, :key=>[:id]
+      column :xml, "text", :null=>false
+      column :created_at, "datetime", :null=>false
+      column :updated_at, "datetime", :null=>false
+      
+      index [:known_entity_id], :unique=>true
     end
     
     create_table(:roles_subjects) do
@@ -742,6 +754,9 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150216043207_create_known_entities.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150216050609_rename_entities_descriptor_id_foreign_keys.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150217053637_add_kind_to_role_descriptor.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150219021123_create_raw_entity_descriptors.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150223223047_add_url_to_entity_source.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150226001416_add_sp_sso_descriptor_foreign_key_to_discovery_response_services.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150226030540_add_certificate_to_entity_sources.rb')"
   end
 end

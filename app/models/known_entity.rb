@@ -1,6 +1,9 @@
 class KnownEntity < Sequel::Model
   many_to_one :entity_source
   one_to_one :entity_descriptor
+  one_to_one :raw_entity_descriptor
+
+  alias_method :active?, :active
 
   def validate
     super
