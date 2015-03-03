@@ -8,6 +8,7 @@ gem 'aaf-gumboot', git: 'https://github.com/ausaccessfed/aaf-gumboot.git',
                    branch: 'develop'
 gem 'accession'
 gem 'nokogiri', '~> 1.6.5'
+gem 'xmldsig'
 
 gem 'resque'
 gem 'resque-retry'

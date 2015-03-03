@@ -35,6 +35,10 @@ module Metadata
                      "#{created_at.to_formatted_s(:number)}"
     end
 
+    def sign(key)
+      Xmldsig::SignedDocument.new(builder.doc).sign(key)
+    end
+
     def entities_descriptor(known_entities)
       attributes = { ID: instance_id,
                      Name: metadata_name,

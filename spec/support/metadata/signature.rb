@@ -96,4 +96,36 @@ RSpec.shared_examples 'ds:Signature xml' do
 
     expect(cert).to eq(certificate.to_pem.strip)
   end
+
+  context 'with a signed document' do
+    let(:raw_xml) { subject.sign(key) }
+
+    let(:c14n_xml) do
+      doc = subject.builder.doc.dup
+      doc.xpath('//ds:Signature').each(&:remove)
+      doc.canonicalize(Nokogiri::XML::XML_C14N_EXCLUSIVE_1_0)
+    end
+
+    let(:c14n_signed_info) do
+      doc = Nokogiri::XML::Document.new
+      doc << signed_info.native.dup
+      doc.canonicalize(Nokogiri::XML::XML_C14N_EXCLUSIVE_1_0)
+    end
+
+    it 'includes the digest value' do
+      sha1 = OpenSSL::Digest::SHA1.digest(c14n_xml)
+      expected = Base64.strict_encode64(sha1)
+
+      expect(reference.find(:xpath, 'ds:DigestValue').text.strip)
+        .to eq(expected)
+    end
+
+    it 'includes the signature value' do
+      rsa_sig = key.sign(OpenSSL::Digest::SHA1.new, c14n_signed_info)
+      expected = Base64.encode64(rsa_sig).strip
+
+      expect(signature.find(:xpath, 'ds:SignatureValue').text.strip)
+        .to eq(expected)
+    end
+  end
 end
