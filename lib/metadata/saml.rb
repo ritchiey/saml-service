@@ -99,11 +99,11 @@ module Metadata
               ds.Modulus(bn_base64(certificate.public_key.n))
               ds.Exponent(bn_base64(certificate.public_key.e))
             end
+          end
 
-            ds.X509Data do
-              b64 = Base64.strict_encode64(certificate.to_der)
-              ds.X509Certificate(b64.scan(/.{1,64}/).join("\n"))
-            end
+          ds.X509Data do
+            b64 = Base64.strict_encode64(certificate.to_der)
+            ds.X509Certificate(b64.scan(/.{1,64}/).join("\n"))
           end
         end
       end

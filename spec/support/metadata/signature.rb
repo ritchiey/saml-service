@@ -61,12 +61,12 @@ RSpec.shared_examples 'ds:Signature xml' do
   it 'includes the key info' do
     expect(signature).to have_xpath('ds:KeyInfo', count: 1)
       .and have_xpath('ds:KeyInfo/ds:KeyValue', count: 1)
+      .and have_xpath('ds:KeyInfo/ds:X509Data', count: 1)
+      .and have_xpath('ds:KeyInfo/ds:X509Data/ds:X509Certificate', count: 1)
 
     expect(key_value).to have_xpath('ds:RSAKeyValue', count: 1)
       .and have_xpath('ds:RSAKeyValue/ds:Modulus', count: 1)
       .and have_xpath('ds:RSAKeyValue/ds:Exponent', count: 1)
-      .and have_xpath('ds:X509Data', count: 1)
-      .and have_xpath('ds:X509Data/ds:X509Certificate', count: 1)
   end
 
   def bn_base64(bn)
@@ -90,7 +90,7 @@ RSpec.shared_examples 'ds:Signature xml' do
   it 'includes the X509 certificate' do
     cert = [
       '-----BEGIN CERTIFICATE-----',
-      key_value.find(:xpath, './/ds:X509Certificate').text.strip,
+      signature.find(:xpath, './/ds:X509Certificate').text.strip,
       '-----END CERTIFICATE-----'
     ].join("\n")
 
@@ -98,6 +98,8 @@ RSpec.shared_examples 'ds:Signature xml' do
   end
 
   context 'with a signed document' do
+    let(:schema) { Nokogiri::XML::Schema.new(File.open('schema/top.xsd', 'r')) }
+    let(:validation_errors) { schema.validate(Nokogiri::XML.parse(raw_xml)) }
     let(:raw_xml) { subject.sign(key) }
 
     let(:c14n_xml) do
@@ -126,6 +128,10 @@ RSpec.shared_examples 'ds:Signature xml' do
 
       expect(signature.find(:xpath, 'ds:SignatureValue').text.strip)
         .to eq(expected)
+    end
+
+    it 'is schema-valid' do
+      expect(validation_errors).to be_empty
     end
   end
 end
