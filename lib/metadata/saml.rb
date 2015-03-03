@@ -6,7 +6,7 @@ module Metadata
 
     attr_reader :builder, :created_at, :expires_at, :instance_id,
                 :federation_identifier, :metadata_name, :metadata_instance,
-                :metadata_validity_period
+                :metadata_validity_period, :certificate
 
     protected
 
@@ -41,6 +41,7 @@ module Metadata
                      validUntil: expires_at.xmlschema }
 
       root.EntitiesDescriptor(ns, attributes) do |_|
+        signature_element
         entities_descriptor_extensions
 
         known_entities.each do |ke|
@@ -57,6 +58,50 @@ module Metadata
         registration_info(mi) if mi.registration_info.present?
         key_authority(mi) if mi.ca_key_infos.present?
         entity_attribute(mi.entity_attribute) if mi.entity_attribute.present?
+      end
+    end
+
+    C14N_METHOD = 'http://www.w3.org/2001/10/xml-exc-c14n#'
+    SIGNATURE_METHOD = 'http://www.w3.org/2000/09/xmldsig#rsa-sha1'
+    TRANSFORM_METHODS = %w(
+      http://www.w3.org/2000/09/xmldsig#enveloped-signature
+      http://www.w3.org/2001/10/xml-exc-c14n#
+    )
+    DIGEST_METHOD = 'http://www.w3.org/2000/09/xmldsig#sha1'
+
+    def signature_element
+      ds.Signature do
+        ds.SignedInfo do
+          ds.CanonicalizationMethod(Algorithm: C14N_METHOD)
+          ds.SignatureMethod(Algorithm: SIGNATURE_METHOD)
+
+          ds.Reference(URI: "##{instance_id}") do
+            ds.Transforms do
+              TRANSFORM_METHODS.each do |method|
+                ds.Transform(Algorithm: method)
+              end
+            end
+
+            ds.DigestMethod(Algorithm: DIGEST_METHOD)
+            ds.DigestValue('')
+          end
+        end
+
+        ds.SignatureValue('')
+
+        ds.KeyInfo do
+          ds.KeyValue do
+            ds.RSAKeyValue do
+              ds.Modulus(bn_base64(certificate.public_key.n))
+              ds.Exponent(bn_base64(certificate.public_key.e))
+            end
+
+            ds.X509Data do
+              b64 = Base64.strict_encode64(certificate.to_der)
+              ds.X509Certificate(b64.scan(/.{1,64}/).join("\n"))
+            end
+          end
+        end
       end
     end
 
@@ -474,6 +519,10 @@ module Metadata
           mdui.GeolocationHint(geolocation_hint.uri)
         end
       end
+    end
+
+    def bn_base64(bn)
+      Base64.strict_encode64([bn.to_s(16)].pack('H*'))
     end
   end
 end

@@ -7,7 +7,8 @@ RSpec.describe Metadata::SAML do
     Metadata::SAML.new(metadata_instance: metadata_instance,
                        federation_identifier: federation_identifier,
                        metadata_name: metadata_name,
-                       metadata_validity_period: metadata_validity_period)
+                       metadata_validity_period: metadata_validity_period,
+                       certificate: certificate)
   end
 
   let(:federation_identifier) { Faker::Internet.domain_word }
@@ -15,6 +16,27 @@ RSpec.describe Metadata::SAML do
   let(:metadata_validity_period) { 1.weeks }
   let(:metadata_instance) { create(:metadata_instance) }
   let(:entity_descriptors) { entity_source.entity_descriptors }
+
+  before(:all) { @key = OpenSSL::PKey::RSA.new(1024) }
+
+  let(:key) { @key }
+
+  let(:certificate) do
+    cert = OpenSSL::X509::Certificate.new
+
+    cert.subject = cert.issuer =
+      OpenSSL::X509::Name.parse("CN=#{SecureRandom.urlsafe_base64}")
+
+    cert.public_key = key.public_key
+
+    cert.not_before = Time.now
+    cert.not_after = Time.now + 3600
+    cert.serial = 0x0
+    cert.version = 2
+
+    cert.sign key, OpenSSL::Digest::SHA1.new
+    cert
+  end
 
   let(:builder) { subject.builder }
   let(:raw_xml) { builder.to_xml }
@@ -351,5 +373,11 @@ RSpec.describe Metadata::SAML do
     let(:disco_hints) { create :mdui_disco_hints_with_content }
     before { subject.disco_hints(disco_hints) }
     include_examples 'mdui:DiscoHints xml'
+  end
+
+  context 'ds:Signature' do
+    let(:entities) { [create(:raw_entity_descriptor).known_entity] }
+    before { subject.entities_descriptor(entities) }
+    include_examples 'ds:Signature xml'
   end
 end
