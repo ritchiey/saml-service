@@ -14,6 +14,7 @@ guard :rspec, cmd: 'bundle exec rspec' do
   watch(%r{^spec/factories/(.+)\.rb$})                { "spec/support/factories_spec.rb" }
 
   watch(%r{^spec/.+_spec\.rb$})
+  watch(%r{^spec/support/metadata/.+\.rb$})           { 'spec/metadata' }
   watch(%r{^app/(.+)\.rb$})                           { |m| "spec/#{m[1]}_spec.rb" }
   watch(%r{^lib/(.+)\.rb$})                           { |m| "spec/#{m[1]}_spec.rb" }
   watch(%r{^app/(.*)(\.erb|\.haml|\.slim)$})          { |m| "spec/#{m[1]}#{m[2]}_spec.rb" }
