@@ -95,6 +95,7 @@ Sequel.migration do
       column :created_at, "datetime"
       column :updated_at, "datetime"
       column :ca_verify_depth, "int(11)"
+      column :hash_algorithm, "varchar(255)", :null=>false
     end
     
     create_table(:organizations) do
@@ -758,5 +759,6 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150223223047_add_url_to_entity_source.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150226001416_add_sp_sso_descriptor_foreign_key_to_discovery_response_services.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150226030540_add_certificate_to_entity_sources.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150304031737_add_hash_algorithm_to_metadata_instance.rb')"
   end
 end

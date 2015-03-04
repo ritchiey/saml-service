@@ -1,6 +1,7 @@
 FactoryGirl.define do
   factory :metadata_instance do
     name { Faker::Internet.domain_name }
+    hash_algorithm 'sha256'
 
     after :create do | mi |
       create(:mdrpi_publication_info, metadata_instance: mi)
