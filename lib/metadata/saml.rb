@@ -109,8 +109,8 @@ module Metadata
         ds.KeyInfo do
           ds.KeyValue do
             ds.RSAKeyValue do
-              ds.Modulus(bn_base64(certificate.public_key.n))
-              ds.Exponent(bn_base64(certificate.public_key.e))
+              ds.Modulus(openssl_bn_to_base64(certificate.public_key.n))
+              ds.Exponent(openssl_bn_to_base64(certificate.public_key.e))
             end
           end
 
@@ -538,7 +538,7 @@ module Metadata
       end
     end
 
-    def bn_base64(bn)
+    def openssl_bn_to_base64(bn)
       Base64.strict_encode64([bn.to_s(16)].pack('H*'))
     end
   end
