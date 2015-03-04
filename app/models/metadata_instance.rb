@@ -8,8 +8,10 @@ class MetadataInstance < Sequel::Model
 
   def validate
     super
-    validates_presence [:name, :created_at, :updated_at]
+    validates_presence [:name, :created_at, :updated_at, :hash_algorithm]
     validates_presence :ca_verify_depth if ca_key_infos.present?
     validates_presence :publication_info unless new?
+
+    validates_includes %w(sha1 sha256), :hash_algorithm
   end
 end
