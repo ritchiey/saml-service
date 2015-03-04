@@ -66,18 +66,31 @@ module Metadata
     end
 
     C14N_METHOD = 'http://www.w3.org/2001/10/xml-exc-c14n#'
-    SIGNATURE_METHOD = 'http://www.w3.org/2000/09/xmldsig#rsa-sha1'
     TRANSFORM_METHODS = %w(
       http://www.w3.org/2000/09/xmldsig#enveloped-signature
       http://www.w3.org/2001/10/xml-exc-c14n#
     )
-    DIGEST_METHOD = 'http://www.w3.org/2000/09/xmldsig#sha1'
+
+    SIGNATURE_METHOD = {
+      sha1: 'http://www.w3.org/2000/09/xmldsig#rsa-sha1',
+      sha256: 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256'
+    }.with_indifferent_access
+
+    DIGEST_METHOD = {
+      sha1: 'http://www.w3.org/2000/09/xmldsig#sha1',
+      sha256: 'http://www.w3.org/2001/04/xmlenc#sha256'
+    }.with_indifferent_access
+
+    private_constant :C14N_METHOD, :TRANSFORM_METHODS, :SIGNATURE_METHOD,
+                     :DIGEST_METHOD
 
     def signature_element
+      hash_algorithm = metadata_instance.hash_algorithm
+
       ds.Signature do
         ds.SignedInfo do
           ds.CanonicalizationMethod(Algorithm: C14N_METHOD)
-          ds.SignatureMethod(Algorithm: SIGNATURE_METHOD)
+          ds.SignatureMethod(Algorithm: SIGNATURE_METHOD[hash_algorithm])
 
           ds.Reference(URI: "##{instance_id}") do
             ds.Transforms do
@@ -86,7 +99,7 @@ module Metadata
               end
             end
 
-            ds.DigestMethod(Algorithm: DIGEST_METHOD)
+            ds.DigestMethod(Algorithm: DIGEST_METHOD[hash_algorithm])
             ds.DigestValue('')
           end
         end

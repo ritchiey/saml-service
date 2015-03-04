@@ -14,8 +14,12 @@ RSpec.describe Metadata::SAML do
   let(:federation_identifier) { Faker::Internet.domain_word }
   let(:metadata_name) { "urn:mace:#{federation_identifier}.edu:test" }
   let(:metadata_validity_period) { 1.weeks }
-  let(:metadata_instance) { create(:metadata_instance) }
   let(:entity_descriptors) { entity_source.entity_descriptors }
+  let(:hash_algorithm) { 'sha256' }
+
+  let(:metadata_instance) do
+    create(:metadata_instance, hash_algorithm: hash_algorithm)
+  end
 
   before(:all) { @key = OpenSSL::PKey::RSA.new(1024) }
 

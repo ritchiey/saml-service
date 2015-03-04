@@ -22,11 +22,6 @@ RSpec.shared_examples 'ds:Signature xml' do
     expect(signed_info).to have_xpath('ds:SignatureMethod', count: 1)
   end
 
-  it 'uses the correct signature method' do
-    e = signed_info.find(:xpath, 'ds:SignatureMethod')
-    expect(e['Algorithm']).to eq('http://www.w3.org/2000/09/xmldsig#rsa-sha1')
-  end
-
   it 'includes the reference element' do
     expect(signed_info).to have_xpath('ds:Reference', count: 1)
   end
@@ -51,11 +46,6 @@ RSpec.shared_examples 'ds:Signature xml' do
 
   it 'includes the digest method' do
     expect(reference).to have_xpath('ds:DigestMethod', count: 1)
-  end
-
-  it 'specifies the digest algorithm' do
-    e = reference.find(:xpath, 'ds:DigestMethod')
-    expect(e['Algorithm']).to eq('http://www.w3.org/2000/09/xmldsig#sha1')
   end
 
   it 'includes the key info' do
@@ -114,24 +104,74 @@ RSpec.shared_examples 'ds:Signature xml' do
       doc.canonicalize(Nokogiri::XML::XML_C14N_EXCLUSIVE_1_0)
     end
 
-    it 'includes the digest value' do
-      sha1 = OpenSSL::Digest::SHA1.digest(c14n_xml)
-      expected = Base64.strict_encode64(sha1)
+    context 'using sha1' do
+      let(:hash_algorithm) { 'sha1' }
 
-      expect(reference.find(:xpath, 'ds:DigestValue').text.strip)
-        .to eq(expected)
+      it 'uses the correct signature method' do
+        e = signed_info.find(:xpath, 'ds:SignatureMethod')
+        expect(e['Algorithm'])
+          .to eq('http://www.w3.org/2000/09/xmldsig#rsa-sha1')
+      end
+
+      it 'specifies the digest algorithm' do
+        e = reference.find(:xpath, 'ds:DigestMethod')
+        expect(e['Algorithm']).to eq('http://www.w3.org/2000/09/xmldsig#sha1')
+      end
+
+      it 'includes the digest value' do
+        hash = OpenSSL::Digest::SHA1.digest(c14n_xml)
+        expected = Base64.strict_encode64(hash)
+
+        expect(reference.find(:xpath, 'ds:DigestValue').text.strip)
+          .to eq(expected)
+      end
+
+      it 'includes the signature value' do
+        rsa_sig = key.sign(OpenSSL::Digest::SHA1.new, c14n_signed_info)
+        expected = Base64.encode64(rsa_sig).strip
+
+        expect(signature.find(:xpath, 'ds:SignatureValue').text.strip)
+          .to eq(expected)
+      end
+
+      it 'is schema-valid' do
+        expect(validation_errors).to be_empty
+      end
     end
 
-    it 'includes the signature value' do
-      rsa_sig = key.sign(OpenSSL::Digest::SHA1.new, c14n_signed_info)
-      expected = Base64.encode64(rsa_sig).strip
+    context 'using sha256' do
+      let(:hash_algorithm) { 'sha256' }
 
-      expect(signature.find(:xpath, 'ds:SignatureValue').text.strip)
-        .to eq(expected)
-    end
+      it 'uses the correct signature method' do
+        e = signed_info.find(:xpath, 'ds:SignatureMethod')
+        expect(e['Algorithm'])
+          .to eq('http://www.w3.org/2001/04/xmldsig-more#rsa-sha256')
+      end
 
-    it 'is schema-valid' do
-      expect(validation_errors).to be_empty
+      it 'specifies the digest algorithm' do
+        e = reference.find(:xpath, 'ds:DigestMethod')
+        expect(e['Algorithm']).to eq('http://www.w3.org/2001/04/xmlenc#sha256')
+      end
+
+      it 'includes the digest value' do
+        hash = OpenSSL::Digest::SHA256.digest(c14n_xml)
+        expected = Base64.strict_encode64(hash)
+
+        expect(reference.find(:xpath, 'ds:DigestValue').text.strip)
+          .to eq(expected)
+      end
+
+      it 'includes the signature value' do
+        rsa_sig = key.sign(OpenSSL::Digest::SHA256.new, c14n_signed_info)
+        expected = Base64.encode64(rsa_sig).strip
+
+        expect(signature.find(:xpath, 'ds:SignatureValue').text.strip)
+          .to eq(expected)
+      end
+
+      it 'is schema-valid' do
+        expect(validation_errors).to be_empty
+      end
     end
   end
 end
