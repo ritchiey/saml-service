@@ -59,22 +59,22 @@ RSpec.shared_examples 'ds:Signature xml' do
       .and have_xpath('ds:RSAKeyValue/ds:Exponent', count: 1)
   end
 
-  def bn_base64(bn)
-    Base64.strict_encode64([bn.to_s(16)].pack('H*'))
+  def base64_to_i(str)
+    Base64.decode64(str).unpack('C*').reduce { |a, e| (a << 8) + e }
   end
 
   it 'includes the key modulus' do
-    modulus = key_value.find(:xpath, './/ds:Modulus').text
+    modulus = base64_to_i(key_value.find(:xpath, './/ds:Modulus').text)
     key = certificate.public_key
 
-    expect(modulus).to eq(bn_base64(key.n))
+    expect(modulus).to eq(key.n.to_i)
   end
 
   it 'includes the key exponent' do
-    exponent = key_value.find(:xpath, './/ds:Exponent').text
+    exponent = base64_to_i(key_value.find(:xpath, './/ds:Exponent').text)
     key = certificate.public_key
 
-    expect(exponent).to eq(bn_base64(key.e))
+    expect(exponent).to eq(key.e.to_i)
   end
 
   it 'includes the X509 certificate' do
