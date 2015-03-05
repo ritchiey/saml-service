@@ -14,13 +14,14 @@ FactoryGirl.define do
   factory :certificate, class: OpenSSL::X509::Certificate do
     transient do
       rsa_key { create(:rsa_key) }
-      dn { "CN=#{SecureRandom.urlsafe_base64}" }
+      subject_dn { "CN=#{SecureRandom.urlsafe_base64}" }
+      issuer_dn { subject_dn }
       digest_class OpenSSL::Digest::SHA256
     end
 
     public_key { rsa_key.public_key }
-    issuer { OpenSSL::X509::Name.parse(dn) }
-    subject { issuer }
+    issuer { OpenSSL::X509::Name.parse(issuer_dn) }
+    subject { OpenSSL::X509::Name.parse(subject_dn) }
 
     not_before { Time.now }
     not_after { 1.hour.from_now }

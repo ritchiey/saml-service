@@ -21,26 +21,8 @@ RSpec.describe Metadata::SAML do
     create(:metadata_instance, hash_algorithm: hash_algorithm)
   end
 
-  before(:all) { @key = OpenSSL::PKey::RSA.new(1024) }
-
-  let(:key) { @key }
-
-  let(:certificate) do
-    cert = OpenSSL::X509::Certificate.new
-
-    cert.subject = cert.issuer =
-      OpenSSL::X509::Name.parse("CN=#{SecureRandom.urlsafe_base64}")
-
-    cert.public_key = key.public_key
-
-    cert.not_before = Time.now
-    cert.not_after = Time.now + 3600
-    cert.serial = 0x0
-    cert.version = 2
-
-    cert.sign key, OpenSSL::Digest::SHA1.new
-    cert
-  end
+  let(:key) { create(:rsa_key) }
+  let(:certificate) { create(:certificate, rsa_key: key) }
 
   let(:builder) { subject.builder }
   let(:raw_xml) { builder.to_xml }
