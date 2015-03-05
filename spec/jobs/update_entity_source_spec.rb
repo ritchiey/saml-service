@@ -1,13 +1,35 @@
 require 'rails_helper'
 
 RSpec.describe UpdateEntitySource do
-  subject { create(:entity_source, :external) }
+  subject { create(:entity_source, :external, certificate: certificate.to_pem) }
   before { stub_request(:get, subject.url).to_return(response) }
-  let(:response) { { status: 200, headers: {}, body: xml } }
+  let(:response) { { status: 200, headers: {}, body: signed_xml } }
   let(:doc) { Nokogiri::XML.parse(xml) }
+  let(:signed_xml) { Xmldsig::SignedDocument.new(xml).sign(key) }
 
   let(:entity_ids) do
     doc.xpath('//*[local-name() = "EntityDescriptor"]/@entityID').map(&:value)
+  end
+
+  before(:all) { @key = OpenSSL::PKey::RSA.new(1024) }
+
+  let(:key) { @key }
+
+  let(:certificate) do
+    cert = OpenSSL::X509::Certificate.new
+
+    cert.subject = cert.issuer =
+      OpenSSL::X509::Name.parse("CN=#{SecureRandom.urlsafe_base64}")
+
+    cert.public_key = key.public_key
+
+    cert.not_before = Time.now
+    cert.not_after = Time.now + 3600
+    cert.serial = 0x0
+    cert.version = 2
+
+    cert.sign key, OpenSSL::Digest::SHA1.new
+    cert
   end
 
   def swallow
@@ -29,9 +51,37 @@ RSpec.describe UpdateEntitySource do
     fragments.join("\n")
   end
 
+  EMPTY_SIGNATURE = <<-EOF.strip_heredoc
+    <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+      <ds:SignedInfo>
+        <ds:CanonicalizationMethod
+          Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+        <ds:SignatureMethod
+          Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
+
+        <ds:Reference URI="#_x">
+          <ds:Transforms>
+            <ds:Transform Algorithm=
+              "http://www.w3.org/2000/09/xmldsig#enveloped-signature" />
+            <ds:Transform
+              Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+          </ds:Transforms>
+
+          <ds:DigestMethod
+            Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+          <ds:DigestValue></ds:DigestValue>
+        </ds:Reference>
+      </ds:SignedInfo>
+
+      <ds:SignatureValue></ds:SignatureValue>
+    </ds:Signature>
+  EOF
+
   def entities_descriptor(fore: nil, entities:)
     [
-      '<EntitiesDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata">',
+      '<EntitiesDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" ',
+      'ID="_x">',
+      EMPTY_SIGNATURE.indent(2),
       fore,
       entity_descriptors(entities: entities).indent(2),
       '</EntitiesDescriptor>'
@@ -64,7 +114,7 @@ RSpec.describe UpdateEntitySource do
     it 'sets the xml for the raw entity descriptor' do
       run
       expect(subject.known_entities.last.raw_entity_descriptor.xml)
-        .to eq(Nokogiri::XML.parse(xml).root.elements[0].canonicalize)
+        .to eq(Nokogiri::XML.parse(xml).root.elements[1].canonicalize)
     end
 
     context 'when the entity already exists' do
@@ -110,7 +160,7 @@ RSpec.describe UpdateEntitySource do
         end
 
         it 'updates the raw entity descriptor' do
-          new_xml = Nokogiri::XML.parse(xml).root.elements[0].canonicalize
+          new_xml = Nokogiri::XML.parse(xml).root.elements[1].canonicalize
           expect { run }.to change { red.reload.xml }.from(old_xml).to(new_xml)
         end
       end
@@ -199,8 +249,7 @@ RSpec.describe UpdateEntitySource do
 
   context 'with invalid xml' do
     let(:xml) do
-      entities_descriptor(entities: 1)
-        .gsub(/entityID="[^"]+"/, '')
+      entities_descriptor(entities: 1) .gsub(/entityID="[^"]+"/, '')
     end
 
     it 'creates no records' do
@@ -247,11 +296,10 @@ RSpec.describe UpdateEntitySource do
     end
   end
 
-  context 'with an invalid signature', pending: 'Not implemented yet' do
-    let(:signature) { '' } # TODO
-    let(:xml) do
-      entities_descriptor(fore: signature, entities: 1)
-    end
+  context 'with an invalid signature' do
+    let(:wrong_key) { OpenSSL::PKey::RSA.new(1024) }
+    let(:xml) { entities_descriptor(entities: 1) }
+    let(:signed_xml) { Xmldsig::SignedDocument.new(xml).sign(wrong_key) }
 
     it 'raises an informative message' do
       swallow { run }

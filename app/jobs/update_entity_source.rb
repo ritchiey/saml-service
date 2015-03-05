@@ -40,12 +40,23 @@ class UpdateEntitySource
 
   def document(source)
     doc = Nokogiri::XML.parse(retrieve(source))
+
     errors = metadata_schema.validate(doc)
-    return doc if errors.empty?
+    if errors.empty?
+      verify_signature(source, doc)
+      return doc
+    end
 
     fail("Unable to update EntitySource(id=#{source.id} url=#{source.url}). " \
          'Schema validation errors prevented processing of the metadata ' \
          "document. Errors were: #{errors.join(', ')}")
+  end
+
+  def verify_signature(source, doc)
+    return if Xmldsig::SignedDocument.new(doc).validate(source.x509_certificate)
+
+    fail("Unable to update EntitySource(id=#{source.id} url=#{source.url}. " \
+         'Signature validation failed.')
   end
 
   def known_entity(source, node)
