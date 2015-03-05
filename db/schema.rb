@@ -62,6 +62,12 @@ Sequel.migration do
       column :updated_at, "datetime"
     end
     
+    create_table(:keypairs) do
+      primary_key :id, :type=>"int(11)"
+      column :certificate, "varchar(4096)", :null=>false
+      column :key, "varchar(4096)", :null=>false
+    end
+    
     create_table(:known_entities) do
       primary_key :id, :type=>"int(11)"
       column :entity_id, "varchar(255)", :null=>false
@@ -760,5 +766,6 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150226001416_add_sp_sso_descriptor_foreign_key_to_discovery_response_services.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150226030540_add_certificate_to_entity_sources.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150304031737_add_hash_algorithm_to_metadata_instance.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150305210958_create_keypairs.rb')"
   end
 end
