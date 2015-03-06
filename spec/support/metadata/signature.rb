@@ -5,6 +5,12 @@ RSpec.shared_examples 'ds:Signature xml' do
   let(:reference) { signed_info.find(:xpath, 'ds:Reference') }
   let(:key_value) { signature.find(:xpath, 'ds:KeyInfo/ds:KeyValue') }
 
+  let(:key) { OpenSSL::PKey::RSA.new(metadata_instance.keypair.key) }
+
+  let(:certificate) do
+    OpenSSL::X509::Certificate.new(metadata_instance.keypair.certificate)
+  end
+
   it 'has a <Signature> element' do
     expect(xml).to have_xpath("#{sig_xpath}")
   end
@@ -90,7 +96,7 @@ RSpec.shared_examples 'ds:Signature xml' do
   context 'with a signed document' do
     let(:schema) { Nokogiri::XML::Schema.new(File.open('schema/top.xsd', 'r')) }
     let(:validation_errors) { schema.validate(Nokogiri::XML.parse(raw_xml)) }
-    let(:raw_xml) { subject.sign(key) }
+    let(:raw_xml) { subject.sign }
 
     let(:c14n_xml) do
       doc = subject.builder.doc.dup

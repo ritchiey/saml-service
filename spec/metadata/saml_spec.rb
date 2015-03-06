@@ -7,8 +7,7 @@ RSpec.describe Metadata::SAML do
     Metadata::SAML.new(metadata_instance: metadata_instance,
                        federation_identifier: federation_identifier,
                        metadata_name: metadata_name,
-                       metadata_validity_period: metadata_validity_period,
-                       certificate: certificate)
+                       metadata_validity_period: metadata_validity_period)
   end
 
   let(:federation_identifier) { Faker::Internet.domain_word }
@@ -20,9 +19,6 @@ RSpec.describe Metadata::SAML do
   let(:metadata_instance) do
     create(:metadata_instance, hash_algorithm: hash_algorithm)
   end
-
-  let(:key) { create(:rsa_key) }
-  let(:certificate) { create(:certificate, rsa_key: key) }
 
   let(:builder) { subject.builder }
   let(:raw_xml) { builder.to_xml }

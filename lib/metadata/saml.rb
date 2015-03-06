@@ -6,7 +6,7 @@ module Metadata
 
     attr_reader :builder, :created_at, :expires_at, :instance_id,
                 :federation_identifier, :metadata_name, :metadata_instance,
-                :metadata_validity_period, :certificate
+                :metadata_validity_period
 
     protected
 
@@ -19,6 +19,14 @@ module Metadata
       attr.attribute_values.each do |attr_val|
         attribute_value(attr_val)
       end
+    end
+
+    def certificate
+      OpenSSL::X509::Certificate.new(metadata_instance.keypair.certificate)
+    end
+
+    def key
+      OpenSSL::PKey::RSA.new(metadata_instance.keypair.key)
     end
 
     public
@@ -35,7 +43,7 @@ module Metadata
                      "#{created_at.to_formatted_s(:number)}"
     end
 
-    def sign(key)
+    def sign
       Xmldsig::SignedDocument.new(builder.doc).sign(key)
     end
 
