@@ -1,5 +1,7 @@
 FactoryGirl.define do
   factory :metadata_instance do
+    association :keypair
+
     name { Faker::Internet.domain_name }
     hash_algorithm 'sha256'
 

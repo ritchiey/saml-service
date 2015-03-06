@@ -1,4 +1,6 @@
 class MetadataInstance < Sequel::Model
+  many_to_one :keypair
+
   one_to_many :entity_descriptors
   one_to_many :ca_key_infos
 
@@ -8,7 +10,8 @@ class MetadataInstance < Sequel::Model
 
   def validate
     super
-    validates_presence [:name, :created_at, :updated_at, :hash_algorithm]
+    validates_presence [:name, :created_at, :updated_at, :hash_algorithm,
+                        :keypair]
     validates_presence :ca_verify_depth if ca_key_infos.present?
     validates_presence :publication_info unless new?
 
