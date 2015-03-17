@@ -21,6 +21,14 @@ module Metadata
       end
     end
 
+    def certificate
+      OpenSSL::X509::Certificate.new(metadata_instance.keypair.certificate)
+    end
+
+    def key
+      OpenSSL::PKey::RSA.new(metadata_instance.keypair.key)
+    end
+
     public
 
     def initialize(params)
@@ -35,12 +43,17 @@ module Metadata
                      "#{created_at.to_formatted_s(:number)}"
     end
 
+    def sign
+      Xmldsig::SignedDocument.new(builder.doc).sign(key)
+    end
+
     def entities_descriptor(known_entities)
       attributes = { ID: instance_id,
                      Name: metadata_name,
                      validUntil: expires_at.xmlschema }
 
       root.EntitiesDescriptor(ns, attributes) do |_|
+        signature_element
         entities_descriptor_extensions
 
         known_entities.each do |ke|
@@ -57,6 +70,63 @@ module Metadata
         registration_info(mi) if mi.registration_info.present?
         key_authority(mi) if mi.ca_key_infos.present?
         entity_attribute(mi.entity_attribute) if mi.entity_attribute.present?
+      end
+    end
+
+    C14N_METHOD = 'http://www.w3.org/2001/10/xml-exc-c14n#'
+    TRANSFORM_METHODS = %w(
+      http://www.w3.org/2000/09/xmldsig#enveloped-signature
+      http://www.w3.org/2001/10/xml-exc-c14n#
+    )
+
+    SIGNATURE_METHOD = {
+      sha1: 'http://www.w3.org/2000/09/xmldsig#rsa-sha1',
+      sha256: 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256'
+    }.with_indifferent_access
+
+    DIGEST_METHOD = {
+      sha1: 'http://www.w3.org/2000/09/xmldsig#sha1',
+      sha256: 'http://www.w3.org/2001/04/xmlenc#sha256'
+    }.with_indifferent_access
+
+    private_constant :C14N_METHOD, :TRANSFORM_METHODS, :SIGNATURE_METHOD,
+                     :DIGEST_METHOD
+
+    def signature_element
+      hash_algorithm = metadata_instance.hash_algorithm
+
+      ds.Signature do
+        ds.SignedInfo do
+          ds.CanonicalizationMethod(Algorithm: C14N_METHOD)
+          ds.SignatureMethod(Algorithm: SIGNATURE_METHOD[hash_algorithm])
+
+          ds.Reference(URI: "##{instance_id}") do
+            ds.Transforms do
+              TRANSFORM_METHODS.each do |method|
+                ds.Transform(Algorithm: method)
+              end
+            end
+
+            ds.DigestMethod(Algorithm: DIGEST_METHOD[hash_algorithm])
+            ds.DigestValue('')
+          end
+        end
+
+        ds.SignatureValue('')
+
+        ds.KeyInfo do
+          ds.KeyValue do
+            ds.RSAKeyValue do
+              ds.Modulus(openssl_bn_to_base64(certificate.public_key.n))
+              ds.Exponent(openssl_bn_to_base64(certificate.public_key.e))
+            end
+          end
+
+          ds.X509Data do
+            b64 = Base64.strict_encode64(certificate.to_der)
+            ds.X509Certificate(b64.scan(/.{1,64}/).join("\n"))
+          end
+        end
       end
     end
 
@@ -474,6 +544,10 @@ module Metadata
           mdui.GeolocationHint(geolocation_hint.uri)
         end
       end
+    end
+
+    def openssl_bn_to_base64(bn)
+      Base64.strict_encode64([bn.to_s(16)].pack('H*'))
     end
   end
 end

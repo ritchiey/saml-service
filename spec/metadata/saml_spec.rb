@@ -13,8 +13,12 @@ RSpec.describe Metadata::SAML do
   let(:federation_identifier) { Faker::Internet.domain_word }
   let(:metadata_name) { "urn:mace:#{federation_identifier}.edu:test" }
   let(:metadata_validity_period) { 1.weeks }
-  let(:metadata_instance) { create(:metadata_instance) }
   let(:entity_descriptors) { entity_source.entity_descriptors }
+  let(:hash_algorithm) { 'sha256' }
+
+  let(:metadata_instance) do
+    create(:metadata_instance, hash_algorithm: hash_algorithm)
+  end
 
   let(:builder) { subject.builder }
   let(:raw_xml) { builder.to_xml }
@@ -351,5 +355,11 @@ RSpec.describe Metadata::SAML do
     let(:disco_hints) { create :mdui_disco_hints_with_content }
     before { subject.disco_hints(disco_hints) }
     include_examples 'mdui:DiscoHints xml'
+  end
+
+  context 'ds:Signature' do
+    let(:entities) { [create(:raw_entity_descriptor).known_entity] }
+    before { subject.entities_descriptor(entities) }
+    include_examples 'ds:Signature xml'
   end
 end

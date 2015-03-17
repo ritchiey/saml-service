@@ -62,6 +62,12 @@ Sequel.migration do
       column :updated_at, "datetime"
     end
     
+    create_table(:keypairs) do
+      primary_key :id, :type=>"int(11)"
+      column :certificate, "varchar(4096)", :null=>false
+      column :key, "varchar(4096)", :null=>false
+    end
+    
     create_table(:known_entities) do
       primary_key :id, :type=>"int(11)"
       column :entity_id, "varchar(255)", :null=>false
@@ -85,16 +91,6 @@ Sequel.migration do
       column :lang, "varchar(255)", :null=>false
       column :created_at, "datetime"
       column :updated_at, "datetime"
-    end
-    
-    create_table(:metadata_instances) do
-      primary_key :id, :type=>"int(11)"
-      column :identifier, "varchar(255)"
-      column :name, "varchar(255)", :null=>false
-      column :extensions, "text"
-      column :created_at, "datetime"
-      column :updated_at, "datetime"
-      column :ca_verify_depth, "int(11)"
     end
     
     create_table(:organizations) do
@@ -148,13 +144,6 @@ Sequel.migration do
       index [:sso_descriptor_id], :name=>:sso_ars_fkey
     end
     
-    create_table(:ca_key_infos) do
-      primary_key :id, :type=>"int(11)"
-      foreign_key :metadata_instance_id, :metadata_instances, :type=>"int(11)", :key=>[:id]
-      
-      index [:metadata_instance_id], :name=>:ca_key_infos_mi_id_fk
-    end
-    
     create_table(:entity_descriptors) do
       primary_key :id, :type=>"int(11)"
       foreign_key :organization_id, :organizations, :type=>"int(11)", :key=>[:id]
@@ -172,6 +161,20 @@ Sequel.migration do
       foreign_key :sso_descriptor_id, :sso_descriptors, :type=>"int(11)", :key=>[:id]
       
       index [:sso_descriptor_id], :name=>:sso_mnid_fkey
+    end
+    
+    create_table(:metadata_instances) do
+      primary_key :id, :type=>"int(11)"
+      column :identifier, "varchar(255)"
+      column :name, "varchar(255)", :null=>false
+      column :extensions, "text"
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      column :ca_verify_depth, "int(11)"
+      column :hash_algorithm, "varchar(255)", :null=>false
+      foreign_key :keypair_id, :keypairs, :type=>"int(11)", :null=>false, :key=>[:id]
+      
+      index [:keypair_id], :name=>:keypair_id
     end
     
     create_table(:organization_display_names) do
@@ -252,6 +255,13 @@ Sequel.migration do
       foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :key=>[:id]
       
       index [:entity_descriptor_id], :name=>:ed_aad_fkey
+    end
+    
+    create_table(:ca_key_infos) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :metadata_instance_id, :metadata_instances, :type=>"int(11)", :key=>[:id]
+      
+      index [:metadata_instance_id], :name=>:ca_key_infos_mi_id_fk
     end
     
     create_table(:entity_attributes) do
@@ -758,5 +768,8 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150223223047_add_url_to_entity_source.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150226001416_add_sp_sso_descriptor_foreign_key_to_discovery_response_services.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150226030540_add_certificate_to_entity_sources.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150304031737_add_hash_algorithm_to_metadata_instance.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150305210958_create_keypairs.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150305230517_add_keypair_to_metadata_instances.rb')"
   end
 end

@@ -26,8 +26,12 @@ class EntitySource < Sequel::Model
   def validate_certificate
     return if certificate.nil?
 
-    OpenSSL::X509::Certificate.new(certificate)
+    x509_certificate
   rescue OpenSSL::X509::CertificateError
     errors.add(:certificate, 'is not a valid PEM format X.509 certificate')
+  end
+
+  def x509_certificate
+    certificate && OpenSSL::X509::Certificate.new(certificate)
   end
 end
