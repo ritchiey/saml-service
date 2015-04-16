@@ -119,7 +119,7 @@ describe EntityDescriptor do
       end
       it 'is not functioning when not enabled' do
         subject.enabled = false
-        expect(subject.functioning?).not_to be
+        expect(subject).not_to be_functioning
       end
     end
 
@@ -134,11 +134,11 @@ describe EntityDescriptor do
         expect(subject).not_to be_valid
       end
       it 'is not functioning when enabled' do
-        expect(subject.functioning?).not_to be
+        expect(subject).not_to be_functioning
       end
       it 'is not functioning when not enabled' do
         subject.enabled = false
-        expect(subject.functioning?).not_to be
+        expect(subject).not_to be_functioning
       end
     end
   end

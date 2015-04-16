@@ -190,10 +190,9 @@ module Metadata
     end
 
     def known_entity(entity)
-      if entity.entity_descriptor && entity.entity_descriptor.functioning?
+      if entity.entity_descriptor.try(:functioning?)
         entity_descriptor(entity.entity_descriptor)
-      elsif entity.raw_entity_descriptor &&
-            entity.raw_entity_descriptor.functioning?
+      elsif entity.raw_entity_descriptor.try(:functioning?)
         raw_entity_descriptor(entity.raw_entity_descriptor)
       end
     end
