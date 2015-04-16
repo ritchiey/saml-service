@@ -44,4 +44,41 @@ RSpec.describe RawEntityDescriptor do
         .to contain_exactly(match(/is not valid per the XML Schema/))
     end
   end
+
+  describe '#functioning?' do
+    subject { create :raw_entity_descriptor }
+
+    context 'when ED is valid' do
+      before { subject.enabled = true }
+
+      it 'valid' do
+        expect(subject).to be_valid
+      end
+      it 'is functioning when enabled' do
+        expect(subject).to be_functioning
+      end
+      it 'is not functioning when not enabled' do
+        subject.enabled = false
+        expect(subject.functioning?).not_to be
+      end
+    end
+
+    context 'when ED is invalid' do
+      before do
+        subject.enabled = true
+        subject.xml = nil
+      end
+
+      it 'is not valid' do
+        expect(subject).not_to be_valid
+      end
+      it 'is not functioning when enabled' do
+        expect(subject.functioning?).not_to be
+      end
+      it 'is not functioning when not enabled' do
+        subject.enabled = false
+        expect(subject.functioning?).not_to be
+      end
+    end
+  end
 end

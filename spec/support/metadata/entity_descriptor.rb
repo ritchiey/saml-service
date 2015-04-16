@@ -34,6 +34,7 @@ RSpec.shared_examples 'EntityDescriptor xml' do
   end
 
   RSpec.shared_examples 'md:EntityDescriptor xml' do
+    let(:create_idp) { true } # Ensure ED is valid to pass #functioning?
     it 'is created' do
       expect(xml).to have_xpath(entity_descriptor_path)
     end
@@ -65,23 +66,27 @@ RSpec.shared_examples 'EntityDescriptor xml' do
 
     context 'RoleDescriptors' do
       context 'IDPSSODescriptor' do
-        let(:create_idp) { true }
         it 'creates IDPSSODescriptor node' do
           expect(xml).to have_xpath(idp_path, count: 1)
         end
       end
+
       context 'SPSSODescriptor' do
+        let(:create_idp) { false }
         let(:create_sp) { true }
         it 'creates SPSSODescriptor node' do
           expect(xml).to have_xpath(sp_path, count: 1)
         end
       end
+
       context 'AttributeAuthorityDescriptor' do
+        let(:create_idp) { false }
         let(:create_aa) { true }
         it 'creates AttributeAuthorityDescriptor node' do
           expect(xml).to have_xpath(aad_path, count: 1)
         end
       end
+
       context 'IDPSSODescriptor and AttributeAuthorityDescriptor pairing' do
         let(:create_idp) { true }
         let(:create_aa) { true }
@@ -125,6 +130,17 @@ RSpec.shared_examples 'EntityDescriptor xml' do
       it 'creates a mdrpi:PublisherInfo' do
         expect(xml).to have_xpath(all_publication_infos, count: 1)
       end
+    end
+  end
+
+  context 'Root EntityDescriptor - non functioning' do
+    before do
+      entity_descriptor.enabled = false
+      subject.root_entity_descriptor(entity_descriptor)
+    end
+
+    it 'is not created' do
+      expect(xml).not_to have_xpath(entity_descriptor_path)
     end
   end
 
