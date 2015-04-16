@@ -39,13 +39,13 @@ RSpec.describe Metadata::SAML do
   context 'EntitiesDescriptors' do
     let(:entity_source) { create :basic_federation }
 
-    # context 'with only functioning entity descriptors' do
-    #   include_examples 'EntitiesDescriptor xml' do
-    #     it 'has 5 known entities' do
-    #       expect(entity_source.known_entities.size).to eq(5)
-    #     end
-    #   end
-    # end
+    context 'with only functioning entity descriptors' do
+      include_examples 'EntitiesDescriptor xml' do
+        it 'has 5 known entities' do
+          expect(entity_source.known_entities.size).to eq(5)
+        end
+      end
+    end
 
     context 'with functioning and non functioning EntityDescriptors' do
       before do
