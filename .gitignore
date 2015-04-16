@@ -6,6 +6,7 @@
 /public/system
 /spec/tmp
 /coverage
+/schema
 **.orig
 rerun.txt
 .ruby-version

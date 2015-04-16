@@ -151,6 +151,7 @@ Sequel.migration do
       column :created_at, "datetime"
       column :updated_at, "datetime"
       foreign_key :known_entity_id, :known_entities, :type=>"int(11)", :null=>false, :key=>[:id]
+      column :enabled, "tinyint(1)", :default=>false
       
       index [:known_entity_id], :name=>:known_entity_id_key
       index [:organization_id], :name=>:organization_id_key
@@ -220,6 +221,7 @@ Sequel.migration do
       column :xml, "text", :null=>false
       column :created_at, "datetime", :null=>false
       column :updated_at, "datetime", :null=>false
+      column :enabled, "tinyint(1)", :default=>false
       
       index [:known_entity_id], :unique=>true
     end
@@ -771,5 +773,7 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150304031737_add_hash_algorithm_to_metadata_instance.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150305210958_create_keypairs.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150305230517_add_keypair_to_metadata_instances.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150415004025_add_enabled_to_entity_descriptor.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150415030131_add_enabled_to_raw_entity_descriptor.rb')"
   end
 end

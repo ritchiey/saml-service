@@ -26,6 +26,10 @@ class EntityDescriptor < Sequel::Model
     validate_technical_contact
   end
 
+  def functioning?
+    valid? && enabled
+  end
+
   def validate_technical_contact
     return if new?
     error_message = 'must specify a technical contact'

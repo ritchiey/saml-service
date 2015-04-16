@@ -1,6 +1,5 @@
 FactoryGirl.define do
   factory :basic_federation, parent: :entity_source do
-    # Services
     after :create do | es |
       create_list(:basic_federation_entity, 2, :idp, entity_source: es)
       create_list(:basic_federation_entity, 2, :sp, entity_source: es)

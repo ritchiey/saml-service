@@ -14,6 +14,10 @@ class RawEntityDescriptor < Sequel::Model
     validate_xml
   end
 
+  def functioning?
+    valid? && enabled
+  end
+
   def validate_xml
     return if xml.blank?
 

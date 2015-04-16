@@ -103,4 +103,43 @@ describe EntityDescriptor do
       expect(subject).to be_valid
     end
   end
+
+  describe '#functioning?' do
+    context 'when ED is valid' do
+      let(:idp) { create :idp_sso_descriptor }
+      subject { idp.entity_descriptor }
+
+      before { subject.enabled = true }
+
+      it 'valid' do
+        expect(subject).to be_valid
+      end
+      it 'is functioning when enabled' do
+        expect(subject).to be_functioning
+      end
+      it 'is not functioning when not enabled' do
+        subject.enabled = false
+        expect(subject).not_to be_functioning
+      end
+    end
+
+    context 'when ED is invalid' do
+      subject { create :entity_descriptor }
+
+      before do
+        subject.enabled = true
+      end
+
+      it 'is not valid' do
+        expect(subject).not_to be_valid
+      end
+      it 'is not functioning when enabled' do
+        expect(subject).not_to be_functioning
+      end
+      it 'is not functioning when not enabled' do
+        subject.enabled = false
+        expect(subject).not_to be_functioning
+      end
+    end
+  end
 end

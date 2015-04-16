@@ -182,16 +182,19 @@ module Metadata
     end
 
     def root_entity_descriptor(ed)
+      return unless ed.functioning?
+
       attributes = { ID: instance_id,
                      validUntil: expires_at.xmlschema }
       entity_descriptor(ed, attributes, true)
     end
 
     def known_entity(entity)
-      if entity.entity_descriptor
-        return entity_descriptor(entity.entity_descriptor)
+      if entity.entity_descriptor.try(:functioning?)
+        entity_descriptor(entity.entity_descriptor)
+      elsif entity.raw_entity_descriptor.try(:functioning?)
+        raw_entity_descriptor(entity.raw_entity_descriptor)
       end
-      raw_entity_descriptor(entity.raw_entity_descriptor)
     end
 
     def raw_entity_descriptor(red)

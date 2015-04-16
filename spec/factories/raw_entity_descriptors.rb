@@ -1,5 +1,7 @@
 FactoryGirl.define do
   factory :raw_entity_descriptor do
+    enabled true
+
     transient { hostname { "raw.#{Faker::Internet.domain_name}" } }
 
     known_entity do
