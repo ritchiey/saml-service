@@ -174,6 +174,7 @@ Sequel.migration do
       column :ca_verify_depth, "int(11)"
       column :hash_algorithm, "varchar(255)", :null=>false
       foreign_key :keypair_id, :keypairs, :type=>"int(11)", :null=>false, :key=>[:id]
+      column :primary_tag, "varchar(255)", :null=>false
       
       index [:keypair_id], :name=>:keypair_id
     end
@@ -775,5 +776,6 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150305230517_add_keypair_to_metadata_instances.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150415004025_add_enabled_to_entity_descriptor.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150415030131_add_enabled_to_raw_entity_descriptor.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150504231555_add_primary_tag_to_metadata_instance.rb')"
   end
 end

@@ -14,5 +14,7 @@ class MetadataInstance < Sequel::Model
     validates_presence :publication_info unless new?
 
     validates_includes %w(sha1 sha256), :hash_algorithm
+
+    validates_presence :primary_tag
   end
 end

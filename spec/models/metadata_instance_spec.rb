@@ -9,6 +9,7 @@ describe MetadataInstance do
   it { is_expected.to validate_presence :name }
   it { is_expected.not_to validate_presence :publication_info }
   it { is_expected.to validate_presence :hash_algorithm }
+  it { is_expected.to validate_presence :primary_tag }
   it { is_expected.to validate_includes(%w(sha1 sha256), :hash_algorithm) }
 
   context 'optional attributes' do

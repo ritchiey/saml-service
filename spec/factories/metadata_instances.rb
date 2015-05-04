@@ -4,6 +4,7 @@ FactoryGirl.define do
 
     name { Faker::Internet.domain_name }
     hash_algorithm 'sha256'
+    primary_tag { Faker::Lorem.word }
 
     after :create do | mi |
       create(:mdrpi_publication_info, metadata_instance: mi)
