@@ -3,7 +3,6 @@ require 'rails_helper'
 describe MetadataInstance do
   it_behaves_like 'a basic model'
 
-  it { is_expected.to have_one_to_many :entity_descriptors }
   it { is_expected.to have_one_to_many :ca_key_infos }
   it { is_expected.to have_many_to_one :keypair }
   it { is_expected.to validate_presence :keypair }

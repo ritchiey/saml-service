@@ -1,7 +1,5 @@
 class MetadataInstance < Sequel::Model
   many_to_one :keypair
-
-  one_to_many :entity_descriptors
   one_to_many :ca_key_infos
 
   one_to_one :registration_info, class: 'MDRPI::RegistrationInfo'
