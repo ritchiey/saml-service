@@ -166,7 +166,6 @@ Sequel.migration do
     
     create_table(:metadata_instances) do
       primary_key :id, :type=>"int(11)"
-      column :identifier, "varchar(255)"
       column :name, "varchar(255)", :null=>false
       column :extensions, "text"
       column :created_at, "datetime"
@@ -176,6 +175,8 @@ Sequel.migration do
       foreign_key :keypair_id, :keypairs, :type=>"int(11)", :null=>false, :key=>[:id]
       column :primary_tag, "varchar(255)", :null=>false
       column :all_entities, "tinyint(1)", :default=>true, :null=>false
+      column :federation_identifier, "varchar(255)", :null=>false
+      column :validity_period, "int(11)", :null=>false
       
       index [:keypair_id], :name=>:keypair_id
     end
@@ -779,5 +780,6 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150415030131_add_enabled_to_raw_entity_descriptor.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150504231555_add_primary_tag_to_metadata_instance.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150504232739_add_all_entities_to_metadata_instance.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150505032956_add_saml_fields_to_metadata_instance.rb')"
   end
 end

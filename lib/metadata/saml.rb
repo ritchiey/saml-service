@@ -4,9 +4,8 @@ module Metadata
   class SAML
     include SAMLNamespaces
 
-    attr_reader :builder, :created_at, :expires_at, :instance_id,
-                :federation_identifier, :metadata_name, :metadata_instance,
-                :metadata_validity_period
+    attr_reader :builder, :created_at, :expires_at,
+                :instance_id, :metadata_instance
 
     protected
 
@@ -38,8 +37,8 @@ module Metadata
 
       @builder = Nokogiri::XML::Builder.new(encoding: 'UTF-8')
       @created_at = Time.now.utc
-      @expires_at = created_at + metadata_validity_period
-      @instance_id = "#{federation_identifier}" \
+      @expires_at = created_at + metadata_instance.validity_period
+      @instance_id = "#{metadata_instance.federation_identifier}" \
                      "#{created_at.to_formatted_s(:number)}"
     end
 
@@ -49,7 +48,7 @@ module Metadata
 
     def entities_descriptor(known_entities)
       attributes = { ID: instance_id,
-                     Name: metadata_name,
+                     Name: metadata_instance.name,
                      validUntil: expires_at.xmlschema }
 
       root.EntitiesDescriptor(ns, attributes) do |_|

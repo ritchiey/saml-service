@@ -4,10 +4,7 @@ require 'metadata/saml'
 
 RSpec.describe Metadata::SAML do
   subject do
-    Metadata::SAML.new(metadata_instance: metadata_instance,
-                       federation_identifier: federation_identifier,
-                       metadata_name: metadata_name,
-                       metadata_validity_period: metadata_validity_period)
+    Metadata::SAML.new(metadata_instance: metadata_instance)
   end
 
   let(:federation_identifier) { Faker::Internet.domain_word }
@@ -17,7 +14,10 @@ RSpec.describe Metadata::SAML do
   let(:hash_algorithm) { 'sha256' }
 
   let(:metadata_instance) do
-    create(:metadata_instance, hash_algorithm: hash_algorithm)
+    create(:metadata_instance, hash_algorithm: hash_algorithm,
+                               name: metadata_name,
+                               federation_identifier: federation_identifier,
+                               validity_period: metadata_validity_period)
   end
 
   let(:builder) { subject.builder }
