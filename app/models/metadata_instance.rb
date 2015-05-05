@@ -16,5 +16,6 @@ class MetadataInstance < Sequel::Model
     validates_includes %w(sha1 sha256), :hash_algorithm
 
     validates_presence :primary_tag
+    validates_presence :all_entities
   end
 end
