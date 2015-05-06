@@ -500,13 +500,13 @@ Sequel.migration do
     create_table(:tags) do
       primary_key :id, :type=>"int(11)"
       column :name, "varchar(255)", :null=>false
-      foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :key=>[:id]
       foreign_key :role_descriptor_id, :role_descriptors, :type=>"int(11)", :key=>[:id]
       column :created_at, "datetime"
       column :updated_at, "datetime"
+      foreign_key :known_entity_id, :known_entities, :type=>"int(11)", :key=>[:id]
       
-      index [:entity_descriptor_id], :name=>:entity_descriptor_id
-      index [:name, :entity_descriptor_id], :name=>:name_entity_descriptor_id_un, :unique=>true
+      index [:known_entity_id], :name=>:known_entity_id
+      index [:name, :known_entity_id], :name=>:name_known_entity_id_un, :unique=>true
       index [:name, :role_descriptor_id], :name=>:name_role_descriptor_id_un, :unique=>true
       index [:role_descriptor_id], :name=>:role_descriptor_id
     end
@@ -781,5 +781,7 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150504231555_add_primary_tag_to_metadata_instance.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150504232739_add_all_entities_to_metadata_instance.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150505032956_add_saml_fields_to_metadata_instance.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150505052005_drop_entity_descriptor_from_tags.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150505052251_add_known_entity_foreign_key_to_tags.rb')"
   end
 end
