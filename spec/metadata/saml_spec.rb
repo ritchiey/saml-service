@@ -390,14 +390,16 @@ RSpec.describe Metadata::SAML do
   end
 
   context 'ds:Signature' do
-    let(:entities) { [create(:raw_entity_descriptor).known_entity] }
+    let(:entities) do
+      [create(:idp_sso_descriptor).entity_descriptor.known_entity]
+    end
     before { subject.entities_descriptor(entities) }
     include_examples 'ds:Signature xml' do
       let(:root_node) { 'EntitiesDescriptor' }
     end
   end
 
-  context 'ds:Signature', focus: true do
+  context 'ds:Signature' do
     let(:entity) { create(:idp_sso_descriptor).entity_descriptor }
     before { subject.root_entity_descriptor(entity) }
     include_examples 'ds:Signature xml' do

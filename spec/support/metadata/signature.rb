@@ -96,18 +96,18 @@ RSpec.shared_examples 'ds:Signature xml' do
   context 'with a signed document' do
     let(:schema) { Nokogiri::XML::Schema.new(File.open('schema/top.xsd', 'r')) }
     let(:validation_errors) { schema.validate(Nokogiri::XML.parse(raw_xml)) }
-    let(:raw_xml) { subject.sign }
+    before { subject.sign }
 
     let(:c14n_xml) do
-      doc = subject.builder.doc.dup
+      doc = builder.doc.dup
       doc.xpath('//ds:Signature').each(&:remove)
       doc.canonicalize(Nokogiri::XML::XML_C14N_EXCLUSIVE_1_0)
     end
 
     let(:c14n_signed_info) do
-      doc = Nokogiri::XML::Document.new
-      doc << signed_info.native.dup
-      doc.canonicalize(Nokogiri::XML::XML_C14N_EXCLUSIVE_1_0)
+      doc = builder.doc.dup
+      doc.at_xpath("#{sig_xpath}/ds:SignedInfo")
+        .canonicalize(Nokogiri::XML::XML_C14N_EXCLUSIVE_1_0)
     end
 
     context 'using sha1' do
@@ -133,7 +133,6 @@ RSpec.shared_examples 'ds:Signature xml' do
       end
 
       it 'includes the signature value' do
-        binding.pry
         rsa_sig = key.sign(OpenSSL::Digest::SHA1.new, c14n_signed_info)
         expected = Base64.encode64(rsa_sig).strip
 
