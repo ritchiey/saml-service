@@ -96,7 +96,7 @@ RSpec.shared_examples 'ds:Signature xml' do
   context 'with a signed document' do
     let(:schema) { Nokogiri::XML::Schema.new(File.open('schema/top.xsd', 'r')) }
     let(:validation_errors) { schema.validate(Nokogiri::XML.parse(raw_xml)) }
-    before { subject.sign }
+    let!(:raw_xml) { subject.sign }
 
     let(:c14n_xml) do
       doc = builder.doc.dup
