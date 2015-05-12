@@ -202,6 +202,7 @@ module Metadata
 
     def entity_descriptor(ed, attributes = {}, root_node = false)
       root.EntityDescriptor(ns, attributes, entityID: ed.entity_id.uri) do |_|
+        signature_element if root_node
         entity_descriptor_extensions(ed, root_node)
 
         ed.idp_sso_descriptors.each do |idp|

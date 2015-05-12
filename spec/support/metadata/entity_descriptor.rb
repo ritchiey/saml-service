@@ -126,6 +126,7 @@ RSpec.shared_examples 'EntityDescriptor xml' do
       end
     end
 
+
     context 'Extensions' do
       it 'creates a mdrpi:PublisherInfo' do
         expect(xml).to have_xpath(all_publication_infos, count: 1)

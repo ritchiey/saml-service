@@ -1,5 +1,5 @@
 RSpec.shared_examples 'ds:Signature xml' do
-  let(:sig_xpath) { '/*[local-name() = "EntitiesDescriptor"]/ds:Signature' }
+  let(:sig_xpath) { "/*[local-name() = \"#{root_node}\"]/ds:Signature" }
   let(:signature) { xml.find(:xpath, sig_xpath) }
   let(:signed_info) { xml.find(:xpath, "#{sig_xpath}/ds:SignedInfo") }
   let(:reference) { signed_info.find(:xpath, 'ds:Reference') }
@@ -133,6 +133,7 @@ RSpec.shared_examples 'ds:Signature xml' do
       end
 
       it 'includes the signature value' do
+        binding.pry
         rsa_sig = key.sign(OpenSSL::Digest::SHA1.new, c14n_signed_info)
         expected = Base64.encode64(rsa_sig).strip
 
