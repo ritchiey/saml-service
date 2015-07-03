@@ -1,0 +1,628 @@
+require 'rails_helper'
+
+RSpec.describe MetadataQueryController, type: :controller do
+  around { |example| Timecop.freeze { example.run } }
+
+  RSpec.shared_examples 'invalid requests' do
+    subject { response }
+
+    context 'with invalid content_type' do
+      before do
+        request.accept = 'text/plain'
+        query
+      end
+
+      it { is_expected.to have_http_status(:not_acceptable) }
+    end
+
+    context 'with invalid charset' do
+      before do
+        request.accept = saml_content
+        request.headers['Accept-Charset'] = 'utf-16'
+        query
+      end
+
+      it { is_expected.to have_http_status(:not_acceptable) }
+    end
+
+    context 'with invalid primary_tag (MetadataInstance)' do
+      let(:fake_primary_tag) { Faker::Lorem.word }
+      before do
+        request.accept = saml_content
+        query
+      end
+
+      it { is_expected.to have_http_status(:not_found) }
+    end
+  end
+
+  RSpec.shared_examples 'non get request' do
+    context 'POST, PATCH, DELETE etc' do
+      subject { response }
+      before do
+        query
+      end
+
+      it { is_expected.to have_http_status(:method_not_allowed) }
+    end
+  end
+
+  RSpec.shared_examples '200 response' do
+    it { is_expected.to have_http_status(:ok) }
+
+    context 'headers' do
+      it 'has relevant MUST/SHOULD headers per specification' do
+        expect(subject.headers).to include(
+          'Content-Type' => "#{saml_content}; charset=utf-8",
+          'ETag' => etag,
+          'Cache-Control' =>
+            "max-age=#{metadata_instance.validity_period}, private"
+        )
+      end
+    end
+  end
+
+  RSpec.shared_examples 'entity descriptor response' do
+    context 'response body' do
+      subject { Capybara::Node::Simple.new(Nokogiri::XML.parse(response.body)) }
+
+      it 'Has a root EntityDescriptor element' do
+        expect(subject).to have_xpath('/xmlns:EntityDescriptor')
+      end
+
+      it 'Has a signature element' do
+        expect(subject
+          .first(:xpath,
+                 '/xmlns:EntityDescriptor/ds:Signature/ds:SignatureValue')
+          .text)
+          .not_to be_empty
+      end
+    end
+  end
+
+  RSpec.shared_examples 'entities descriptor response' do
+    context 'response body' do
+      subject { Capybara::Node::Simple.new(Nokogiri::XML.parse(response.body)) }
+
+      it 'Has a root EntityDescriptor element' do
+        expect(subject).to have_xpath('/xmlns:EntitiesDescriptor')
+      end
+
+      it 'Has a signature element' do
+        expect(subject
+          .first(:xpath,
+                 '/xmlns:EntitiesDescriptor/ds:Signature/ds:SignatureValue')
+          .text)
+          .not_to be_empty
+      end
+    end
+  end
+
+  before(:each) do
+    Rails.cache.clear
+  end
+
+  let(:saml_content) { MetadataQueryController::SAML_CONTENT_TYPE }
+  let(:primary_tag) { Faker::Lorem.word }
+
+  describe '#all_entities' do
+    context 'GET' do
+      context 'valid client request' do
+        context 'MetadataInstance does not allow rendering all entities' do
+          let!(:metadata_instance) do
+            create :metadata_instance, primary_tag: primary_tag,
+                                       all_entities: false
+          end
+
+          before do
+            request.accept = saml_content
+            get :all_entities, primary_tag: primary_tag
+          end
+
+          context 'response' do
+            subject { response }
+            it { is_expected.to have_http_status(:not_found) }
+          end
+        end
+
+        context 'MetadataInstance does allow rendering all entities' do
+          let!(:metadata_instance) do
+            create :metadata_instance, primary_tag: primary_tag,
+                                       all_entities: true
+          end
+          let!(:known_entities) do
+            create_list :known_entity, 2, :with_idp
+          end
+          let(:etag) do
+            controller.send(:generate_known_entities_etag, known_entities)
+          end
+
+          before do
+            known_entities.each do |ke|
+              create :tag, name: primary_tag, known_entity: ke
+            end
+
+            request.accept = saml_content
+          end
+
+          context 'initial request' do
+            def run
+              get :all_entities, primary_tag: primary_tag
+            end
+
+            context 'uncached server side' do
+              context 'response' do
+                before { run }
+                subject { response }
+
+                include_examples '200 response'
+                include_examples 'entities descriptor response'
+              end
+
+              context 'cache' do
+                it 'updates server side cache' do
+                  expect { run }.to change { Rails.cache.fetch(etag) }
+                end
+              end
+            end
+
+            context 'cached server side' do
+              before { run } # pre-cache data
+
+              context 'response' do
+                subject { response }
+                before { Timecop.freeze { run } }
+
+                include_examples '200 response'
+                include_examples 'entities descriptor response'
+              end
+
+              context 'cache' do
+                it 'does not modify server side cache' do
+                  expect { run }.not_to change { Rails.cache.fetch(etag) }
+                end
+              end
+            end
+          end
+
+          context 'subsequent requests' do
+            def run
+              get :all_entities, primary_tag: primary_tag
+            end
+
+            before do
+              run
+              @etag = response.headers['ETag']
+              @last_modified = response.headers['Last-Modified']
+            end
+
+            context 'ETags' do
+              context 'with valid resource ETag' do
+                before do
+                  request.headers['If-None-Match'] = @etag
+                  run
+                end
+
+                context 'response' do
+                  subject { response }
+                  it { is_expected.to have_http_status(:not_modified) }
+                end
+              end
+
+              context 'with invalid resource ETag' do
+                before do
+                  request.headers['If-None-Match'] = Faker::Lorem.word
+                  run
+                end
+
+                context 'response' do
+                  subject { response }
+
+                  include_examples '200 response'
+                  include_examples 'entities descriptor response'
+                end
+              end
+            end
+
+            context 'Modification Time' do
+              context 'when resource unmodified' do
+                before do
+                  request.headers['If-Modified-Since'] = @last_modified
+                  run
+                end
+
+                context 'response' do
+                  subject { response }
+                  it { is_expected.to have_http_status(:not_modified) }
+                end
+              end
+
+              context 'when resource modified' do
+                before do
+                  request.headers['If-Modified-Since'] =
+                  @last_modified - 1.second
+                  run
+                end
+
+                context 'response' do
+                  subject { response }
+
+                  include_examples '200 response'
+                  include_examples 'entities descriptor response'
+                end
+              end
+            end
+          end
+        end
+      end
+
+      context 'invalid client request' do
+        it_behaves_like 'invalid requests' do
+          let(:query) { get :all_entities, primary_tag: primary_tag }
+        end
+      end
+    end
+
+    include_examples 'non get request' do
+      let(:query) { post :all_entities, primary_tag: primary_tag }
+    end
+  end
+
+  describe '#specific_entity' do
+    let(:entity_descriptor) { idp_sso_descriptor.entity_descriptor }
+    let(:idp_sso_descriptor) { create :idp_sso_descriptor }
+    let(:entity_id) { entity_descriptor.entity_id.uri }
+
+    context 'GET' do
+      before { request.accept = saml_content }
+      context 'valid client request' do
+        let!(:metadata_instance) do
+          create :metadata_instance, primary_tag: primary_tag
+        end
+        let(:etag) do
+          controller.send(:generate_descriptor_etag, entity_descriptor)
+        end
+        context 'valid entity_descriptor' do
+          def run
+            get :specific_entity, primary_tag: primary_tag,
+                                  identifier: entity_id
+          end
+
+          context 'initial request' do
+            context 'uncached server side' do
+              context 'response' do
+                before { run }
+                subject { response }
+
+                include_examples '200 response'
+                include_examples 'entity descriptor response'
+              end
+
+              context 'cache' do
+                it 'updates server side cache' do
+                  expect { run }.to change { Rails.cache.fetch(etag) }
+                end
+              end
+            end
+
+            context 'cached server side' do
+              before { run } # pre-cache data
+
+              context 'response' do
+                subject { response }
+                before { Timecop.freeze { run } }
+
+                include_examples '200 response'
+                include_examples 'entity descriptor response'
+              end
+
+              context 'cache' do
+                it 'does not modify server side cache' do
+                  expect { run }.not_to change { Rails.cache.fetch(etag) }
+                end
+              end
+            end
+          end
+
+          context 'subsequent requests' do
+            before do
+              run
+              @etag = response.headers['ETag']
+              @last_modified = response.headers['Last-Modified']
+            end
+
+            context 'ETags' do
+              context 'with valid resource ETag' do
+                before do
+                  request.headers['If-None-Match'] = @etag
+                  run
+                end
+
+                context 'response' do
+                  subject { response }
+                  it { is_expected.to have_http_status(:not_modified) }
+                end
+              end
+
+              context 'with invalid resource ETag' do
+                before do
+                  request.headers['If-None-Match'] = Faker::Lorem.word
+                  run
+                end
+
+                context 'response' do
+                  subject { response }
+
+                  include_examples '200 response'
+                  include_examples 'entity descriptor response'
+                end
+              end
+            end
+
+            context 'Modification Time' do
+              context 'when resource unmodified' do
+                before do
+                  request.headers['If-Modified-Since'] = @last_modified
+                  run
+                end
+
+                context 'response' do
+                  subject { response }
+                  it { is_expected.to have_http_status(:not_modified) }
+                end
+              end
+
+              context 'when resource modified' do
+                before do
+                  request.headers['If-Modified-Since'] =
+                  @last_modified - 1.second
+                  run
+                end
+
+                context 'response' do
+                  subject { response }
+
+                  include_examples '200 response'
+                  include_examples 'entity descriptor response'
+                end
+              end
+            end
+          end
+        end
+
+        context 'invalid entity_descriptor' do
+          before do
+            get :specific_entity, primary_tag: primary_tag,
+                                  identifier: 'https://example.edu/shibboleth'
+          end
+
+          context 'response' do
+            subject { response }
+            it { is_expected.to have_http_status(:not_found) }
+          end
+        end
+      end
+
+      context 'invalid client request' do
+        it_behaves_like 'invalid requests' do
+          let(:query) do
+            get :specific_entity, primary_tag: primary_tag,
+                                  identifier: entity_id
+          end
+        end
+      end
+    end
+
+    include_examples 'non get request' do
+      let(:query) do
+        post :specific_entity, primary_tag: primary_tag, identifier: entity_id
+      end
+    end
+  end
+
+  describe '#tagged_entities' do
+    let(:primary_tag2) { "#{Faker::Lorem.word}_2" }
+    let(:secondary_tag) { "#{Faker::Lorem.word}_#{Faker::Lorem.word}" }
+
+    context 'GET' do
+      context 'valid client request' do
+        context 'MetadataInstance has no entities matching tag' do
+          let!(:metadata_instance) do
+            create :metadata_instance, primary_tag: primary_tag
+          end
+
+          before do
+            request.accept = saml_content
+            get :tagged_entities, primary_tag: primary_tag,
+                                  identifier: secondary_tag
+          end
+
+          context 'response' do
+            subject { response }
+            it { is_expected.to have_http_status(:not_found) }
+          end
+        end
+
+        context 'MetadataInstance has entities matching tag' do
+          let!(:metadata_instance) do
+            create :metadata_instance, primary_tag: primary_tag
+          end
+          let!(:known_entities) do
+            create_list :known_entity, 2, :with_idp
+          end
+          let!(:untagged_known_entities) do
+            create_list :known_entity, 2, :with_idp
+          end
+          let!(:metadata_instance2) do
+            create :metadata_instance, primary_tag: primary_tag2
+          end
+          let!(:known_entities2) do
+            create_list :known_entity, 2, :with_idp
+          end
+          let(:etag) do
+            controller.send(:generate_known_entities_etag, known_entities)
+          end
+
+          before do
+            known_entities.each do |ke|
+              create :tag, name: primary_tag, known_entity: ke
+              create :tag, name: secondary_tag, known_entity: ke
+            end
+            untagged_known_entities.each do |ke|
+              create :tag, name: primary_tag, known_entity: ke
+            end
+            known_entities2.each do |ke|
+              create :tag, name: primary_tag2, known_entity: ke
+              create :tag, name: secondary_tag, known_entity: ke
+            end
+
+            request.accept = saml_content
+          end
+
+          def run
+            get :tagged_entities, primary_tag: primary_tag,
+                                  identifier: secondary_tag
+          end
+
+          context 'initial request' do
+            context 'uncached server side' do
+              context 'response' do
+                before { run }
+                subject { response }
+
+                include_examples '200 response'
+                include_examples 'entities descriptor response'
+              end
+
+              context 'cache' do
+                it 'updates server side cache' do
+                  expect { run }.to change { Rails.cache.fetch(etag) }
+                end
+              end
+
+              context 'supplied entities' do
+                before { run }
+
+                it 'has 4 known entities in metadata_instance' do
+                  expect(KnownEntity.with_all_tags(primary_tag).count).to eq(4)
+                end
+
+                it 'has 4 known entities with secondary tag' do
+                  expect(KnownEntity.with_all_tags(secondary_tag).count)
+                    .to eq(4)
+                end
+
+                it 'renders only the 2 matching entities in metadata xml' do
+                  xml = Capybara::Node::Simple.new(
+                          Nokogiri::XML.parse(response.body))
+
+                  path = '/xmlns:EntitiesDescriptor/xmlns:EntityDescriptor'
+                  expect(xml.has_xpath?(path, count: 2)).to be
+                end
+              end
+            end
+
+            context 'cached server side' do
+              before { run } # pre-cache data
+
+              context 'response' do
+                subject { response }
+                before { Timecop.freeze { run } }
+
+                include_examples '200 response'
+                include_examples 'entities descriptor response'
+              end
+
+              context 'cache' do
+                it 'does not modify server side cache' do
+                  expect { run }.not_to change { Rails.cache.fetch(etag) }
+                end
+              end
+            end
+          end
+
+          context 'subsequent requests' do
+            before do
+              run
+              @etag = response.headers['ETag']
+              @last_modified = response.headers['Last-Modified']
+            end
+
+            context 'ETags' do
+              context 'with valid resource ETag' do
+                before do
+                  request.headers['If-None-Match'] = @etag
+                  run
+                end
+
+                context 'response' do
+                  subject { response }
+                  it { is_expected.to have_http_status(:not_modified) }
+                end
+              end
+
+              context 'with invalid resource ETag' do
+                before do
+                  request.headers['If-None-Match'] = Faker::Lorem.word
+                  run
+                end
+
+                context 'response' do
+                  subject { response }
+
+                  include_examples '200 response'
+                  include_examples 'entities descriptor response'
+                end
+              end
+            end
+
+            context 'Modification Time' do
+              context 'when resource unmodified' do
+                before do
+                  request.headers['If-Modified-Since'] = @last_modified
+                  run
+                end
+
+                context 'response' do
+                  subject { response }
+                  it { is_expected.to have_http_status(:not_modified) }
+                end
+              end
+
+              context 'when resource modified' do
+                before do
+                  request.headers['If-Modified-Since'] =
+                  @last_modified - 1.second
+                  run
+                end
+
+                context 'response' do
+                  subject { response }
+
+                  include_examples '200 response'
+                  include_examples 'entities descriptor response'
+                end
+              end
+            end
+          end
+        end
+      end
+
+      context 'invalid client request' do
+        it_behaves_like 'invalid requests' do
+          let(:query) do
+            get :tagged_entities, primary_tag: primary_tag,
+                                  identifier: secondary_tag
+          end
+        end
+      end
+    end
+
+    include_examples 'non get request' do
+      let(:query) do
+        post :tagged_entities, primary_tag: primary_tag,
+                               identifier: secondary_tag
+      end
+    end
+  end
+end
