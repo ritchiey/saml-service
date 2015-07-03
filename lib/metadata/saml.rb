@@ -72,6 +72,23 @@ module Metadata
       end
     end
 
+    def known_entity(ke)
+      if ke.entity_descriptor.try(:functioning?)
+        entity_descriptor(ke.entity_descriptor)
+      elsif ke.raw_entity_descriptor.try(:functioning?)
+        raw_entity_descriptor(ke.raw_entity_descriptor)
+      end
+    end
+
+    def root_entity_descriptor(ke)
+      if ke.entity_descriptor.try(:functioning?)
+        attributes = { ID: instance_id, validUntil: expires_at.xmlschema }
+        entity_descriptor(ke.entity_descriptor, attributes, true)
+      elsif ke.raw_entity_descriptor.try(:functioning?)
+        raw_entity_descriptor(ke.raw_entity_descriptor, true)
+      end
+    end
+
     C14N_METHOD = 'http://www.w3.org/2001/10/xml-exc-c14n#'
     TRANSFORM_METHODS = %w(
       http://www.w3.org/2000/09/xmldsig#enveloped-signature
@@ -180,24 +197,9 @@ module Metadata
       saml.AttributeValue(ns, attr_val.value)
     end
 
-    def root_entity_descriptor(ed)
-      return unless ed.functioning?
-
-      attributes = { ID: instance_id,
-                     validUntil: expires_at.xmlschema }
-      entity_descriptor(ed, attributes, true)
-    end
-
-    def known_entity(entity)
-      if entity.entity_descriptor.try(:functioning?)
-        entity_descriptor(entity.entity_descriptor)
-      elsif entity.raw_entity_descriptor.try(:functioning?)
-        raw_entity_descriptor(entity.raw_entity_descriptor)
-      end
-    end
-
-    def raw_entity_descriptor(red)
-      root << red.xml
+    def raw_entity_descriptor(red, root_node = false)
+      # TODO: Handle adding signature for root_node state
+      root << red.xml unless root_node
     end
 
     def entity_descriptor(ed, attributes = {}, root_node = false)

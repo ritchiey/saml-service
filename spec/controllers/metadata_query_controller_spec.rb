@@ -280,7 +280,8 @@ RSpec.describe MetadataQueryController, type: :controller do
           create :metadata_instance, primary_tag: primary_tag
         end
         let(:etag) do
-          controller.send(:generate_descriptor_etag, entity_descriptor)
+          controller
+            .send(:generate_descriptor_etag, entity_descriptor.known_entity)
         end
         context 'valid entity_descriptor' do
           def run

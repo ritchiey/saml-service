@@ -1,5 +1,6 @@
 RSpec.shared_examples 'EntityDescriptor xml' do
   let(:entity_descriptor) { create :entity_descriptor }
+  let(:known_entity) { entity_descriptor.known_entity }
   let(:entity_descriptor_path) { '/EntityDescriptor' }
   let(:extensions_path) { "#{entity_descriptor_path}/Extensions" }
   let(:registration_info_path) { "#{extensions_path}/mdrpi:RegistrationInfo" }
@@ -108,7 +109,7 @@ RSpec.shared_examples 'EntityDescriptor xml' do
   end
 
   context 'Root EntityDescriptor' do
-    before { subject.root_entity_descriptor(entity_descriptor) }
+    before { subject.root_entity_descriptor(known_entity) }
     include_examples 'md:EntityDescriptor xml'
 
     context 'attributes' do
@@ -136,7 +137,7 @@ RSpec.shared_examples 'EntityDescriptor xml' do
   context 'Root EntityDescriptor - non functioning' do
     before do
       entity_descriptor.enabled = false
-      subject.root_entity_descriptor(entity_descriptor)
+      subject.root_entity_descriptor(known_entity)
     end
 
     it 'is not created' do

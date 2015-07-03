@@ -18,8 +18,8 @@ module MetadataQueryCaching
     false
   end
 
-  def descriptor_unmodified(descriptor, etag)
-    return true if valid_etag(etag) || unmodified(descriptor)
+  def known_entity_unmodified(known_entity, etag)
+    return true if valid_etag(etag) || unmodified(known_entity)
     false
   end
 
@@ -33,12 +33,12 @@ module MetadataQueryCaching
     obj.updated_at <= request.headers['If-Modified-Since']
   end
 
-  def cache_descriptor_response(descriptor, etag)
+  def cache_descriptor_response(known_entity, etag)
     cache_expiry_period = @metadata_instance.validity_period
     cache_expiry = Time.now + cache_expiry_period
 
     Rails.cache.fetch(etag, expires_in: cache_expiry_period) do
-      @saml_renderer.root_entity_descriptor(descriptor)
+      @saml_renderer.root_entity_descriptor(known_entity)
       @saml_renderer.sign
 
       { expires: cache_expiry, metadata: @saml_renderer.builder.to_xml }

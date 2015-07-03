@@ -38,14 +38,14 @@ class MetadataQueryController < ApplicationController
   def specific_entity
     public_action
 
-    entity_descriptor = EntityId.first(uri: params[:identifier])
-                        .try(:entity_descriptor)
-    return head :not_found unless entity_descriptor
+    known_entity = EntityId.first(uri: params[:identifier])
+                   .try(:entity_descriptor).try(:known_entity)
+    return head :not_found unless known_entity
 
-    etag = generate_descriptor_etag(entity_descriptor)
-    return head :not_modified if descriptor_unmodified(entity_descriptor, etag)
+    etag = generate_descriptor_etag(known_entity)
+    return head :not_modified if known_entity_unmodified(known_entity, etag)
 
-    create_descriptor_response(entity_descriptor, etag)
+    create_known_entity_response(known_entity, etag)
   end
 
   private
@@ -93,10 +93,10 @@ class MetadataQueryController < ApplicationController
     expires_in ttl
   end
 
-  def create_descriptor_response(descriptor, etag)
-    response = cache_descriptor_response(descriptor, etag)
+  def create_known_entity_response(known_entity, etag)
+    response = cache_descriptor_response(known_entity, etag)
 
-    create_headers(descriptor, etag, response[:expires])
+    create_headers(known_entity, etag, response[:expires])
     render body: response[:metadata]
   end
 
