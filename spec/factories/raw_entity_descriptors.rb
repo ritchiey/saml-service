@@ -21,5 +21,9 @@ FactoryGirl.define do
         </EntityDescriptor>
       EOF
     end
+
+    after :create do |red|
+      red.entity_id = create :raw_entity_id, raw_entity_descriptor: red
+    end
   end
 end

@@ -65,13 +65,18 @@ class UpdateEntitySource
   end
 
   def update_raw_entity_descriptor(entity, node)
-    red = entity.raw_entity_descriptor ||
-          RawEntityDescriptor.new(known_entity: entity)
-    red.update(xml: node.canonicalize)
+    if entity.raw_entity_descriptor
+      entity.raw_entity_descriptor.update(xml: node.canonicalize)
+    else
+      red = RawEntityDescriptor.create(known_entity: entity,
+                                       xml: node.canonicalize)
+      EntityId.create(uri: node['entityID'], raw_entity_descriptor: red)
+    end
   end
 
   def sweep(untouched)
     KnownEntity.where(id: untouched.map(&:id)).each do |ke|
+      ke.raw_entity_descriptor.entity_id.try(:destroy)
       ke.raw_entity_descriptor.try(:destroy)
       ke.destroy
     end

@@ -282,10 +282,12 @@ Sequel.migration do
     
     create_table(:entity_ids) do
       primary_key :id, :type=>"int(11)"
-      foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
+      foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :key=>[:id]
       column :sha1, "varchar(255)", :null=>false
+      foreign_key :raw_entity_descriptor_id, :raw_entity_descriptors, :type=>"int(11)", :key=>[:id]
       
       index [:entity_descriptor_id], :name=>:eid_ed_fkey
+      index [:raw_entity_descriptor_id], :name=>:red_eid_fkey
     end
     
     create_table(:idp_sso_descriptors) do
@@ -785,5 +787,7 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150505052005_drop_entity_descriptor_from_tags.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150505052251_add_known_entity_foreign_key_to_tags.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150703014627_add_sha1_to_entity_id.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150703023921_add_raw_entity_descriptor_foreign_key_to_entity_id.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150703030108_update_entity_descriptor_foreign_key_on_entity_id.rb')"
   end
 end
