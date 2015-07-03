@@ -46,6 +46,7 @@ group :development, :test do
   gem 'guard-rspec', require: false
   gem 'guard-brakeman', require: false
   gem 'pry-rails'
+  gem 'pry-byebug'
   gem 'capybara', '~> 2.4.4'
   gem 'timecop', '~>0.7.1'
 end
