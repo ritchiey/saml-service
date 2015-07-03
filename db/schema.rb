@@ -283,6 +283,7 @@ Sequel.migration do
     create_table(:entity_ids) do
       primary_key :id, :type=>"int(11)"
       foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
+      column :sha1, "varchar(255)", :null=>false
       
       index [:entity_descriptor_id], :name=>:eid_ed_fkey
     end
@@ -783,5 +784,6 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150505032956_add_saml_fields_to_metadata_instance.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150505052005_drop_entity_descriptor_from_tags.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150505052251_add_known_entity_foreign_key_to_tags.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150703014627_add_sha1_to_entity_id.rb')"
   end
 end
