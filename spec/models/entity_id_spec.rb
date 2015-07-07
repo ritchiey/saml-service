@@ -36,12 +36,12 @@ RSpec.describe EntityId, type: :model do
         expect(subject).not_to be_valid
       end
 
-      it 'owned by entity_descriptor' do
+      it 'can be owned by entity_descriptor' do
         subject.entity_descriptor = create :entity_descriptor
         expect(subject).to be_valid
       end
 
-      it 'owned by raw_entity_descriptor' do
+      it 'can be owned by raw_entity_descriptor' do
         subject.raw_entity_descriptor = create :raw_entity_descriptor
 
         expect(subject).to be_valid
@@ -53,6 +53,18 @@ RSpec.describe EntityId, type: :model do
 
         expect(subject).not_to be_valid
       end
+    end
+  end
+
+  describe '#parent' do
+    it 'provides owning EntityDescriptor' do
+      subject { create :entity_id }
+      expect(subject.parent).to eq(subject.entity_descriptor)
+    end
+
+    it 'provides owning RawEntityDescriptor' do
+      subject { create :raw_entity_id }
+      expect(subject.parent).to eq(subject.raw_entity_descriptor)
     end
   end
 end

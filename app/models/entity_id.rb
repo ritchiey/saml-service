@@ -19,4 +19,9 @@ class EntityId < SamlURI
     super
     self.sha1 = Digest::SHA1.hexdigest uri if uri
   end
+
+  def parent
+    return entity_descriptor if entity_descriptor
+    raw_entity_descriptor
+  end
 end
