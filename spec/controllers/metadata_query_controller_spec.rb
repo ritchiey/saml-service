@@ -269,155 +269,168 @@ RSpec.describe MetadataQueryController, type: :controller do
   end
 
   describe '#specific_entity' do
-    let(:entity_descriptor) { idp_sso_descriptor.entity_descriptor }
-    let(:idp_sso_descriptor) { create :idp_sso_descriptor }
-    let(:entity_id) { entity_descriptor.entity_id.uri }
-
-    context 'GET' do
-      before { request.accept = saml_content }
-      context 'valid client request' do
-        let!(:metadata_instance) do
-          create :metadata_instance, primary_tag: primary_tag
-        end
-        let(:etag) do
-          controller
-            .send(:generate_descriptor_etag, entity_descriptor.known_entity)
-        end
-        context 'valid entity_descriptor' do
-          def run
-            get :specific_entity, primary_tag: primary_tag,
-                                  identifier: entity_id
+    RSpec.shared_examples 'Specific Entity Descriptor' do
+      context 'GET' do
+        before { request.accept = saml_content }
+        context 'valid client request' do
+          let!(:metadata_instance) do
+            create :metadata_instance, primary_tag: primary_tag
           end
+          let(:etag) do
+            controller
+              .send(:generate_descriptor_etag, entity_descriptor.known_entity)
+          end
+          context 'valid entity_descriptor' do
+            def run
+              get :specific_entity, primary_tag: primary_tag,
+                                    identifier: entity_id
+            end
 
-          context 'initial request' do
-            context 'uncached server side' do
-              context 'response' do
-                before { run }
-                subject { response }
+            context 'initial request' do
+              context 'uncached server side' do
+                context 'response' do
+                  before { run }
+                  subject { response }
 
-                include_examples '200 response'
-                include_examples 'entity descriptor response'
+                  include_examples '200 response'
+                  include_examples 'entity descriptor response'
+                end
+
+                context 'cache' do
+                  it 'updates server side cache' do
+                    expect { run }.to change { Rails.cache.fetch(etag) }
+                  end
+                end
               end
 
-              context 'cache' do
-                it 'updates server side cache' do
-                  expect { run }.to change { Rails.cache.fetch(etag) }
+              context 'cached server side' do
+                before { run } # pre-cache data
+
+                context 'response' do
+                  subject { response }
+                  before { Timecop.freeze { run } }
+
+                  include_examples '200 response'
+                  include_examples 'entity descriptor response'
+                end
+
+                context 'cache' do
+                  it 'does not modify server side cache' do
+                    expect { run }.not_to change { Rails.cache.fetch(etag) }
+                  end
                 end
               end
             end
 
-            context 'cached server side' do
-              before { run } # pre-cache data
-
-              context 'response' do
-                subject { response }
-                before { Timecop.freeze { run } }
-
-                include_examples '200 response'
-                include_examples 'entity descriptor response'
+            context 'subsequent requests' do
+              before do
+                run
+                @etag = response.headers['ETag']
+                @last_modified = response.headers['Last-Modified']
               end
 
-              context 'cache' do
-                it 'does not modify server side cache' do
-                  expect { run }.not_to change { Rails.cache.fetch(etag) }
+              context 'ETags' do
+                context 'with valid resource ETag' do
+                  before do
+                    request.headers['If-None-Match'] = @etag
+                    run
+                  end
+
+                  context 'response' do
+                    subject { response }
+                    it { is_expected.to have_http_status(:not_modified) }
+                  end
+                end
+
+                context 'with invalid resource ETag' do
+                  before do
+                    request.headers['If-None-Match'] = Faker::Lorem.word
+                    run
+                  end
+
+                  context 'response' do
+                    subject { response }
+
+                    include_examples '200 response'
+                    include_examples 'entity descriptor response'
+                  end
+                end
+              end
+
+              context 'Modification Time' do
+                context 'when resource unmodified' do
+                  before do
+                    request.headers['If-Modified-Since'] = @last_modified
+                    run
+                  end
+
+                  context 'response' do
+                    subject { response }
+                    it { is_expected.to have_http_status(:not_modified) }
+                  end
+                end
+
+                context 'when resource modified' do
+                  before do
+                    request.headers['If-Modified-Since'] =
+                    @last_modified - 1.second
+                    run
+                  end
+
+                  context 'response' do
+                    subject { response }
+
+                    include_examples '200 response'
+                    include_examples 'entity descriptor response'
+                  end
                 end
               end
             end
           end
 
-          context 'subsequent requests' do
+          context 'invalid entity_descriptor' do
             before do
-              run
-              @etag = response.headers['ETag']
-              @last_modified = response.headers['Last-Modified']
+              get :specific_entity, primary_tag: primary_tag,
+                                    identifier: 'https://example.edu/shibboleth'
             end
 
-            context 'ETags' do
-              context 'with valid resource ETag' do
-                before do
-                  request.headers['If-None-Match'] = @etag
-                  run
-                end
-
-                context 'response' do
-                  subject { response }
-                  it { is_expected.to have_http_status(:not_modified) }
-                end
-              end
-
-              context 'with invalid resource ETag' do
-                before do
-                  request.headers['If-None-Match'] = Faker::Lorem.word
-                  run
-                end
-
-                context 'response' do
-                  subject { response }
-
-                  include_examples '200 response'
-                  include_examples 'entity descriptor response'
-                end
-              end
-            end
-
-            context 'Modification Time' do
-              context 'when resource unmodified' do
-                before do
-                  request.headers['If-Modified-Since'] = @last_modified
-                  run
-                end
-
-                context 'response' do
-                  subject { response }
-                  it { is_expected.to have_http_status(:not_modified) }
-                end
-              end
-
-              context 'when resource modified' do
-                before do
-                  request.headers['If-Modified-Since'] =
-                  @last_modified - 1.second
-                  run
-                end
-
-                context 'response' do
-                  subject { response }
-
-                  include_examples '200 response'
-                  include_examples 'entity descriptor response'
-                end
-              end
+            context 'response' do
+              subject { response }
+              it { is_expected.to have_http_status(:not_found) }
             end
           end
         end
 
-        context 'invalid entity_descriptor' do
-          before do
-            get :specific_entity, primary_tag: primary_tag,
-                                  identifier: 'https://example.edu/shibboleth'
-          end
-
-          context 'response' do
-            subject { response }
-            it { is_expected.to have_http_status(:not_found) }
+        context 'invalid client request' do
+          it_behaves_like 'invalid requests' do
+            let(:query) do
+              get :specific_entity, primary_tag: primary_tag,
+                                    identifier: entity_id
+            end
           end
         end
       end
 
-      context 'invalid client request' do
-        it_behaves_like 'invalid requests' do
-          let(:query) do
-            get :specific_entity, primary_tag: primary_tag,
-                                  identifier: entity_id
-          end
+      include_examples 'non get request' do
+        let(:query) do
+          post :specific_entity, primary_tag: primary_tag, identifier: entity_id
         end
       end
     end
 
-    include_examples 'non get request' do
-      let(:query) do
-        post :specific_entity, primary_tag: primary_tag, identifier: entity_id
-      end
+    context 'EntityDescriptor' do
+      let(:idp_sso_descriptor) { create :idp_sso_descriptor }
+      let(:entity_descriptor) { idp_sso_descriptor.entity_descriptor }
+      let(:entity_id) { entity_descriptor.entity_id.uri }
+
+      include_examples 'Specific Entity Descriptor'
+    end
+
+    context 'RawEntityDescriptor' do
+      let(:entity_descriptor) { create :raw_entity_descriptor }
+      let(:entity_id) { entity_descriptor.entity_id.uri }
+
+      include_examples 'Specific Entity Descriptor'
     end
   end
 
@@ -449,7 +462,8 @@ RSpec.describe MetadataQueryController, type: :controller do
             create :metadata_instance, primary_tag: primary_tag
           end
           let!(:known_entities) do
-            create_list :known_entity, 2, :with_idp
+            create_list(:known_entity, 2, :with_idp) +
+              create_list(:known_entity, 2, :with_raw_entity_descriptor)
           end
           let!(:untagged_known_entities) do
             create_list :known_entity, 2, :with_idp
@@ -505,12 +519,12 @@ RSpec.describe MetadataQueryController, type: :controller do
                 before { run }
 
                 it 'has 4 known entities in metadata_instance' do
-                  expect(KnownEntity.with_all_tags(primary_tag).count).to eq(4)
+                  expect(KnownEntity.with_all_tags(primary_tag).count).to eq(6)
                 end
 
                 it 'has 4 known entities with secondary tag' do
                   expect(KnownEntity.with_all_tags(secondary_tag).count)
-                    .to eq(4)
+                    .to eq(6)
                 end
 
                 it 'renders only the 2 matching entities in metadata xml' do
@@ -518,7 +532,7 @@ RSpec.describe MetadataQueryController, type: :controller do
                           Nokogiri::XML.parse(response.body))
 
                   path = '/xmlns:EntitiesDescriptor/xmlns:EntityDescriptor'
-                  expect(xml.has_xpath?(path, count: 2)).to be
+                  expect(xml.all(:xpath, path).count).to eq(4)
                 end
               end
             end

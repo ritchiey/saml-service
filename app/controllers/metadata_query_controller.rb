@@ -39,7 +39,7 @@ class MetadataQueryController < ApplicationController
     public_action
 
     known_entity = EntityId.first(uri: params[:identifier])
-                   .try(:entity_descriptor).try(:known_entity)
+                   .try(:parent).try(:known_entity)
     return head :not_found unless known_entity
 
     etag = generate_descriptor_etag(known_entity)
