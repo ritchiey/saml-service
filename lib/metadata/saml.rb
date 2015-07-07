@@ -81,11 +81,11 @@ module Metadata
     end
 
     def root_entity_descriptor(ke)
+      attributes = { ID: instance_id, validUntil: expires_at.xmlschema }
       if ke.entity_descriptor.try(:functioning?)
-        attributes = { ID: instance_id, validUntil: expires_at.xmlschema }
         entity_descriptor(ke.entity_descriptor, attributes, true)
       elsif ke.raw_entity_descriptor.try(:functioning?)
-        raw_entity_descriptor(ke.raw_entity_descriptor, true)
+        raw_entity_descriptor(ke.raw_entity_descriptor, attributes, true)
       end
     end
 
@@ -111,7 +111,7 @@ module Metadata
     def signature_element
       hash_algorithm = metadata_instance.hash_algorithm
 
-      ds.Signature do
+      ds.Signature(ns) do |_|
         ds.SignedInfo do
           ds.CanonicalizationMethod(Algorithm: C14N_METHOD)
           ds.SignatureMethod(Algorithm: SIGNATURE_METHOD[hash_algorithm])
@@ -197,9 +197,22 @@ module Metadata
       saml.AttributeValue(ns, attr_val.value)
     end
 
-    def raw_entity_descriptor(red, root_node = false)
-      # TODO: Handle adding signature for root_node state
-      root << red.xml unless root_node
+    def raw_entity_descriptor(red, attributes = {}, root_node = false)
+      return root << red.xml unless root_node
+
+      # A dodgy hack to prevent Nokogiri from adding 'default' as a
+      # namespace to xmlns elements moved from this document to our actual
+      # EntityDescriptor builder, <default:IDPSSODescriptor> wtf Nokogiri...
+      xmlns_striped_input = red.xml.gsub(/xmlns=".+?"/, '')
+      parsed_xml = Nokogiri::XML(xmlns_striped_input, 'UTF-8')
+
+      root.EntityDescriptor(ns, attributes, entityID: red.entity_id.uri) do |_|
+        signature_element
+      end
+
+      parsed_xml.root.elements.each do |element|
+        builder.doc.root << element
+      end
     end
 
     def entity_descriptor(ed, attributes = {}, root_node = false)

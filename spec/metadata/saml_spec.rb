@@ -399,8 +399,47 @@ RSpec.describe Metadata::SAML do
     end
   end
 
-  context 'ds:Signature' do
+  context 'ds:Signature Root EntityDescriptor' do
     let(:entity) { create(:idp_sso_descriptor).entity_descriptor }
+    before { subject.root_entity_descriptor(entity.known_entity) }
+    include_examples 'ds:Signature xml' do
+      let(:root_node) { 'EntityDescriptor' }
+    end
+  end
+
+  context 'ds:Signature Root RawEntityDescriptor' do
+    let(:ed_xml) do
+      <<-EOF.strip_heredoc
+        <EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata"
+            entityID="https://test.example.com/idp/shibboleth"
+            xmlns:mdrpi="urn:oasis:names:tc:SAML:metadata:rpi">
+          <Extensions>
+            <mdrpi:PublicationInfo publisher="http://luettgen.com/maximilian"
+              creationInstant="2015-07-06T22:33:00Z"
+              publicationId="hoppekuhn20150706223300">
+              <mdrpi:UsagePolicy xml:lang="en">
+                http://www.edugain.org/policy/metadata-tou_1_0.txt
+              </mdrpi:UsagePolicy>
+            </mdrpi:PublicationInfo>
+            <mdrpi:RegistrationInfo
+              registrationAuthority="http://sauerheidenreich.net/einar_upton"
+              registrationInstant="2015-07-06T22:33:00Z">
+              <mdrpi:RegistrationPolicy xml:lang="en">
+                http://trantow.info/ella
+              </mdrpi:RegistrationPolicy>
+            </mdrpi:RegistrationInfo>
+          </Extensions>
+          <AttributeAuthorityDescriptor
+              protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+            <AttributeService
+                Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
+                Location="https://example.com/idp/profile/AttributeQuery/SOAP"/>
+          </AttributeAuthorityDescriptor>
+        </EntityDescriptor>
+      EOF
+    end
+
+    let(:entity) { create(:raw_entity_descriptor, xml: ed_xml) }
     before { subject.root_entity_descriptor(entity.known_entity) }
     include_examples 'ds:Signature xml' do
       let(:root_node) { 'EntityDescriptor' }

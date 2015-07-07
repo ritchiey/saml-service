@@ -1,5 +1,6 @@
 RSpec.shared_examples 'ds:Signature xml' do
-  let(:sig_xpath) { "/*[local-name() = \"#{root_node}\"]/ds:Signature" }
+  let(:sig_xpath) { "/#{root_node}/ds:Signature" }
+  let(:doc_sig_xpath) { "/xmlns:#{root_node}/ds:Signature" }
   let(:signature) { xml.find(:xpath, sig_xpath) }
   let(:signed_info) { xml.find(:xpath, "#{sig_xpath}/ds:SignedInfo") }
   let(:reference) { signed_info.find(:xpath, 'ds:Reference') }
@@ -106,7 +107,7 @@ RSpec.shared_examples 'ds:Signature xml' do
 
     let(:c14n_signed_info) do
       doc = builder.doc.dup
-      doc.at_xpath("#{sig_xpath}/ds:SignedInfo")
+      doc.at_xpath("#{doc_sig_xpath}/ds:SignedInfo")
         .canonicalize(Nokogiri::XML::XML_C14N_EXCLUSIVE_1_0)
     end
 
