@@ -2,6 +2,7 @@ require 'metadata/saml'
 
 class MetadataQueryController < ApplicationController
   SAML_CONTENT_TYPE = 'application/samlmetadata+xml'.freeze
+  SHA1_REGEX = /{sha1}(.*)?/
 
   include MetadataQueryCaching
 
@@ -39,6 +40,22 @@ class MetadataQueryController < ApplicationController
     public_action
 
     known_entity = EntityId.first(uri: params[:identifier])
+                   .try(:parent).try(:known_entity)
+    return head :not_found unless known_entity
+
+    etag = generate_descriptor_etag(known_entity)
+    return head :not_modified if known_entity_unmodified(known_entity, etag)
+
+    create_known_entity_response(known_entity, etag)
+  end
+
+  def specific_entity_sha1
+    public_action
+
+    sha1_identifier = params[:identifier].match(SHA1_REGEX)
+    return head :not_found unless sha1_identifier
+
+    known_entity = EntityId.first(sha1: sha1_identifier[1])
                    .try(:parent).try(:known_entity)
     return head :not_found unless known_entity
 

@@ -281,11 +281,6 @@ RSpec.describe MetadataQueryController, type: :controller do
               .send(:generate_descriptor_etag, entity_descriptor.known_entity)
           end
           context 'valid entity_descriptor' do
-            def run
-              get :specific_entity, primary_tag: primary_tag,
-                                    identifier: entity_id
-            end
-
             context 'initial request' do
               context 'uncached server side' do
                 context 'response' do
@@ -418,19 +413,49 @@ RSpec.describe MetadataQueryController, type: :controller do
       end
     end
 
-    context 'EntityDescriptor' do
-      let(:idp_sso_descriptor) { create :idp_sso_descriptor }
-      let(:entity_descriptor) { idp_sso_descriptor.entity_descriptor }
-      let(:entity_id) { entity_descriptor.entity_id.uri }
+    context 'With URI identifier' do
+      def run
+        get :specific_entity, primary_tag: primary_tag,
+                              identifier: entity_id
+      end
 
-      include_examples 'Specific Entity Descriptor'
+      context 'EntityDescriptor' do
+        let(:idp_sso_descriptor) { create :idp_sso_descriptor }
+        let(:entity_descriptor) { idp_sso_descriptor.entity_descriptor }
+        let(:entity_id) { entity_descriptor.entity_id.uri }
+
+        include_examples 'Specific Entity Descriptor'
+      end
+
+      context 'RawEntityDescriptor' do
+        let(:entity_descriptor) { create :raw_entity_descriptor }
+        let(:entity_id) { entity_descriptor.entity_id.uri }
+
+        include_examples 'Specific Entity Descriptor'
+      end
     end
 
-    context 'RawEntityDescriptor' do
-      let(:entity_descriptor) { create :raw_entity_descriptor }
-      let(:entity_id) { entity_descriptor.entity_id.uri }
+    context 'With sha1 identifier' do
+      def run
+        identifier = "{sha1}#{Digest::SHA1.hexdigest(entity_id)}"
+        get :specific_entity_sha1, primary_tag: primary_tag,
+                                   identifier: identifier
+      end
 
-      include_examples 'Specific Entity Descriptor'
+      context 'EntityDescriptor' do
+        let(:idp_sso_descriptor) { create :idp_sso_descriptor }
+        let(:entity_descriptor) { idp_sso_descriptor.entity_descriptor }
+        let(:entity_id) { entity_descriptor.entity_id.uri }
+
+        include_examples 'Specific Entity Descriptor'
+      end
+
+      context 'RawEntityDescriptor' do
+        let(:entity_descriptor) { create :raw_entity_descriptor }
+        let(:entity_id) { entity_descriptor.entity_id.uri }
+
+        include_examples 'Specific Entity Descriptor'
+      end
     end
   end
 
