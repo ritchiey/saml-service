@@ -60,8 +60,10 @@ class UpdateEntitySource
   end
 
   def known_entity(source, node)
-    attrs = { entity_source: source, entity_id: node['entityID'] }
-    KnownEntity.find_or_create(attrs) { |e| e.active = true }
+    entity_id = EntityId.find(uri: node['entityID'])
+    return entity_id.parent.known_entity if entity_id
+
+    KnownEntity.create(entity_source: source, active: true)
   end
 
   def update_raw_entity_descriptor(entity, node)

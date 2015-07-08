@@ -24,4 +24,11 @@ class KnownEntity < Sequel::Model
     qualify.join(:tags, known_entity_id: :id, name: tags)
       .group(:known_entity_id)
   end
+
+  def entity_id
+    return entity_descriptor.entity_id.uri if entity_descriptor
+    return raw_entity_descriptor.entity_id.uri if raw_entity_descriptor
+
+    nil
+  end
 end

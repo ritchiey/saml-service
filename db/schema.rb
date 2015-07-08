@@ -70,7 +70,6 @@ Sequel.migration do
     
     create_table(:known_entities) do
       primary_key :id, :type=>"int(11)"
-      column :entity_id, "varchar(255)", :null=>false
       column :active, "tinyint(1)", :null=>false
       column :entity_source_id, "int(11)", :null=>false
       column :created_at, "datetime", :null=>false
@@ -789,5 +788,6 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150703014627_add_sha1_to_entity_id.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150703023921_add_raw_entity_descriptor_foreign_key_to_entity_id.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150703030108_update_entity_descriptor_foreign_key_on_entity_id.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150708025727_remove_entity_id_from_known_entity.rb')"
   end
 end
