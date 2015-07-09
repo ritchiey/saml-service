@@ -203,8 +203,8 @@ module Metadata
       # A dodgy hack to prevent Nokogiri from adding 'default' as a
       # namespace to xmlns elements moved from this document to our actual
       # EntityDescriptor builder, <default:IDPSSODescriptor> wtf Nokogiri...
-      xmlns_striped_input = red.xml.gsub(/xmlns=".+?"/, '')
-      parsed_xml = Nokogiri::XML(xmlns_striped_input, 'UTF-8')
+      xmlns_stripped_input = red.xml.gsub(/xmlns=".+?"/, '')
+      parsed_xml = Nokogiri::XML(xmlns_stripped_input, 'UTF-8')
 
       root.EntityDescriptor(ns, attributes, entityID: red.entity_id.uri) do |_|
         signature_element
