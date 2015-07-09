@@ -11,16 +11,11 @@ module MetadataQueryCaching
   end
 
   def known_entities_unmodified(known_entities, etag)
-    if valid_etag(etag) || unmodified(known_entities.sort_by(&:updated_at).last)
-      return true
-    end
-
-    false
+    valid_etag(etag) || unmodified(known_entities.sort_by(&:updated_at).last)
   end
 
   def known_entity_unmodified(known_entity, etag)
-    return true if valid_etag(etag) || unmodified(known_entity)
-    false
+    valid_etag(etag) || unmodified(known_entity)
   end
 
   def valid_etag(etag)

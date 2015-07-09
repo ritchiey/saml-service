@@ -21,7 +21,6 @@ class EntityId < SamlURI
   end
 
   def parent
-    return entity_descriptor if entity_descriptor
-    raw_entity_descriptor
+    entity_descriptor || raw_entity_descriptor
   end
 end
