@@ -106,7 +106,7 @@ class MetadataQueryController < ApplicationController
 
   def create_headers(obj, etag, expiry)
     response.headers['ETag'] = etag
-    response.headers['Last-Modified'] = obj.updated_at
+    response.headers['Last-Modified'] = obj.updated_at.rfc2822
     response.headers['Content-Type'] =
       "#{MetadataQueryController::SAML_CONTENT_TYPE}; charset=utf-8"
 

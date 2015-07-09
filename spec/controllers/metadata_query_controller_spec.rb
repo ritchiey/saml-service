@@ -193,7 +193,7 @@ RSpec.describe MetadataQueryController, type: :controller do
             before do
               run
               @etag = response.headers['ETag']
-              @last_modified = response.headers['Last-Modified']
+              @last_modified = Time.rfc822(response.headers['Last-Modified'])
             end
 
             context 'ETags' do
@@ -321,7 +321,7 @@ RSpec.describe MetadataQueryController, type: :controller do
               before do
                 run
                 @etag = response.headers['ETag']
-                @last_modified = response.headers['Last-Modified']
+                @last_modified = Time.rfc822(response.headers['Last-Modified'])
               end
 
               context 'ETags' do
@@ -585,7 +585,7 @@ RSpec.describe MetadataQueryController, type: :controller do
             before do
               run
               @etag = response.headers['ETag']
-              @last_modified = response.headers['Last-Modified']
+              @last_modified = Time.rfc822(response.headers['Last-Modified'])
             end
 
             context 'ETags' do
