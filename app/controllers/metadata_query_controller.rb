@@ -12,10 +12,10 @@ class MetadataQueryController < ApplicationController
 
   def all_entities
     public_action
-    return head :not_found unless @metadata_instance.all_entities
+    return not_found unless @metadata_instance.all_entities
 
     known_entities = KnownEntity.with_all_tags(@metadata_instance.primary_tag)
-    return head :not_found unless known_entities.present?
+    return not_found unless known_entities.present?
 
     etag = generate_known_entities_etag(known_entities)
     if known_entities_unmodified?(known_entities, etag)
@@ -30,7 +30,7 @@ class MetadataQueryController < ApplicationController
 
     tags = [@metadata_instance.primary_tag, params[:identifier]]
     known_entities = KnownEntity.with_all_tags(tags)
-    return head :not_found unless known_entities.present?
+    return not_found unless known_entities.present?
 
     etag = generate_known_entities_etag(known_entities)
     if known_entities_unmodified?(known_entities, etag)
@@ -45,7 +45,7 @@ class MetadataQueryController < ApplicationController
 
     known_entity = EntityId.first(uri: params[:identifier])
                    .try(:parent).try(:known_entity)
-    return head :not_found unless known_entity
+    return not_found unless known_entity
 
     etag = generate_descriptor_etag(known_entity)
     return head :not_modified if known_entity_unmodified?(known_entity, etag)
@@ -57,11 +57,11 @@ class MetadataQueryController < ApplicationController
     public_action
 
     sha1_identifier = params[:identifier].match(SHA1_REGEX)
-    return head :not_found unless sha1_identifier
+    return not_found unless sha1_identifier
 
     known_entity = EntityId.first(sha1: sha1_identifier[1])
                    .try(:parent).try(:known_entity)
-    return head :not_found unless known_entity
+    return not_found unless known_entity
 
     etag = generate_descriptor_etag(known_entity)
     return head :not_modified if known_entity_unmodified?(known_entity, etag)
@@ -100,7 +100,7 @@ class MetadataQueryController < ApplicationController
       return
     end
 
-    head :not_found
+    not_found
     false
   end
 
@@ -127,5 +127,12 @@ class MetadataQueryController < ApplicationController
     create_headers(known_entities.sort_by(&:updated_at).last,
                    etag, response[:expires])
     render body: response[:metadata]
+  end
+
+  def not_found
+    ttl = Rails.application.config.saml_service.metadata.negative_cache_ttl
+    expires_in(ttl)
+
+    head :not_found
   end
 end

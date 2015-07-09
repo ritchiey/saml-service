@@ -1,0 +1,12 @@
+defaults: &defaults
+  metadata:
+    negative_cache_ttl: 600
+
+development:
+  <<: *defaults
+
+test:
+  <<: *defaults
+
+production:
+  <<: *defaults

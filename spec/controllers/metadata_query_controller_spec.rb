@@ -33,6 +33,12 @@ RSpec.describe MetadataQueryController, type: :controller do
       end
 
       it { is_expected.to have_http_status(:not_found) }
+      it 'has relevant MUST/SHOULD headers per specification' do
+        expect(subject.headers).to include(
+          'Cache-Control' =>
+            'max-age=600, private'
+        )
+      end
     end
   end
 
@@ -122,6 +128,12 @@ RSpec.describe MetadataQueryController, type: :controller do
           context 'response' do
             subject { response }
             it { is_expected.to have_http_status(:not_found) }
+            it 'has relevant MUST/SHOULD headers per specification' do
+              expect(subject.headers).to include(
+                'Cache-Control' =>
+                  'max-age=600, private'
+              )
+            end
           end
         end
 
@@ -392,6 +404,12 @@ RSpec.describe MetadataQueryController, type: :controller do
             context 'response' do
               subject { response }
               it { is_expected.to have_http_status(:not_found) }
+              it 'has relevant MUST/SHOULD headers per specification' do
+                expect(subject.headers).to include(
+                  'Cache-Control' =>
+                    'max-age=600, private'
+                )
+              end
             end
           end
         end
@@ -479,6 +497,12 @@ RSpec.describe MetadataQueryController, type: :controller do
           context 'response' do
             subject { response }
             it { is_expected.to have_http_status(:not_found) }
+            it 'has relevant MUST/SHOULD headers per specification' do
+              expect(subject.headers).to include(
+                'Cache-Control' =>
+                  'max-age=600, private'
+              )
+            end
           end
         end
 

@@ -14,6 +14,8 @@ gem 'resque'
 gem 'resque-retry'
 gem 'redis'
 
+gem 'recursive-open-struct'
+
 # Web
 gem 'uglifier', '>= 1.3.0'
 gem 'therubyracer',  platforms: :ruby
