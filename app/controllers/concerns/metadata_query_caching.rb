@@ -10,20 +10,20 @@ module MetadataQueryCaching
     Digest::MD5.hexdigest("samlmetadata/#{desc.id}-#{desc.updated_at}")
   end
 
-  def known_entities_unmodified(known_entities, etag)
-    valid_etag(etag) || unmodified(known_entities.sort_by(&:updated_at).last)
+  def known_entities_unmodified?(known_entities, etag)
+    valid_etag?(etag) || unmodified?(known_entities.sort_by(&:updated_at).last)
   end
 
-  def known_entity_unmodified(known_entity, etag)
-    valid_etag(etag) || unmodified(known_entity)
+  def known_entity_unmodified?(known_entity, etag)
+    valid_etag?(etag) || unmodified?(known_entity)
   end
 
-  def valid_etag(etag)
+  def valid_etag?(etag)
     return false unless request.headers['If-None-Match']
     request.headers['If-None-Match'] == etag
   end
 
-  def unmodified(obj)
+  def unmodified?(obj)
     return false unless request.headers['If-Modified-Since']
     obj.updated_at <= request.headers['If-Modified-Since']
   end
