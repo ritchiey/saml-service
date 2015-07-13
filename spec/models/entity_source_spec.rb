@@ -43,7 +43,7 @@ RSpec.describe EntitySource do
     end
 
     it 'rejects a url which does not parse' do
-      subject.url = 'https://fed.test_example.com/metadata/full.xml'
+      subject.url = 'https://fed.test example.com/metadata/full.xml'
       expect(subject).not_to be_valid
     end
   end
