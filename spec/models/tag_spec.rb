@@ -4,16 +4,16 @@ RSpec.describe Tag, type: :model do
   it_behaves_like 'a basic model'
 
   it { is_expected.to validate_presence :name }
-  it { is_expected.to have_many_to_one :entity_descriptor }
+  it { is_expected.to have_many_to_one :known_entity }
   it { is_expected.to have_many_to_one :role_descriptor }
 
   let(:role_descriptor) { create(:role_descriptor) }
-  let(:entity_descriptor) { create(:entity_descriptor) }
+  let(:known_entity) { create(:known_entity) }
 
   let(:tag_name) { Faker::Lorem.word }
 
   context 'with no owner' do
-    let(:tag) { build(:tag, entity_descriptor: nil, role_descriptor: nil) }
+    let(:tag) { build(:tag, known_entity: nil, role_descriptor: nil) }
     subject { tag }
     it { is_expected.to_not be_valid }
     context 'the error message' do
@@ -21,7 +21,7 @@ RSpec.describe Tag, type: :model do
       subject { tag.errors }
       it 'is expected to be a single owner validation' do
         expect(subject).to eq(ownership: ['Must be owned by one of' \
-                                      ' entity_descriptor, role_descriptor'])
+                                      ' known_entity, role_descriptor'])
       end
     end
   end
@@ -29,7 +29,7 @@ RSpec.describe Tag, type: :model do
   context 'with one owner' do
     subject do
       build(:tag, role_descriptor: role_descriptor,
-                  entity_descriptor: nil)
+                  known_entity: nil)
     end
     it { is_expected.to be_valid }
   end
@@ -37,7 +37,7 @@ RSpec.describe Tag, type: :model do
   context 'with more than one owner' do
     let(:tag) do
       build(:tag, role_descriptor: role_descriptor,
-                  entity_descriptor: entity_descriptor)
+                  known_entity: known_entity)
     end
     subject { tag }
     it { is_expected.to_not be_valid }
@@ -46,7 +46,7 @@ RSpec.describe Tag, type: :model do
       subject { tag.errors }
       it 'is expected to be a single owner validation' do
         expect(subject).to eq(ownership: ['Cannot be owned by more than one' \
-                                      ' of entity_descriptor, role_descriptor'])
+                                      ' of known_entity, role_descriptor'])
       end
     end
   end
@@ -72,25 +72,25 @@ RSpec.describe Tag, type: :model do
       end
     end
 
-    context 'entity_descriptor tag with same name' do
+    context 'known_entity tag with same name' do
       subject do
-        build(:entity_descriptor_tag,
-              entity_descriptor: entity_descriptor, name: tag_name)
+        build(:known_entity_tag,
+              known_entity: known_entity, name: tag_name)
       end
       before { tag.valid? }
       it { is_expected.to be_valid }
     end
   end
 
-  context '[name, entity_descriptor] uniqueness' do
+  context '[name, known_entity] uniqueness' do
     before do
-      create(:entity_descriptor_tag,
-             entity_descriptor: entity_descriptor, name: tag_name)
+      create(:known_entity_tag,
+             known_entity: known_entity, name: tag_name)
     end
 
     let(:tag) do
-      build(:entity_descriptor_tag,
-            entity_descriptor: entity_descriptor, name: tag_name)
+      build(:known_entity_tag,
+            known_entity: known_entity, name: tag_name)
     end
 
     subject { tag }
@@ -101,7 +101,7 @@ RSpec.describe Tag, type: :model do
       subject { tag.errors }
       it 'is expected to be a uniqueness validation' do
         expect(subject)
-          .to eq([:name, :entity_descriptor] => ['is already taken'])
+          .to eq([:name, :known_entity] => ['is already taken'])
       end
     end
 

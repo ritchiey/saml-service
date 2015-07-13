@@ -1,7 +1,5 @@
 class MetadataInstance < Sequel::Model
   many_to_one :keypair
-
-  one_to_many :entity_descriptors
   one_to_many :ca_key_infos
 
   one_to_one :registration_info, class: 'MDRPI::RegistrationInfo'
@@ -11,7 +9,8 @@ class MetadataInstance < Sequel::Model
   def validate
     super
     validates_presence [:name, :created_at, :updated_at, :hash_algorithm,
-                        :keypair]
+                        :keypair, :federation_identifier, :validity_period,
+                        :primary_tag, :all_entities]
     validates_presence :ca_verify_depth if ca_key_infos.present?
     validates_presence :publication_info unless new?
 

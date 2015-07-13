@@ -9,7 +9,7 @@ shared_examples 'a taggable model' do | tag_factory, association |
   end
 
   describe '#with_any_tag' do
-    let(:tag_name) { Faker::Lorem.characters }
+    let(:tag_name) { Faker::Lorem.word }
     let(:instance) { create(klass) }
 
     subject { described_class.with_any_tag(tag_name) }

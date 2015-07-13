@@ -12,6 +12,7 @@ Timecop.safe_mode = true
 RSpec.configure do |config|
   config.fixture_path = "#{::Rails.root}/spec/fixtures"
   config.include FactoryGirl::Syntax::Methods
+  config.include Rails.application.routes.url_helpers
 
   # Use Sequel matchers and transactions
   config.include RspecSequel::Matchers

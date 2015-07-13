@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe KnownEntity do
   it_behaves_like 'a basic model'
+  it_behaves_like 'a taggable model', :known_entity_tag, :known_entity
 
   it { is_expected.to validate_presence(:active) }
   it { is_expected.to validate_presence(:entity_source) }

@@ -101,23 +101,16 @@ RSpec.describe UpdateEntitySource do
 
     context 'when the entity already exists' do
       let!(:entity) do
-        KnownEntity.create(entity_source: subject, active: true,
-                           entity_id: entity_id)
-      end
-
-      it 'uses the existing entity' do
-        expect { run }.not_to change(KnownEntity, :count)
-      end
-
-      it 'creates the raw entity descriptor' do
-        expect { run }.to change(RawEntityDescriptor, :count).by(1)
+        create :known_entity, entity_source: subject, active: true
       end
 
       context 'when the raw entity descriptor already exists' do
         let!(:red) do
-          RawEntityDescriptor.create(xml: old_xml, known_entity: entity)
+          create :raw_entity_descriptor, xml: old_xml,
+                                         entity_id_uri: entity_id,
+                                         known_entity: entity
         end
-        let(:hostname) { URI.parse(entity.entity_id).hostname }
+        let(:hostname) { URI.parse(entity_id).hostname }
 
         let(:old_xml) do
           <<-EOF.strip_heredoc
@@ -200,12 +193,13 @@ RSpec.describe UpdateEntitySource do
     end
 
     let!(:other_entity) do
-      KnownEntity.create(entity_source: subject, active: true,
-                         entity_id: entity_ids[0])
+      create :known_entity, entity_source: subject, active: true
     end
 
     let!(:other_red) do
-      RawEntityDescriptor.create(xml: old_xml, known_entity: other_entity)
+      create :raw_entity_descriptor, xml: old_xml,
+                                     known_entity: other_entity,
+                                     entity_id_uri: entity_ids[0]
     end
 
     it 'removes the known entity' do

@@ -70,7 +70,6 @@ Sequel.migration do
     
     create_table(:known_entities) do
       primary_key :id, :type=>"int(11)"
-      column :entity_id, "varchar(255)", :null=>false
       column :active, "tinyint(1)", :null=>false
       column :entity_source_id, "int(11)", :null=>false
       column :created_at, "datetime", :null=>false
@@ -166,7 +165,6 @@ Sequel.migration do
     
     create_table(:metadata_instances) do
       primary_key :id, :type=>"int(11)"
-      column :identifier, "varchar(255)"
       column :name, "varchar(255)", :null=>false
       column :extensions, "text"
       column :created_at, "datetime"
@@ -174,6 +172,10 @@ Sequel.migration do
       column :ca_verify_depth, "int(11)"
       column :hash_algorithm, "varchar(255)", :null=>false
       foreign_key :keypair_id, :keypairs, :type=>"int(11)", :null=>false, :key=>[:id]
+      column :primary_tag, "varchar(255)", :null=>false
+      column :all_entities, "tinyint(1)", :default=>true, :null=>false
+      column :federation_identifier, "varchar(255)", :null=>false
+      column :validity_period, "int(11)", :null=>false
       
       index [:keypair_id], :name=>:keypair_id
     end
@@ -279,9 +281,12 @@ Sequel.migration do
     
     create_table(:entity_ids) do
       primary_key :id, :type=>"int(11)"
-      foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
+      foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :key=>[:id]
+      column :sha1, "varchar(255)", :null=>false
+      foreign_key :raw_entity_descriptor_id, :raw_entity_descriptors, :type=>"int(11)", :key=>[:id]
       
       index [:entity_descriptor_id], :name=>:eid_ed_fkey
+      index [:raw_entity_descriptor_id], :name=>:red_eid_fkey
     end
     
     create_table(:idp_sso_descriptors) do
@@ -497,13 +502,13 @@ Sequel.migration do
     create_table(:tags) do
       primary_key :id, :type=>"int(11)"
       column :name, "varchar(255)", :null=>false
-      foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :key=>[:id]
       foreign_key :role_descriptor_id, :role_descriptors, :type=>"int(11)", :key=>[:id]
       column :created_at, "datetime"
       column :updated_at, "datetime"
+      foreign_key :known_entity_id, :known_entities, :type=>"int(11)", :key=>[:id]
       
-      index [:entity_descriptor_id], :name=>:entity_descriptor_id
-      index [:name, :entity_descriptor_id], :name=>:name_entity_descriptor_id_un, :unique=>true
+      index [:known_entity_id], :name=>:known_entity_id
+      index [:name, :known_entity_id], :name=>:name_known_entity_id_un, :unique=>true
       index [:name, :role_descriptor_id], :name=>:name_role_descriptor_id_un, :unique=>true
       index [:role_descriptor_id], :name=>:role_descriptor_id
     end
@@ -775,5 +780,14 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150305230517_add_keypair_to_metadata_instances.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150415004025_add_enabled_to_entity_descriptor.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150415030131_add_enabled_to_raw_entity_descriptor.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150504231555_add_primary_tag_to_metadata_instance.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150504232739_add_all_entities_to_metadata_instance.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150505032956_add_saml_fields_to_metadata_instance.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150505052005_drop_entity_descriptor_from_tags.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150505052251_add_known_entity_foreign_key_to_tags.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150703014627_add_sha1_to_entity_id.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150703023921_add_raw_entity_descriptor_foreign_key_to_entity_id.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150703030108_update_entity_descriptor_foreign_key_on_entity_id.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150708025727_remove_entity_id_from_known_entity.rb')"
   end
 end

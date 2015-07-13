@@ -3,7 +3,13 @@ FactoryGirl.define do
     association :keypair
 
     name { Faker::Internet.domain_name }
+
     hash_algorithm 'sha256'
+    validity_period { 1.week }
+    federation_identifier { Faker::Lorem.word }
+
+    primary_tag { Faker::Lorem.word }
+    all_entities true
 
     after :create do | mi |
       create(:mdrpi_publication_info, metadata_instance: mi)

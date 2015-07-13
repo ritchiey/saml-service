@@ -4,9 +4,8 @@ module Metadata
   class SAML
     include SAMLNamespaces
 
-    attr_reader :builder, :created_at, :expires_at, :instance_id,
-                :federation_identifier, :metadata_name, :metadata_instance,
-                :metadata_validity_period
+    attr_reader :builder, :created_at, :expires_at,
+                :instance_id, :metadata_instance
 
     protected
 
@@ -38,8 +37,8 @@ module Metadata
 
       @builder = Nokogiri::XML::Builder.new(encoding: 'UTF-8')
       @created_at = Time.now.utc
-      @expires_at = created_at + metadata_validity_period
-      @instance_id = "#{federation_identifier}" \
+      @expires_at = created_at + metadata_instance.validity_period
+      @instance_id = "#{metadata_instance.federation_identifier}" \
                      "#{created_at.to_formatted_s(:number)}"
     end
 
@@ -49,7 +48,7 @@ module Metadata
 
     def entities_descriptor(known_entities)
       attributes = { ID: instance_id,
-                     Name: metadata_name,
+                     Name: metadata_instance.name,
                      validUntil: expires_at.xmlschema }
 
       root.EntitiesDescriptor(ns, attributes) do |_|
@@ -70,6 +69,23 @@ module Metadata
         registration_info(mi) if mi.registration_info.present?
         key_authority(mi) if mi.ca_key_infos.present?
         entity_attribute(mi.entity_attribute) if mi.entity_attribute.present?
+      end
+    end
+
+    def known_entity(ke)
+      if ke.entity_descriptor.try(:functioning?)
+        entity_descriptor(ke.entity_descriptor)
+      elsif ke.raw_entity_descriptor.try(:functioning?)
+        raw_entity_descriptor(ke.raw_entity_descriptor)
+      end
+    end
+
+    def root_entity_descriptor(ke)
+      attributes = { ID: instance_id, validUntil: expires_at.xmlschema }
+      if ke.entity_descriptor.try(:functioning?)
+        entity_descriptor(ke.entity_descriptor, attributes, true)
+      elsif ke.raw_entity_descriptor.try(:functioning?)
+        raw_entity_descriptor(ke.raw_entity_descriptor, attributes, true)
       end
     end
 
@@ -95,7 +111,7 @@ module Metadata
     def signature_element
       hash_algorithm = metadata_instance.hash_algorithm
 
-      ds.Signature do
+      ds.Signature(ns) do |_|
         ds.SignedInfo do
           ds.CanonicalizationMethod(Algorithm: C14N_METHOD)
           ds.SignatureMethod(Algorithm: SIGNATURE_METHOD[hash_algorithm])
@@ -181,28 +197,27 @@ module Metadata
       saml.AttributeValue(ns, attr_val.value)
     end
 
-    def root_entity_descriptor(ed)
-      return unless ed.functioning?
+    def raw_entity_descriptor(red, attributes = {}, root_node = false)
+      return root << red.xml unless root_node
 
-      attributes = { ID: instance_id,
-                     validUntil: expires_at.xmlschema }
-      entity_descriptor(ed, attributes, true)
-    end
+      # A dodgy hack to prevent Nokogiri from adding 'default' as a
+      # namespace to xmlns elements moved from this document to our actual
+      # EntityDescriptor builder, <default:IDPSSODescriptor> wtf Nokogiri...
+      xmlns_stripped_input = red.xml.gsub(/xmlns=".+?"/, '')
+      parsed_xml = Nokogiri::XML(xmlns_stripped_input, 'UTF-8')
 
-    def known_entity(entity)
-      if entity.entity_descriptor.try(:functioning?)
-        entity_descriptor(entity.entity_descriptor)
-      elsif entity.raw_entity_descriptor.try(:functioning?)
-        raw_entity_descriptor(entity.raw_entity_descriptor)
+      root.EntityDescriptor(ns, attributes, entityID: red.entity_id.uri) do |_|
+        signature_element
       end
-    end
 
-    def raw_entity_descriptor(red)
-      root << red.xml
+      parsed_xml.root.elements.each do |element|
+        builder.doc.root << element
+      end
     end
 
     def entity_descriptor(ed, attributes = {}, root_node = false)
       root.EntityDescriptor(ns, attributes, entityID: ed.entity_id.uri) do |_|
+        signature_element if root_node
         entity_descriptor_extensions(ed, root_node)
 
         ed.idp_sso_descriptors.each do |idp|
