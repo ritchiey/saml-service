@@ -9,11 +9,11 @@ class UpdateEntitySource
     .freeze
   private_constant :ENTITY_DESCRIPTOR_XPATH
 
-  def self.perform(id: id)
+  def self.perform(id:)
     new.perform(id: id)
   end
 
-  def perform(id: id)
+  def perform(id:)
     source = EntitySource[id]
     untouched = source.known_entities.to_a
 
