@@ -15,6 +15,8 @@ class EntityDescriptor < Sequel::Model
   one_to_one :publication_info, class: 'MDRPI::PublicationInfo'
   one_to_one :entity_attribute, class: 'MDATTR::EntityAttribute'
 
+  plugin :touch
+
   def validate
     super
     validates_presence [:known_entity, :created_at, :updated_at]

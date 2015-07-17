@@ -141,4 +141,15 @@ describe EntityDescriptor do
       end
     end
   end
+
+  describe '#touch' do
+    let(:role_descriptor) { create :role_descriptor }
+    subject { role_descriptor.entity_descriptor }
+
+    it 'modifies parent EntityDescriptor on save' do
+      Timecop.travel(30.seconds) do
+        expect { subject.touch }.to change { subject.updated_at }
+      end
+    end
+  end
 end
