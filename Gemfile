@@ -51,5 +51,5 @@ group :development, :test do
   gem 'guard-rspec', require: false
   gem 'guard-brakeman', require: false
   gem 'pry-rails', require: false
-  gem 'pry-byebug', require: false
+  gem 'pry-byebug'
 end
