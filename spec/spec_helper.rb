@@ -18,5 +18,9 @@ RSpec.configure do |config|
     mocks.verify_partial_doubles = true
   end
 
+  config.after(:suite) do
+    WebMock.disable_net_connect!(:allow => 'codeclimate.com')
+  end
+
   config.alias_it_should_behave_like_to :has_behavior, 'has behavior:'
 end
