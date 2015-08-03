@@ -94,7 +94,6 @@ Sequel.migration do
     
     create_table(:organizations) do
       primary_key :id, :type=>"int(11)"
-      column :url, "varchar(255)", :null=>false
       column :created_at, "datetime"
       column :updated_at, "datetime"
     end
@@ -789,5 +788,6 @@ Sequel.migration do
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150703023921_add_raw_entity_descriptor_foreign_key_to_entity_id.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150703030108_update_entity_descriptor_foreign_key_on_entity_id.rb')"
     self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150708025727_remove_entity_id_from_known_entity.rb')"
+    self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150803035704_drop_url_from_organization.rb')"
   end
 end
