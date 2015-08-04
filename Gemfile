@@ -17,6 +17,8 @@ gem 'resque-retry'
 gem 'redis'
 gem 'redis-rails'
 
+gem 'implicit-schema'
+
 gem 'recursive-open-struct'
 
 # Web
