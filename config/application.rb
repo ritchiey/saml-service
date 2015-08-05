@@ -13,6 +13,8 @@ require 'sprockets/railtie'
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
+Sequel.default_timezone = :utc
+
 module Saml
   class Application < Rails::Application
     # Settings in config/environments/* take precedence over those
