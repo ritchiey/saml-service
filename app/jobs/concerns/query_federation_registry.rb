@@ -1,17 +1,17 @@
 module QueryFederationRegistry
-  def entity_descriptors
+  def fr_entity_descriptors
     data(fr_source.entity_descriptors_url)[:entity_descriptors]
   end
 
-  def identity_providers
+  def fr_identity_providers
     data_by_id(fr_source.identity_providers_url, :identity_providers)
   end
 
-  def service_providers
+  def fr_service_providers
     data_by_id(fr_source.service_providers_url, :service_providers)
   end
 
-  def attribute_authorities
+  def fr_attribute_authorities
     data_by_id(fr_source.attribute_authorities_url, :attribute_authorities)
   end
 

@@ -103,6 +103,10 @@ RSpec.describe UpdateFromFederationRegistry do
       expect(known_entities.map(&:entity_id)).to contain_exactly(*entity_ids)
     end
 
+    it 'creates the entity id' do
+      expect { run }.to change(EntityId, :count).by(1)
+    end
+
     it 'creates the idp sso descriptor' do
       expect { run }.to change(IDPSSODescriptor, :count).by(1)
     end
@@ -156,6 +160,10 @@ RSpec.describe UpdateFromFederationRegistry do
       expect { run }.not_to change(EntityDescriptor, :count)
     end
 
+    it 'creates no entity id' do
+      expect { run }.not_to change(EntityId, :count)
+    end
+
     it 'creates no idp sso descriptor' do
       expect { run }.not_to change(IDPSSODescriptor, :count)
     end
@@ -170,6 +178,7 @@ RSpec.describe UpdateFromFederationRegistry do
       result << {
         id: n,
         entity_id: "https://#{Faker::Lorem.words.join('.')}/idp/shibboleth",
+        active: true,
         saml: {
           identity_providers: [{ id: idp[:id] }],
           service_providers: [],
@@ -182,6 +191,7 @@ RSpec.describe UpdateFromFederationRegistry do
       n += 1
       result << {
         entity_id: "https://#{Faker::Lorem.words.join('.')}/shibboleth",
+        active: true,
         saml: {
           identity_providers: [],
           service_providers: [{ id: sp[:id] }],
@@ -194,10 +204,11 @@ RSpec.describe UpdateFromFederationRegistry do
   end
 
   def fr_time(time)
+    puts time
     time.utc.strftime('%Y-%m-%dT%H:%M:%S+0000')
   end
 
-  let(:idp_created_at) { Time.at(rand(Time.now.to_i)) }
+  let(:idp_created_at) { Time.at(rand(Time.now.utc.to_i)) }
   let(:idp_signed) { false }
   let(:idp_active) { true }
   let(:idp_error_url) { "https://error.#{Faker::Internet.domain_name}" }
