@@ -13,7 +13,7 @@ RSpec.describe FederationRegistrySource do
 
   context 'hostname validation' do
     it 'rejects a hostname which does not parse in a url' do
-      subject.hostname = 'test_example.com'
+      subject.hostname = 'test|example.com'
       expect(subject).not_to be_valid
     end
   end

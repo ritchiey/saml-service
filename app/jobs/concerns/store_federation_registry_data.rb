@@ -1,4 +1,4 @@
-module QuerySyncedData
+module StoreFederationRegistryData
   def create_or_update_by_fr_id(dataset, fr_id, **attrs)
     update_by_fr_id(dataset, fr_id, attrs) ||
       create_by_fr_id(dataset, fr_id, attrs) { |o| yield o }
