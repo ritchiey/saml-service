@@ -24,9 +24,6 @@ RSpec.describe UpdateFromFederationRegistry do
   end
 
   let(:request_headers) { { 'Authorization' => authorization } }
-  let(:entity_ids) { entity_descriptors.map { |ed| ed[:entity_id] } }
-  let(:idp_count) { 0 }
-  let(:sp_count) { 0 }
   let(:truncated_now) { Time.at(Time.now.to_i) }
 
   delegate :entity_source, to: :fr_source
@@ -44,13 +41,6 @@ RSpec.describe UpdateFromFederationRegistry do
   end
 
   around { |e| Timecop.freeze { e.run } }
-
-  before do
-    stub_fr_request(:entity_descriptors)
-    stub_fr_request(:identity_providers)
-    stub_fr_request(:service_providers)
-    stub_fr_request(:attribute_authorities)
-  end
 
   def run
     described_class.perform(fr_source.id)
@@ -77,175 +67,13 @@ RSpec.describe UpdateFromFederationRegistry do
     verify_checked_all_attributes(attr_generators.keys)
 
     it 'is valid' do
-      skip
       expect(subject).to be_valid
     end
   end
 
-  context 'with a single idp' do
-    let(:idp_count) { 1 }
-
-    it 'creates the entity' do
-      expect { run }.to change { known_entities(true).count }.by(1)
-    end
-
-    it 'creates the entity descriptor' do
-      expect { run }.to change(EntityDescriptor, :count).by(1)
-    end
-
-    it 'associates the entity descriptor with its fr id' do
-      run
-      expect(EntityDescriptor.last).to have_fr_id(1)
-    end
-
-    it 'assigns the entity the correct id' do
-      run
-      expect(known_entities.map(&:entity_id)).to contain_exactly(*entity_ids)
-    end
-
-    it 'creates the entity id' do
-      expect { run }.to change(EntityId, :count).by(1)
-    end
-
-    it 'creates the idp sso descriptor' do
-      expect { run }.to change(IDPSSODescriptor, :count).by(1)
-    end
-
-    context 'the created idp sso descriptor' do
-      before { run }
-      subject { IDPSSODescriptor.last }
-
-      let(:ed) { EntityDescriptor.last }
-
-      verify(want_authn_requests_signed: false,
-             active: true,
-             created_at: -> { idp_created_at },
-             updated_at: -> { truncated_now },
-             entity_descriptor_id: -> { ed.id },
-             error_url: -> { idp_error_url },
-             extensions: -> { idp_extensions },
-             kind: 'IDPSSODescriptor',
-             organization_id: -> { skip })
-
-      context 'with authn requests signed' do
-        let(:idp_signed) { true }
-
-        verify_attributes(want_authn_requests_signed: true)
-      end
-
-      context 'when inactive' do
-        let(:idp_active) { false }
-
-        verify_attributes(active: false)
-      end
-    end
-  end
-
-  context 'with an existing idp' do
-    let(:idp_count) { 1 }
-
-    let!(:idp_sso_descriptor) { create(:idp_sso_descriptor) }
-    let!(:entity_descriptor) { idp_sso_descriptor.entity_descriptor }
-
-    before do
-      record_fr_id(entity_descriptor, entity_descriptors[0][:id])
-      record_fr_id(idp_sso_descriptor, identity_providers[0][:id])
-    end
-
-    it 'creates no entity' do
-      expect { run }.not_to change { known_entities(true).count }
-    end
-
-    it 'creates no entity descriptor' do
-      expect { run }.not_to change(EntityDescriptor, :count)
-    end
-
-    it 'creates no entity id' do
-      expect { run }.not_to change(EntityId, :count)
-    end
-
-    it 'creates no idp sso descriptor' do
-      expect { run }.not_to change(IDPSSODescriptor, :count)
-    end
-  end
-
-  let(:entity_descriptors) do
-    result = []
-    n = 0
-
-    identity_providers.zip(attribute_authorities).each do |(idp, aa)|
-      n += 1
-      result << {
-        id: n,
-        entity_id: "https://#{Faker::Lorem.words.join('.')}/idp/shibboleth",
-        active: true,
-        saml: {
-          identity_providers: [{ id: idp[:id] }],
-          service_providers: [],
-          attribute_authorities: [{ id: aa[:id] }]
-        }
-      }
-    end
-
-    service_providers.each do |sp|
-      n += 1
-      result << {
-        entity_id: "https://#{Faker::Lorem.words.join('.')}/shibboleth",
-        active: true,
-        saml: {
-          identity_providers: [],
-          service_providers: [{ id: sp[:id] }],
-          attribute_authorities: []
-        }
-      }
-    end
-
-    result
-  end
-
   def fr_time(time)
-    puts time
     time.utc.strftime('%Y-%m-%dT%H:%M:%S+0000')
   end
 
-  let(:idp_created_at) { Time.at(rand(Time.now.utc.to_i)) }
-  let(:idp_signed) { false }
-  let(:idp_active) { true }
-  let(:idp_error_url) { "https://error.#{Faker::Internet.domain_name}" }
-  let(:idp_extensions) { '<external:SomeExtension></external:SomeExtension>' }
-
-  let(:identity_providers) do
-    (1..idp_count).to_a.map do |i|
-      {
-        id: (1000 + i),
-        active: idp_active,
-        created_at: fr_time(idp_created_at),
-        saml: {
-          authnrequests_signed: idp_signed,
-          sso_descriptor: {
-            role_descriptor: {
-              extensions: idp_extensions,
-              error_url: idp_error_url
-            }
-          }
-        }
-      }
-    end
-  end
-
-  let(:service_providers) do
-    (1..sp_count).to_a.map do |i|
-      {
-        id: (2000 + i)
-      }
-    end
-  end
-
-  let(:attribute_authorities) do
-    (1..idp_count).to_a.map do |i|
-      {
-        id: (3000 + i)
-      }
-    end
-  end
+  include_examples 'ETL::Organizations'
 end

@@ -1,14 +1,14 @@
 module StoreFederationRegistryData
   def create_or_update_by_fr_id(dataset, fr_id, **attrs)
     update_by_fr_id(dataset, fr_id, attrs) ||
-      create_by_fr_id(dataset, fr_id, attrs) { |o| yield o }
+      create_by_fr_id(dataset, fr_id, attrs) { |o| yield o if block_given? }
   end
 
   private
 
   def create_by_fr_id(dataset, fr_id, attrs)
     obj = dataset.model.new(attrs)
-    yield obj
+    yield obj if block_given?
     obj.save
     record_fr_id(obj, fr_id)
     obj

@@ -14,6 +14,10 @@ class FederationRegistrySource < Sequel::Model
     errors.add(:hostname, 'could not be parsed as part of a valid URI')
   end
 
+  def organizations_url
+    export_url('organizations')
+  end
+
   def entity_descriptors_url
     export_url('entitydescriptors')
   end

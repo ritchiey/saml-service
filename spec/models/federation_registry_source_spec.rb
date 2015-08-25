@@ -45,6 +45,11 @@ RSpec.describe FederationRegistrySource do
     }
   end
 
+  context '#organizations_url' do
+    subject { source.organizations_url }
+    it { is_expected.to have_attributes(url_attrs('organizations')) }
+  end
+
   context '#entity_descriptors_url' do
     subject { source.entity_descriptors_url }
     it { is_expected.to have_attributes(url_attrs('entitydescriptors')) }

@@ -1,4 +1,8 @@
 module QueryFederationRegistry
+  def fr_organizations
+    data(fr_source.organizations_url)[:organizations]
+  end
+
   def fr_entity_descriptors
     data(fr_source.entity_descriptors_url)[:entity_descriptors]
   end
