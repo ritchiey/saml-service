@@ -204,12 +204,12 @@ RSpec.describe UpdateEntitySource do
 
     it 'removes the known entity' do
       expect { run }.to change(KnownEntity, :count).by(-1)
-      expect { entity.reload }.to raise_error
+      expect { entity.reload }.to raise_error(/Record not found/)
     end
 
     it 'removes the raw entity descriptor' do
       expect { run }.to change(RawEntityDescriptor, :count).by(-1)
-      expect { red.reload }.to raise_error
+      expect { red.reload }.to raise_error(/Record not found/)
     end
 
     it 'leaves the other entity intact' do
