@@ -11,13 +11,13 @@ FactoryGirl.define do
     primary_tag { Faker::Lorem.word }
     all_entities true
 
-    after :create do | mi |
+    after :create do |mi|
       create(:mdrpi_publication_info, metadata_instance: mi)
       mi.reload
     end
 
     trait :with_registration_info do
-      after :create do | mi |
+      after :create do |mi|
         mi.registration_info = create :mdrpi_registration_info
       end
     end

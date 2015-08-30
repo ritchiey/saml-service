@@ -12,19 +12,19 @@ FactoryGirl.define do
     end
 
     trait :with_publication_info do
-      after(:create) do | ed |
+      after(:create) do |ed|
         ed.publication_info = create :mdrpi_publication_info
       end
     end
 
     trait :with_entity_attribute do
-      after(:create) do | ed |
+      after(:create) do |ed|
         ed.entity_attribute = create :mdattr_entity_attribute
       end
     end
 
     trait :with_refeds_rs_entity_category do
-      after(:create) do | ed |
+      after(:create) do |ed|
         ed.entity_attribute = create :mdattr_entity_attribute,
                                      :with_refeds_rs_entity_category
       end

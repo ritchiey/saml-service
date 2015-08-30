@@ -20,7 +20,7 @@ gem 'recursive-open-struct'
 
 # Web
 gem 'uglifier', '>= 1.3.0'
-gem 'therubyracer',  platforms: :ruby
+gem 'therubyracer', platforms: :ruby
 gem 'turbolinks'
 
 # JSON

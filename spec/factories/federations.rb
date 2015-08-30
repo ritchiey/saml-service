@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :basic_federation, parent: :entity_source do
-    after :create do | es |
+    after :create do |es|
       create_list(:basic_federation_entity, 2, :idp, entity_source: es)
       create_list(:basic_federation_entity, 2, :sp, entity_source: es)
       create(:basic_federation_entity, :aa, entity_source: es)
