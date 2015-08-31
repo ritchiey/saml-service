@@ -578,7 +578,7 @@ RSpec.describe MetadataQueryController, type: :controller do
 
                 it 'renders only the 2 matching entities in metadata xml' do
                   xml = Capybara::Node::Simple.new(
-                          Nokogiri::XML.parse(response.body))
+                    Nokogiri::XML.parse(response.body))
 
                   path = '/xmlns:EntitiesDescriptor/xmlns:EntityDescriptor'
                   expect(xml.all(:xpath, path).count).to eq(4)

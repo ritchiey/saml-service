@@ -1,4 +1,4 @@
-shared_examples 'a taggable model' do | tag_factory, association |
+shared_examples 'a taggable model' do |tag_factory, association|
   let(:klass) { described_class.name.underscore.to_sym }
 
   def factory_args(tag_name, instance, association)

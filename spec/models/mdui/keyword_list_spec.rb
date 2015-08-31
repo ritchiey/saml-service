@@ -44,7 +44,7 @@ RSpec.describe MDUI::KeywordList, type: :model do
 
         expect { subject.add "#{keyword_p1} #{keyword_p2}" }.to \
           change { subject.content }.to \
-          eq "#{content} #{keyword_p1}+#{keyword_p2}"
+            eq "#{content} #{keyword_p1}+#{keyword_p2}"
       end
     end
   end
