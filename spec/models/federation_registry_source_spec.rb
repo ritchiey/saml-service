@@ -10,6 +10,9 @@ RSpec.describe FederationRegistrySource do
   it { is_expected.to validate_presence(:entity_source) }
   it { is_expected.to validate_presence(:hostname) }
   it { is_expected.to validate_presence(:secret) }
+  it { is_expected.to validate_presence(:registration_authority) }
+  it { is_expected.to validate_presence(:registration_policy_uri) }
+  it { is_expected.to validate_presence(:registration_policy_uri_lang) }
 
   context 'hostname validation' do
     it 'rejects a hostname which does not parse in a url' do
