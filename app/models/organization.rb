@@ -7,6 +7,9 @@ class Organization < Sequel::Model
   one_to_many :entity_descriptors
   one_to_many :role_descriptors
 
+  plugin :nested_attributes
+  nested_attributes :organization_names
+
   def validate
     super
     validates_presence [:created_at, :updated_at]

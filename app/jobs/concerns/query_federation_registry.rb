@@ -1,10 +1,14 @@
 module QueryFederationRegistry
+  def fr_contacts
+    data(fr_source.contacts_url)[:contacts]
+  end
+
   def fr_organizations
     data(fr_source.organizations_url)[:organizations]
   end
 
   def fr_entity_descriptors
-    data(fr_source.entity_descriptors_url)[:entity_descriptors]
+    data_by_id(fr_source.entity_descriptors_url, :entity_descriptors)
   end
 
   def fr_identity_providers

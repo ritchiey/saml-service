@@ -5,6 +5,10 @@ class UpdateFromFederationRegistry
   include QueryFederationRegistry
   include StoreFederationRegistryData
 
+  include ETL::Contacts
+  include ETL::Organizations
+  include ETL::EntityDescriptors
+
   attr_reader :fr_source, :source
 
   def self.perform(id)
@@ -19,15 +23,8 @@ class UpdateFromFederationRegistry
 
   def perform
     Sequel::Model.db.transaction do
-      fr_organizations.each do |org|
-        organization(org[:organization])
-      end
+      contacts
+      organizations
     end
-  end
-
-  include ETL::Organizations
-
-  # TODO: migrate to ETL::EntityDescriptors
-  def entity_descriptor(_o, _org_data)
   end
 end
