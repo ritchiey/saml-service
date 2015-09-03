@@ -36,6 +36,10 @@ class FederationRegistrySource < Sequel::Model
     export_url('attributeauthorities')
   end
 
+  def contacts_url
+    export_url('contacts')
+  end
+
   private
 
   def export_url(part)

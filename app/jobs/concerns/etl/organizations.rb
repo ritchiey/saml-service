@@ -1,5 +1,11 @@
 module ETL
   module Organizations
+    def organizations
+      fr_organizations.each do |org_data|
+        organization(org_data)
+      end
+    end
+
     def organization(org_data)
       ds = Organization.dataset
       o = create_or_update_by_fr_id(ds, org_data[:id], org_attrs(org_data))
@@ -7,7 +13,7 @@ module ETL
       organization_display_name(o, org_data)
       organization_url(o, org_data)
 
-      entity_descriptor(o, org_data)
+      entity_descriptors(o, org_data)
     end
 
     def org_attrs(org_data)

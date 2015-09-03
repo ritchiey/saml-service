@@ -2,75 +2,69 @@ RSpec.shared_examples 'ETL::Organizations' do
   # rubocop:disable Metrics/MethodLength
   def create_json(id)
     {
-      organization: {
-        id: id,
-        domain: Faker::Internet.domain_name,
-        display_name: Faker::Lorem.sentence,
-        description: Faker::Lorem.sentence,
-        url: Faker::Internet.url,
-        lang: 'en',
-        saml: {
-          entity_descriptors: [
-            {
-              id: 2000 + id,
-              entity_id: Faker::Internet.url,
-              functioning: true
-            }
-          ]
-        },
-        created_at: fr_time(org_created_at)
-      }
+      id: id,
+      domain: Faker::Internet.domain_name,
+      display_name: Faker::Lorem.sentence,
+      description: Faker::Lorem.sentence,
+      url: Faker::Internet.url,
+      lang: 'en',
+      saml: {
+        entity_descriptors: [
+          {
+            id: 2000 + id,
+            entity_id: Faker::Internet.url,
+            functioning: true
+          }
+        ]
+      },
+      created_at: fr_time(org_created_at)
     }
   end
   # rubocop:enable Metrics/MethodLength
 
   let(:org_created_at) { Time.at(rand(Time.now.utc.to_i)) }
   let(:organization_list) do
-    result = []
-    n = 0
-
-    (0...organization_count).each do |_org|
-      n += 1
-      result << create_json(1000 + n)
-    end
-
-    result
+    (0...organization_count).reduce([]) { |a, e| a << create_json(1000 + e) }
   end
 
   before do
     stub_fr_request(:organizations)
-    allow_any_instance_of(described_class).to receive(:entity_descriptor)
+    allow_any_instance_of(described_class).to receive(:entity_descriptors)
       .with(kind_of(Organization), anything)
+  end
+
+  def run
+    described_class.new(fr_source.id).organizations
   end
 
   context 'creating an organization' do
     let(:organizations) { organization_list }
     let(:organization_count) { 1 }
     before { run }
-    subject { Organization.first }
+    subject { Organization.last }
 
     verify(created_at: -> { org_created_at },
            updated_at: -> { truncated_now })
 
     it 'has an OrganizationName' do
-      expect(subject.organization_names.first.value)
-        .to eq(organizations.first[:organization][:domain])
-      expect(subject.organization_names.first.lang)
-        .to eq(organizations.first[:organization][:lang])
+      expect(subject.organization_names.last.value)
+        .to eq(organizations.last[:domain])
+      expect(subject.organization_names.last.lang)
+        .to eq(organizations.last[:lang])
     end
 
     it 'has an OrganizationDisplayName' do
-      expect(subject.organization_display_names.first.value)
-        .to eq(organizations.first[:organization][:display_name])
-      expect(subject.organization_display_names.first.lang)
-        .to eq(organizations.first[:organization][:lang])
+      expect(subject.organization_display_names.last.value)
+        .to eq(organizations.last[:display_name])
+      expect(subject.organization_display_names.last.lang)
+        .to eq(organizations.last[:lang])
     end
 
     it 'has an OrganizationURL' do
-      expect(subject.organization_urls.first.uri)
-        .to eq(organizations.first[:organization][:url])
-      expect(subject.organization_urls.first.lang)
-        .to eq(organizations.first[:organization][:lang])
+      expect(subject.organization_urls.last.uri)
+        .to eq(organizations.last[:url])
+      expect(subject.organization_urls.last.lang)
+        .to eq(organizations.last[:lang])
     end
   end
 
@@ -96,20 +90,20 @@ RSpec.shared_examples 'ETL::Organizations' do
 
       it 'has an OrganizationName' do
         expect { run }
-          .to change { subject.reload.organization_names.first.value }
-          .to eq(organizations.first[:organization][:domain])
+          .to change { subject.reload.organization_names.last.value }
+          .to eq(organizations.last[:domain])
       end
 
       it 'has an OrganizationDisplayName' do
         expect { run }
-          .to change { subject.reload.organization_display_names.first.value }
-          .to eq(organizations.first[:organization][:display_name])
+          .to change { subject.reload.organization_display_names.last.value }
+          .to eq(organizations.last[:display_name])
       end
 
       it 'has an OrganizationURL' do
         expect { run }
-          .to change { subject.reload.organization_urls.first.uri }
-          .to eq(organizations.first[:organization][:url])
+          .to change { subject.reload.organization_urls.last.uri }
+          .to eq(organizations.last[:url])
       end
     end
   end

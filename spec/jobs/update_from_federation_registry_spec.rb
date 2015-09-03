@@ -1,6 +1,8 @@
 require 'rails_helper'
 
-RSpec.describe UpdateFromFederationRegistry do
+RSpec.describe UpdateFromFederationRegistry, focus: true do
+  around { |e| Timecop.freeze { e.run } }
+
   RSpec::Matchers.define(:have_fr_id) do |expected|
     match do |actual|
       fr_id = FederationRegistryObject
@@ -19,18 +21,15 @@ RSpec.describe UpdateFromFederationRegistry do
                                     fr_id: fr_id)
   end
 
+  let(:fr_source) { create(:federation_registry_source) }
   let(:authorization) do
     %(AAF-FR-EXPORT service="saml-service", key="#{fr_source.secret}")
   end
-
   let(:request_headers) { { 'Authorization' => authorization } }
   let(:truncated_now) { Time.at(Time.now.to_i) }
 
   delegate :entity_source, to: :fr_source
   delegate :known_entities, to: :entity_source
-
-  let(:fr_source) { create(:federation_registry_source) }
-  subject { fr_source }
 
   def stub_fr_request(kind)
     url = "https://#{fr_source.hostname}/federationregistry/export/" \
@@ -38,12 +37,6 @@ RSpec.describe UpdateFromFederationRegistry do
 
     stub_request(:get, url).with(headers: request_headers)
       .to_return(status: 200, body: JSON.generate(kind => send(kind)))
-  end
-
-  around { |e| Timecop.freeze { e.run } }
-
-  def run
-    described_class.perform(fr_source.id)
   end
 
   def self.verify_attributes(attr_generators)
@@ -75,5 +68,7 @@ RSpec.describe UpdateFromFederationRegistry do
     time.utc.strftime('%Y-%m-%dT%H:%M:%S+0000')
   end
 
-  include_examples 'ETL::Organizations'
+  it_behaves_like 'ETL::Organizations'
+  it_behaves_like 'ETL::Contacts'
+  it_behaves_like 'ETL::EntityDescriptors'
 end

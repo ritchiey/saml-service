@@ -169,7 +169,9 @@ Sequel.migration do
       column :secret, "varchar(255)", :null=>false
       column :created_at, "datetime", :null=>false
       column :updated_at, "datetime", :null=>false
-
+      column :registration_authority, "varchar(255)", :null=>false
+      column :registration_policy_uri, "varchar(255)", :null=>false
+      column :registration_policy_uri_lang, "varchar(255)", :null=>false
       index [:entity_source_id], :name=>:entity_source_id
     end
 
@@ -823,5 +825,7 @@ self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150708025727_re
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150803035704_drop_url_from_organization.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150907002959_create_shibmd_scopes.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151029042723_add_enabled_to_role_descriptors.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150902054540_add_registration_authority_to_federation_registry_source.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150902055324_add_registration_policy_to_federation_registry_source.rb')"
                 end
               end
