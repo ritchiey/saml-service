@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe UpdateFromFederationRegistry, focus: true do
+RSpec.describe UpdateFromFederationRegistry do
   around { |e| Timecop.freeze { e.run } }
 
   RSpec::Matchers.define(:have_fr_id) do |expected|
