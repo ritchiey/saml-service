@@ -72,4 +72,5 @@ RSpec.describe UpdateFromFederationRegistry do
   it_behaves_like 'ETL::Organizations'
   it_behaves_like 'ETL::Contacts'
   it_behaves_like 'ETL::EntityDescriptors'
+  it_behaves_like 'ETL::IDPSSODescriptors'
 end
