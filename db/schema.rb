@@ -47,8 +47,8 @@ Sequel.migration do
 
     create_table(:federation_registry_objects) do
       primary_key :id, :type=>"int(11)"
-      column :object_type, "varchar(255)", :null=>false
-      column :object_id, "int(11)", :null=>false
+      column :internal_class_name, "varchar(255)", :null=>false
+      column :internal_id, "int(11)", :null=>false
       column :fr_id, "int(11)", :null=>false
     end
 
@@ -827,5 +827,6 @@ self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150907002959_cr
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151029042723_add_enabled_to_role_descriptors.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150902054540_add_registration_authority_to_federation_registry_source.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150902055324_add_registration_policy_to_federation_registry_source.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150904024225_rename_federation_registry_object_fields.rb')"
                 end
               end

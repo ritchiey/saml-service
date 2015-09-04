@@ -15,22 +15,14 @@ module StoreFederationRegistryData
   end
 
   def update_by_fr_id(dataset, fr_id, attrs)
-    obj = find_by_fr_id(dataset, fr_id)
+    obj = FederationRegistryObject.local_instance(fr_id, dataset.model.name)
     obj.try(:update, attrs)
     obj
   end
 
   def record_fr_id(object, fr_id)
-    FederationRegistryObject.create(object_type: object.class.name,
-                                    object_id: object.id,
+    FederationRegistryObject.create(internal_class_name: object.class.name,
+                                    internal_id: object.id,
                                     fr_id: fr_id)
-  end
-
-  def find_by_fr_id(dataset, fr_id)
-    qual = ->(col) { Sequel.qualify(:federation_registry_objects, col) }
-
-    ds = dataset.qualify.join(:federation_registry_objects, object_id: :id)
-         .where(qual[:object_type] => dataset.model.name, qual[:fr_id] => fr_id)
-    ds.first
   end
 end

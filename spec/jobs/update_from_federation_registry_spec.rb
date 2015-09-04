@@ -6,7 +6,8 @@ RSpec.describe UpdateFromFederationRegistry, focus: true do
   RSpec::Matchers.define(:have_fr_id) do |expected|
     match do |actual|
       fr_id = FederationRegistryObject
-              .where(object_type: actual.class.name, object_id: actual.id)
+              .where(internal_class_name: actual.class.name,
+                     internal_id: actual.id)
               .first.try(:fr_id)
 
       fr_id == expected
@@ -16,8 +17,8 @@ RSpec.describe UpdateFromFederationRegistry, focus: true do
   end
 
   def record_fr_id(object, fr_id)
-    FederationRegistryObject.create(object_type: object.class.name,
-                                    object_id: object.id,
+    FederationRegistryObject.create(internal_class_name: object.class.name,
+                                    internal_id: object.id,
                                     fr_id: fr_id)
   end
 
