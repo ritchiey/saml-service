@@ -29,13 +29,13 @@ describe SPSSODescriptor do
           create(:sp_sso_descriptor, :with_attribute_consuming_services)
         end
         it 'is true' do
-          expect(subject.attribute_consuming_services?).to be
+          expect(subject.attribute_consuming_services?).to be_truthy
         end
       end
       context 'when unpopulated' do
         subject { create :sp_sso_descriptor }
         it 'is false' do
-          expect(subject.attribute_consuming_services?).not_to be
+          expect(subject.attribute_consuming_services?).to be_falsey
         end
       end
     end
@@ -43,25 +43,25 @@ describe SPSSODescriptor do
     describe '#extensions?' do
       context 'without extensions, ui_info or discovery_response_services' do
         it 'is false' do
-          expect(subject.extensions?).not_to be
+          expect(subject.extensions?).to be_falsey
         end
       end
       context 'with extensions' do
         subject { create :sp_sso_descriptor, :with_extensions }
         it 'is true' do
-          expect(subject.extensions?).to be
+          expect(subject.extensions?).to be_truthy
         end
       end
       context 'with ui_info' do
         subject { create :sp_sso_descriptor, :with_ui_info }
         it 'is true' do
-          expect(subject.extensions?).to be
+          expect(subject.extensions?).to be_truthy
         end
       end
       context 'with discovery_response_services' do
         subject { create :sp_sso_descriptor, :with_discovery_response_services }
         it 'is true' do
-          expect(subject.extensions?).to be
+          expect(subject.extensions?).to be_truthy
         end
       end
       context 'with extensions, ui_info and discovery_response_services' do
@@ -71,7 +71,7 @@ describe SPSSODescriptor do
                  :with_extensions
         end
         it 'is true' do
-          expect(subject.extensions?).to be
+          expect(subject.extensions?).to be_truthy
         end
       end
     end

@@ -20,7 +20,7 @@ RSpec.shared_examples 'SPSSODescriptor xml' do
 
     context 'AuthnRequestsSigned' do
       it 'is rendered' do
-        expect(node['AuthnRequestsSigned']).to be
+        expect(node['AuthnRequestsSigned']).to be_truthy
       end
       context 'when explicitly set' do
         let(:sp_sso_descriptor) do
@@ -35,7 +35,7 @@ RSpec.shared_examples 'SPSSODescriptor xml' do
 
     context 'WantAssertionsSigned' do
       it 'is rendered' do
-        expect(node['WantAssertionsSigned']).to be
+        expect(node['WantAssertionsSigned']).to be_truthy
       end
       context 'when explicitly set' do
         let(:sp_sso_descriptor) do

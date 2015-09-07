@@ -29,25 +29,25 @@ describe IDPSSODescriptor do
     describe '#extensions?' do
       context 'without extensions, ui_info or disco_hints' do
         it 'is false' do
-          expect(subject.extensions?).not_to be
+          expect(subject.extensions?).to be_falsey
         end
       end
       context 'with extensions' do
         subject { create :idp_sso_descriptor, :with_extensions }
         it 'is true' do
-          expect(subject.extensions?).to be
+          expect(subject.extensions?).to be_truthy
         end
       end
       context 'with ui_info' do
         subject { create :idp_sso_descriptor, :with_ui_info }
         it 'is true' do
-          expect(subject.extensions?).to be
+          expect(subject.extensions?).to be_truthy
         end
       end
       context 'with disco_hints' do
         subject { create :idp_sso_descriptor, :with_disco_hints }
         it 'is true' do
-          expect(subject.extensions?).to be
+          expect(subject.extensions?).to be_truthy
         end
       end
       context 'with extensions, ui_info and disco_hints' do
@@ -56,7 +56,7 @@ describe IDPSSODescriptor do
                  :with_ui_info, :with_disco_hints, :with_extensions
         end
         it 'is true' do
-          expect(subject.extensions?).to be
+          expect(subject.extensions?).to be_truthy
         end
       end
     end
@@ -65,13 +65,13 @@ describe IDPSSODescriptor do
       context 'when populated' do
         subject { create(:idp_sso_descriptor, :with_name_id_mapping_services) }
         it 'is true' do
-          expect(subject.name_id_mapping_services?).to be
+          expect(subject.name_id_mapping_services?).to be_truthy
         end
       end
       context 'when unpopulated' do
         subject { create :idp_sso_descriptor }
         it 'is false' do
-          expect(subject.name_id_mapping_services?).not_to be
+          expect(subject.name_id_mapping_services?).to be_falsey
         end
       end
     end
@@ -82,13 +82,13 @@ describe IDPSSODescriptor do
           create(:idp_sso_descriptor, :with_assertion_id_request_services)
         end
         it 'is true' do
-          expect(subject.assertion_id_request_services?).to be
+          expect(subject.assertion_id_request_services?).to be_truthy
         end
       end
       context 'when unpopulated' do
         subject { create :idp_sso_descriptor }
         it 'is false' do
-          expect(subject.assertion_id_request_services?).not_to be
+          expect(subject.assertion_id_request_services?).to be_falsey
         end
       end
     end
@@ -99,13 +99,13 @@ describe IDPSSODescriptor do
           create(:idp_sso_descriptor, :with_attribute_profiles)
         end
         it 'is true' do
-          expect(subject.attribute_profiles?).to be
+          expect(subject.attribute_profiles?).to be_truthy
         end
       end
       context 'when unpopulated' do
         subject { create :idp_sso_descriptor }
         it 'is false' do
-          expect(subject.attribute_profiles?).not_to be
+          expect(subject.attribute_profiles?).to be_falsey
         end
       end
     end
@@ -116,13 +116,13 @@ describe IDPSSODescriptor do
           create(:idp_sso_descriptor, :with_attributes)
         end
         it 'is true' do
-          expect(subject.attributes?).to be
+          expect(subject.attributes?).to be_truthy
         end
       end
       context 'when unpopulated' do
         subject { create :idp_sso_descriptor }
         it 'is false' do
-          expect(subject.attributes?).not_to be
+          expect(subject.attributes?).to be_falsey
         end
       end
     end
@@ -133,13 +133,13 @@ describe IDPSSODescriptor do
           create(:idp_sso_descriptor, :with_disco_hints)
         end
         it 'is true' do
-          expect(subject.disco_hints?).to be
+          expect(subject.disco_hints?).to be_truthy
         end
       end
       context 'when unpopulated' do
         subject { create :idp_sso_descriptor }
         it 'is false' do
-          expect(subject.disco_hints?).not_to be
+          expect(subject.disco_hints?).to be_falsey
         end
       end
     end

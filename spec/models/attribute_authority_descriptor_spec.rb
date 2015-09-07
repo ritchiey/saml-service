@@ -23,13 +23,13 @@ RSpec.describe AttributeAuthorityDescriptor, type: :model do
                  :with_multiple_assertion_id_request_services)
         end
         it 'is true' do
-          expect(subject.assertion_id_request_services?).to be
+          expect(subject.assertion_id_request_services?).to be_truthy
         end
       end
       context 'when unpopulated' do
         subject { create :attribute_authority_descriptor }
         it 'is false' do
-          expect(subject.assertion_id_request_services?).not_to be
+          expect(subject.assertion_id_request_services?).to be_falsey
         end
       end
     end
@@ -41,13 +41,13 @@ RSpec.describe AttributeAuthorityDescriptor, type: :model do
                  :with_multiple_name_id_formats)
         end
         it 'is true' do
-          expect(subject.name_id_formats?).to be
+          expect(subject.name_id_formats?).to be_truthy
         end
       end
       context 'when unpopulated' do
         subject { create :attribute_authority_descriptor }
         it 'is false' do
-          expect(subject.name_id_formats?).not_to be
+          expect(subject.name_id_formats?).to be_falsey
         end
       end
     end
@@ -59,13 +59,13 @@ RSpec.describe AttributeAuthorityDescriptor, type: :model do
                  :with_multiple_attribute_profiles)
         end
         it 'is true' do
-          expect(subject.attribute_profiles?).to be
+          expect(subject.attribute_profiles?).to be_truthy
         end
       end
       context 'when unpopulated' do
         subject { create :attribute_authority_descriptor }
         it 'is false' do
-          expect(subject.attribute_profiles?).not_to be
+          expect(subject.attribute_profiles?).to be_falsey
         end
       end
     end
@@ -77,13 +77,13 @@ RSpec.describe AttributeAuthorityDescriptor, type: :model do
                  :with_multiple_attributes)
         end
         it 'is true' do
-          expect(subject.attributes?).to be
+          expect(subject.attributes?).to be_truthy
         end
       end
       context 'when unpopulated' do
         subject { create :attribute_authority_descriptor }
         it 'is false' do
-          expect(subject.attributes?).not_to be
+          expect(subject.attributes?).to be_falsey
         end
       end
     end

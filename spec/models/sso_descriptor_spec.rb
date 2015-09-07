@@ -15,13 +15,13 @@ describe SSODescriptor do
     context 'when populated' do
       subject { create(:sso_descriptor, :with_artifact_resolution_service) }
       it 'is true' do
-        expect(subject.artifact_resolution_services?).to be
+        expect(subject.artifact_resolution_services?).to be_truthy
       end
     end
     context 'when unpopulated' do
       subject { create :sso_descriptor }
       it 'is false' do
-        expect(subject.artifact_resolution_services?).not_to be
+        expect(subject.artifact_resolution_services?).to be_falsey
       end
     end
   end
@@ -30,13 +30,13 @@ describe SSODescriptor do
     context 'when populated' do
       subject { create(:sso_descriptor, :with_artifact_resolution_service) }
       it 'is true' do
-        expect(subject.artifact_resolution_services?).to be
+        expect(subject.artifact_resolution_services?).to be_truthy
       end
     end
     context 'when unpopulated' do
       subject { create :sso_descriptor }
       it 'is false' do
-        expect(subject.artifact_resolution_services?).not_to be
+        expect(subject.artifact_resolution_services?).to be_falsey
       end
     end
   end
@@ -45,13 +45,13 @@ describe SSODescriptor do
     context 'when populated' do
       subject { create(:sso_descriptor, :with_single_logout_service) }
       it 'is true' do
-        expect(subject.single_logout_services?).to be
+        expect(subject.single_logout_services?).to be_truthy
       end
     end
     context 'when unpopulated' do
       subject { create :sso_descriptor }
       it 'is false' do
-        expect(subject.single_logout_services?).not_to be
+        expect(subject.single_logout_services?).to be_falsey
       end
     end
   end
@@ -60,13 +60,13 @@ describe SSODescriptor do
     context 'when populated' do
       subject { create(:sso_descriptor, :with_manage_name_id_service) }
       it 'is true' do
-        expect(subject.manage_name_id_services?).to be
+        expect(subject.manage_name_id_services?).to be_truthy
       end
     end
     context 'when unpopulated' do
       subject { create :sso_descriptor }
       it 'is false' do
-        expect(subject.manage_name_id_services?).not_to be
+        expect(subject.manage_name_id_services?).to be_falsey
       end
     end
   end
@@ -75,13 +75,13 @@ describe SSODescriptor do
     context 'when populated' do
       subject { create(:sso_descriptor, :with_name_id_format) }
       it 'is true' do
-        expect(subject.name_id_formats?).to be
+        expect(subject.name_id_formats?).to be_truthy
       end
     end
     context 'when unpopulated' do
       subject { create :sso_descriptor }
       it 'is false' do
-        expect(subject.name_id_formats?).not_to be
+        expect(subject.name_id_formats?).to be_falsey
       end
     end
   end

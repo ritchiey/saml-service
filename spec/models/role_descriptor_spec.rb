@@ -29,24 +29,24 @@ describe RoleDescriptor do
     context 'with extensions' do
       subject { create :role_descriptor, :with_extensions }
       it 'is true' do
-        expect(subject.extensions?).to be
+        expect(subject.extensions?).to be_truthy
       end
     end
     context 'without extensions or ui_info' do
       it 'is false' do
-        expect(subject.extensions?).not_to be
+        expect(subject.extensions?).to be_falsey
       end
     end
     context 'with ui_info' do
       subject { create :role_descriptor, :with_ui_info }
       it 'is true' do
-        expect(subject.extensions?).to be
+        expect(subject.extensions?).to be_truthy
       end
     end
     context 'with scope' do
       subject { create :role_descriptor, :with_scope }
       it 'is true' do
-        expect(subject.extensions?).to be
+        expect(subject.extensions?).to be_truthy
       end
     end
     context 'with scope, ui_info and extensions' do
@@ -54,7 +54,7 @@ describe RoleDescriptor do
         create :role_descriptor, :with_ui_info, :with_extensions, :with_scope
       end
       it 'is true' do
-        expect(subject.extensions?).to be
+        expect(subject.extensions?).to be_truthy
       end
     end
   end
@@ -63,12 +63,12 @@ describe RoleDescriptor do
     context 'with key descriptors' do
       subject { create :role_descriptor, :with_key_descriptors }
       it 'is true' do
-        expect(subject.key_descriptors?).to be
+        expect(subject.key_descriptors?).to be_truthy
       end
     end
     context 'without key descriptors' do
       it 'is false' do
-        expect(subject.key_descriptors?).not_to be
+        expect(subject.key_descriptors?).to be_falsey
       end
     end
   end
@@ -77,12 +77,12 @@ describe RoleDescriptor do
     context 'with contacts' do
       subject { create :role_descriptor, :with_contacts }
       it 'is true' do
-        expect(subject.contact_people?).to be
+        expect(subject.contact_people?).to be_truthy
       end
     end
     context 'without contacts' do
       it 'is false' do
-        expect(subject.contact_people?).not_to be
+        expect(subject.contact_people?).to be_falsey
       end
     end
   end
@@ -91,12 +91,12 @@ describe RoleDescriptor do
     context 'with scope' do
       subject { create :role_descriptor, :with_scope }
       it 'is true' do
-        expect(subject.scopes?).to be
+        expect(subject.scopes?).to be_truthy
       end
     end
     context 'without scope' do
       it 'is false' do
-        expect(subject.scopes?).not_to be
+        expect(subject.scopes?).to be_falsey
       end
     end
   end

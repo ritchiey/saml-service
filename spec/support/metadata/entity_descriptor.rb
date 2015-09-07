@@ -153,10 +153,10 @@ RSpec.shared_examples 'EntityDescriptor xml' do
       let(:node) { xml.find(:xpath, entity_descriptor_path) }
 
       it 'sets ID' do
-        expect(node['ID']).not_to be
+        expect(node['ID']).to be_falsey
       end
       it 'sets validUntil' do
-        expect(node['validUntil']).not_to be
+        expect(node['validUntil']).to be_falsey
       end
     end
 
