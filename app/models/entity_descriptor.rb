@@ -39,7 +39,7 @@ class EntityDescriptor < Sequel::Model
   end
 
   def entity_attribute?
-    entity_attribute.try(:present?)
+    entity_attribute.present?
   end
 
   protected

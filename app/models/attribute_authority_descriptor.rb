@@ -11,18 +11,18 @@ class AttributeAuthorityDescriptor < RoleDescriptor
   end
 
   def assertion_id_request_services?
-    assertion_id_request_services.try(:present?)
+    assertion_id_request_services.present?
   end
 
   def name_id_formats?
-    name_id_formats.try(:present?)
+    name_id_formats.present?
   end
 
   def attribute_profiles?
-    attribute_profiles.try(:present?)
+    attribute_profiles.present?
   end
 
   def attributes?
-    attributes.try(:present?)
+    attributes.present?
   end
 end

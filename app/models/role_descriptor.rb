@@ -20,19 +20,19 @@ class RoleDescriptor < Sequel::Model
   end
 
   def extensions?
-    extensions.try(:present?) || ui_info.try(:present?) || scopes.try(:present?)
+    extensions.present? || ui_info.present? || scopes.present?
   end
 
   def key_descriptors?
-    key_descriptors.try(:present?)
+    key_descriptors.present?
   end
 
   def contact_people?
-    contact_people.try(:present?)
+    contact_people.present?
   end
 
   def scopes?
-    scopes.try(:present?)
+    scopes.present?
   end
 
   def self.with_any_tag(tags)
