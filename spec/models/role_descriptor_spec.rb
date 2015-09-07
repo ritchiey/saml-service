@@ -19,6 +19,7 @@ describe RoleDescriptor do
     it { is_expected.to have_many_to_one :organization }
     it { is_expected.to have_one_to_many :key_descriptors }
     it { is_expected.to have_one_to_many :contact_people }
+    it { is_expected.to have_one_to_many :scopes }
     it { is_expected.to have_column :extensions, type: :text }
 
     it { is_expected.to have_one_to_one :ui_info }
@@ -42,8 +43,16 @@ describe RoleDescriptor do
         expect(subject.extensions?).to be
       end
     end
-    context 'with ui_info and extensions' do
-      subject { create :role_descriptor, :with_ui_info, :with_extensions }
+    context 'with scope' do
+      subject { create :role_descriptor, :with_scope }
+      it 'is true' do
+        expect(subject.extensions?).to be
+      end
+    end
+    context 'with scope, ui_info and extensions' do
+      subject do
+        create :role_descriptor, :with_ui_info, :with_extensions, :with_scope
+      end
       it 'is true' do
         expect(subject.extensions?).to be
       end
@@ -74,6 +83,20 @@ describe RoleDescriptor do
     context 'without contacts' do
       it 'is false' do
         expect(subject.contact_people?).not_to be
+      end
+    end
+  end
+
+  describe '#scopes?' do
+    context 'with scope' do
+      subject { create :role_descriptor, :with_scope }
+      it 'is true' do
+        expect(subject.scopes?).to be
+      end
+    end
+    context 'without scope' do
+      it 'is false' do
+        expect(subject.scopes?).not_to be
       end
     end
   end

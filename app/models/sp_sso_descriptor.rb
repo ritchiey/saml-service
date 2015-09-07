@@ -14,7 +14,6 @@ class SPSSODescriptor < SSODescriptor
   end
 
   def extensions?
-    extensions.try(:present?) || ui_info.present? ||
-      discovery_response_services.present?
+    super || discovery_response_services.present?
   end
 end

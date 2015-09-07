@@ -7,6 +7,7 @@ class RoleDescriptor < Sequel::Model
   one_to_many :protocol_supports
   one_to_many :key_descriptors
   one_to_many :contact_people
+  one_to_many :scopes, class: 'SHIBMD::Scope'
 
   one_to_one :ui_info, class: 'MDUI::UIInfo'
 
@@ -19,7 +20,7 @@ class RoleDescriptor < Sequel::Model
   end
 
   def extensions?
-    extensions.try(:present?) || ui_info.try(:present?)
+    extensions.try(:present?) || ui_info.try(:present?) || scopes.try(:present?)
   end
 
   def key_descriptors?
@@ -28,6 +29,10 @@ class RoleDescriptor < Sequel::Model
 
   def contact_people?
     contact_people.try(:present?)
+  end
+
+  def scopes?
+    scopes.try(:present?)
   end
 
   def self.with_any_tag(tags)

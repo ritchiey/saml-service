@@ -310,6 +310,12 @@ module Metadata
       scope.Extensions do |_|
         ui_info(rd.ui_info) if rd.ui_info.present?
 
+        if rd.scopes?
+          rd.scopes.each do |s|
+            shibmd_scope(s)
+          end
+        end
+
         # IDPSSODescriptor specific
         if rd.is_a? IDPSSODescriptor
           disco_hints(rd.disco_hints) if rd.disco_hints.present?
@@ -516,6 +522,10 @@ module Metadata
       root.AttributeService do |as_node|
         endpoint(ep, as_node)
       end
+    end
+
+    def shibmd_scope(scope)
+      shibmd.Scope(ns, scope.value, regexp: scope.regexp)
     end
 
     def ui_info(info)
