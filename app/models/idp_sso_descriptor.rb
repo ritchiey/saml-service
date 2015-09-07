@@ -18,22 +18,22 @@ class IDPSSODescriptor < SSODescriptor
   end
 
   def name_id_mapping_services?
-    name_id_mapping_services.try(:present?)
+    name_id_mapping_services.present?
   end
 
   def assertion_id_request_services?
-    assertion_id_request_services.try(:present?)
+    assertion_id_request_services.present?
   end
 
   def attribute_profiles?
-    attribute_profiles.try(:present?)
+    attribute_profiles.present?
   end
 
   def attributes?
-    attributes.try(:present?)
+    attributes.present?
   end
 
   def disco_hints?
-    disco_hints.try(:present?)
+    disco_hints.present?
   end
 end

@@ -65,13 +65,13 @@ RSpec.describe Endpoint, type: :model do
     context 'when populated' do
       subject { create(:_endpoint, :response_location) }
       it 'is true' do
-        expect(subject.response_location?).to be
+        expect(subject.response_location?).to be_truthy
       end
     end
     context 'when unpopulated' do
       subject { create :_endpoint }
       it 'is false' do
-        expect(subject.response_location?).not_to be
+        expect(subject.response_location?).to be_falsey
       end
     end
   end

@@ -74,10 +74,10 @@ describe EntityDescriptor do
       context '#entity_attribute?' do
         it 'is true when an entity_attribute is set' do
           subject.entity_attribute = create :mdattr_entity_attribute
-          expect(subject.entity_attribute?).to be
+          expect(subject.entity_attribute?).to be_truthy
         end
         it 'is false when an entity_attribute is not set' do
-          expect(subject.entity_attribute?).not_to be
+          expect(subject.entity_attribute?).to be_falsey
         end
       end
     end

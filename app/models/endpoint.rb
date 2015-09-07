@@ -10,6 +10,6 @@ class Endpoint < Sequel::Model
   end
 
   def response_location?
-    response_location.try(:present?)
+    response_location.present?
   end
 end

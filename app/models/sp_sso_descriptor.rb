@@ -10,7 +10,7 @@ class SPSSODescriptor < SSODescriptor
   end
 
   def attribute_consuming_services?
-    attribute_consuming_services.try(:present?)
+    attribute_consuming_services.present?
   end
 
   def extensions?

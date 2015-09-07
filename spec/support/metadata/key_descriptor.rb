@@ -11,7 +11,7 @@ RSpec.shared_examples 'KeyDescriptor xml' do
     context 'use' do
       context 'when not populated' do
         it 'is not rendered' do
-          expect(node['use']).not_to be
+          expect(node['use']).to be_falsey
         end
       end
       context 'when populated' do

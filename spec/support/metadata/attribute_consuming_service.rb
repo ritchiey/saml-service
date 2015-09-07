@@ -17,7 +17,7 @@ RSpec.shared_examples 'AttributeConsumingService xml' do
 
     context 'index' do
       it 'is rendered' do
-        expect(node['index']).to be
+        expect(node['index']).to be_truthy
       end
       it 'has expected value' do
         expect(node['index']).to eq(attribute_consuming_service.index.to_s)
@@ -26,7 +26,7 @@ RSpec.shared_examples 'AttributeConsumingService xml' do
 
     context 'isDefault' do
       it 'is rendered' do
-        expect(node['isDefault']).to be
+        expect(node['isDefault']).to be_truthy
       end
       it 'has expected value' do
         expect(node['isDefault'])

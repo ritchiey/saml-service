@@ -23,7 +23,7 @@ RSpec.shared_examples 'RoleDescriptor xml' do
     context 'error URL' do
       context 'when not populated' do
         it 'is not rendered' do
-          expect(node['errorURL']).not_to be
+          expect(node['errorURL']).to be_falsey
         end
       end
       context 'when populated' do

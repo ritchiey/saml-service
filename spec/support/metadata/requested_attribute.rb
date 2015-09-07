@@ -22,7 +22,7 @@ RSpec.shared_examples 'RequestedAttribute xml' do
       context 'NameFormat' do
         context 'without value' do
           it 'is not included' do
-            expect(node['NameFormat']).not_to be
+            expect(node['NameFormat']).to be_falsey
           end
         end
         context 'with value' do
@@ -40,7 +40,7 @@ RSpec.shared_examples 'RequestedAttribute xml' do
         context 'without value' do
           let(:requested_attribute) { create :requested_attribute }
           it 'is not included' do
-            expect(node['FriendlyName']).not_to be
+            expect(node['FriendlyName']).to be_falsey
           end
         end
         context 'with value' do
@@ -57,7 +57,7 @@ RSpec.shared_examples 'RequestedAttribute xml' do
       context 'isRequired' do
         let(:requested_attribute) { create :requested_attribute, :is_required }
         it 'is rendered' do
-          expect(node['isRequired']).to be
+          expect(node['isRequired']).to be_truthy
         end
         it 'has correct value' do
           expect(node['isRequired']).to eq(requested_attribute.required.to_s)
