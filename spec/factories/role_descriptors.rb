@@ -33,6 +33,12 @@ FactoryGirl.define do
       end
     end
 
+    trait :with_scope do
+      after(:create) do |rd|
+        create(:shibmd_scope, role_descriptor: rd)
+      end
+    end
+
     trait :with_ui_info do
       after(:create) do |rd|
         rd.ui_info = create :mdui_ui_info, :with_content, role_descriptor: rd
