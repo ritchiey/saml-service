@@ -14,7 +14,7 @@ class IDPSSODescriptor < SSODescriptor
   end
 
   def extensions?
-    extensions.try(:present?) || ui_info.present? || disco_hints.present?
+    super || disco_hints.present?
   end
 
   def name_id_mapping_services?

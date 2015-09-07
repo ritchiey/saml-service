@@ -389,6 +389,10 @@ RSpec.describe Metadata::SAML do
     include_examples 'mdui:DiscoHints xml'
   end
 
+  context 'shibmd:Scope' do
+    include_examples 'shibmd:Scope xml'
+  end
+
   context 'ds:Signature' do
     let(:entities) do
       [create(:idp_sso_descriptor).entity_descriptor.known_entity]

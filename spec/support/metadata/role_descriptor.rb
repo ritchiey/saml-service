@@ -2,6 +2,7 @@ RSpec.shared_examples 'RoleDescriptor xml' do
   let(:extensions_path) { "#{role_descriptor_path}/Extensions" }
   let(:test_extensions_path) { "#{extensions_path}/some-node" }
   let(:mdui_ui_info_path) { "#{role_descriptor_path}/Extensions/mdui:UIInfo" }
+  let(:shibmd_scope_path) { "#{role_descriptor_path}/Extensions/shibmd:Scope" }
   let(:key_descriptors_path) { "#{role_descriptor_path}/KeyDescriptor" }
   let(:organization_path) { "#{role_descriptor_path}/Organization" }
   let(:contacts_path) { "#{role_descriptor_path}/ContactPerson" }
@@ -105,6 +106,20 @@ RSpec.shared_examples 'RoleDescriptor xml' do
       let(:role_descriptor) { create parent_node, :with_ui_info }
       it 'is rendered' do
         expect(xml).to have_xpath(mdui_ui_info_path)
+      end
+    end
+  end
+
+  context 'shibmd:Scope' do
+    context 'when not populated' do
+      it 'is not rendered' do
+        expect(xml).not_to have_xpath(shibmd_scope_path)
+      end
+    end
+    context 'when populated' do
+      let(:role_descriptor) { create parent_node, :with_scopes }
+      it 'is rendered' do
+        expect(xml).to have_xpath(shibmd_scope_path, count: 2)
       end
     end
   end
