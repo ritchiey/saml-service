@@ -10,7 +10,7 @@
 [Code Climate]: https://codeclimate.com/github/ausaccessfed/saml-service
 
 [BS img]: https://img.shields.io/codeship/6269b040-0b3d-0133-4276-2696e3e4b295/develop.svg
-[DS img]: https://img.shields.io/gemnasium/ausaccessfed/saml-service/develop.svg
+[DS img]: https://img.shields.io/gemnasium/ausaccessfed/saml-service.svg
 [CC img]: https://img.shields.io/codeclimate/github/ausaccessfed/saml-service.svg
 [CS img]: https://img.shields.io/codeclimate/coverage/github/ausaccessfed/saml-service.svg
 
