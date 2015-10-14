@@ -22,5 +22,7 @@ module Saml
       Sequel::Model.plugin :timestamps, update_on_create: true
       Sequel::Model.plugin :validation_helpers
     end
+
+    config.cache_store = :redis_store, 'redis://localhost:6379/0/cache'
   end
 end

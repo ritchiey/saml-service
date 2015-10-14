@@ -15,6 +15,7 @@ gem 'xmldsig'
 gem 'resque'
 gem 'resque-retry'
 gem 'redis'
+gem 'redis-rails'
 
 gem 'recursive-open-struct'
 
