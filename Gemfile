@@ -41,7 +41,7 @@ group :development, :test do
   gem 'rspec_sequel_matchers', git: 'https://github.com/bradleybeddoes/rspec_sequel_matchers.git'
   gem 'factory_girl_rails'
   gem 'faker'
-  gem 'fakeredis', require: 'fakeredis/rspec'
+  gem 'fakeredis', require: false
   gem 'capybara', '~> 2.4'
   gem 'timecop', '~> 0.7'
   gem 'webmock', require: false
