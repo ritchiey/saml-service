@@ -1,6 +1,7 @@
 require 'simplecov'
 
 require 'webmock/rspec'
+require 'fakeredis/rspec'
 
 RSpec.configure do |config|
   config.filter_run :focus
