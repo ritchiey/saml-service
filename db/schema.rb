@@ -172,6 +172,7 @@ Sequel.migration do
       column :registration_authority, "varchar(255)", :null=>false
       column :registration_policy_uri, "varchar(255)", :null=>false
       column :registration_policy_uri_lang, "varchar(255)", :null=>false
+
       index [:entity_source_id], :name=>:entity_source_id
     end
 
@@ -351,8 +352,12 @@ Sequel.migration do
       column :created_at, "datetime"
       column :updated_at, "datetime"
       column :kind, "varchar(255)"
+<<<<<<< f07a367138788ff986cf0b4dec620b3b86841d1d
       column :enabled, "tinyint(1)", :default=>true
 
+=======
+
+>>>>>>> Minor changes after rebasing latest develop
       index [:entity_descriptor_id], :name=>:ed_rd_key
       index [:organization_id], :name=>:o_rd_key
     end
@@ -828,5 +833,6 @@ self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151029042723_ad
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150902054540_add_registration_authority_to_federation_registry_source.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150902055324_add_registration_policy_to_federation_registry_source.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150904024225_rename_federation_registry_object_fields.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150907002959_create_shibmd_scopes.rb')"
                 end
               end
