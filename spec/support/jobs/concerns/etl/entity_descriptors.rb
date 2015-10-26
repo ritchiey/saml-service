@@ -72,7 +72,7 @@ RSpec.shared_examples 'ETL::EntityDescriptors' do
 
   before do
     stub_fr_request(:entity_descriptors)
-    allow_any_instance_of(described_class).to receive(:idp_sso_descriptors)
+    allow_any_instance_of(described_class).to receive(:identity_providers)
       .with(kind_of(EntityDescriptor), anything)
   end
 
@@ -115,6 +115,25 @@ RSpec.shared_examples 'ETL::EntityDescriptors' do
         .to eq(fr_source.registration_policy_uri)
       expect(subject.registration_info.registration_policies.first.lang)
         .to eq(fr_source.registration_policy_uri_lang)
+    end
+  end
+
+  context 'updating an EntityDescriptor' do
+    subject { EntityDescriptor.last }
+    let(:entity_descriptor_count) { 1 }
+
+    context 'EntityID' do
+      let(:updated_entityid) { Faker::Internet.url }
+      before do
+        run
+        entity_descriptor_list.first[:entity_id] = updated_entityid
+        stub_fr_request(:entity_descriptors)
+      end
+
+      it 'updates the EntityID uri' do
+        expect { run }.to change { subject.reload.entity_id.uri }
+          .to eq(updated_entityid)
+      end
     end
   end
 

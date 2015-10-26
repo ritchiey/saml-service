@@ -8,7 +8,7 @@ class UpdateFromFederationRegistry
   include ETL::Contacts
   include ETL::Organizations
   include ETL::EntityDescriptors
-  include ETL::IDPSSODescriptors
+  include ETL::IdentityProviders
 
   attr_reader :fr_source, :source
 
