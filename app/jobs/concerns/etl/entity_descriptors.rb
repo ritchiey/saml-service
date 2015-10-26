@@ -7,7 +7,7 @@ module ETL
 
         entity_id(ed, ed_data)
         registration_info(ed)
-        idp_sso_descriptors(ed, ed_data)
+        identity_providers(ed, ed_data)
       end
     end
 
