@@ -19,6 +19,10 @@ class RoleDescriptor < Sequel::Model
     validates_presence :protocol_supports
   end
 
+  def functioning?
+    valid? && enabled
+  end
+
   def extensions?
     extensions.present? || ui_info.present? || scopes.present?
   end
