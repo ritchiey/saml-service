@@ -331,6 +331,7 @@ Sequel.migration do
       column :created_at, "datetime"
       column :updated_at, "datetime"
       column :kind, "varchar(255)"
+      column :enabled, "tinyint(1)", :default=>true
       
       index [:entity_descriptor_id], :name=>:ed_rd_key
       index [:organization_id], :name=>:o_rd_key
@@ -801,5 +802,6 @@ self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150703030108_up
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150708025727_remove_entity_id_from_known_entity.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150803035704_drop_url_from_organization.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150907002959_create_shibmd_scopes.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151029042723_add_enabled_to_role_descriptors.rb')"
                 end
               end
