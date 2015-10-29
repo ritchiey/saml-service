@@ -100,4 +100,43 @@ describe RoleDescriptor do
       end
     end
   end
+
+  describe '#functioning?' do
+    context 'when RoleDescriptor is valid' do
+      subject { create :role_descriptor }
+
+      before { subject.enabled = true }
+
+      it 'valid' do
+        expect(subject).to be_valid
+      end
+      it 'is functioning when enabled' do
+        expect(subject).to be_functioning
+      end
+      it 'is not functioning when not enabled' do
+        subject.enabled = false
+        expect(subject).not_to be_functioning
+      end
+    end
+
+    context 'when RoleDescriptor is invalid' do
+      subject { create :role_descriptor }
+
+      before do
+        subject.enabled = true
+        subject.entity_descriptor = nil
+      end
+
+      it 'is not valid' do
+        expect(subject).not_to be_valid
+      end
+      it 'is not functioning when enabled' do
+        expect(subject).not_to be_functioning
+      end
+      it 'is not functioning when not enabled' do
+        subject.enabled = false
+        expect(subject).not_to be_functioning
+      end
+    end
+  end
 end
