@@ -29,7 +29,7 @@ class EntityDescriptor < Sequel::Model
   end
 
   def functioning?
-    valid? && enabled
+    valid? && enabled && functional_role_descriptor?
   end
 
   def validate_technical_contact
@@ -50,5 +50,12 @@ class EntityDescriptor < Sequel::Model
       .and(Sequel.qualify(:contact_people, :contact_type_id) =>
            ContactPerson::TYPE[:technical])
       .count
+  end
+
+  def functional_role_descriptor?
+    sp_sso_descriptors.any?(&:functioning?) ||
+      idp_sso_descriptors.any?(&:functioning?) ||
+      attribute_authority_descriptors.any?(&:functioning?) ||
+      role_descriptors.any?(&:functioning?)
   end
 end
