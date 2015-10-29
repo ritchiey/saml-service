@@ -110,7 +110,7 @@ describe EntityDescriptor do
 
       before { subject.enabled = true }
 
-      it 'valid' do
+      it 'is valid' do
         expect(subject).to be_valid
       end
       it 'is functioning when enabled' do
@@ -119,6 +119,16 @@ describe EntityDescriptor do
       it 'is not functioning when not enabled' do
         subject.enabled = false
         expect(subject).not_to be_functioning
+      end
+
+      context 'without a functioning role descriptor' do
+        before do
+          subject.idp_sso_descriptors.first.update(enabled: false)
+        end
+
+        it 'is not functioning' do
+          expect(subject).not_to be_functioning
+        end
       end
     end
 
