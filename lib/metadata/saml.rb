@@ -300,7 +300,6 @@ module Metadata
         key_descriptor(kd)
       end
 
-      organization(rd.organization) if rd.organization
       rd.contact_people.each { |cp| contact_person(cp) }
     end
 
