@@ -69,16 +69,8 @@ RSpec.shared_examples 'RoleDescriptor xml' do
   end
 
   context 'Organization' do
-    context 'when populated' do
-      let(:role_descriptor) { create parent_node, :with_organization }
-      it 'is rendered when present' do
-        expect(xml).to have_xpath(organization_path, count: 1)
-      end
-    end
-    context 'when not populated' do
-      it 'is not rendered' do
-        expect(xml).not_to have_xpath(organization_path)
-      end
+    it 'is not rendered' do
+      expect(xml).not_to have_xpath(organization_path)
     end
   end
 
