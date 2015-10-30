@@ -25,7 +25,7 @@ class EntityDescriptor < Sequel::Model
     validates_presence :organization, allow_missing: new?
     validates_presence :registration_info, allow_missing: new?
 
-    validate_technical_contact
+    # validate_technical_contact
   end
 
   def functioning?
@@ -34,6 +34,7 @@ class EntityDescriptor < Sequel::Model
 
   def validate_technical_contact
     return if new?
+
     error_message = 'must specify a technical contact'
     errors.add(:contact_people, error_message) if technical_contact_count == 0
   end

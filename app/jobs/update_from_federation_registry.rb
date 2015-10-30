@@ -27,5 +27,7 @@ class UpdateFromFederationRegistry
       contacts
       organizations
     end
+
+    true
   end
 end

@@ -23,6 +23,10 @@ module QueryFederationRegistry
     data_by_id(fr_source.attribute_authorities_url, :attribute_authorities)
   end
 
+  def fr_attributes
+    data_by_id(fr_source.attributes_url, :attributes)
+  end
+
   private
 
   def data_by_id(url, kind)

@@ -3,19 +3,20 @@ module ETL
     def entity_descriptors(o, org_data)
       org_data[:saml][:entity_descriptors].each do |ed_ref|
         ed_data = fr_entity_descriptors[ed_ref[:id]]
-        ed = create_or_update(o, EntityDescriptor.dataset, ed_data)
-
-        entity_id(ed, ed_data)
-        registration_info(ed)
-        identity_providers(ed, ed_data)
+        create_or_update_ed(o, EntityDescriptor.dataset, ed_data)
       end
     end
 
-    def create_or_update(o, ds, ed_data)
-      create_or_update_by_fr_id(ds, ed_data[:id], ed_attrs(ed_data)) do |obj|
-        obj.organization = o
-        obj.known_entity = known_entity(ed_data)
-      end
+    def create_or_update_ed(o, ds, ed_data)
+      ed =
+        create_or_update_by_fr_id(ds, ed_data[:id], ed_attrs(ed_data)) do |obj|
+          obj.organization = o
+          obj.known_entity = known_entity(ed_data)
+        end
+
+      entity_id(ed, ed_data)
+      registration_info(ed)
+      identity_providers(ed, ed_data)
     end
 
     def known_entity(ed_data)
