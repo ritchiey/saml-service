@@ -9,16 +9,16 @@ class UpdateEntitySource
     .freeze
   private_constant :ENTITY_DESCRIPTOR_XPATH
 
-  def self.perform(id:)
-    new.perform(id: id)
+  def self.perform(id:, primary_tag:)
+    new.perform(id: id, primary_tag: primary_tag)
   end
 
-  def perform(id:)
+  def perform(id:, primary_tag:)
     source = EntitySource[id]
     untouched = source.known_entities.to_a
 
     document(source).xpath(ENTITY_DESCRIPTOR_XPATH).each do |node|
-      entity = known_entity(source, node)
+      entity = known_entity(source, node, primary_tag)
       update_raw_entity_descriptor(entity, node)
 
       untouched.reject! { |e| e.id == entity.id }
@@ -59,11 +59,13 @@ class UpdateEntitySource
          'Signature validation failed.')
   end
 
-  def known_entity(source, node)
+  def known_entity(source, node, primary_tag)
     entity_id = EntityId.find(uri: node['entityID'])
     return entity_id.parent.known_entity if entity_id
 
-    KnownEntity.create(entity_source: source, active: true)
+    ke = KnownEntity.create(entity_source: source, active: true)
+    ke.add_tag(Tag.new(name: primary_tag))
+    ke
   end
 
   def update_raw_entity_descriptor(entity, node)
