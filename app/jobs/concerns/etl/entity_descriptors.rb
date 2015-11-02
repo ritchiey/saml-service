@@ -16,11 +16,18 @@ module ETL
 
       entity_id(ed, ed_data)
       registration_info(ed)
+      tag_known_entity(ed)
       identity_providers(ed, ed_data)
     end
 
     def known_entity(ed_data)
       KnownEntity.create(entity_source: source, active: ed_data[:active])
+    end
+
+    def tag_known_entity(ed)
+      # Only specify tags when not locally managed (i.e. first import)
+      return if ed.known_entity.tags.present?
+      ed.known_entity.add_tag(Tag.new(name: @primary_tag))
     end
 
     def ed_attrs(ed_data)

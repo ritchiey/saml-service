@@ -23,6 +23,7 @@ RSpec.describe UpdateFromFederationRegistry do
   end
 
   let(:fr_source) { create(:federation_registry_source) }
+  let(:federation_tag) { Faker::Lorem.word }
   let(:authorization) do
     %(AAF-FR-EXPORT service="saml-service", key="#{fr_source.secret}")
   end

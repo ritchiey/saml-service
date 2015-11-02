@@ -21,7 +21,7 @@ RSpec.shared_examples 'ETL::Contacts' do
   end
 
   def run
-    described_class.new(fr_source.id).contacts
+    described_class.new(fr_source.id, federation_tag).contacts
   end
 
   context 'creating a contact' do

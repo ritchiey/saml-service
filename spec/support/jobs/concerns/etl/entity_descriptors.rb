@@ -77,7 +77,8 @@ RSpec.shared_examples 'ETL::EntityDescriptors' do
   end
 
   def run
-    described_class.new(fr_source.id).entity_descriptors(organization, org_data)
+    described_class.new(fr_source.id, federation_tag)
+      .entity_descriptors(organization, org_data)
   end
 
   context 'creating an EntityDescriptor' do
@@ -116,6 +117,10 @@ RSpec.shared_examples 'ETL::EntityDescriptors' do
       expect(subject.registration_info.registration_policies.first.lang)
         .to eq(fr_source.registration_policy_uri_lang)
     end
+
+    it 'has known_entity with federation tag' do
+      expect(subject.known_entity.tags.first.name).to eq(federation_tag)
+    end
   end
 
   context 'updating an EntityDescriptor' do
@@ -133,6 +138,10 @@ RSpec.shared_examples 'ETL::EntityDescriptors' do
       it 'updates the EntityID uri' do
         expect { run }.to change { subject.reload.entity_id.uri }
           .to eq(updated_entityid)
+      end
+
+      it 'has known_entity with federation tag' do
+        expect(subject.known_entity.tags.first.name).to eq(federation_tag)
       end
     end
   end

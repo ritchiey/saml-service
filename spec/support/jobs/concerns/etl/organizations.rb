@@ -34,7 +34,7 @@ RSpec.shared_examples 'ETL::Organizations' do
   end
 
   def run
-    described_class.new(fr_source.id).organizations
+    described_class.new(fr_source.id, federation_tag).organizations
   end
 
   context 'creating an organization' do
