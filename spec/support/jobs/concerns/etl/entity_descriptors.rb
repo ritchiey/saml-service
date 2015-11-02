@@ -77,7 +77,7 @@ RSpec.shared_examples 'ETL::EntityDescriptors' do
   end
 
   def run
-    described_class.new(fr_source.id, federation_tag)
+    described_class.new(id: fr_source.id, primary_tag: federation_tag)
       .entity_descriptors(organization, org_data)
   end
 
