@@ -1,4 +1,6 @@
 class KnownEntity < Sequel::Model
+  plugin :touch
+
   many_to_one :entity_source
   one_to_one :entity_descriptor
   one_to_one :raw_entity_descriptor

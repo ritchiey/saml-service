@@ -18,6 +18,8 @@ module ETL
       registration_info(ed)
       tag_known_entity(ed)
       identity_providers(ed, ed_data)
+
+      indicate_content_updated(ed.known_entity)
     end
 
     def known_entity(ed_data)
@@ -49,6 +51,12 @@ module ETL
         registration_info: ri,
         uri: @fr_source.registration_policy_uri,
         lang: @fr_source.registration_policy_uri_lang)
+    end
+
+    def indicate_content_updated(ke)
+      # Changes updated_at timestamp for associated KnownEntity
+      # which is used by MDQP for etag generation / caching.
+      ke.touch
     end
   end
 end

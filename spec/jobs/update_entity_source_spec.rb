@@ -145,6 +145,13 @@ RSpec.describe UpdateEntitySource do
           new_xml = Nokogiri::XML.parse(xml).root.elements[1].canonicalize
           expect { run }.to change { red.reload.xml }.from(old_xml).to(new_xml)
         end
+
+        it 'modifies KnownEntity updated_at' do
+          Timecop.travel(1.second) do
+            expect { run }
+              .to change { red.reload.known_entity.updated_at }
+          end
+        end
       end
     end
   end

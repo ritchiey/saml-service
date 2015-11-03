@@ -1,4 +1,6 @@
 class EntityDescriptor < Sequel::Model
+  plugin :touch
+
   many_to_one :known_entity
   many_to_one :organization
 
@@ -14,8 +16,6 @@ class EntityDescriptor < Sequel::Model
   one_to_one :registration_info, class: 'MDRPI::RegistrationInfo'
   one_to_one :publication_info, class: 'MDRPI::PublicationInfo'
   one_to_one :entity_attribute, class: 'MDATTR::EntityAttribute'
-
-  plugin :touch
 
   def validate
     super

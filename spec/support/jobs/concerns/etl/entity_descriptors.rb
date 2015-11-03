@@ -140,6 +140,12 @@ RSpec.shared_examples 'ETL::EntityDescriptors' do
           .to eq(updated_entityid)
       end
 
+      it 'modifies KnownEntity updated_at' do
+        Timecop.travel(1.second) do
+          expect { run }.to change { subject.reload.known_entity.updated_at }
+        end
+      end
+
       it 'has known_entity with federation tag' do
         expect(subject.known_entity.tags.first.name).to eq(federation_tag)
       end

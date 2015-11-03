@@ -20,6 +20,7 @@ class UpdateEntitySource
     document(source).xpath(ENTITY_DESCRIPTOR_XPATH).each do |node|
       entity = known_entity(source, node, primary_tag)
       update_raw_entity_descriptor(entity, node)
+      indicate_content_updated(entity)
 
       untouched.reject! { |e| e.id == entity.id }
     end
@@ -84,5 +85,11 @@ class UpdateEntitySource
       ke.raw_entity_descriptor.try(:destroy)
       ke.destroy
     end
+  end
+
+  def indicate_content_updated(ke)
+    # Changes updated_at timestamp for associated KnownEntity
+    # which is used by MDQP for etag generation / caching.
+    ke.touch
   end
 end
