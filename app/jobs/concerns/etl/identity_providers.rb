@@ -4,16 +4,9 @@ module ETL
 
     def identity_providers(ed, ed_data)
       ed_data[:saml][:identity_providers].each do |idp_ref|
-        puts "Processing IdP #{idp_ref[:id]}"
         idp_data = fr_identity_providers[idp_ref[:id]]
-        ed_contacts(ed, idp_data[:contacts])
-        create_or_update_idp(ed, IDPSSODescriptor.dataset, idp_data)
 
-        # IdPSSODescriptor
-        # name_id_mapping_services(idp, idp_data)
-        # assertion_id_request_services(idp, idp_data)
-        # attribute_profiles
-        # attributes
+        create_or_update_idp(ed, IDPSSODescriptor.dataset, idp_data)
       end
     end
 
@@ -35,6 +28,8 @@ module ETL
       assertion_id_request_services(
         idp, idp_data[:saml][:assertion_id_request_services])
       attributes(idp, idp_data[:saml][:attributes])
+
+      puts "Processing IdP #{idp.id}"
     end
 
     def idp_attrs(idp_data)
@@ -45,20 +40,6 @@ module ETL
           idp_data[:saml][:sso_descriptor][:role_descriptor][:error_url],
         want_authn_requests_signed: idp_data[:saml][:authnrequests_signed]
       }
-    end
-
-    def ed_contacts(ed, contact_people)
-      ed.contact_people.each(&:destroy)
-      contact_people.each do |contact|
-        type = contact[:type][:name].to_sym
-        next unless ContactPerson::TYPE.key?(type)
-
-        c = FederationRegistryObject.local_instance(contact[:id], Contact.name)
-        next unless c
-
-        cp = ContactPerson.create(contact: c, contact_type: type)
-        ed.add_contact_person(cp)
-      end
     end
 
     def mdui(rd, display_name, description)

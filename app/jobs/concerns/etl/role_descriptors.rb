@@ -2,6 +2,7 @@ module ETL
   module RoleDescriptors
     def role_descriptor(rd, rd_data, scopes_data)
       scopes(rd, scopes_data)
+      contact_people(rd, rd_data[:contact_people])
       protocol_supports(rd, rd_data[:protocol_support_enumerations])
       key_descriptors(rd, rd_data[:key_descriptors])
     end
@@ -10,6 +11,24 @@ module ETL
       rd.scopes.each(&:destroy)
       rd.add_scope(SHIBMD::Scope.new(value: scope_data,
                                      regexp: regexp_scope?(scope_data)))
+    end
+
+    def contact_people(rd, contact_people)
+      # Contacts are stored at the ED level only within saml-service
+      # This is more inline with eduGain policy and prevents duplication
+      rd.entity_descriptor.contact_people.each(&:destroy)
+      contact_people.each do |contact_person|
+        type = contact_person[:type][:name].to_sym
+        next unless ContactPerson::TYPE.key?(type)
+
+        c =
+          FederationRegistryObject.local_instance(contact_person[:contact][:id],
+                                                  Contact.name)
+        next unless c
+
+        cp = ContactPerson.create(contact: c, contact_type: type)
+        rd.entity_descriptor.add_contact_person(cp)
+      end
     end
 
     def regexp_scope?(scope)
