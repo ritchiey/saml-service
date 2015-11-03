@@ -11,35 +11,35 @@ module ETL
     end
 
     def create_or_update_idp(ed, ds, idp_data)
-      idp =
-        create_or_update_by_fr_id(ds, idp_data[:id], idp_attrs(idp_data)) do |obj|
-          obj.entity_descriptor = ed
-          obj.organization = ed.organization
-        end
+      attrs = idp_attrs(idp_data)
+      idp = create_or_update_by_fr_id(ds, idp_data[:id], attrs) do |obj|
+        obj.entity_descriptor = ed
+        obj.organization = ed.organization
+      end
 
-      sso_desc_data = idp_data[:saml][:sso_descriptor]
-      scopes_data = idp_data[:saml][:scope]
-      sso_descriptor(idp, sso_desc_data, scopes_data)
-
+      saml_core(idp, idp_data)
       mdui(idp, idp_data[:display_name], idp_data[:description])
-
-      single_sign_on_services(idp, idp_data[:saml][:single_sign_on_services])
-      name_id_mapping_services(idp, idp_data[:saml][:name_id_mapping_services])
-      assertion_id_request_services(
-        idp, idp_data[:saml][:assertion_id_request_services])
-      attributes(idp, idp_data[:saml][:attributes])
-
-      puts "Processing IdP #{idp.id}"
     end
 
     def idp_attrs(idp_data)
+      saml = idp_data[:saml]
       {
         created_at: Time.parse(idp_data[:created_at]),
         enabled: idp_data[:functioning],
-        error_url:
-          idp_data[:saml][:sso_descriptor][:role_descriptor][:error_url],
-        want_authn_requests_signed: idp_data[:saml][:authnrequests_signed]
+        error_url: saml[:sso_descriptor][:role_descriptor][:error_url],
+        want_authn_requests_signed: saml[:authnrequests_signed]
       }
+    end
+
+    def saml_core(idp, idp_data)
+      saml = idp_data[:saml]
+      sso_descriptor(idp, saml[:sso_descriptor], saml[:scope])
+
+      single_sign_on_services(idp, saml[:single_sign_on_services])
+      name_id_mapping_services(idp, saml[:name_id_mapping_services])
+      assertion_id_request_services(idp, saml[:assertion_id_request_services])
+
+      attributes(idp, saml[:attributes])
     end
 
     def mdui(rd, display_name, description)
@@ -80,8 +80,9 @@ module ETL
       aidrs_services_data.each do |aidrs_data|
         next unless aidrs_data[:functioning]
 
-        aidrs = AssertionIdRequestService.new(location: aidrs_data[:location],
-                                              binding: aidrs_data[:binding][:uri])
+        aidrs =
+          AssertionIdRequestService.new(location: aidrs_data[:location],
+                                        binding: aidrs_data[:binding][:uri])
         idp.add_assertion_id_request_service(aidrs)
       end
     end
@@ -95,10 +96,7 @@ module ETL
     end
 
     def attributes(idp, attrs_data)
-      idp.attributes.each do |attr|
-        attr.name_format.destroy if attr.name_format
-        attr.destroy
-      end
+      destroy_attributes(idp)
       attrs_data.each do |attr_data|
         base = fr_attributes[attr_data[:id]]
 
@@ -108,6 +106,13 @@ module ETL
                                 oid: base[:oid])
         idp.add_attribute(attr)
         NameFormat.create(uri: base[:name_format][:uri], attribute: attr)
+      end
+    end
+
+    def destroy_attributes(idp)
+      idp.attributes.each do |attr|
+        attr.name_format.destroy if attr.name_format
+        attr.destroy
       end
     end
   end
