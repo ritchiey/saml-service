@@ -139,4 +139,35 @@ describe RoleDescriptor do
       end
     end
   end
+
+  describe '#edugain_compliant?' do
+    context 'with ui_info' do
+      subject { create :role_descriptor, :with_ui_info }
+
+      it { is_expected.to be_edugain_compliant }
+
+      context 'without display_names' do
+        before do
+          subject.ui_info.display_names.each(&:destroy)
+          subject.reload
+        end
+
+        it { is_expected.not_to be_edugain_compliant }
+      end
+
+      context 'without descriptions' do
+        before do
+          subject.ui_info.descriptions.each(&:destroy)
+          subject.reload
+        end
+
+        it { is_expected.not_to be_edugain_compliant }
+      end
+    end
+
+    context 'without ui_info' do
+      subject { create :role_descriptor }
+      it { is_expected.not_to be_edugain_compliant }
+    end
+  end
 end

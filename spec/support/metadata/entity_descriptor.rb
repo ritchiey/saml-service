@@ -1,5 +1,5 @@
 RSpec.shared_examples 'EntityDescriptor xml' do
-  let(:entity_descriptor) { create :entity_descriptor }
+  let(:entity_descriptor) { create :entity_descriptor, :with_technical_contact }
   let(:known_entity) { entity_descriptor.known_entity }
   let(:entity_descriptor_path) { '/EntityDescriptor' }
   let(:extensions_path) { "#{entity_descriptor_path}/Extensions" }

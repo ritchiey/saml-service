@@ -50,4 +50,10 @@ class RoleDescriptor < Sequel::Model
   def self.join_tags(tags)
     join(:tags, role_descriptor_id: :id, name: tags).group(:role_descriptor_id)
   end
+
+  def edugain_compliant?
+    ui_info.present? &&
+      ui_info.display_names.present? &&
+      ui_info.descriptions.present?
+  end
 end
