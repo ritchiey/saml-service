@@ -16,11 +16,18 @@ RSpec.shared_examples 'EntityDescriptor xml' do
   let(:create_idp) { false }
   let(:create_sp) { false }
   let(:create_aa) { false }
+  let(:create_non_functioning_idp) { false }
+  let(:create_non_functioning_aa) { false }
+  let(:create_non_functioning_sp) { false }
   let(:add_entity_attributes) { false }
 
   before do
     if create_idp
       create(:idp_sso_descriptor, entity_descriptor: entity_descriptor)
+    end
+    if create_non_functioning_idp
+      create(:idp_sso_descriptor, entity_descriptor: entity_descriptor,
+                                  enabled: false)
     end
     if create_sp
       create(:sp_sso_descriptor, entity_descriptor: entity_descriptor)
@@ -28,6 +35,14 @@ RSpec.shared_examples 'EntityDescriptor xml' do
     if create_aa
       create(:attribute_authority_descriptor,
              entity_descriptor: entity_descriptor)
+    end
+    if create_non_functioning_aa
+      create(:attribute_authority_descriptor,
+             entity_descriptor: entity_descriptor, enabled: false)
+    end
+    if create_non_functioning_sp
+      create(:sp_sso_descriptor, entity_descriptor: entity_descriptor,
+                                 enabled: false)
     end
     if add_entity_attributes
       create(:mdattr_entity_attribute, entity_descriptor: entity_descriptor)
@@ -96,6 +111,37 @@ RSpec.shared_examples 'EntityDescriptor xml' do
         end
         it 'creates AttributeAuthorityDescriptor node' do
           expect(xml).to have_xpath(aad_path, count: 1)
+        end
+      end
+
+      context 'IdP that are not functioning' do
+        let(:create_idp) { true }
+        let(:create_non_functioning_idp) { true }
+
+        it 'only uses functioning IDPSSODescriptor node' do
+          expect(entity_descriptor.idp_sso_descriptors.count).to eq(2)
+          expect(xml).to have_xpath(idp_path, count: 1)
+        end
+      end
+
+      context 'AA that are not functioning' do
+        let(:create_aa) { true }
+        let(:create_non_functioning_aa) { true }
+
+        it 'only uses functioning AADescriptor node' do
+          expect(entity_descriptor.attribute_authority_descriptors.count)
+            .to eq(2)
+          expect(xml).to have_xpath(aad_path, count: 1)
+        end
+      end
+
+      context 'SP that are not functioning' do
+        let(:create_sp) { true }
+        let(:create_non_functioning_sp) { true }
+
+        it 'only uses functioning SPSSODescriptor node' do
+          expect(entity_descriptor.sp_sso_descriptors.count).to eq(2)
+          expect(xml).to have_xpath(sp_path, count: 1)
         end
       end
     end

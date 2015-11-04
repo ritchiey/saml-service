@@ -221,15 +221,15 @@ module Metadata
         entity_descriptor_extensions(ed, root_node)
 
         ed.idp_sso_descriptors.each do |idp|
-          idp_sso_descriptor(idp)
+          idp_sso_descriptor(idp) if idp.functioning?
         end
 
         ed.sp_sso_descriptors.each do |sp|
-          sp_sso_descriptor(sp)
+          sp_sso_descriptor(sp) if sp.functioning?
         end
 
         ed.attribute_authority_descriptors.each do |aad|
-          attribute_authority_descriptor(aad)
+          attribute_authority_descriptor(aad) if aad.functioning?
         end
 
         organization(ed.organization)
