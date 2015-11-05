@@ -1,5 +1,10 @@
+require 'metadata/schema'
+require 'metadata/schema_invalid_error'
+
 module MetadataQueryCaching
   extend ActiveSupport::Concern
+
+  include Metadata::Schema
 
   def generate_known_entities_etag(known_entities)
     timestamps = known_entities.map(&:updated_at).map(&:to_i).join('.')
@@ -34,6 +39,7 @@ module MetadataQueryCaching
 
     Rails.cache.fetch(etag, expires_in: cache_expiry_period) do
       @saml_renderer.root_entity_descriptor(known_entity)
+      validate_xml
       @saml_renderer.sign
 
       { expires: cache_expiry, metadata: @saml_renderer.builder.to_xml }
@@ -46,9 +52,18 @@ module MetadataQueryCaching
 
     Rails.cache.fetch(etag, expires_in: cache_expiry_period) do
       @saml_renderer.entities_descriptor(known_entities)
+      validate_xml
       @saml_renderer.sign
 
       { expires: cache_expiry, metadata: @saml_renderer.builder.to_xml }
     end
+  end
+
+  def validate_xml
+    doc = @saml_renderer.builder.doc
+    return if metadata_schema.valid?(doc)
+
+    fail Metadata::SchemaInvalidError, 'metadata is not schema valid\n' \
+                                       "#{metadata_schema.validate(doc)}"
   end
 end

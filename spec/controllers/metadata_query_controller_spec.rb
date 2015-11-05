@@ -327,6 +327,19 @@ RSpec.describe MetadataQueryController, type: :controller do
                   end
                 end
               end
+
+              context 'unexpected schema verification failure' do
+                before do
+                  doc = double('schema', valid?: false,
+                                         validate: ['nokogiri error'])
+                  allow(subject).to receive(:metadata_schema).and_return(doc)
+                end
+                it 'responds with an internal server error' do
+                  run
+                  expect(subject.response)
+                    .to have_http_status(:internal_server_error)
+                end
+              end
             end
 
             context 'subsequent requests' do

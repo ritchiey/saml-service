@@ -1,4 +1,5 @@
 require 'metadata/saml'
+require 'metadata/schema_invalid_error'
 
 class MetadataQueryController < ApplicationController
   SAML_CONTENT_TYPE = 'application/samlmetadata+xml'.freeze
@@ -6,6 +7,7 @@ class MetadataQueryController < ApplicationController
 
   include MetadataQueryCaching
 
+  rescue_from Metadata::SchemaInvalidError, with: :schema_invalid
   skip_before_action :ensure_authenticated
   before_action :ensure_get_request, :ensure_content_type,
                 :ensure_accept_charset, :ensure_metadata_instance
@@ -125,5 +127,9 @@ class MetadataQueryController < ApplicationController
     expires_in(ttl)
 
     head :not_found
+  end
+
+  def schema_invalid
+    head :internal_server_error
   end
 end
