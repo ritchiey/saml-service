@@ -3,6 +3,7 @@ require 'openssl'
 FactoryGirl.define do
   subject = "CN=#{Faker::Lorem.word}/DC=#{Faker::Lorem.word}"
   issuer = "CN=#{Faker::Lorem.word}/DC=#{Faker::Lorem.word}"
+
   trait :base_key_info do
     transient do
       certificate do

@@ -49,34 +49,40 @@ module ETL
       rd.key_descriptors.each(&:destroy)
 
       key_descriptor_data.each do |kd_data|
-        next if kd_data[:disabled]
-
-        kd = KeyDescriptor.create(key_type: kd_data[:type].to_sym)
-        key_encryption_method(kd, kd_data)
+        key_type = kd_data.key?(:type) ? kd_data[:type].to_sym : nil
+        kd = KeyDescriptor.create(key_type: key_type,
+                                  disabled: kd_data.fetch(:disabled, false))
         key_info(kd, kd_data)
         rd.add_key_descriptor(kd)
       end
     end
 
-    def key_encryption_method(kd, kd_data)
-      return unless kd_data[:encryption_method][:algorithm].present?
-
-      em_data = kd_data[:encryption_method]
-      em = EncryptionMethod.new(algorithm: em_data[:algorithm],
-                                key_size: em_data[:key_size],
-                                oae_params: em_data[:oae_params])
-      kd.add_encryption_method(em)
-    end
-
     def key_info(kd, kd_data)
+      return unless kd_data.key?(:key_info)
+
       ki_data = kd_data[:key_info]
-      cert_data = ki_data[:certificate][:data].gsub(/(\n\n)/, "\n")
-      ki = KeyInfo.create(key_name: ki_data[:name],
-                          subject: ki_data[:certificate][:subject],
-                          issuer: ki_data[:certificate][:issuer],
-                          data: cert_data)
+      return unless ki_data.key?(:certificate)
+
+      cert = ki_data[:certificate]
+      return unless cert.key?(:data)
+
+      cert_data = cert[:data].gsub(/(\n\n)/, "\n")
+      ki = KeyInfo.create(key_name: ki_data.fetch(:name, nil),
+                          subject: cert.fetch(:subject, nil),
+                          issuer: cert.fetch(:issuer, nil), data: cert_data)
 
       kd.update(key_info: ki)
+    end
+
+    def mdui(rd, display_name, description)
+      ui_info = rd.ui_info || MDUI::UIInfo.create(role_descriptor: rd)
+      ui_info.display_names.each(&:destroy)
+      ui_info.descriptions.each(&:destroy)
+
+      ui_info.add_display_name(MDUI::DisplayName.new(value: display_name,
+                                                     lang: 'en'))
+      ui_info.add_description(MDUI::Description.new(value: description,
+                                                    lang: 'en'))
     end
   end
 end

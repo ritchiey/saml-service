@@ -40,17 +40,7 @@ module ETL
       assertion_id_request_services(idp, saml[:assertion_id_request_services])
 
       attributes(idp, saml[:attributes])
-    end
-
-    def mdui(rd, display_name, description)
-      ui_info = rd.ui_info || MDUI::UIInfo.create(role_descriptor: rd)
-      ui_info.display_names.each(&:destroy)
-      ui_info.descriptions.each(&:destroy)
-
-      ui_info.add_display_name(MDUI::DisplayName.new(value: display_name,
-                                                     lang: 'en'))
-      ui_info.add_description(MDUI::Description.new(value: description,
-                                                    lang: 'en'))
+      attribute_profiles(idp, saml[:attribute_profiles])
     end
 
     def single_sign_on_services(idp, ssoservices_data)

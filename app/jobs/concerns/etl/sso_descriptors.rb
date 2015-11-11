@@ -9,7 +9,7 @@ module ETL
       name_id_formats(sd, sd_data[:name_id_formats])
       artifact_resolution_services(sd, sd_data[:artifact_resolution_services])
       single_logout_services(sd, sd_data[:single_logout_services])
-      managed_name_id_services(sd, sd_data[:manage_nameid_services])
+      manage_name_id_services(sd, sd_data[:manage_nameid_services])
     end
 
     def name_id_formats(sd, nidfs_data)
@@ -44,14 +44,14 @@ module ETL
       end
     end
 
-    def managed_name_id_services(sd, mnidservices_data)
+    def manage_name_id_services(sd, mnidservices_data)
       sd.manage_name_id_services.each(&:destroy)
       mnidservices_data.each do |mnids_data|
         next unless mnids_data[:functioning]
 
-        mnids = ManagedNameIdService.new(location: mnids_data[:location],
-                                         binding: mnids_data[:binding][:uri])
-        sd.add_managed_nameid_service(mnids)
+        mnids = ManageNameIdService.new(location: mnids_data[:location],
+                                        binding: mnids_data[:binding][:uri])
+        sd.add_manage_name_id_service(mnids)
       end
     end
   end
