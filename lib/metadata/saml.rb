@@ -297,7 +297,7 @@ module Metadata
       role_descriptor_extensions(rd, scope)
 
       rd.key_descriptors.each do |kd|
-        key_descriptor(kd)
+        key_descriptor(kd) unless kd.disabled
       end
 
       rd.contact_people.each { |cp| contact_person(cp) }

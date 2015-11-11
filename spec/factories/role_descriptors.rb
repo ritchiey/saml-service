@@ -11,6 +11,13 @@ FactoryGirl.define do
       error_url { Faker::Internet.url }
     end
 
+    trait :with_disabled_key_descriptor do
+      after(:create) do |rd|
+        create(:key_descriptor, :encryption, disabled: true,
+                                             role_descriptor: rd)
+      end
+    end
+
     trait :with_key_descriptors do
       after(:create) do |rd|
         create_list(:key_descriptor, 2, role_descriptor: rd)
