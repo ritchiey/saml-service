@@ -53,7 +53,8 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
             protocol_support_enumerations:
               idp.protocol_supports.map { |pse| saml_uri_json(pse) },
             key_descriptors:
-              idp.key_descriptors.map { |kd| key_descriptor_json(kd) },
+              idp.key_descriptors.map { |kd| key_descriptor_json(kd) }
+                .push(bad_key_descriptor_json),
             contact_people:
               contact_instances.map { |cp| contact_person_json(cp) },
             error_url: idp.error_url
@@ -84,6 +85,21 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
           subject: kd.key_info.subject,
           issuer: kd.key_info.issuer,
           data: kd.key_info.data
+        }
+      }
+    }
+  end
+
+  def bad_key_descriptor_json
+    {
+      disabled: false,
+      type: :signing,
+      key_info: {
+        certificate: {
+          name: Faker::Lorem.word,
+          subject: Faker::Lorem.word,
+          issuer: Faker::Lorem.word,
+          data: Faker::Lorem.word
         }
       }
     }

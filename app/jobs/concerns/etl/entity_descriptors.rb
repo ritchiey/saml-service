@@ -8,22 +8,27 @@ module ETL
     end
 
     def create_or_update_ed(o, ds, ed_data)
+      Rails.logger.info "Processing FR entity #{ed_data[:entity_id]}"
+
       ed =
         create_or_update_by_fr_id(ds, ed_data[:id], ed_attrs(ed_data)) do |obj|
           obj.organization = o
           obj.known_entity = known_entity(ed_data)
         end
 
-      entity_id(ed, ed_data)
-      registration_info(ed)
+      ed_saml_core(ed, ed_data)
       tag_known_entity(ed)
-      identity_providers(ed, ed_data)
-
       indicate_content_updated(ed.known_entity)
     end
 
     def known_entity(ed_data)
       KnownEntity.create(entity_source: source, active: ed_data[:active])
+    end
+
+    def ed_saml_core(ed, ed_data)
+      entity_id(ed, ed_data)
+      registration_info(ed)
+      identity_providers(ed, ed_data)
     end
 
     def tag_known_entity(ed)

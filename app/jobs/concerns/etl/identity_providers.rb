@@ -17,7 +17,7 @@ module ETL
         obj.organization = ed.organization
       end
 
-      saml_core(idp, idp_data)
+      idp_saml_core(idp, idp_data)
       mdui(idp, idp_data[:display_name], idp_data[:description])
     end
 
@@ -31,7 +31,7 @@ module ETL
       }
     end
 
-    def saml_core(idp, idp_data)
+    def idp_saml_core(idp, idp_data)
       saml = idp_data[:saml]
       sso_descriptor(idp, saml[:sso_descriptor], saml[:scope])
 

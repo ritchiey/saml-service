@@ -49,12 +49,22 @@ module ETL
       rd.key_descriptors.each(&:destroy)
 
       key_descriptor_data.each do |kd_data|
-        key_type = kd_data.key?(:type) ? kd_data[:type].to_sym : nil
-        kd = KeyDescriptor.create(key_type: key_type,
-                                  disabled: kd_data.fetch(:disabled, false))
-        key_info(kd, kd_data)
-        rd.add_key_descriptor(kd)
+        begin
+          rd.add_key_descriptor(key_descriptor(kd_data))
+        rescue OpenSSL::X509::CertificateError => e
+          Rails.logger.info(
+            "FR certificate \n#{kd_data[:key_info][:certificate][:data]}\n" \
+            "was invalid and not persisted due to: #{e.message}")
+        end
       end
+    end
+
+    def key_descriptor(kd_data)
+      key_type = kd_data.key?(:type) ? kd_data[:type].to_sym : nil
+      kd = KeyDescriptor.create(key_type: key_type,
+                                disabled: kd_data.fetch(:disabled, false))
+      key_info(kd, kd_data)
+      kd
     end
 
     def key_info(kd, kd_data)
