@@ -1,34 +1,7 @@
 RSpec.shared_examples 'ETL::IdentityProviders' do
-  # rubocop:disable Metrics/MethodLength
-  def endpoint_json(s)
-    {
-      location: s.location,
-      binding: {
-        uri: s.binding
-      },
-      functioning: true
-    }
-  end
+  include_examples 'ETL::RoleDescriptors'
 
-  def indexed_endpoint_json(s)
-    {
-      location: s.location,
-      index: s.index,
-      is_default: s.is_default,
-      binding: {
-        uri: s.binding
-      },
-      functioning: true
-    }
-  end
-
-  def saml_uri_json(su)
-    {
-      uri: su.uri
-    }
-  end
-
-  # rubocop:disable Metrics/AbcSize
+  # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
   def create_json(idp)
     {
       id: idp.id,
@@ -73,59 +46,7 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
       }
     }
   end
-  # rubocop:enable Metrics/AbcSize
-
-  def key_descriptor_json(kd)
-    {
-      disabled: kd.disabled,
-      type: kd.key_type,
-      key_info: {
-        certificate: {
-          name: kd.key_info.key_name,
-          subject: kd.key_info.subject,
-          issuer: kd.key_info.issuer,
-          data: kd.key_info.data
-        }
-      }
-    }
-  end
-
-  def bad_key_descriptor_json
-    {
-      disabled: false,
-      type: :signing,
-      key_info: {
-        certificate: {
-          name: Faker::Lorem.word,
-          subject: Faker::Lorem.word,
-          issuer: Faker::Lorem.word,
-          data: Faker::Lorem.word
-        }
-      }
-    }
-  end
-
-  def contact_json(c)
-    {
-      id: c.id,
-      given_name: c.given_name,
-      surname: c.surname,
-      email: c.email_address,
-      work_phone: c.telephone_number,
-      created_at: Time.at(rand(Time.now.utc.to_i))
-    }
-  end
-
-  def contact_person_json(cp)
-    {
-      type: {
-        name: ContactPerson::TYPE.keys[rand 0..4].to_s
-      },
-      contact: {
-        id: cp.id
-      }
-    }
-  end
+  # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
 
   def attribute_json(a)
     {
@@ -174,17 +95,10 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
   let(:identity_providers_list) do
     identity_provider_instances.map { |idp| create_json(idp) }
   end
-  let(:identity_providers) { identity_providers_list }
-  let(:idp_created_at) { Time.at(rand(Time.now.utc.to_i)) }
-  let(:scope) { 'example.edu' }
 
-  let(:contact_instances) do
-    create_list(:contact, contact_count)
-  end
-  let(:contacts_list) do
-    contact_instances.map { |ci| contact_json(ci) }
-  end
-  let(:contacts) { contacts_list }
+  let(:identity_providers) { identity_providers_list }
+
+  let(:idp_created_at) { Time.at(rand(Time.now.utc.to_i)) }
 
   let(:attribute_instances) do
     (0..attribute_count).map do |i|
@@ -195,9 +109,11 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
       }
     end
   end
+
   let(:attributes_list) do
     attribute_instances.map { |a| attribute_base_json(a) }
   end
+
   let(:attributes) { attributes_list }
 
   let(:entity_descriptor) { create :entity_descriptor }
@@ -211,62 +127,6 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
           end
       }
     }
-  end
-
-  shared_examples 'endpoint' do
-    it 'has source data' do
-      expect(source.count).to be > 0
-    end
-
-    it 'creates new instances' do
-      expect(target.count)
-        .to eq(source.count)
-    end
-
-    it 'sets expected locations' do
-      source.each_with_index do |s, i|
-        expect(target[i].location == s.location)
-      end
-    end
-
-    it 'sets expected bindings' do
-      source.each_with_index do |s, i|
-        expect(target[i].binding == s.binding)
-      end
-    end
-  end
-
-  shared_examples 'indexed_endpoint' do
-    include_examples 'endpoint'
-
-    it 'sets is_default' do
-      source.each_with_index do |s, i|
-        expect(target[i].is_default).to eq(s.is_default)
-      end
-    end
-
-    it 'sets index' do
-      source.each_with_index do |s, i|
-        expect(target[i].index).to eq(s.index)
-      end
-    end
-  end
-
-  shared_examples 'saml_uris' do
-    it 'has source data' do
-      expect(source.count).to be > 0
-    end
-
-    it 'creates new instances' do
-      expect(target.count)
-        .to eq(source.count)
-    end
-
-    it 'sets expected uri' do
-      source.each_with_index do |s, i|
-        expect(target[i].uri == s.uri)
-      end
-    end
   end
 
   shared_examples 'saml_attributes' do
@@ -300,87 +160,6 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
     it 'sets oid' do
       source.each_with_index do |s, i|
         expect(target[i].oid == s[:oid])
-      end
-    end
-  end
-
-  shared_examples 'key_descriptors' do
-    it 'has source data' do
-      expect(source.count).to be > 0
-    end
-
-    it 'creates new instances' do
-      expect(target.count)
-        .to eq(source.count)
-    end
-
-    it 'sets type' do
-      source.each_with_index do |s, i|
-        expect(target[i].key_type).to eq(s.key_type)
-      end
-    end
-
-    context 'key info' do
-      it 'sets key_name' do
-        source.each_with_index do |s, i|
-          expect(target[i].key_info.key_name).to eq(s.key_info.key_name)
-        end
-      end
-
-      it 'sets subject' do
-        source.each_with_index do |s, i|
-          expect(target[i].key_info.subject).to eq(s.key_info.subject)
-        end
-      end
-
-      it 'sets issuer' do
-        source.each_with_index do |s, i|
-          expect(target[i].key_info.issuer).to eq(s.key_info.issuer)
-        end
-      end
-
-      it 'sets certificate PEM data' do
-        source.each_with_index do |s, i|
-          expect(target[i].key_info.data).to eq(s.key_info.data)
-        end
-      end
-    end
-  end
-
-  shared_examples 'contact_people' do
-    it 'has source data' do
-      expect(source.count).to be > 0
-    end
-
-    it 'creates new instances' do
-      expect(target.count)
-        .to eq(source.count)
-    end
-
-    it 'has source types' do
-      source.each_with_index do |s, i|
-        expect(target[i].contact_type.to_s).to eq(s[:type][:name])
-      end
-    end
-
-    it 'has email' do
-      source.each_with_index do |_s, i|
-        expect(target[i].contact.email_address)
-          .to eq(contact_instances[i].email_address)
-      end
-    end
-
-    it 'has given_name' do
-      source.each_with_index do |_s, i|
-        expect(target[i].contact.given_name)
-          .to eq(contact_instances[i].given_name)
-      end
-    end
-
-    it 'has surname' do
-      source.each_with_index do |_s, i|
-        expect(target[i].contact.surname)
-          .to eq(contact_instances[i].surname)
       end
     end
   end
