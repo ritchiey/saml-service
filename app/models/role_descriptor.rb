@@ -13,7 +13,7 @@ class RoleDescriptor < Sequel::Model
 
   def validate
     super
-    validates_presence [:entity_descriptor, :active, :created_at, :updated_at]
+    validates_presence [:entity_descriptor, :enabled, :created_at, :updated_at]
     return if new?
 
     validates_presence :protocol_supports
@@ -49,5 +49,11 @@ class RoleDescriptor < Sequel::Model
 
   def self.join_tags(tags)
     join(:tags, role_descriptor_id: :id, name: tags).group(:role_descriptor_id)
+  end
+
+  def edugain_compliant?
+    ui_info.present? &&
+      ui_info.display_names.present? &&
+      ui_info.descriptions.present?
   end
 end

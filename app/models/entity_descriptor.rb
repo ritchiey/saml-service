@@ -1,4 +1,6 @@
 class EntityDescriptor < Sequel::Model
+  plugin :touch
+
   many_to_one :known_entity
   many_to_one :organization
 
@@ -15,8 +17,6 @@ class EntityDescriptor < Sequel::Model
   one_to_one :publication_info, class: 'MDRPI::PublicationInfo'
   one_to_one :entity_attribute, class: 'MDATTR::EntityAttribute'
 
-  plugin :touch
-
   def validate
     super
     validates_presence [:known_entity, :created_at, :updated_at]
@@ -24,18 +24,37 @@ class EntityDescriptor < Sequel::Model
     validates_presence :role_descriptors, allow_missing: new?
     validates_presence :organization, allow_missing: new?
     validates_presence :registration_info, allow_missing: new?
-
-    validate_technical_contact
   end
 
   def functioning?
     valid? && enabled && functional_role_descriptor?
   end
 
-  def validate_technical_contact
-    return if new?
-    error_message = 'must specify a technical contact'
-    errors.add(:contact_people, error_message) if technical_contact_count == 0
+  def edugain_compliant?
+    functioning? &&
+      edugain_compliant_contacts? &&
+      edugain_compliant_idp? &&
+      edugain_compliant_sp?
+  end
+
+  def edugain_compliant_contacts?
+    technical_contact_count > 0 || support_contact_count > 0
+  end
+
+  def edugain_compliant_idp?
+    idp_sso_descriptors.each do |idp|
+      return false unless idp.functioning? && idp.edugain_compliant?
+    end
+
+    true
+  end
+
+  def edugain_compliant_sp?
+    sp_sso_descriptors.each do |sp|
+      return false unless sp.functioning? && sp.edugain_compliant?
+    end
+
+    true
   end
 
   def entity_attribute?
@@ -49,6 +68,14 @@ class EntityDescriptor < Sequel::Model
       .where(Sequel.qualify(:entity_descriptors, :id) => id)
       .and(Sequel.qualify(:contact_people, :contact_type_id) =>
            ContactPerson::TYPE[:technical])
+      .count
+  end
+
+  def support_contact_count
+    ContactPerson.join(:entity_descriptors, id: :entity_descriptor_id)
+      .where(Sequel.qualify(:entity_descriptors, :id) => id)
+      .and(Sequel.qualify(:contact_people, :contact_type_id) =>
+           ContactPerson::TYPE[:support])
       .count
   end
 

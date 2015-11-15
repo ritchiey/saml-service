@@ -5,6 +5,13 @@ FactoryGirl.define do
       create :attribute_service, attribute_authority_descriptor: aad
     end
 
+    trait :with_disabled_key_descriptor do
+      after(:create) do |aad|
+        create(:key_descriptor, :encryption, disabled: true,
+                                             role_descriptor: aad)
+      end
+    end
+
     trait :with_multiple_attribute_services do
       after(:create) do |aad|
         create_list(:attribute_service, 2, attribute_authority_descriptor: aad)

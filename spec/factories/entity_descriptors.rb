@@ -7,8 +7,13 @@ FactoryGirl.define do
 
     after :create do |ed|
       ed.entity_id = create :entity_id, entity_descriptor: ed
-      ed.add_contact_person create :contact_person, entity_descriptor: ed
       ed.registration_info = create :mdrpi_registration_info
+    end
+
+    trait :with_technical_contact do
+      after :create do |ed|
+        ed.add_contact_person create :contact_person, entity_descriptor: ed
+      end
     end
 
     trait :with_publication_info do

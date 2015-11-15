@@ -9,6 +9,13 @@ FactoryGirl.define do
                                                sp_sso_descriptor: sp)
     end
 
+    trait :with_disabled_key_descriptor do
+      after(:create) do |sp|
+        create(:key_descriptor, :encryption, disabled: true,
+                                             role_descriptor: sp)
+      end
+    end
+
     trait :with_authn_requests_signed do
       authn_requests_signed true
     end

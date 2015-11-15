@@ -14,6 +14,8 @@ RSpec.describe UpdateEntitySource do
   let(:key) { create(:rsa_key) }
   let(:certificate) { create(:certificate, rsa_key: key) }
 
+  let(:federation_tag) { Faker::Lorem.word }
+
   def swallow
     yield
   rescue => e
@@ -21,7 +23,7 @@ RSpec.describe UpdateEntitySource do
   end
 
   def run
-    described_class.perform(id: subject.id)
+    described_class.perform(id: subject.id, primary_tag: federation_tag)
   end
 
   def entity_descriptors(entities:)
@@ -77,6 +79,11 @@ RSpec.describe UpdateEntitySource do
 
     it 'creates the known entity' do
       expect { run }.to change { subject.known_entities(true).count }.by(1)
+    end
+
+    it 'has known_entity with federation tag' do
+      run
+      expect(subject.known_entities.last.tags.first.name).to eq(federation_tag)
     end
 
     it 'creates the raw entity descriptor' do
@@ -137,6 +144,13 @@ RSpec.describe UpdateEntitySource do
         it 'updates the raw entity descriptor' do
           new_xml = Nokogiri::XML.parse(xml).root.elements[1].canonicalize
           expect { run }.to change { red.reload.xml }.from(old_xml).to(new_xml)
+        end
+
+        it 'modifies KnownEntity updated_at' do
+          Timecop.travel(1.second) do
+            expect { run }
+              .to change { red.reload.known_entity.updated_at }
+          end
         end
       end
     end

@@ -13,6 +13,8 @@ require 'sprockets/railtie'
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
+Sequel.default_timezone = :utc
+
 module Saml
   class Application < Rails::Application
     # Settings in config/environments/* take precedence over those
@@ -24,5 +26,6 @@ module Saml
     end
 
     config.cache_store = :redis_store, 'redis://localhost:6379/0/cache'
+    config.autoload_paths << Rails.root.join('app', 'jobs', 'concerns')
   end
 end

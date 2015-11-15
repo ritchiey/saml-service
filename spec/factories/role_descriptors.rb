@@ -1,7 +1,7 @@
 FactoryGirl.define do
   factory :role_descriptor do
     entity_descriptor
-    active true
+    enabled true
 
     after(:create) do |rd|
       rd.add_protocol_support(create :protocol_support, role_descriptor: rd)
@@ -9,6 +9,13 @@ FactoryGirl.define do
 
     trait :with_error_url do
       error_url { Faker::Internet.url }
+    end
+
+    trait :with_disabled_key_descriptor do
+      after(:create) do |rd|
+        create(:key_descriptor, :encryption, disabled: true,
+                                             role_descriptor: rd)
+      end
     end
 
     trait :with_key_descriptors do

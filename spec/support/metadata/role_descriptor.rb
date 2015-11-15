@@ -60,6 +60,26 @@ RSpec.shared_examples 'RoleDescriptor xml' do
       it 'is rendered' do
         expect(xml).to have_xpath(key_descriptors_path, count: 2)
       end
+
+      context 'with disabled keys' do
+        let(:role_descriptor) do
+          create parent_node, :with_key_descriptors,
+                 :with_disabled_key_descriptor
+        end
+
+        it 'has 3 key_descriptors' do
+          expect(role_descriptor.key_descriptors.count).to eq(3)
+        end
+
+        it 'has a disabled key_descriptor' do
+          disabled_kd = role_descriptor.key_descriptors.find_all(&:disabled)
+          expect(disabled_kd.count).to eq(1)
+        end
+
+        it 'is rendered' do
+          expect(xml).to have_xpath(key_descriptors_path, count: 2)
+        end
+      end
     end
     context 'when not populated' do
       it 'is not rendered' do

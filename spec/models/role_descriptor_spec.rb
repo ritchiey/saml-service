@@ -7,7 +7,7 @@ describe RoleDescriptor do
   context 'validations' do
     it { is_expected.to validate_presence :entity_descriptor }
     it { is_expected.to have_many_to_one :entity_descriptor }
-    it { is_expected.to validate_presence :active }
+    it { is_expected.to validate_presence :enabled }
 
     context 'instance validations' do
       subject { create :role_descriptor }
@@ -137,6 +137,37 @@ describe RoleDescriptor do
         subject.enabled = false
         expect(subject).not_to be_functioning
       end
+    end
+  end
+
+  describe '#edugain_compliant?' do
+    context 'with ui_info' do
+      subject { create :role_descriptor, :with_ui_info }
+
+      it { is_expected.to be_edugain_compliant }
+
+      context 'without display_names' do
+        before do
+          subject.ui_info.display_names.each(&:destroy)
+          subject.reload
+        end
+
+        it { is_expected.not_to be_edugain_compliant }
+      end
+
+      context 'without descriptions' do
+        before do
+          subject.ui_info.descriptions.each(&:destroy)
+          subject.reload
+        end
+
+        it { is_expected.not_to be_edugain_compliant }
+      end
+    end
+
+    context 'without ui_info' do
+      subject { create :role_descriptor }
+      it { is_expected.not_to be_edugain_compliant }
     end
   end
 end

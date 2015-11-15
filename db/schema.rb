@@ -45,6 +45,13 @@ Sequel.migration do
       column :certificate, "varchar(4096)"
     end
     
+    create_table(:federation_registry_objects) do
+      primary_key :id, :type=>"int(11)"
+      column :internal_class_name, "varchar(255)", :null=>false
+      column :internal_id, "int(11)", :null=>false
+      column :fr_id, "int(11)", :null=>false
+    end
+    
     create_table(:indexed_endpoints) do
       primary_key :id, :type=>"int(11)"
       column :is_default, "tinyint(1)", :null=>false
@@ -153,6 +160,20 @@ Sequel.migration do
       
       index [:known_entity_id], :name=>:known_entity_id_key
       index [:organization_id], :name=>:organization_id_key
+    end
+    
+    create_table(:federation_registry_sources) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :entity_source_id, :entity_sources, :type=>"int(11)", :null=>false, :key=>[:id]
+      column :hostname, "varchar(255)", :null=>false
+      column :secret, "varchar(255)", :null=>false
+      column :created_at, "datetime", :null=>false
+      column :updated_at, "datetime", :null=>false
+      column :registration_authority, "varchar(255)", :null=>false
+      column :registration_policy_uri, "varchar(255)", :null=>false
+      column :registration_policy_uri_lang, "varchar(255)", :null=>false
+      
+      index [:entity_source_id], :name=>:entity_source_id
     end
     
     create_table(:manage_name_id_services) do
@@ -789,6 +810,8 @@ self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150226030540_ad
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150304031737_add_hash_algorithm_to_metadata_instance.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150305210958_create_keypairs.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150305230517_add_keypair_to_metadata_instances.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150310004339_create_federation_registry_sources.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150312002156_create_federation_registry_objects.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150415004025_add_enabled_to_entity_descriptor.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150415030131_add_enabled_to_raw_entity_descriptor.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150504231555_add_primary_tag_to_metadata_instance.rb')"
@@ -801,6 +824,9 @@ self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150703023921_ad
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150703030108_update_entity_descriptor_foreign_key_on_entity_id.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150708025727_remove_entity_id_from_known_entity.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150803035704_drop_url_from_organization.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150902054540_add_registration_authority_to_federation_registry_source.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150902055324_add_registration_policy_to_federation_registry_source.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150904024225_rename_federation_registry_object_fields.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150907002959_create_shibmd_scopes.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151029042723_add_enabled_to_role_descriptors.rb')"
                 end

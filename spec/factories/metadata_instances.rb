@@ -5,7 +5,7 @@ FactoryGirl.define do
     name { Faker::Internet.domain_name }
 
     hash_algorithm 'sha256'
-    validity_period { 1.week }
+    validity_period { 1.hour }
     federation_identifier { Faker::Lorem.word }
 
     primary_tag { Faker::Lorem.word }
