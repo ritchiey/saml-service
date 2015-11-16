@@ -73,6 +73,9 @@ Sequel.migration do
       primary_key :id, :type=>"int(11)"
       column :certificate, "varchar(4096)", :null=>false
       column :key, "varchar(4096)", :null=>false
+      column :fingerprint, "varchar(40)"
+      
+      index [:fingerprint], :unique=>true
     end
     
     create_table(:known_entities) do
@@ -829,5 +832,6 @@ self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150902055324_ad
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150904024225_rename_federation_registry_object_fields.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150907002959_create_shibmd_scopes.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151029042723_add_enabled_to_role_descriptors.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151116230223_add_fingerprint_to_keypairs.rb')"
                 end
               end

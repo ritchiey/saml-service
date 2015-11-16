@@ -2,8 +2,9 @@ class Keypair < Sequel::Model
   def validate
     super
 
-    validates_presence [:certificate, :key]
+    validates_presence [:certificate, :key, :fingerprint]
     validates_max_length 4096, [:certificate, :key]
+    validates_unique :fingerprint
 
     validate_keypair_content
   end
@@ -13,7 +14,10 @@ class Keypair < Sequel::Model
     key = validate_key
 
     return if cert.nil? || key.nil?
-    return if cert.public_key.params == key.public_key.params
+
+    if cert.public_key.params == key.public_key.params
+      return validate_fingerprint(cert)
+    end
 
     errors.add(:certificate, 'does not match the private key')
   end
@@ -30,5 +34,12 @@ class Keypair < Sequel::Model
   rescue OpenSSL::PKey::RSAError
     errors.add(:key, 'is not a valid RSA key')
     nil
+  end
+
+  def validate_fingerprint(cert)
+    digest = OpenSSL::Digest::SHA1.new(cert.to_der).to_s.downcase
+    return if fingerprint == digest
+
+    errors.add(:fingerprint, 'does not match the certificate fingerprint')
   end
 end
