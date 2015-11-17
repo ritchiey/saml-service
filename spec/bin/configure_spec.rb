@@ -91,8 +91,7 @@ RSpec.describe ConfigureCLI do
       end
 
       it 'does not change the existing keypair' do
-        attrs = -> { keypair.reload && [keypair.certificate, keypair.key] }
-        expect { run }.not_to change(&attrs)
+        expect { run }.not_to change { keypair.reload.to_hash }
       end
     end
 
@@ -102,6 +101,70 @@ RSpec.describe ConfigureCLI do
 
         expected = { certificate: x509_certificate.to_pem, key: rsa_key.to_pem }
         expect(Keypair.last).to have_attributes(expected)
+      end
+    end
+  end
+
+  describe '#md_instance' do
+    let(:hash) { nil }
+    let(:name) { "#{Faker::Lorem.word}.#{Faker::Internet.domain_name}" }
+    let(:tag) { Faker::Lorem.word }
+    let!(:keypair) { create(:keypair) }
+
+    let(:cert_file) { '/nonexistent/path/to/cert.pem' }
+
+    before do
+      allow(File).to receive(:read).with(cert_file)
+        .and_return(keypair.certificate)
+    end
+
+    def run
+      args = ['md_instance',
+              '--cert', cert_file,
+              '--name', name,
+              '--tag', tag]
+
+      args += ['--hash', hash] if hash
+
+      ConfigureCLI.start(args)
+    end
+
+    context 'when the metadata instance exists' do
+      let!(:instance) { create(:metadata_instance, primary_tag: tag) }
+
+      it 'does not create a new metadata instance' do
+        expect { run }.not_to change(MetadataInstance, :count)
+      end
+
+      it 'updates the attributes' do
+        attrs = { keypair_id: keypair.id, name: name, hash_algorithm: 'sha256' }
+        expect { run }.to change { instance.reload.to_hash }.to include(attrs)
+      end
+    end
+
+    context 'when no metadata instance exists' do
+      it 'creates a new metadata instance' do
+        expect { run }.to change(MetadataInstance, :count).by(1)
+
+        expect(MetadataInstance.last)
+          .to have_attributes(keypair_id: keypair.id, name: name)
+      end
+    end
+
+    context 'when the keypair is missing' do
+      before { keypair.destroy }
+
+      it 'raises an informative error' do
+        expect { run }.to raise_error(/certificate has not been registered/)
+      end
+    end
+
+    context 'when the hash is provided' do
+      let(:hash) { 'sha1' }
+
+      it 'uses the provided hash' do
+        run
+        expect(MetadataInstance.last).to have_attributes(hash_algorithm: hash)
       end
     end
   end

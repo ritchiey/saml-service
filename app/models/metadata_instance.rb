@@ -1,4 +1,6 @@
 class MetadataInstance < Sequel::Model
+  plugin :update_or_create
+
   many_to_one :keypair
   one_to_many :ca_key_infos
 
