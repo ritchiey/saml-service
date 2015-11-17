@@ -201,6 +201,7 @@ Sequel.migration do
       column :validity_period, "int(11)", :null=>false
       
       index [:keypair_id], :name=>:keypair_id
+      index [:primary_tag], :unique=>true
     end
     
     create_table(:organization_display_names) do
@@ -833,5 +834,6 @@ self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150904024225_re
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20150907002959_create_shibmd_scopes.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151029042723_add_enabled_to_role_descriptors.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151116230223_add_fingerprint_to_keypairs.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151117041822_add_unique_key_to_metadata_instance_primary_tag.rb')"
                 end
               end

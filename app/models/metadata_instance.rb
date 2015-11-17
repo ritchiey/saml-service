@@ -14,6 +14,8 @@ class MetadataInstance < Sequel::Model
     validates_presence :ca_verify_depth if ca_key_infos.present?
     validates_presence :publication_info unless new?
 
+    validates_unique :primary_tag
+
     validates_includes %w(sha1 sha256), :hash_algorithm
   end
 end
