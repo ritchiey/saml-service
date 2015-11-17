@@ -22,6 +22,26 @@ class ConfigureCLI < Thor
     source.update(options.slice(:hostname, :secret))
   end
 
+  desc 'keypair [options...]', 'Create or update a Keypair for metadata signing'
+  option :cert, desc: 'The file containing the self-signed certificate'
+  option :key, desc: 'The file containing the private key'
+  long_desc <<-LONGDESC
+    Configures the SAML Service with a keypair which can be used by a metadata
+    instance to sign a generated document.
+
+    An existing keypair will be left unmodified. Keypairs are identified by
+    the certificate's SHA1 fingerprint.
+  LONGDESC
+
+  def keypair
+    cert, key = load_keypair
+    fingerprint = OpenSSL::Digest::SHA1.new(cert.to_der).to_s.downcase
+    return if Keypair.first_where(fingerprint: fingerprint)
+
+    Keypair.create(certificate: cert.to_pem, key: key.to_pem,
+                   fingerprint: fingerprint)
+  end
+
   private
 
   def new_federation_registry_source
@@ -33,6 +53,13 @@ class ConfigureCLI < Thor
       source.registration_policy_uri = "https://#{hostname}/federationregistry/"
       source.registration_policy_uri_lang = 'en'
     end
+  end
+
+  def load_keypair
+    [
+      OpenSSL::X509::Certificate.new(File.read(options[:cert])),
+      OpenSSL::PKey::RSA.new(File.read(options[:key]))
+    ]
   end
 end
 

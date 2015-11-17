@@ -61,4 +61,48 @@ RSpec.describe ConfigureCLI do
       end
     end
   end
+
+  describe '#keypair' do
+    let(:cert_file) { '/nonexistent/path/to/cert.pem' }
+    let(:key_file) { '/nonexistent/path/to/key.pem' }
+
+    let(:rsa_key) { create(:rsa_key) }
+    let(:x509_certificate) { create(:certificate, rsa_key: rsa_key) }
+
+    before do
+      allow(File).to receive(:read).with(cert_file)
+        .and_return(x509_certificate.to_pem)
+      allow(File).to receive(:read).with(key_file).and_return(rsa_key.to_pem)
+    end
+
+    def run
+      ConfigureCLI.start(['keypair',
+                          '--cert', cert_file,
+                          '--key', key_file])
+    end
+
+    context 'when the keypair exists' do
+      let!(:keypair) do
+        create(:keypair, x509_certificate: x509_certificate, rsa_key: rsa_key)
+      end
+
+      it 'creates no new keypair' do
+        expect { run }.not_to change(Keypair, :count)
+      end
+
+      it 'does not change the existing keypair' do
+        attrs = -> { keypair.reload && [keypair.certificate, keypair.key] }
+        expect { run }.not_to change(&attrs)
+      end
+    end
+
+    context 'when no keypair exists' do
+      it 'creates a keypair' do
+        expect { run }.to change(Keypair, :count).by(1)
+
+        expected = { certificate: x509_certificate.to_pem, key: rsa_key.to_pem }
+        expect(Keypair.last).to have_attributes(expected)
+      end
+    end
+  end
 end
