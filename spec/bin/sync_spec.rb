@@ -8,6 +8,6 @@ RSpec.describe 'bin/sync' do
   it 'invokes the job' do
     expect(UpdateFromFederationRegistry).to receive(:perform)
       .with(id: fr_source.id, primary_tag: tag)
-    SyncCLI.perform(tag)
+    SyncCLI.perform(fr_source.hostname, tag)
   end
 end
