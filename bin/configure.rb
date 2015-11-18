@@ -48,6 +48,9 @@ class ConfigureCLI < Thor
   option :tag, desc: 'The primary tag for the metadata instance'
   option :hash, desc: 'The hash algorithm for signing (default: SHA256)',
                 default: 'SHA256'
+  option :publisher, desc: 'The URI for MDRPI::PublicationInfo/@publisher'
+  option :usage_policy, desc: 'The URI for MDRPI::UsagePolicy'
+  option :lang, desc: 'The specified language for any localised elements'
   long_desc <<-LONGDESC
     Configures the SAML Service with a metadata instance which will be used to
     generate an output metadata document.
@@ -62,6 +65,8 @@ class ConfigureCLI < Thor
   def md_instance
     instance = MetadataInstance.find_or_new(primary_tag: options[:tag])
     instance.update(md_instance_attrs)
+
+    update_publication_info(instance)
   end
 
   private
@@ -101,6 +106,23 @@ class ConfigureCLI < Thor
       hash_algorithm: opts[:hash].downcase, validity_period: 7.days,
       keypair_id: keypair.id, all_entities: true
     }
+  end
+
+  def update_publication_info(instance)
+    pi = instance.publication_info || MDRPI::PublicationInfo.new
+    pi.update(publisher: options[:publisher], metadata_instance_id: instance.id)
+
+    update_usage_policy(pi)
+  end
+
+  def update_usage_policy(publication_info)
+    up, up2 = publication_info.usage_policies
+    up ||= MDRPI::UsagePolicy.new
+
+    up2 && fail("Can't PublicationInfo with multiple usage policies")
+
+    up.update(uri: options[:usage_policy], lang: options[:lang],
+              publication_info_id: publication_info.id)
   end
 end
 

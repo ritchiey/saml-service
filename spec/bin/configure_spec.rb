@@ -109,6 +109,9 @@ RSpec.describe ConfigureCLI do
     let(:hash) { nil }
     let(:name) { "#{Faker::Lorem.word}.#{Faker::Internet.domain_name}" }
     let(:tag) { Faker::Lorem.word }
+    let(:publisher) { Faker::Internet.url }
+    let(:usage_policy) { Faker::Internet.url }
+    let(:lang) { 'en' }
     let!(:keypair) { create(:keypair) }
 
     let(:cert_file) { '/nonexistent/path/to/cert.pem' }
@@ -122,7 +125,10 @@ RSpec.describe ConfigureCLI do
       args = ['md_instance',
               '--cert', cert_file,
               '--name', name,
-              '--tag', tag]
+              '--tag', tag,
+              '--publisher', publisher,
+              '--usage-policy', usage_policy,
+              '--lang', lang]
 
       args += ['--hash', hash] if hash
 
@@ -140,14 +146,56 @@ RSpec.describe ConfigureCLI do
         attrs = { keypair_id: keypair.id, name: name, hash_algorithm: 'sha256' }
         expect { run }.to change { instance.reload.to_hash }.to include(attrs)
       end
+
+      it 'does not create a new PublicationInfo' do
+        expect { run }.to not_change(MDRPI::PublicationInfo, :count)
+          .and not_change(MDRPI::UsagePolicy, :count)
+      end
+
+      it 'updates the PublicationInfo' do
+        pi = instance.publication_info
+        up = pi.usage_policies.first
+
+        run
+
+        expect { pi.reload }.to change { pi.values }
+          .to include(publisher: publisher)
+
+        expect { up.reload }.to change { up.values }
+          .to include(uri: usage_policy)
+      end
+
+      context 'when the PublicationInfo has two usage_policies' do
+        let!(:other_usage_policy) do
+          create(:mdrpi_usage_policy,
+                 publication_info: instance.publication_info)
+        end
+
+        it 'raises an exception' do
+          expect { run }.to raise_error(/multiple usage policies/)
+        end
+      end
     end
 
     context 'when no metadata instance exists' do
-      it 'creates a new metadata instance' do
+      it 'creates a valid metadata instance' do
         expect { run }.to change(MetadataInstance, :count).by(1)
 
-        expect(MetadataInstance.last)
-          .to have_attributes(keypair_id: keypair.id, name: name)
+        expect(MetadataInstance.last).to be_valid
+          .and have_attributes(keypair_id: keypair.id, name: name)
+      end
+
+      it 'creates a valid PublicationInfo' do
+        expect { run }.to change(MDRPI::PublicationInfo, :count).by(1)
+          .and change(MDRPI::UsagePolicy, :count).by(1)
+
+        md_instance = MetadataInstance.last
+
+        expect(md_instance.publication_info)
+          .to have_attributes(publisher: publisher)
+
+        expect(md_instance.publication_info.usage_policies.first)
+          .to have_attributes(uri: usage_policy)
       end
     end
 
