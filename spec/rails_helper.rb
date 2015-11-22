@@ -21,5 +21,15 @@ RSpec.configure do |config|
                                  auto_savepoint: true) { spec.run }
   end
 
+  config.around(:each, :debug) do |spec|
+    begin
+      logger = Logger.new($stderr)
+      Sequel::Model.db.loggers << logger
+      spec.run
+    ensure
+      Sequel::Model.db.loggers.delete(logger)
+    end
+  end
+
   config.infer_spec_type_from_file_location!
 end
