@@ -25,7 +25,9 @@ Rails.application.routes.draw do
 
   namespace :api, defaults: { format: 'json' } do
     scope constraints: APIConstraints.new(version: 1, default: true) do
-      # TODO
+      scope 'discovery' do
+        resources :discovery_entities, path: 'entities'
+      end
     end
   end
 end
