@@ -335,9 +335,7 @@ RSpec.describe MetadataQueryController, type: :controller do
                   allow(subject).to receive(:metadata_schema).and_return(doc)
                 end
                 it 'responds with an internal server error' do
-                  run
-                  expect(subject.response)
-                    .to have_http_status(:internal_server_error)
+                  expect { run }.to raise_error(Metadata::SchemaInvalidError)
                 end
               end
             end

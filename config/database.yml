@@ -25,6 +25,6 @@ test:
 
 production:
   <<: *default
-  username: <%= ENV['SAML_SERVICE_DB_USERNAME'] %>
-  password: <%= ENV['SAML_SERVICE_DB_PASSWORD'] %>
-  database: <%= ENV['SAML_SERVICE_DB_NAME'] %>
+  username: <%= ENV['SAML_DB_USERNAME'] %>
+  password: <%= ENV['SAML_DB_PASSWORD'] %>
+  database: <%= ENV['SAML_DB_NAME'] %>
