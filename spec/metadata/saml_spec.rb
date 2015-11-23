@@ -384,7 +384,7 @@ RSpec.describe Metadata::SAML do
   end
 
   context 'mdui:DiscoHints' do
-    let(:disco_hints) { create :mdui_disco_hints_with_content }
+    let(:disco_hints) { create :mdui_disco_hint, :with_content }
     before { subject.disco_hints(disco_hints) }
     include_examples 'mdui:DiscoHints xml'
   end
