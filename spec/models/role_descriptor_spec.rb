@@ -20,6 +20,7 @@ describe RoleDescriptor do
     it { is_expected.to have_one_to_many :key_descriptors }
     it { is_expected.to have_one_to_many :contact_people }
     it { is_expected.to have_one_to_many :scopes }
+    it { is_expected.to have_one_to_many :tags }
     it { is_expected.to have_column :extensions, type: :text }
 
     it { is_expected.to have_one_to_one :ui_info }
