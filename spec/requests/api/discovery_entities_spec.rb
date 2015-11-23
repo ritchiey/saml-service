@@ -5,32 +5,79 @@ RSpec.describe API::DiscoveryEntitiesController, type: :request do
 
   let(:json) { JSON.parse(response.body, symbolize_names: true) }
 
+  shared_examples 'a discovery entity' do
+    it 'includes the entity id' do
+      expect(subject.map { |obj| obj[:entity_id] })
+        .to include(entity.entity_id.uri)
+    end
+
+    context 'with no tags' do
+      it 'returns an empty tag list' do
+        expect(entry[:tags]).to eq([])
+      end
+    end
+
+    context 'with tags' do
+      let!(:tags) do
+        %w(tag_a tag_b tag_c).map do |tag|
+          create(:role_descriptor_tag,
+                 name: tag, role_descriptor: role_descriptor)
+        end
+      end
+
+      it 'returns the tags' do
+        expect(entry[:tags]).to contain_exactly(*tags.map(&:name))
+      end
+    end
+
+    context 'with no mdui info' do
+      it 'includes an empty list of display names' do
+        expect(entry[:names]).to eq([])
+      end
+
+      it 'includes an empty list of logos' do
+        expect(entry[:logos]).to eq([])
+      end
+
+      it 'includes an empty list of descriptions' do
+        expect(entry[:descriptions]).to eq([])
+      end
+    end
+
+    context 'with mdui info' do
+      let!(:ui_info) do
+        create(:mdui_ui_info, :with_content, role_descriptor: role_descriptor)
+      end
+
+      it 'includes the display names' do
+        display_name = role_descriptor.ui_info.display_names.first
+        expect(entry[:names])
+          .to include(value: display_name.value, lang: display_name.lang)
+      end
+
+      it 'includes the logo uri' do
+        logo = role_descriptor.ui_info.logos.first
+        expect(entry[:logos]).to include(uri: logo.uri, lang: logo.lang)
+      end
+
+      it 'includes the descriptions' do
+        description = role_descriptor.ui_info.descriptions.first
+        expect(entry[:descriptions])
+          .to include(value: description.value, lang: description.lang)
+      end
+    end
+  end
+
   context 'get /api/discovery/entities' do
     def run
       get '/api/discovery/entities', nil, headers
     end
 
-    let!(:identity_providers) { create_list(:entity_descriptor, 1) }
-    let!(:service_providers) { create_list(:entity_descriptor, 1) }
+    context 'response' do
+      before { run }
 
-    let!(:idp_sso_descriptors) do
-      identity_providers.map do |idp|
-        create(:idp_sso_descriptor, entity_descriptor: idp)
-      end
+      it { is_expected.to have_http_status(:ok) }
     end
-
-    let!(:sp_sso_descriptors) do
-      service_providers.map do |sp|
-        create(:sp_sso_descriptor, entity_descriptor: sp)
-      end
-    end
-
-    # Lets us create things in nested contexts before the `before { run }`
-    let!(:extras) { nil }
-
-    before { run }
-
-    it { is_expected.to have_http_status(:ok) }
 
     # {
     #   "identity_providers":[
@@ -64,68 +111,39 @@ RSpec.describe API::DiscoveryEntitiesController, type: :request do
     #   ]
     # }
     context 'identity_providers' do
+      let!(:identity_providers) { create_list(:entity_descriptor, 1) }
+
+      let!(:idp_sso_descriptors) do
+        identity_providers.map do |idp|
+          create(:idp_sso_descriptor, entity_descriptor: idp)
+        end
+      end
+
+      let(:entity) { identity_providers.first }
+      let(:role_descriptor) { entity.idp_sso_descriptors.first }
+
+      let(:entry) do
+        subject.find do |idp|
+          idp[:entity_id] == entity.entity_id.uri
+        end
+      end
+
+      let!(:tags) { [] }
+      let!(:ui_info) { nil }
+
+      before { run }
+
       subject { json[:identity_providers] }
 
-      let(:identity_provider) { identity_providers.first }
-      let(:idp_sso_descriptor) { identity_provider.idp_sso_descriptors.first }
-
-      let(:idp_entry) do
-        subject.find do |idp|
-          idp[:entity_id] == identity_provider.entity_id.uri
-        end
-      end
-
-      it 'includes the entity id' do
-        expect(subject.map { |idp| idp[:entity_id] })
-          .to include(identity_provider.entity_id.uri)
-      end
-
-      context 'with no mdui info' do
-        it 'includes an empty list of display names' do
-          expect(idp_entry[:names]).to eq([])
-        end
-
-        it 'includes an empty list of logos' do
-          expect(idp_entry[:logos]).to eq([])
-        end
-
-        it 'includes an empty list of descriptions' do
-          expect(idp_entry[:descriptions]).to eq([])
-        end
-      end
+      it_behaves_like 'a discovery entity'
 
       context 'with no disco hints' do
         it 'includes an empty list of geolocation data' do
-          expect(idp_entry[:geolocations]).to eq([])
+          expect(entry[:geolocations]).to eq([])
         end
 
         it 'includes an empty list of domain hints' do
-          expect(idp_entry[:domains]).to eq([])
-        end
-      end
-
-      context 'with mdui info' do
-        let!(:idp_sso_descriptors) do
-          identity_providers.map do |idp|
-            create(:idp_sso_descriptor, :with_ui_info, entity_descriptor: idp)
-          end
-        end
-
-        it 'includes the display names' do
-          display_name = idp_sso_descriptor.ui_info.display_names.first
-          expect(idp_entry[:names])
-            .to include(value: display_name.value, lang: display_name.lang)
-        end
-
-        it 'includes the logo uri' do
-          logo = idp_sso_descriptor.ui_info.logos.first
-          expect(idp_entry[:logos]).to include(uri: logo.uri, lang: logo.lang)
-        end
-
-        it 'includes the descriptions' do
-          description = idp_sso_descriptor.ui_info.descriptions.first
-          expect(idp_entry[:descriptions])
-            .to include(value: description.value, lang: description.lang)
+          expect(entry[:domains]).to eq([])
         end
       end
 
@@ -140,9 +158,9 @@ RSpec.describe API::DiscoveryEntitiesController, type: :request do
         end
 
         it 'includes the geolocation data' do
-          geo = idp_sso_descriptor.disco_hints.geolocation_hints.first.uri
+          geo = role_descriptor.disco_hints.geolocation_hints.first.uri
           match = geo.match(/^geo:(?<lat>[\d.]+),(?<long>[\d.]+)/)
-          expect(idp_entry[:geolocations])
+          expect(entry[:geolocations])
             .to include(latitude: match[:lat], longitude: match[:long])
         end
 
@@ -158,39 +176,19 @@ RSpec.describe API::DiscoveryEntitiesController, type: :request do
           end
 
           it 'includes the geolocation data' do
-            geo = idp_sso_descriptor.disco_hints.geolocation_hints.first.uri
+            geo = role_descriptor.disco_hints.geolocation_hints.first.uri
             regexp = /^geo:(?<lat>[\d.]+),(?<long>[\d.]+),(?<alt>[\d.]+)/
             match = geo.match(regexp)
 
-            expect(idp_entry[:geolocations])
+            expect(entry[:geolocations])
               .to include(latitude: match[:lat], longitude: match[:long],
                           altitude: match[:alt])
           end
         end
 
         it 'includes the domain hints' do
-          domain = idp_sso_descriptor.disco_hints.domain_hints.first.domain
-          expect(idp_entry[:domains]).to include(domain)
-        end
-      end
-
-      context 'when the identity provider is not tagged' do
-        it 'includes an empty tag list' do
-          expect(idp_entry[:tags]).to eq([])
-        end
-      end
-
-      context 'when the identity provider is tagged' do
-        let(:tags) { Faker::Lorem.words }
-
-        let!(:extras) do
-          tags.map do |tag|
-            Tag.create(name: tag, role_descriptor: idp_sso_descriptor)
-          end
-        end
-
-        it 'includes the tags' do
-          expect(idp_entry[:tags]).to contain_exactly(*tags)
+          domain = role_descriptor.disco_hints.domain_hints.first.domain
+          expect(entry[:domains]).to include(domain)
         end
       end
     end
@@ -241,62 +239,73 @@ RSpec.describe API::DiscoveryEntitiesController, type: :request do
     #   ...
     # ]
     context 'service_providers' do
-      subject { json[:service_providers] }
+      let!(:service_providers) { create_list(:entity_descriptor, 1) }
 
-      let(:service_provider) { service_providers.first }
-      let(:sp_sso_descriptor) { service_provider.sp_sso_descriptors.first }
-
-      let(:sp_entry) do
-        subject.find do |sp|
-          sp[:entity_id] == service_provider.entity_id.uri
+      let!(:sp_sso_descriptors) do
+        service_providers.map do |sp|
+          create(:sp_sso_descriptor, entity_descriptor: sp)
         end
       end
 
-      it 'includes the entity id' do
-        expect(subject.map { |sp| sp[:entity_id] })
-          .to include(service_provider.entity_id.uri)
+      let(:entity) { service_providers.first }
+      let(:role_descriptor) { entity.sp_sso_descriptors.first }
+
+      let(:entry) do
+        subject.find do |sp|
+          sp[:entity_id] == entity.entity_id.uri
+        end
       end
+
+      let!(:tags) { [] }
+      let!(:ui_info) { nil }
+      let!(:discovery_response_services) { [] }
+
+      before { run }
+
+      subject { json[:service_providers] }
+
+      it_behaves_like 'a discovery entity'
 
       context 'with discovery response services' do
         context 'with a default' do
           let(:non_default) do
             create(:discovery_response_service,
-                   is_default: false, sp_sso_descriptor: sp_sso_descriptor)
+                   is_default: false, sp_sso_descriptor: role_descriptor)
           end
 
           let(:default) do
             create(:discovery_response_service,
-                   is_default: true, sp_sso_descriptor: sp_sso_descriptor)
+                   is_default: true, sp_sso_descriptor: role_descriptor)
           end
 
-          let!(:extras) do
+          let!(:discovery_response_services) do
             non_default
             default
           end
 
           it 'includes the default discovery response location' do
-            expect(sp_entry[:discovery_response]).to eq(default.location)
+            expect(entry[:discovery_response]).to eq(default.location)
           end
 
           context 'when multiple defaults exist' do
             let(:second_default) do
               create(:discovery_response_service,
-                     is_default: true, sp_sso_descriptor: sp_sso_descriptor)
+                     is_default: true, sp_sso_descriptor: role_descriptor)
             end
 
-            let!(:extras) do
+            let!(:discovery_response_services) do
               non_default
               default
               second_default
             end
 
             it 'includes the "first" default' do
-              expect(sp_entry[:discovery_response]).to eq(default.location)
+              expect(entry[:discovery_response]).to eq(default.location)
             end
 
             it 'lists all the endpoints' do
               endpoints = [non_default, default, second_default].map(&:location)
-              expect(sp_entry[:all_discovery_response_endpoints])
+              expect(entry[:all_discovery_response_endpoints])
                 .to contain_exactly(*endpoints)
             end
           end
@@ -305,105 +314,55 @@ RSpec.describe API::DiscoveryEntitiesController, type: :request do
         context 'with no default' do
           let(:preferred) do
             create(:discovery_response_service,
-                   is_default: false, sp_sso_descriptor: sp_sso_descriptor)
+                   is_default: false, sp_sso_descriptor: role_descriptor)
           end
 
           let(:non_preferred) do
             create(:discovery_response_service,
-                   is_default: false, sp_sso_descriptor: sp_sso_descriptor)
+                   is_default: false, sp_sso_descriptor: role_descriptor)
           end
 
-          let!(:extras) do
+          let!(:discovery_response_services) do
             preferred
             non_preferred
           end
 
           it 'includes the preferred endpoint' do
-            expect(sp_entry[:discovery_response]).to eq(preferred.location)
+            expect(entry[:discovery_response]).to eq(preferred.location)
           end
 
           it 'lists all the endpoints' do
             endpoints = [preferred, non_preferred].map(&:location)
-            expect(sp_entry[:all_discovery_response_endpoints])
+            expect(entry[:all_discovery_response_endpoints])
               .to contain_exactly(*endpoints)
           end
         end
       end
 
-      context 'with no tags' do
-        it 'returns an empty tag list' do
-          expect(sp_entry[:tags]).to eq([])
-        end
-      end
-
-      context 'with tags' do
-        let(:tags) do
-          create_list(:role_descriptor_tag, 3,
-                      role_descriptor: sp_sso_descriptor)
-        end
-
-        let!(:extras) { tags }
-
-        it 'returns the tags' do
-          expect(sp_entry[:tags]).to contain_exactly(*tags.map(&:name))
-        end
-      end
-
       context 'with no mdui info' do
-        it 'includes an empty list of display names' do
-          expect(sp_entry[:names]).to eq([])
-        end
-
-        it 'includes an empty list of logos' do
-          expect(sp_entry[:logos]).to eq([])
-        end
-
-        it 'includes an empty list of descriptions' do
-          expect(sp_entry[:descriptions]).to eq([])
-        end
-
         it 'includes an empty list of information urls' do
-          expect(sp_entry[:information_urls]).to eq([])
+          expect(entry[:information_urls]).to eq([])
         end
 
         it 'includes an empty list of privacy statement urls' do
-          expect(sp_entry[:privacy_statement_urls]).to eq([])
+          expect(entry[:privacy_statement_urls]).to eq([])
         end
       end
 
       context 'with mdui info' do
-        let!(:sp_sso_descriptors) do
-          service_providers.map do |sp|
-            create(:sp_sso_descriptor, :with_ui_info, entity_descriptor: sp)
-          end
-        end
-
-        it 'includes the display names' do
-          display_name = sp_sso_descriptor.ui_info.display_names.first
-          expect(sp_entry[:names])
-            .to include(value: display_name.value, lang: display_name.lang)
-        end
-
-        it 'includes the logo uri' do
-          logo = sp_sso_descriptor.ui_info.logos.first
-          expect(sp_entry[:logos]).to include(uri: logo.uri, lang: logo.lang)
-        end
-
-        it 'includes the descriptions' do
-          description = sp_sso_descriptor.ui_info.descriptions.first
-          expect(sp_entry[:descriptions])
-            .to include(value: description.value, lang: description.lang)
+        let!(:ui_info) do
+          create(:mdui_ui_info, :with_content, role_descriptor: role_descriptor)
         end
 
         it 'includes the information urls' do
-          info_url = sp_sso_descriptor.ui_info.information_urls.first
-          expect(sp_entry[:information_urls])
+          info_url = role_descriptor.ui_info.information_urls.first
+          expect(entry[:information_urls])
             .to include(uri: info_url.uri, lang: info_url.lang)
         end
 
         it 'includes the information urls' do
-          privacy_url = sp_sso_descriptor.ui_info.privacy_statement_urls.first
-          expect(sp_entry[:privacy_statement_urls])
+          privacy_url = role_descriptor.ui_info.privacy_statement_urls.first
+          expect(entry[:privacy_statement_urls])
             .to include(uri: privacy_url.uri, lang: privacy_url.lang)
         end
       end
