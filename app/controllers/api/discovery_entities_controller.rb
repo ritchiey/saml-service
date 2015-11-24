@@ -29,6 +29,8 @@ module API
       }
     }
 
+    private_constant :SP_EAGER_FETCH, :IDP_EAGER_FETCH
+
     def service_providers
       entities_with_role_descriptor(:sp_sso_descriptors)
         .eager(SP_EAGER_FETCH).all
