@@ -1,4 +1,6 @@
 class MetadataInstance < Sequel::Model
+  plugin :update_or_create
+
   many_to_one :keypair
   one_to_many :ca_key_infos
 
@@ -13,6 +15,8 @@ class MetadataInstance < Sequel::Model
                         :primary_tag, :all_entities]
     validates_presence :ca_verify_depth if ca_key_infos.present?
     validates_presence :publication_info unless new?
+
+    validates_unique :primary_tag
 
     validates_includes %w(sha1 sha256), :hash_algorithm
   end

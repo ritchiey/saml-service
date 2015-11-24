@@ -17,7 +17,7 @@ RSpec.describe Keypair do
   let(:invalid_cert) { pem_jumble(certificate.to_pem) }
   let(:invalid_key) { pem_jumble(key.to_pem) }
 
-  subject { build(:keypair, key: key.to_pem, certificate: certificate.to_pem) }
+  subject { build(:keypair, rsa_key: key, x509_certificate: certificate) }
 
   context 'validations' do
     it { is_expected.to be_valid }
@@ -25,6 +25,8 @@ RSpec.describe Keypair do
     it { is_expected.to validate_max_length(4096, :key) }
     it { is_expected.to validate_presence(:certificate) }
     it { is_expected.to validate_max_length(4096, :certificate) }
+    it { is_expected.to validate_presence(:fingerprint) }
+    it { is_expected.to validate_unique(:fingerprint) }
 
     it 'rejects an invalid certificate' do
       subject.certificate = invalid_cert
@@ -38,6 +40,18 @@ RSpec.describe Keypair do
 
     it 'rejects a mismatched keypair' do
       subject.certificate = mismatched_certificate
+      expect(subject).not_to be_valid
+    end
+
+    it 'rejects a mismatched fingerprint' do
+      subject.fingerprint =
+        OpenSSL::Digest::SHA1.new(Faker::Lorem.word).to_s.downcase
+      expect(subject).not_to be_valid
+    end
+
+    it 'rejects an upper case fingerprint' do
+      subject.fingerprint =
+        OpenSSL::Digest::SHA1.new(certificate.to_der).to_s.upcase
       expect(subject).not_to be_valid
     end
   end

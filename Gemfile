@@ -34,6 +34,7 @@ gem 'jbuilder'
 gem 'bcrypt', '~> 3.1'
 
 # Deployment
+gem 'god', require: false
 gem 'unicorn', require: false
 
 group :development, :test do

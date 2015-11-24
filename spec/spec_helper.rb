@@ -25,4 +25,5 @@ RSpec.configure do |config|
   config.alias_it_should_behave_like_to :has_behavior, 'has behavior:'
 
   RSpec::Matchers.define_negated_matcher :not_include, :include
+  RSpec::Matchers.define_negated_matcher :not_change, :change
 end

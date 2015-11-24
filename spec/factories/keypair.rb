@@ -36,9 +36,16 @@ FactoryGirl.define do
   end
 
   factory :keypair do
-    transient { rsa_key { create(:rsa_key) } }
+    transient do
+      rsa_key { create(:rsa_key) }
+      x509_certificate { create(:certificate, rsa_key: rsa_key) }
+    end
 
-    certificate { create(:certificate, rsa_key: rsa_key).to_pem }
+    fingerprint do
+      OpenSSL::Digest::SHA1.new(x509_certificate.to_der).to_s.downcase
+    end
+
+    certificate { x509_certificate.to_pem }
     key { rsa_key.to_pem }
   end
 end
