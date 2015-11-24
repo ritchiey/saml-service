@@ -10,18 +10,38 @@ module API
 
     private
 
+    SP_EAGER_FETCH = {
+      entity_id: {},
+      sp_sso_descriptors: {
+        ui_info: %i(logos descriptions display_names information_urls
+                    privacy_statement_urls),
+        discovery_response_services: [],
+        tags: []
+      }
+    }
+
+    IDP_EAGER_FETCH = {
+      entity_id: {},
+      idp_sso_descriptors: {
+        ui_info: %i(logos descriptions display_names),
+        disco_hints: %i(geolocation_hints domain_hints),
+        tags: []
+      }
+    }
+
     def service_providers
       entities_with_role_descriptor(:sp_sso_descriptors)
+        .eager(SP_EAGER_FETCH).all
     end
 
     def identity_providers
       entities_with_role_descriptor(:idp_sso_descriptors)
+        .eager(IDP_EAGER_FETCH).all
     end
 
     def entities_with_role_descriptor(table)
-      EntityDescriptor.dataset.qualify.distinct(:id)
+      EntityDescriptor.qualify.distinct(:id)
         .join(table, entity_descriptor_id: :id)
-        .to_a
     end
   end
 end
