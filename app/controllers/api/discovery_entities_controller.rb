@@ -11,7 +11,7 @@ module API
     private
 
     SP_EAGER_FETCH = {
-      entity_id: {},
+      entity_id: [],
       sp_sso_descriptors: {
         ui_info: %i(logos descriptions display_names information_urls
                     privacy_statement_urls),
@@ -21,7 +21,7 @@ module API
     }
 
     IDP_EAGER_FETCH = {
-      entity_id: {},
+      entity_id: [],
       idp_sso_descriptors: {
         ui_info: %i(logos descriptions display_names),
         disco_hints: %i(geolocation_hints domain_hints),
