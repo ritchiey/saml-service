@@ -12,6 +12,7 @@ module API
 
     SP_EAGER_FETCH = {
       entity_id: [],
+      known_entity: :tags,
       sp_sso_descriptors: {
         ui_info: %i(logos descriptions display_names information_urls
                     privacy_statement_urls),
@@ -22,6 +23,7 @@ module API
 
     IDP_EAGER_FETCH = {
       entity_id: [],
+      known_entity: :tags,
       idp_sso_descriptors: {
         ui_info: %i(logos descriptions display_names),
         disco_hints: %i(geolocation_hints domain_hints),

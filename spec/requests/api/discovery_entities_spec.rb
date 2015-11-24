@@ -17,7 +17,7 @@ RSpec.describe API::DiscoveryEntitiesController, type: :request do
       end
     end
 
-    context 'with tags' do
+    context 'with tags on the role descriptor' do
       let!(:tags) do
         %w(tag_a tag_b tag_c).map do |tag|
           create(:role_descriptor_tag,
@@ -26,7 +26,35 @@ RSpec.describe API::DiscoveryEntitiesController, type: :request do
       end
 
       it 'returns the tags' do
-        expect(entry[:tags]).to contain_exactly(*tags.map(&:name))
+        expect(entry[:tags]).to contain_exactly('tag_a', 'tag_b', 'tag_c')
+      end
+    end
+
+    context 'with tags on the known entity' do
+      let!(:tags) do
+        %w(tag_a tag_b tag_c).map do |tag|
+          create(:known_entity_tag,
+                 name: tag, known_entity: entity.known_entity)
+        end
+      end
+
+      it 'returns the tags' do
+        expect(entry[:tags]).to contain_exactly('tag_a', 'tag_b', 'tag_c')
+      end
+    end
+
+    context 'with duplicate tags on the known entity and role descriptor' do
+      let!(:tags) do
+        %w(tag_a tag_b tag_c).map do |tag|
+          create(:known_entity_tag,
+                 name: tag, known_entity: entity.known_entity)
+          create(:role_descriptor_tag,
+                 name: tag, role_descriptor: role_descriptor)
+        end
+      end
+
+      it 'returns only unique tags' do
+        expect(entry[:tags]).to contain_exactly('tag_a', 'tag_b', 'tag_c')
       end
     end
 

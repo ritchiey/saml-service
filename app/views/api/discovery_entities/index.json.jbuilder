@@ -11,6 +11,12 @@ def insert_ui_info(json, ui_info)
   json.descriptions(descriptions, :value, :lang)
 end
 
+def insert_tags(json, entity, role_descriptor)
+  tags = role_descriptor.tags.map(&:name)
+  tags += entity.known_entity.tags.map(&:name)
+  json.tags(tags.uniq)
+end
+
 json.identity_providers(@identity_providers) do |idp|
   idp_sso_descriptor = idp.idp_sso_descriptors.first
   ui_info = idp_sso_descriptor.ui_info
@@ -18,8 +24,7 @@ json.identity_providers(@identity_providers) do |idp|
 
   json.entity_id(idp.entity_id.uri)
 
-  json.tags(idp_sso_descriptor.tags.map(&:name))
-
+  insert_tags(json, idp, idp_sso_descriptor)
   insert_ui_info(json, ui_info)
 
   geolocations = disco_hints.try(:geolocation_hints) || []
@@ -42,8 +47,7 @@ json.service_providers(@service_providers) do |sp|
   json.discovery_response(discovery_response_endpoints.first)
   json.all_discovery_response_endpoints(discovery_response_endpoints)
 
-  json.tags(sp_sso_descriptor.tags.map(&:name))
-
+  insert_tags(json, sp, sp_sso_descriptor)
   insert_ui_info(json, ui_info)
 
   information_urls = ui_info.try(:information_urls) || []
