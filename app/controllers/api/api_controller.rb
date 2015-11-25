@@ -20,7 +20,7 @@ module API
 
     def ensure_authenticated
       # Ensure API subject exists and is functioning
-      @subject = APISubject.first(x509_cn: x509_cn)
+      @subject = APISubject[x509_cn: x509_cn]
       fail(Unauthorized, 'Subject invalid') unless @subject
       fail(Unauthorized, 'Subject not functional') unless @subject.functioning?
     end
@@ -33,10 +33,7 @@ module API
     end
 
     def x509_cn
-      # Verified DN pushed by nginx following successful client SSL verification
-      # nginx is always going to do a better job of terminating SSL then we can
-      x509_dn = request.headers['HTTP_X509_DN'].try(:force_encoding, 'UTF-8')
-      fail(Unauthorized, 'Subject DN') unless x509_dn
+      fail(Unauthorized, 'Subject DN') if x509_dn.nil?
 
       x509_dn_parsed = OpenSSL::X509::Name.parse(x509_dn)
       x509_dn_hash = Hash[x509_dn_parsed.to_a
@@ -46,6 +43,11 @@ module API
 
     rescue OpenSSL::X509::NameError
       raise(Unauthorized, 'Subject DN invalid')
+    end
+
+    def x509_dn
+      x509_dn = request.headers['HTTP_X509_DN'].try(:force_encoding, 'UTF-8')
+      x509_dn == '(null)' ? nil : x509_dn
     end
 
     def check_access!(action)

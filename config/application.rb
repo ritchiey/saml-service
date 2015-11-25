@@ -27,5 +27,7 @@ module Saml
 
     config.cache_store = :redis_store, 'redis://localhost:6379/0/cache'
     config.autoload_paths << Rails.root.join('app', 'jobs', 'concerns')
+
+    config.sequel.logger = Logger.new($stderr) if ENV['AAF_DEBUG']
   end
 end
