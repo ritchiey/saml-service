@@ -1,11 +1,16 @@
 json.ignore_nil!
 
+def insert_localized_url(json, obj)
+  json.url obj.uri
+  json.lang obj.lang
+end
+
 def insert_ui_info(json, ui_info)
   display_names = ui_info.try(:display_names) || []
   json.names(display_names, :value, :lang)
 
   logos = ui_info.try(:logos) || []
-  json.logos(logos, :uri, :lang)
+  json.logos(logos) { |logo| insert_localized_url(json, logo) }
 
   descriptions = ui_info.try(:descriptions) || []
   json.descriptions(descriptions, :value, :lang)
@@ -51,8 +56,10 @@ json.service_providers(@service_providers) do |sp|
   insert_ui_info(json, ui_info)
 
   information_urls = ui_info.try(:information_urls) || []
-  json.information_urls(information_urls, :uri, :lang)
+  json.information_urls(information_urls) { |o| insert_localized_url(json, o) }
 
   privacy_statement_urls = ui_info.try(:privacy_statement_urls) || []
-  json.privacy_statement_urls(privacy_statement_urls, :uri, :lang)
+  json.privacy_statement_urls(privacy_statement_urls) do |o|
+    insert_localized_url(json, o)
+  end
 end

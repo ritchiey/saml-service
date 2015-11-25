@@ -85,7 +85,7 @@ RSpec.describe API::DiscoveryEntitiesController, type: :request do
 
       it 'includes the logo uri' do
         logo = role_descriptor.ui_info.logos.first
-        expect(entry[:logos]).to include(uri: logo.uri, lang: logo.lang)
+        expect(entry[:logos]).to include(url: logo.uri, lang: logo.lang)
       end
 
       it 'includes the descriptions' do
@@ -123,7 +123,7 @@ RSpec.describe API::DiscoveryEntitiesController, type: :request do
     #       ],
     #       "logos": [
     #         {
-    #           "uri": "https://example.edu/static/logo.jpg",
+    #           "url": "https://example.edu/static/logo.jpg",
     #           "lang": "en"
     #         }
     #       ],
@@ -241,7 +241,7 @@ RSpec.describe API::DiscoveryEntitiesController, type: :request do
     #     ],
     #     "logos": [
     #       {
-    #         "uri": "https://example.edu/static/logo.png",
+    #         "url": "https://example.edu/static/logo.png",
     #         "lang": "en"
     #       }
     #     ],
@@ -253,13 +253,13 @@ RSpec.describe API::DiscoveryEntitiesController, type: :request do
     #     ],
     #     "information_urls": [
     #       {
-    #         "uri": "https://example.edu/info",
+    #         "url": "https://example.edu/info",
     #         "lang": "en"
     #       }
     #     ],
     #     "privacy_statement_urls": [
     #       {
-    #         "uri": "https://example.edu/privacy",
+    #         "url": "https://example.edu/privacy",
     #         "lang": "en"
     #       }
     #     ]
@@ -385,13 +385,13 @@ RSpec.describe API::DiscoveryEntitiesController, type: :request do
         it 'includes the information urls' do
           info_url = role_descriptor.ui_info.information_urls.first
           expect(entry[:information_urls])
-            .to include(uri: info_url.uri, lang: info_url.lang)
+            .to include(url: info_url.uri, lang: info_url.lang)
         end
 
         it 'includes the information urls' do
           privacy_url = role_descriptor.ui_info.privacy_statement_urls.first
           expect(entry[:privacy_statement_urls])
-            .to include(uri: privacy_url.uri, lang: privacy_url.lang)
+            .to include(url: privacy_url.uri, lang: privacy_url.lang)
         end
       end
     end
