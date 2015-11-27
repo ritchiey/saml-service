@@ -4,8 +4,8 @@ module API
 
     def index
       public_action
-      @identity_providers = identity_providers
-      @service_providers = service_providers
+      @identity_providers = identity_providers.select(&:functioning?)
+      @service_providers = service_providers.select(&:functioning?)
     end
 
     private
