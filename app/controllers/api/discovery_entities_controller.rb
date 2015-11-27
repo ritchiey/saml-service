@@ -10,26 +10,30 @@ module API
 
     private
 
-    SP_EAGER_FETCH = {
+    COMMON_EAGER_FETCH = {
       entity_id: [],
       known_entity: :tags,
+      role_descriptors: [],
+      organization: [],
+      registration_info: []
+    }
+
+    SP_EAGER_FETCH = COMMON_EAGER_FETCH.merge(
       sp_sso_descriptors: {
         ui_info: %i(logos descriptions display_names information_urls
                     privacy_statement_urls),
         discovery_response_services: [],
         tags: []
       }
-    }
+    )
 
-    IDP_EAGER_FETCH = {
-      entity_id: [],
-      known_entity: :tags,
+    IDP_EAGER_FETCH = COMMON_EAGER_FETCH.merge(
       idp_sso_descriptors: {
         ui_info: %i(logos descriptions display_names),
         disco_hints: %i(geolocation_hints domain_hints),
         tags: []
       }
-    }
+    )
 
     private_constant :SP_EAGER_FETCH, :IDP_EAGER_FETCH
 
