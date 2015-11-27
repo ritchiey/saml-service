@@ -11,7 +11,7 @@ RSpec.describe MDUI::DiscoHints, type: :model do
 
   describe '#destroy' do
     subject do
-      create :mdui_disco_hints_with_content
+      create :mdui_disco_hint, :with_content
     end
 
     it 'is successfully destroyed' do
