@@ -41,7 +41,7 @@ module ETL
       if aa_data[:saml][:extract_metadata_from_idp_sso_descriptor]
         extract_aa_data_idp(aa_data)
       else
-        extract_aa_data_directly(aa_data)
+        fail 'Does not support AA (even standalone) who do not derive from IdP'
       end
     end
 
@@ -50,14 +50,6 @@ module ETL
       saml = idp_data[:saml]
       rd_data = saml[:sso_descriptor][:role_descriptor]
       nidf_data = saml[:sso_descriptor][:name_id_formats]
-
-      [saml, rd_data, nidf_data]
-    end
-
-    def extract_aa_data_directly(aa_data)
-      saml = aa_data[:saml]
-      rd_data = saml[:sso_descriptor]
-      nidf_data = saml[:name_id_formats]
 
       [saml, rd_data, nidf_data]
     end
