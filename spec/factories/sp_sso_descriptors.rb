@@ -9,10 +9,40 @@ FactoryGirl.define do
                                                sp_sso_descriptor: sp)
     end
 
+    trait :with_key_descriptors do
+      after(:create) do |sp|
+        create_list(:key_descriptor, 2, :signing, role_descriptor: sp)
+      end
+    end
+
     trait :with_disabled_key_descriptor do
       after(:create) do |sp|
         create(:key_descriptor, :encryption, disabled: true,
                                              role_descriptor: sp)
+      end
+    end
+
+    trait :with_single_logout_services do
+      after(:create) do |sp|
+        create_list(:single_logout_service, 2, sso_descriptor: sp)
+      end
+    end
+
+    trait :with_manage_name_id_services do
+      after(:create) do |sp|
+        create_list(:manage_name_id_service, 2, sso_descriptor: sp)
+      end
+    end
+
+    trait :with_name_id_formats do
+      after(:create) do |sp|
+        create_list(:name_id_format, 2, sso_descriptor: sp)
+      end
+    end
+
+    trait :with_artifact_resolution_services do
+      after(:create) do |idp|
+        create_list(:artifact_resolution_service, 2, sso_descriptor: idp)
       end
     end
 

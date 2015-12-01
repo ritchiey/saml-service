@@ -5,7 +5,8 @@ module ETL
     def service_providers(ed, ed_data)
       ed_data[:saml][:service_providers].each do |sp_ref|
         sp_data = fr_service_providers[sp_ref[:id]]
-        next unless sp_data[:saml][:attribute_consuming_services].count > 0
+        next unless sp_data[:saml].key?(:attribute_consuming_services) &&
+                    sp_data[:saml][:attribute_consuming_services].count > 0
 
         create_or_update_sp(ed, SPSSODescriptor.dataset, sp_data)
       end
@@ -77,24 +78,36 @@ module ETL
                                                default: ac_data[:is_default],
                                                sp_sso_descriptor: sp)
         acs.add_service_name(service_name)
+        acs_attributes(acs, ac_data)
+      end
+    end
 
-        ac_data[:attributes].each do |attr_data|
-          base = fr_attributes[attr_data[:id]]
+    def acs_attributes(acs, ac_data)
+      ac_data[:attributes].each do |attr_data|
+        base = fr_attributes[attr_data[:id]]
+        ra = requested_attribute(acs, attr_data, base)
+        acs.add_requested_attribute(ra)
+        NameFormat.create(uri: base[:name_format][:uri], attribute: ra)
+      end
+    end
 
-          ra = RequestedAttribute.create(name: "urn:oid:#{base[:oid]}",
-                                         friendly_name: attr_data[:name],
-                                         description: base[:description],
-                                         oid: base[:oid],
-                                         required: attr_data[:is_required],
-                                         reasoning: attr_data[:reason],
-                                         attribute_consuming_service: acs)
-          attr_data[:values].each do |av|
-            next unless av[:approved]
-            ra.add_attribute_value(value: av[:value])
-          end
-          acs.add_requested_attribute(ra)
-          NameFormat.create(uri: base[:name_format][:uri], attribute: ra)
-        end
+    def requested_attribute(acs, attr_data, base)
+      ra = RequestedAttribute.create(name: "urn:oid:#{base[:oid]}",
+                                     friendly_name: attr_data[:name],
+                                     description: base[:description],
+                                     oid: base[:oid],
+                                     required: attr_data[:is_required],
+                                     reasoning: attr_data[:reason],
+                                     attribute_consuming_service: acs)
+
+      add_values_to_requested_attribute(ra, attr_data)
+      ra
+    end
+
+    def add_values_to_requested_attribute(ra, attr_data)
+      attr_data[:values].each do |av|
+        next unless av[:approved]
+        ra.add_attribute_value(value: av[:value])
       end
     end
   end
