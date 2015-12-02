@@ -159,6 +159,11 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
       expect { run }.to change { SPSSODescriptor.count }.by(sp_count)
     end
 
+    it 'creates a new tag' do
+      expect { run }
+        .to change { Tag.count }.by(1)
+    end
+
     it 'creates a new AttributeConsumingService ' do
       expect { run }.to change { AttributeConsumingService.count }.by(sp_count)
     end
@@ -254,6 +259,10 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
 
     it 'uses the existing instance' do
       expect { run }.not_to change { SPSSODescriptor.count }
+    end
+
+    it 'does not create more tags' do
+      expect { run }.not_to change { Tag.count }
     end
 
     it 'updates assertion_consumer_services' do

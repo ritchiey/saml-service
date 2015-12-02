@@ -20,11 +20,15 @@ module ETL
         create_or_update_by_fr_id(ds, ed_data[:id], ed_attrs(ed_data)) do |obj|
           obj.organization = o
           obj.known_entity = known_entity(ed_data)
+          add_ke_primary_tag(obj)
         end
 
       ed_saml_core(ed, ed_data)
-      tag_known_entity(ed)
       indicate_content_updated(ed.known_entity)
+    end
+
+    def add_ke_primary_tag(ed)
+      ed.known_entity.add_tag(Tag.new(name: @primary_tag))
     end
 
     def known_entity(ed_data)
@@ -37,12 +41,6 @@ module ETL
       identity_providers(ed, ed_data)
       attribute_authorities(ed, ed_data)
       service_providers(ed, ed_data)
-    end
-
-    def tag_known_entity(ed)
-      # Only specify tags when not locally managed (i.e. first import)
-      return if ed.known_entity.tags.present?
-      ed.known_entity.add_tag(Tag.new(name: @primary_tag))
     end
 
     def ed_attrs(ed_data)

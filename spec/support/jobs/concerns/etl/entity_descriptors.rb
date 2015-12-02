@@ -161,6 +161,8 @@ RSpec.shared_examples 'ETL::EntityDescriptors' do
       it 'creates EntityDescriptor' do
         expect { run }.to change { EntityDescriptor.count }
           .by(entity_descriptor_count)
+
+        expect { run }.not_to change { Tag.count }
       end
     end
 

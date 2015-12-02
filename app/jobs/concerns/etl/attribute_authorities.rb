@@ -15,6 +15,7 @@ module ETL
       aa = create_or_update_by_fr_id(ds, aa_data[:id], attrs) do |obj|
         obj.entity_descriptor = ed
         obj.organization = ed.organization
+        add_aa_tag(ed)
       end
       aa_saml_core(aa, aa_data)
     end
@@ -24,6 +25,14 @@ module ETL
         created_at: Time.parse(aa_data[:created_at]),
         enabled: aa_data[:functioning]
       }
+    end
+
+    def add_aa_tag(ed)
+      if ed.idp_sso_descriptors.empty?
+        ed.known_entity.add_tag(Tag.new(name: 'standalone-aa'))
+      else
+        ed.known_entity.add_tag(Tag.new(name: 'aa'))
+      end
     end
 
     def aa_saml_core(aa, aa_data)
@@ -38,7 +47,7 @@ module ETL
     end
 
     def extract_aa_data(aa_data)
-      if aa_data[:saml][:extract_metadata_from_idp_sso_descriptor]
+      if standalone_aa?(aa_data)
         extract_aa_data_idp(aa_data)
       else
         fail 'Does not support AA (even standalone) who do not derive from IdP'
@@ -64,6 +73,10 @@ module ETL
                                binding: attrs_data[:binding][:uri])
         aa.add_attribute_service(attrs)
       end
+    end
+
+    def standalone_aa?(aa_data)
+      aa_data[:saml][:extract_metadata_from_idp_sso_descriptor]
     end
   end
 end
