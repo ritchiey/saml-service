@@ -1,6 +1,8 @@
 FactoryGirl.define do
   factory :tag do
-    name { Faker::Lorem.word }
+    sequence :name do |n|
+      "#{Faker::Lorem.word}-#{n}"
+    end
     association :known_entity
   end
 

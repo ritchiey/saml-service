@@ -82,4 +82,12 @@ RSpec.describe RawEntityDescriptor do
       end
     end
   end
+
+  describe '#destroy' do
+    subject { create :raw_entity_descriptor }
+
+    it 'is successfully destroyed' do
+      expect { subject.destroy }.not_to raise_error
+    end
+  end
 end

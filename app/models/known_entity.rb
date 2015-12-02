@@ -7,6 +7,10 @@ class KnownEntity < Sequel::Model
 
   one_to_many :tags
 
+  plugin :association_dependencies, entity_descriptor: :destroy,
+                                    raw_entity_descriptor: :destroy,
+                                    tags: :destroy
+
   alias_method :active?, :active
 
   def validate

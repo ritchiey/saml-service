@@ -19,4 +19,31 @@ RSpec.describe KnownEntity do
       end
     end
   end
+
+  describe '#destroy' do
+    context 'with tags' do
+      subject { create :known_entity }
+      before { create_list :tag, 5, known_entity: subject }
+
+      it 'is successfully destroyed' do
+        expect { subject.destroy }.not_to raise_error
+      end
+    end
+
+    context 'with entity_descriptor' do
+      subject { create :known_entity, :with_idp }
+
+      it 'is successfully destroyed' do
+        expect { subject.destroy }.not_to raise_error
+      end
+    end
+
+    context 'with raw_entity_descriptor' do
+      subject { create :known_entity, :with_raw_entity_descriptor }
+
+      it 'is successfully destroyed' do
+        expect { subject.destroy }.not_to raise_error
+      end
+    end
+  end
 end
