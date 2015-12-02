@@ -22,16 +22,14 @@ module API
       sp_sso_descriptors: {
         ui_info: %i(logos descriptions display_names information_urls
                     privacy_statement_urls),
-        discovery_response_services: [],
-        tags: []
+        discovery_response_services: []
       }
     )
 
     IDP_EAGER_FETCH = COMMON_EAGER_FETCH.merge(
       idp_sso_descriptors: {
         ui_info: %i(logos descriptions display_names),
-        disco_hints: %i(geolocation_hints domain_hints),
-        tags: []
+        disco_hints: %i(geolocation_hints domain_hints)
       }
     )
 

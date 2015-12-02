@@ -256,6 +256,17 @@ Sequel.migration do
       index [:sso_descriptor_id], :name=>:sso_slo_fkey
     end
     
+    create_table(:tags) do
+      primary_key :id, :type=>"int(11)"
+      column :name, "varchar(255)", :null=>false
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      foreign_key :known_entity_id, :known_entities, :type=>"int(11)", :key=>[:id]
+      
+      index [:known_entity_id], :name=>:known_entity_id
+      index [:name, :known_entity_id], :name=>:name_known_entity_id_un, :unique=>true
+    end
+    
     create_table(:additional_metadata_locations) do
       primary_key :id, :type=>"int(11)"
       column :uri, "varchar(255)", :null=>false
@@ -520,20 +531,6 @@ Sequel.migration do
       foreign_key :idp_sso_descriptor_id, :idp_sso_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
       
       index [:idp_sso_descriptor_id], :name=>:idp_ssos_fkey
-    end
-    
-    create_table(:tags) do
-      primary_key :id, :type=>"int(11)"
-      column :name, "varchar(255)", :null=>false
-      foreign_key :role_descriptor_id, :role_descriptors, :type=>"int(11)", :key=>[:id]
-      column :created_at, "datetime"
-      column :updated_at, "datetime"
-      foreign_key :known_entity_id, :known_entities, :type=>"int(11)", :key=>[:id]
-      
-      index [:known_entity_id], :name=>:known_entity_id
-      index [:name, :known_entity_id], :name=>:name_known_entity_id_un, :unique=>true
-      index [:name, :role_descriptor_id], :name=>:name_role_descriptor_id_un, :unique=>true
-      index [:role_descriptor_id], :name=>:role_descriptor_id
     end
     
     create_table(:ui_infos) do
@@ -837,5 +834,6 @@ self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151029042723_ad
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151116230223_add_fingerprint_to_keypairs.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151117041822_add_unique_key_to_metadata_instance_primary_tag.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151123000127_alter_kd_to_ki_relationship.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151202040537_remove_role_descriptor_from_tags.rb')"
                 end
               end
