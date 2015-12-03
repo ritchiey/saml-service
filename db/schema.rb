@@ -63,6 +63,8 @@ Sequel.migration do
       column :certificate, "varchar(4096)", :null=>false
       column :key, "varchar(4096)", :null=>false
       column :fingerprint, "varchar(40)"
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
       
       index [:fingerprint], :unique=>true
     end
@@ -835,5 +837,6 @@ self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151116230223_ad
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151117041822_add_unique_key_to_metadata_instance_primary_tag.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151123000127_alter_kd_to_ki_relationship.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151202040537_remove_role_descriptor_from_tags.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151203020409_add_timestamps_to_keypair.rb')"
                 end
               end
