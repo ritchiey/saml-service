@@ -3,7 +3,7 @@ FactoryGirl.define do
     transient { hostname { "e.#{Faker::Internet.domain_name}" } }
 
     association :entity_source
-    active true
+    enabled true
 
     trait :with_idp do
       after(:create) do |ke|

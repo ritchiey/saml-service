@@ -66,11 +66,11 @@ RSpec.describe ConfigureCLI do
           .to change(FederationRegistrySource, :count).by(1)
       end
 
-      it 'creates an active EntitySource' do
+      it 'creates an enabled EntitySource' do
         expect { run }
           .to change(EntitySource, :count).by(1)
 
-        expect(EntitySource.last).to have_attributes(active: true, rank: 10)
+        expect(EntitySource.last).to have_attributes(enabled: true, rank: 10)
       end
 
       it 'sets the correct registration attributes on the new source' do

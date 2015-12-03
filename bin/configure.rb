@@ -80,7 +80,7 @@ class ConfigureCLI < Thor
 
   def new_federation_registry_source
     FederationRegistrySource.new do |source|
-      source.entity_source = EntitySource.create(active: true, rank: 10)
+      source.entity_source = EntitySource.create(enabled: true, rank: 10)
     end
   end
 

@@ -32,7 +32,7 @@ module ETL
     end
 
     def known_entity(ed_data)
-      KnownEntity.create(entity_source: source, active: ed_data[:active])
+      KnownEntity.create(entity_source: source, enabled: ed_data[:active])
     end
 
     def ed_saml_core(ed, ed_data)

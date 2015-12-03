@@ -11,11 +11,11 @@ class KnownEntity < Sequel::Model
                                     raw_entity_descriptor: :destroy,
                                     tags: :destroy
 
-  alias_method :active?, :active
+  alias_method :enabled?, :enabled
 
   def validate
     super
-    validates_presence [:entity_source, :active, :created_at, :updated_at]
+    validates_presence [:entity_source, :enabled, :created_at, :updated_at]
   end
 
   def self.with_any_tag(tags)

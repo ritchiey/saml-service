@@ -3,6 +3,10 @@ require 'rails_helper'
 describe RoleDescriptor do
   it_behaves_like 'a basic model'
 
+  context 'deprecated structure' do
+    it { is_expected.not_to have_column :active }
+  end
+
   context 'validations' do
     it { is_expected.to validate_presence :entity_descriptor }
     it { is_expected.to have_many_to_one :entity_descriptor }

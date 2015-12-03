@@ -38,7 +38,7 @@ Sequel.migration do
     create_table(:entity_sources) do
       primary_key :id, :type=>"int(11)"
       column :rank, "int(11)", :null=>false
-      column :active, "tinyint(1)", :null=>false
+      column :enabled, "tinyint(1)", :null=>false
       column :created_at, "datetime", :null=>false
       column :updated_at, "datetime", :null=>false
       column :url, "varchar(255)"
@@ -71,7 +71,7 @@ Sequel.migration do
     
     create_table(:known_entities) do
       primary_key :id, :type=>"int(11)"
-      column :active, "tinyint(1)", :null=>false
+      column :enabled, "tinyint(1)", :null=>false
       column :entity_source_id, "int(11)", :null=>false
       column :created_at, "datetime", :null=>false
       column :updated_at, "datetime", :null=>false
@@ -353,7 +353,6 @@ Sequel.migration do
       foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
       foreign_key :organization_id, :organizations, :type=>"int(11)", :key=>[:id]
       column :error_url, "varchar(255)"
-      column :active, "tinyint(1)"
       column :extensions, "text"
       column :created_at, "datetime"
       column :updated_at, "datetime"
@@ -838,5 +837,7 @@ self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151117041822_ad
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151123000127_alter_kd_to_ki_relationship.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151202040537_remove_role_descriptor_from_tags.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151203020409_add_timestamps_to_keypair.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151203023101_remove_active_from_role_descriptor.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151203025816_rename_active_to_enabled.rb')"
                 end
               end

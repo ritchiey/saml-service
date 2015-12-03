@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :entity_source do
-    active true
+    enabled true
     rank { (Time.now.to_f * 1000).to_i }
 
     trait :external do
