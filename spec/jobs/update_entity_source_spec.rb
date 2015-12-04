@@ -26,9 +26,9 @@ RSpec.describe UpdateEntitySource do
     described_class.perform(id: subject.id, primary_tag: federation_tag)
   end
 
-  def entity_descriptors(entities:)
+  def entity_descriptors(entities:, type:)
     fragments = (1..entities).map do
-      attributes_for(:raw_entity_descriptor)[:xml]
+      attributes_for(type)[:xml]
       .gsub('xmlns="urn:oasis:names:tc:SAML:2.0:metadata"', '')
       .strip
     end
@@ -61,13 +61,13 @@ RSpec.describe UpdateEntitySource do
     </ds:Signature>
   EOF
 
-  def entities_descriptor(fore: nil, entities:)
+  def entities_descriptor(fore: nil, entities:, type: :raw_entity_descriptor)
     [
       '<EntitiesDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" ',
       'ID="_x">',
       EMPTY_SIGNATURE.indent(2),
       fore,
-      entity_descriptors(entities: entities).indent(2),
+      entity_descriptors(entities: entities, type: type).indent(2),
       '</EntitiesDescriptor>'
     ].compact.join("\n")
   end
@@ -104,6 +104,51 @@ RSpec.describe UpdateEntitySource do
       run
       expect(subject.known_entities.last.raw_entity_descriptor.xml)
         .to eq(Nokogiri::XML.parse(xml).root.elements[1].canonicalize)
+    end
+
+    context 'holding only AttributeAuthorityDescriptor' do
+      before { run }
+
+      it 'indicates it is a standalone attribute authority' do
+        expect(subject.known_entities.last.raw_entity_descriptor.standalone_aa)
+          .to be_truthy
+        expect(subject.known_entities.last.raw_entity_descriptor.idp)
+          .to be_falsey
+        expect(subject.known_entities.last.raw_entity_descriptor.sp)
+          .to be_falsey
+      end
+    end
+
+    context 'holding an IDPSSODescriptor' do
+      let(:xml) do
+        entities_descriptor(entities: 1, type: :raw_entity_descriptor_idp)
+      end
+      before { run }
+
+      it 'indicates it is an IdP' do
+        expect(subject.known_entities.last.raw_entity_descriptor.idp)
+          .to be_truthy
+        expect(subject.known_entities.last.raw_entity_descriptor.standalone_aa)
+          .to be_falsey
+        expect(subject.known_entities.last.raw_entity_descriptor.sp)
+          .to be_falsey
+      end
+    end
+
+    context 'holding an SPSSODescriptor' do
+      let(:xml) do
+        entities_descriptor(entities: 1, type: :raw_entity_descriptor_sp)
+      end
+      before { run }
+
+      it 'indicates it is an SP' do
+        expect(subject.known_entities.last.raw_entity_descriptor.sp)
+          .to be_truthy
+        expect(subject.known_entities.last.raw_entity_descriptor.idp)
+          .to be_falsey
+        expect(subject.known_entities.last.raw_entity_descriptor.standalone_aa)
+          .to be_falsey
+      end
     end
 
     context 'when the entity already exists' do
