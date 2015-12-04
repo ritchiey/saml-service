@@ -274,53 +274,6 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
     end
   end
 
-  shared_examples 'updating a RoleDescriptor' do
-    it 're-uses contact instances' do
-      expect { run }.not_to change { Contact.count }
-    end
-
-    it 'updates contact people' do
-      expect { run }
-        .to change { subject.entity_descriptor.reload.contact_people }
-    end
-
-    it 'updates protocol supports' do
-      expect { run }.to change { subject.reload.protocol_supports }
-    end
-
-    it 'updates key descriptors' do
-      expect { run }.to change { subject.reload.key_descriptors }
-    end
-
-    it 'updates mdui display_names' do
-      expect { run }.to change { subject.reload.ui_info.display_names }
-    end
-
-    it 'updates mdui descriptions' do
-      expect { run }.to change { subject.reload.ui_info.descriptions }
-    end
-  end
-
-  shared_examples 'updating an SSODescriptor' do
-    include_examples 'updating a RoleDescriptor'
-
-    it 'updates name id formats' do
-      expect { run }.to change { subject.reload.name_id_formats }
-    end
-
-    it 'updates artifact resolution services' do
-      expect { run }.to change { subject.reload.artifact_resolution_services }
-    end
-
-    it 'updates single_logout_services' do
-      expect { run }.to change { subject.reload.single_logout_services }
-    end
-
-    it 'updates manage name id services' do
-      expect { run }.to change { subject.reload.manage_name_id_services }
-    end
-  end
-
   context 'updating an IDPSSODescriptor' do
     let(:source_idp) { identity_provider_instances.first }
     let(:idp_count) { 1 }

@@ -75,4 +75,5 @@ RSpec.describe UpdateFromFederationRegistry do
   it_behaves_like 'ETL::EntityDescriptors'
   it_behaves_like 'ETL::IdentityProviders'
   it_behaves_like 'ETL::AttributeAuthorities'
+  it_behaves_like 'ETL::ServiceProviders'
 end
