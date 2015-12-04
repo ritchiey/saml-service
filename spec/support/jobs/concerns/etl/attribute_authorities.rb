@@ -1,8 +1,8 @@
-RSpec.shared_examples 'ETL::IdentityProviders' do
+RSpec.shared_examples 'ETL::AttributeAuthorities' do
   include_examples 'ETL::Common'
 
   # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
-  def create_json(idp)
+  def create_idp_json(idp)
     {
       id: idp.id,
       display_name: Faker::Lorem.sentence,
@@ -47,6 +47,22 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
       }
     }
   end
+
+  def create_aa_json(idp, aa)
+    {
+      id: aa.id,
+      display_name: Faker::Lorem.sentence,
+      description: Faker::Lorem.sentence,
+      functioning: aa.functioning?,
+      created_at: idp_created_at,
+      saml: {
+        extract_metadata_from_idp_sso_descriptor: true,
+        attribute_services:
+          aa.attribute_services.map { |as| endpoint_json(as) },
+        idp_sso_descriptor: idp.id
+      }
+    }
+  end
   # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
 
   def attribute_json(a)
@@ -74,7 +90,7 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
 
   def run
     described_class.new(id: fr_source.id, primary_tag: federation_tag)
-      .identity_providers(entity_descriptor, ed_data)
+      .attribute_authorities(entity_descriptor, ed_data)
   end
 
   let(:identity_provider_instances) do
@@ -94,10 +110,22 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
   end
 
   let(:identity_providers_list) do
-    identity_provider_instances.map { |idp| create_json(idp) }
+    identity_provider_instances.map { |idp| create_idp_json(idp) }
   end
 
   let(:identity_providers) { identity_providers_list }
+
+  let(:attribute_authorities_instances) do
+    create_list(:attribute_authority_descriptor, aa_count)
+  end
+
+  let(:attribute_authorities_list) do
+    attribute_authorities_instances.map do |aa|
+      create_aa_json(identity_provider_instances.first, aa)
+    end
+  end
+
+  let(:attribute_authorities) { attribute_authorities_list }
 
   let(:idp_created_at) { Time.at(rand(Time.now.utc.to_i)) }
 
@@ -125,6 +153,10 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
         identity_providers:
           identity_provider_instances.map do |idp|
             { id: idp.id, functioning: idp.functioning? }
+          end,
+        attribute_authorities:
+          attribute_authorities_instances.map do |aa|
+            { id: aa.id, functioning: aa.functioning? }
           end
       }
     }
@@ -136,18 +168,28 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
 
     stub_fr_request(:attributes)
     stub_fr_request(:identity_providers)
+    stub_fr_request(:attribute_authorities)
   end
 
-  context 'creating an IDPSSODescriptor' do
+  context 'creating an AttributeAuthorityDescriptor' do
     let(:source_idp) { identity_provider_instances.first }
+    let(:source_aa) { attribute_authorities_instances.first }
+
     let(:idp_count) { 1 }
+    let(:aa_count) { 1 }
     let(:contact_count) { 1 }
     let(:attribute_count) { 3 }
 
-    subject { IDPSSODescriptor.last }
+    subject { AttributeAuthorityDescriptor.last }
 
     it 'creates a new instance' do
-      expect { run }.to change { IDPSSODescriptor.count }.by(idp_count)
+      expect { run }
+        .to change { AttributeAuthorityDescriptor.count }.by(aa_count)
+    end
+
+    it 'the instance is valid' do
+      run
+      expect(AttributeAuthorityDescriptor.last).to be_valid
     end
 
     context 'created instance' do
@@ -156,11 +198,8 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
       context 'correct attributes' do
         verify(created_at: -> { idp_created_at },
                updated_at: -> { truncated_now },
-               error_url: -> { source_idp.error_url },
-               want_authn_requests_signed:
-                 -> { source_idp.want_authn_requests_signed })
+               error_url: -> { source_idp.error_url })
       end
-
       context 'scopes' do
         it 'sets a scope' do
           expect(subject.scopes.size).to eq(1)
@@ -182,20 +221,6 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
           it 'sets regex to true' do
             expect(subject.scopes.first.regexp).to be
           end
-        end
-      end
-
-      context 'single_sign_on_services' do
-        include_examples 'endpoint' do
-          let(:target) { subject.single_sign_on_services }
-          let(:source) { source_idp.single_sign_on_services }
-        end
-      end
-
-      context 'name_id_mapping_services' do
-        include_examples 'endpoint' do
-          let(:target) { subject.name_id_mapping_services }
-          let(:source) { source_idp.name_id_mapping_services }
         end
       end
 
@@ -251,99 +276,35 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
         end
       end
 
-      context 'artifact resolution services' do
-        include_examples 'indexed_endpoint' do
-          let(:target) { subject.artifact_resolution_services }
-          let(:source) { source_idp.artifact_resolution_services }
-        end
-      end
-
-      context 'single logout services' do
+      context 'attribute_services' do
         include_examples 'endpoint' do
-          let(:target) { subject.single_logout_services }
-          let(:source) { source_idp.single_logout_services }
-        end
-      end
-
-      context 'manage nameid services' do
-        include_examples 'endpoint' do
-          let(:target) { subject.manage_name_id_services }
-          let(:source) { source_idp.manage_name_id_services }
+          let(:target) { subject.attribute_services }
+          let(:source) { source_aa.attribute_services }
         end
       end
     end
   end
 
-  shared_examples 'updating a RoleDescriptor' do
-    it 're-uses contact instances' do
-      expect { run }.not_to change { Contact.count }
-    end
-
-    it 'updates contact people' do
-      expect { run }
-        .to change { subject.entity_descriptor.reload.contact_people }
-    end
-
-    it 'updates protocol supports' do
-      expect { run }.to change { subject.reload.protocol_supports }
-    end
-
-    it 'updates key descriptors' do
-      expect { run }.to change { subject.reload.key_descriptors }
-    end
-
-    it 'updates mdui display_names' do
-      expect { run }.to change { subject.reload.ui_info.display_names }
-    end
-
-    it 'updates mdui descriptions' do
-      expect { run }.to change { subject.reload.ui_info.descriptions }
-    end
-  end
-
-  shared_examples 'updating an SSODescriptor' do
-    include_examples 'updating a RoleDescriptor'
-
-    it 'updates name id formats' do
-      expect { run }.to change { subject.reload.name_id_formats }
-    end
-
-    it 'updates artifact resolution services' do
-      expect { run }.to change { subject.reload.artifact_resolution_services }
-    end
-
-    it 'updates single_logout_services' do
-      expect { run }.to change { subject.reload.single_logout_services }
-    end
-
-    it 'updates manage name id services' do
-      expect { run }.to change { subject.reload.manage_name_id_services }
-    end
-  end
-
-  context 'updating an IDPSSODescriptor' do
+  context 'updating an AttributeAuthorityDescriptor' do
     let(:source_idp) { identity_provider_instances.first }
+    let(:source_aa) { attribute_authorities_instances.first }
     let(:idp_count) { 1 }
+    let(:aa_count) { 1 }
     let(:contact_count) { 1 }
     let(:attribute_count) { 3 }
 
-    subject { IDPSSODescriptor.last }
+    subject { AttributeAuthorityDescriptor.last }
 
     before { run }
 
-    include_examples 'updating an SSODescriptor'
-    include_examples 'updating MDUI content'
+    include_examples 'updating a RoleDescriptor'
 
     it 'uses the existing instance' do
       expect { run }.not_to change { IDPSSODescriptor.count }
     end
 
-    it 'updates single sign on services' do
-      expect { run }.to change { subject.reload.single_sign_on_services }
-    end
-
-    it 'updates name id mapping services' do
-      expect { run }.to change { subject.reload.name_id_mapping_services }
+    it 'updates attribute services' do
+      expect { run }.to change { subject.reload.attribute_services }
     end
 
     it 'updates assertion id request services' do
