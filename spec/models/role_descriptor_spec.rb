@@ -2,7 +2,10 @@ require 'rails_helper'
 
 describe RoleDescriptor do
   it_behaves_like 'a basic model'
-  it_behaves_like 'a taggable model', :role_descriptor_tag, :role_descriptor
+
+  context 'deprecated structure' do
+    it { is_expected.not_to have_column :active }
+  end
 
   context 'validations' do
     it { is_expected.to validate_presence :entity_descriptor }
@@ -20,7 +23,6 @@ describe RoleDescriptor do
     it { is_expected.to have_one_to_many :key_descriptors }
     it { is_expected.to have_one_to_many :contact_people }
     it { is_expected.to have_one_to_many :scopes }
-    it { is_expected.to have_one_to_many :tags }
     it { is_expected.to have_column :extensions, type: :text }
 
     it { is_expected.to have_one_to_one :ui_info }

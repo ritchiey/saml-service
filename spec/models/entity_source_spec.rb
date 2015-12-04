@@ -17,7 +17,7 @@ RSpec.describe EntitySource do
   it { is_expected.to validate_presence(:rank) }
   it { is_expected.to validate_integer(:rank) }
   it { is_expected.to validate_unique(:rank) }
-  it { is_expected.to validate_presence(:active) }
+  it { is_expected.to validate_presence(:enabled) }
   it { is_expected.not_to validate_presence(:url) }
   it { is_expected.not_to validate_presence(:certificate) }
 

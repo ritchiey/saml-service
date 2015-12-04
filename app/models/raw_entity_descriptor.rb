@@ -7,6 +7,8 @@ class RawEntityDescriptor < Sequel::Model
 
   one_to_one :entity_id
 
+  plugin :association_dependencies, entity_id: :destroy
+
   def validate
     super
     validates_presence [:known_entity, :xml, :created_at, :updated_at]

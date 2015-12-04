@@ -6,7 +6,6 @@ class RoleDescriptor < Sequel::Model
   one_to_many :key_descriptors
   one_to_many :contact_people
   one_to_many :scopes, class: 'SHIBMD::Scope'
-  one_to_many :tags
 
   one_to_one :ui_info, class: 'MDUI::UIInfo'
 
@@ -43,18 +42,6 @@ class RoleDescriptor < Sequel::Model
 
   def scopes?
     scopes.present?
-  end
-
-  def self.with_any_tag(tags)
-    join_tags(tags).all
-  end
-
-  def self.with_all_tags(tags)
-    join_tags(tags).having { "count(*) = #{[tags].flatten.length}" }.all
-  end
-
-  def self.join_tags(tags)
-    join(:tags, role_descriptor_id: :id, name: tags).group(:role_descriptor_id)
   end
 
   def edugain_compliant?

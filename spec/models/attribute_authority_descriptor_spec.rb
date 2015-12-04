@@ -1,8 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe AttributeAuthorityDescriptor, type: :model do
-  it_behaves_like 'a taggable model', :role_descriptor_tag, :role_descriptor
-
   context 'Extends RoleDescriptor' do
     it { is_expected.to have_one_to_many :attribute_services }
     it { is_expected.to have_one_to_many :assertion_id_request_services }

@@ -95,9 +95,9 @@ RSpec.describe UpdateEntitySource do
       expect(subject.known_entities.last.entity_id).to eq(entity_id)
     end
 
-    it 'sets the raw entity descriptor as active' do
+    it 'sets the raw entity descriptor as enabled' do
       run
-      expect(subject.known_entities.last).to be_active
+      expect(subject.known_entities.last).to be_enabled
     end
 
     it 'sets the xml for the raw entity descriptor' do
@@ -108,7 +108,7 @@ RSpec.describe UpdateEntitySource do
 
     context 'when the entity already exists' do
       let!(:entity) do
-        create :known_entity, entity_source: subject, active: true
+        create :known_entity, entity_source: subject, enabled: true
       end
 
       context 'when the raw entity descriptor already exists' do
@@ -170,9 +170,9 @@ RSpec.describe UpdateEntitySource do
         .to contain_exactly(*entity_ids)
     end
 
-    it 'sets the raw entity descriptors as active' do
+    it 'sets the raw entity descriptors as enabled' do
       run
-      expect(subject.known_entities).to all(be_active)
+      expect(subject.known_entities).to all(be_enabled)
     end
 
     it 'sets the xml for the raw entity descriptors' do
@@ -207,7 +207,7 @@ RSpec.describe UpdateEntitySource do
     end
 
     let!(:other_entity) do
-      create :known_entity, entity_source: subject, active: true
+      create :known_entity, entity_source: subject, enabled: true
     end
 
     let!(:other_red) do

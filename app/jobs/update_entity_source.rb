@@ -64,7 +64,7 @@ class UpdateEntitySource
     entity_id = EntityId.find(uri: node['entityID'])
     return entity_id.parent.known_entity if entity_id
 
-    ke = KnownEntity.create(entity_source: source, active: true)
+    ke = KnownEntity.create(entity_source: source, enabled: true)
     ke.add_tag(Tag.new(name: primary_tag))
     ke
   end

@@ -192,6 +192,11 @@ RSpec.shared_examples 'ETL::AttributeAuthorities' do
       expect(AttributeAuthorityDescriptor.last).to be_valid
     end
 
+    it 'creates a new tag' do
+      expect { run }
+        .to change { Tag.count }.by(1)
+    end
+
     context 'created instance' do
       before { run }
 
@@ -300,7 +305,11 @@ RSpec.shared_examples 'ETL::AttributeAuthorities' do
     include_examples 'updating a RoleDescriptor'
 
     it 'uses the existing instance' do
-      expect { run }.not_to change { IDPSSODescriptor.count }
+      expect { run }.not_to change { AttributeAuthorityDescriptor.count }
+    end
+
+    it 'does not create more tags' do
+      expect { run }.not_to change { Tag.count }
     end
 
     it 'updates attribute services' do

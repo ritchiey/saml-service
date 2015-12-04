@@ -5,11 +5,16 @@ module ETL
     def identity_providers(ed, ed_data)
       ed_data[:saml][:identity_providers].each do |idp_ref|
         idp_data = fr_identity_providers[idp_ref[:id]]
-        next unless idp_data[:saml][:single_sign_on_services].count > 0
-        next if idp_data[:attribute_authority_only]
+        next unless process_idp?(idp_data)
 
         create_or_update_idp(ed, IDPSSODescriptor.dataset, idp_data)
       end
+    end
+
+    def process_idp?(idp_data)
+      !idp_data[:saml].key?(:single_sign_on_services) ||
+        idp_data[:saml][:single_sign_on_services].count < 1 ||
+        !idp_data[:attribute_authority_only]
     end
 
     def create_or_update_idp(ed, ds, idp_data)
@@ -17,6 +22,7 @@ module ETL
       idp = create_or_update_by_fr_id(ds, idp_data[:id], attrs) do |obj|
         obj.entity_descriptor = ed
         obj.organization = ed.organization
+        ed.known_entity.add_tag(Tag.new(name: 'idp'))
       end
 
       idp_saml_core(idp, idp_data)

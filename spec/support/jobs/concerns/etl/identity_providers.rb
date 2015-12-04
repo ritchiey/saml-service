@@ -150,6 +150,11 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
       expect { run }.to change { IDPSSODescriptor.count }.by(idp_count)
     end
 
+    it 'creates a new tag' do
+      expect { run }
+        .to change { Tag.count }.by(1)
+    end
+
     context 'created instance' do
       before { run }
 
@@ -289,6 +294,10 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
 
     it 'uses the existing instance' do
       expect { run }.not_to change { IDPSSODescriptor.count }
+    end
+
+    it 'does not create more tags' do
+      expect { run }.not_to change { Tag.count }
     end
 
     it 'updates single sign on services' do
