@@ -11,6 +11,10 @@ RSpec.describe RawEntityDescriptor do
   it { is_expected.to validate_presence(:known_entity) }
   it { is_expected.to validate_unique(:known_entity) }
 
+  it { is_expected.to respond_to(:idp?) }
+  it { is_expected.to respond_to(:sp?) }
+  it { is_expected.to respond_to(:standalone_aa?) }
+
   context 'xml validation' do
     subject { build(:raw_entity_descriptor) }
 
