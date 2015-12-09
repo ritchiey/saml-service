@@ -94,4 +94,70 @@ RSpec.describe RawEntityDescriptor do
       expect { subject.destroy }.not_to raise_error
     end
   end
+
+  describe '#ui_info' do
+    subject { create :raw_entity_descriptor }
+
+    it 'populates a hash when ui_info xml content present' do
+      expect(subject.ui_info).not_to be_nil
+    end
+
+    it 'populates MDUI DisplayNames' do
+      expect(subject.ui_info.display_names).to be_present
+      expect(subject.ui_info.display_names).to all(have_key(:lang))
+        .and all(have_key(:value))
+    end
+
+    it 'populates MDUI Description' do
+      expect(subject.ui_info.descriptions).to be_present
+      expect(subject.ui_info.descriptions).to all(have_key(:lang))
+        .and all(have_key(:value))
+    end
+
+    it 'populates MDUI Logo' do
+      expect(subject.ui_info.logos).to be_present
+      expect(subject.ui_info.logos)
+        .to all(have_key(:width))
+        .and all(have_key(:height))
+        .and all(have_key(:uri))
+    end
+
+    it 'populates MDUI Information URL' do
+      expect(subject.ui_info.information_urls).to be_present
+      expect(subject.ui_info.information_urls).to all(have_key(:lang))
+        .and all(have_key(:uri))
+    end
+
+    it 'populates MDUI Privacy Statement URL' do
+      expect(subject.ui_info.privacy_statement_urls).to be_present
+      expect(subject.ui_info.privacy_statement_urls).to all(have_key(:lang))
+        .and all(have_key(:uri))
+    end
+  end
+
+  describe '#disco_hints' do
+    subject { create :raw_entity_descriptor }
+
+    it 'populates a hash when disco_hints xml content present' do
+      expect(subject.disco_hints).not_to be_nil
+    end
+
+    it 'populates IPHints' do
+      expect(subject.disco_hints.ip_hints).to be_present
+      expect(subject.disco_hints.ip_hints).to all(have_key(:block))
+    end
+
+    it 'populates DomainHints' do
+      expect(subject.disco_hints.domain_hints).to be_present
+      expect(subject.disco_hints.domain_hints).to all(have_key(:domain))
+    end
+
+    it 'populates GelocationHints' do
+      expect(subject.disco_hints.geolocation_hints).to be_present
+      expect(subject.disco_hints.geolocation_hints)
+        .to all(have_key(:latitude))
+        .and all(have_key(:longitude))
+        .and all(have_key(:altitude))
+    end
+  end
 end

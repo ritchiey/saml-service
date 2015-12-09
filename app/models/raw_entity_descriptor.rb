@@ -1,7 +1,9 @@
+require 'ostruct'
 require 'metadata/schema'
 
 class RawEntityDescriptor < Sequel::Model
   include Metadata::Schema
+  include RawEntityDescriptorDeconstructor
 
   many_to_one :known_entity
 
