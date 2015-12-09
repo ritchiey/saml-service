@@ -6,6 +6,8 @@ RSpec.describe MDUI::Logo, type: :model do
   it { is_expected.to have_many_to_one :ui_info }
   it { is_expected.to validate_presence :ui_info }
   it { is_expected.to validate_presence :uri }
+  it { is_expected.to validate_presence :width }
+  it { is_expected.to validate_presence :height }
 
   subject { create :mdui_logo }
   describe '#width' do

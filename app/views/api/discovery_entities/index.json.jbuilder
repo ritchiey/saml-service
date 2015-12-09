@@ -5,12 +5,19 @@ def insert_localized_url(json, obj)
   json.lang obj.lang
 end
 
+def insert_logo(json, obj)
+  json.url obj.uri
+  json.lang obj.lang
+  json.width obj.width
+  json.height obj.height
+end
+
 def insert_ui_info(json, ui_info)
   display_names = ui_info.try(:display_names) || []
   json.names(display_names, :value, :lang)
 
   logos = ui_info.try(:logos) || []
-  json.logos(logos) { |logo| insert_localized_url(json, logo) }
+  json.logos(logos) { |logo| insert_logo(json, logo) }
 
   descriptions = ui_info.try(:descriptions) || []
   json.descriptions(descriptions, :value, :lang)
