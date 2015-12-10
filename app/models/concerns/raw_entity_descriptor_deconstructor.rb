@@ -32,6 +32,18 @@ module RawEntityDescriptorDeconstructor
     disco_hints
   end
 
+  def discovery_response_services
+    doc = Nokogiri::XML.parse(xml)
+    discovery_response_node = doc.xpath(DISCOVERY_RESPONSE_PATH)
+    return unless discovery_response_node.present?
+
+    discovery_response_services = []
+    extract_discovery_response_services(discovery_response_node,
+                                        discovery_response_services)
+
+    discovery_response_services
+  end
+
   private
 
   def display_names(ui_info_node, ui_info)
@@ -98,6 +110,17 @@ module RawEntityDescriptorDeconstructor
     URI.parse(uri).opaque.split(',', 3)
   end
 
+  def extract_discovery_response_services(discovery_response_node,
+                                          discovery_response_services)
+    discovery_response_node.xpath(DISCOVERY_RESPONSE_PATH).each do |ds|
+      discovery_response_services << {
+        location: ds.attributes['Location'].value,
+        index: ds.attributes['index'].value,
+        is_default: ds.attributes['isDefault'].value
+      }
+    end
+  end
+
   UI_INFO_PATH =
     '//*[local-name() = "UIInfo" and ' \
     'namespace-uri() = "urn:oasis:names:tc:SAML:metadata:ui"]'
@@ -157,5 +180,12 @@ module RawEntityDescriptorDeconstructor
     'namespace-uri() = "urn:oasis:names:tc:SAML:metadata:ui"]'
     .freeze
   private_constant :DISCO_HINTS_GEOLOCATION_HINT_PATH
+
+  DISCOVERY_RESPONSE_PATH =
+    '//*[local-name() = "DiscoveryResponse" and ' \
+    'namespace-uri() = ' \
+    '"urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol"]'
+    .freeze
+  private_constant :DISCOVERY_RESPONSE_PATH
 end
 # rubocop:enable Metrics/ModuleLength

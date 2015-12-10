@@ -160,4 +160,16 @@ RSpec.describe RawEntityDescriptor do
         .and all(have_key(:altitude))
     end
   end
+
+  describe '#disco_hints' do
+    subject { create :raw_entity_descriptor_sp }
+
+    it 'populates an array when discovery_response xml content present' do
+      expect(subject.discovery_response_services).to be_present
+      expect(subject.discovery_response_services)
+        .to all(have_key(:location))
+        .and all(have_key(:index))
+        .and all(have_key(:is_default))
+    end
+  end
 end

@@ -54,10 +54,38 @@ FactoryGirl.define do
     end
 
     factory :raw_entity_descriptor_idp do
+      idp true
       xml do
         <<-EOF.strip_heredoc
           <EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata"
-              entityID="#{entity_id_uri}">
+            xmlns:mdui="urn:oasis:names:tc:SAML:metadata:ui"
+            entityID="#{entity_id_uri}">
+            <Extensions>
+              <mdui:UIInfo>
+                <mdui:DisplayName xml:lang="en">
+                  #{Faker::Lorem.word}
+                </mdui:DisplayName>
+                <mdui:Description xml:lang="en">
+                  #{Faker::Lorem.sentence}
+                </mdui:Description>
+                <mdui:Logo height="16" width="16">
+                   https://example.edu/img.png
+               </mdui:Logo>
+               <mdui:InformationURL xml:lang="en">
+                  #{Faker::Internet.url}
+                </mdui:InformationURL>
+                <mdui:PrivacyStatementURL xml:lang="en">
+                  #{Faker::Internet.url}
+                </mdui:PrivacyStatementURL>
+              </mdui:UIInfo>
+              <mdui:DiscoHints>
+                <mdui:IPHint>2001:620::0/96</mdui:IPHint>
+                <mdui:DomainHint>example.edu</mdui:DomainHint>
+                <mdui:GeolocationHint>
+                  geo:47.37328,8.531126
+                </mdui:GeolocationHint>
+              </mdui:DiscoHints>
+            </Extensions>
             <IDPSSODescriptor
               protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
               <SingleSignOnService
@@ -70,10 +98,39 @@ FactoryGirl.define do
     end
 
     factory :raw_entity_descriptor_sp do
+      sp true
       xml do
         <<-EOF.strip_heredoc
           <EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata"
-              entityID="#{entity_id_uri}">
+            xmlns:idpdisc=
+              "urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol"
+            xmlns:mdui="urn:oasis:names:tc:SAML:metadata:ui"
+            entityID="#{entity_id_uri}">
+            <Extensions>
+              <idpdisc:DiscoveryResponse
+                Binding=
+                  "urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol"
+                Location=
+                  "https://#{hostname}/Shibboleth.sso/Login"
+                index="1" isDefault="true" />
+              <mdui:UIInfo>
+                <mdui:DisplayName xml:lang="en">
+                  #{Faker::Lorem.word}
+                </mdui:DisplayName>
+                <mdui:Description xml:lang="en">
+                  #{Faker::Lorem.sentence}
+                </mdui:Description>
+                <mdui:Logo height="16" width="16">
+                   https://example.edu/img.png
+               </mdui:Logo>
+               <mdui:InformationURL xml:lang="en">
+                  #{Faker::Internet.url}
+                </mdui:InformationURL>
+                <mdui:PrivacyStatementURL xml:lang="en">
+                  #{Faker::Internet.url}
+                </mdui:PrivacyStatementURL>
+              </mdui:UIInfo>
+            </Extensions>
             <SPSSODescriptor
               protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
               <AssertionConsumerService
