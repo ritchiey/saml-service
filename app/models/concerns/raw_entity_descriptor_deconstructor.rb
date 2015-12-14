@@ -37,11 +37,7 @@ module RawEntityDescriptorDeconstructor
     discovery_response_node = doc.xpath(DISCOVERY_RESPONSE_PATH)
     return unless discovery_response_node.present?
 
-    discovery_response_services = []
-    extract_discovery_response_services(discovery_response_node,
-                                        discovery_response_services)
-
-    discovery_response_services
+    extract_discovery_response_services(discovery_response_node)
   end
 
   private
@@ -110,10 +106,9 @@ module RawEntityDescriptorDeconstructor
     URI.parse(uri).opaque.split(',', 3)
   end
 
-  def extract_discovery_response_services(discovery_response_node,
-                                          discovery_response_services)
-    discovery_response_node.xpath(DISCOVERY_RESPONSE_PATH).each do |ds|
-      discovery_response_services << {
+  def extract_discovery_response_services(discovery_response_node)
+    discovery_response_node.map do |ds|
+      {
         location: ds.attributes['Location'].value,
         index: ds.attributes['index'].value,
         is_default: ds.attributes['isDefault'].value
