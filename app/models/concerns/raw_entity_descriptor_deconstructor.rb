@@ -116,71 +116,40 @@ module RawEntityDescriptorDeconstructor
     end
   end
 
-  UI_INFO_PATH =
-    '//*[local-name() = "UIInfo" and ' \
-    'namespace-uri() = "urn:oasis:names:tc:SAML:metadata:ui"]'
-    .freeze
-  private_constant :UI_INFO_PATH
+  class <<self
+    private
 
-  UI_INFO_DISPLAY_NAME_PATH =
-    './/*[local-name() = "DisplayName" and ' \
-    'namespace-uri() = "urn:oasis:names:tc:SAML:metadata:ui"]'
-    .freeze
-  private_constant :UI_INFO_DISPLAY_NAME_PATH
+    def element_xpath(uri, name)
+      %(.//*[local-name() = "#{name}" and namespace-uri() = "#{uri}"]).freeze
+    end
 
-  UI_INFO_DESCRIPTION_PATH =
-    './/*[local-name() = "Description" and ' \
-    'namespace-uri() = "urn:oasis:names:tc:SAML:metadata:ui"]'
-    .freeze
-  private_constant :UI_INFO_DESCRIPTION_PATH
+    def mdui_element_xpath(name)
+      element_xpath('urn:oasis:names:tc:SAML:metadata:ui', name)
+    end
 
-  UI_INFO_LOGO_PATH =
-    './/*[local-name() = "Logo" and ' \
-    'namespace-uri() = "urn:oasis:names:tc:SAML:metadata:ui"]'
-    .freeze
-  private_constant :UI_INFO_LOGO_PATH
+    def idpdisc_element_xpath(name)
+      uri = 'urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol'
+      element_xpath(uri, name)
+    end
+  end
 
-  UI_INFO_INFORMATION_URL_PATH =
-    './/*[local-name() = "InformationURL" and ' \
-    'namespace-uri() = "urn:oasis:names:tc:SAML:metadata:ui"]'
-    .freeze
-  private_constant :UI_INFO_INFORMATION_URL_PATH
+  UI_INFO_PATH = mdui_element_xpath('UIInfo')
+  UI_INFO_DISPLAY_NAME_PATH = mdui_element_xpath('DisplayName')
+  UI_INFO_DESCRIPTION_PATH = mdui_element_xpath('Description')
+  UI_INFO_LOGO_PATH = mdui_element_xpath('Logo')
+  UI_INFO_INFORMATION_URL_PATH = mdui_element_xpath('InformationURL')
+  UI_INFO_PRIVACY_STATEMENT_URL_PATH = mdui_element_xpath('PrivacyStatementURL')
+  DISCO_HINTS_PATH = mdui_element_xpath('DiscoHints')
+  DISCO_HINTS_IP_HINT_PATH = mdui_element_xpath('IPHint')
+  DISCO_HINTS_DOMAIN_HINT_PATH = mdui_element_xpath('DomainHint')
+  DISCO_HINTS_GEOLOCATION_HINT_PATH = mdui_element_xpath('GeolocationHint')
+  DISCOVERY_RESPONSE_PATH = idpdisc_element_xpath('DiscoveryResponse')
 
-  UI_INFO_PRIVACY_STATEMENT_URL_PATH =
-    './/*[local-name() = "PrivacyStatementURL" and ' \
-    'namespace-uri() = "urn:oasis:names:tc:SAML:metadata:ui"]'
-    .freeze
-  private_constant :UI_INFO_PRIVACY_STATEMENT_URL_PATH
-
-  DISCO_HINTS_PATH =
-    '//*[local-name() = "DiscoHints" and ' \
-    'namespace-uri() = "urn:oasis:names:tc:SAML:metadata:ui"]'
-    .freeze
-  private_constant :DISCO_HINTS_PATH
-
-  DISCO_HINTS_IP_HINT_PATH =
-    '//*[local-name() = "IPHint" and ' \
-    'namespace-uri() = "urn:oasis:names:tc:SAML:metadata:ui"]'
-    .freeze
-  private_constant :DISCO_HINTS_IP_HINT_PATH
-
-  DISCO_HINTS_DOMAIN_HINT_PATH =
-    '//*[local-name() = "DomainHint" and ' \
-    'namespace-uri() = "urn:oasis:names:tc:SAML:metadata:ui"]'
-    .freeze
-  private_constant :DISCO_HINTS_DOMAIN_HINT_PATH
-
-  DISCO_HINTS_GEOLOCATION_HINT_PATH =
-    '//*[local-name() = "GeolocationHint" and ' \
-    'namespace-uri() = "urn:oasis:names:tc:SAML:metadata:ui"]'
-    .freeze
-  private_constant :DISCO_HINTS_GEOLOCATION_HINT_PATH
-
-  DISCOVERY_RESPONSE_PATH =
-    '//*[local-name() = "DiscoveryResponse" and ' \
-    'namespace-uri() = ' \
-    '"urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol"]'
-    .freeze
-  private_constant :DISCOVERY_RESPONSE_PATH
+  private_constant :UI_INFO_PATH, :UI_INFO_DISPLAY_NAME_PATH,
+                   :UI_INFO_DESCRIPTION_PATH, :UI_INFO_LOGO_PATH,
+                   :UI_INFO_INFORMATION_URL_PATH,
+                   :UI_INFO_PRIVACY_STATEMENT_URL_PATH, :DISCO_HINTS_PATH,
+                   :DISCO_HINTS_IP_HINT_PATH, :DISCO_HINTS_DOMAIN_HINT_PATH,
+                   :DISCO_HINTS_GEOLOCATION_HINT_PATH, :DISCOVERY_RESPONSE_PATH
 end
 # rubocop:enable Metrics/ModuleLength
