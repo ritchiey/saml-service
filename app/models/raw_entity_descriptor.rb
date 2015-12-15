@@ -1,13 +1,19 @@
+require 'ostruct'
 require 'metadata/schema'
 
 class RawEntityDescriptor < Sequel::Model
   include Metadata::Schema
+  include RawEntityDescriptorDeconstructor
 
   many_to_one :known_entity
 
   one_to_one :entity_id
 
   plugin :association_dependencies, entity_id: :destroy
+
+  alias_method :idp?, :idp
+  alias_method :sp?, :sp
+  alias_method :standalone_aa?, :standalone_aa
 
   def validate
     super

@@ -9,6 +9,24 @@ class UpdateEntitySource
     .freeze
   private_constant :ENTITY_DESCRIPTOR_XPATH
 
+  IDP_SSO_DESCRIPTOR_XPATH =
+    '//*[local-name() = "IDPSSODescriptor" and ' \
+    'namespace-uri() = "urn:oasis:names:tc:SAML:2.0:metadata"]'
+    .freeze
+  private_constant :IDP_SSO_DESCRIPTOR_XPATH
+
+  ATTRIBUTE_AUTHORITY_DESCRIPTOR_XPATH =
+    '//*[local-name() = "AttributeAuthorityDescriptor" and ' \
+    'namespace-uri() = "urn:oasis:names:tc:SAML:2.0:metadata"]'
+    .freeze
+  private_constant :ATTRIBUTE_AUTHORITY_DESCRIPTOR_XPATH
+
+  SP_SSO_DESCRIPTOR_XPATH =
+    '//*[local-name() = "SPSSODescriptor" and ' \
+    'namespace-uri() = "urn:oasis:names:tc:SAML:2.0:metadata"]'
+    .freeze
+  private_constant :SP_SSO_DESCRIPTOR_XPATH
+
   def self.perform(id:, primary_tag:)
     new.perform(id: id, primary_tag: primary_tag)
   end
@@ -77,6 +95,8 @@ class UpdateEntitySource
                                        xml: node.canonicalize)
       EntityId.create(uri: node['entityID'], raw_entity_descriptor: red)
     end
+
+    indicate_internal_type(entity.raw_entity_descriptor, node)
   end
 
   def sweep(untouched)
@@ -91,5 +111,17 @@ class UpdateEntitySource
     # Changes updated_at timestamp for associated KnownEntity
     # which is used by MDQP for etag generation / caching.
     ke.touch
+  end
+
+  def indicate_internal_type(red, ed_node)
+    red.update(idp: true) if ed_node.xpath(IDP_SSO_DESCRIPTOR_XPATH).present?
+
+    if ed_node.xpath(ATTRIBUTE_AUTHORITY_DESCRIPTOR_XPATH).present? &&
+       !ed_node.xpath(IDP_SSO_DESCRIPTOR_XPATH).present?
+      red.update(standalone_aa: true)
+    end
+
+    return unless ed_node.xpath(SP_SSO_DESCRIPTOR_XPATH).present?
+    red.update(sp: true)
   end
 end

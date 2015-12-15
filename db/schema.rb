@@ -239,6 +239,9 @@ Sequel.migration do
       column :created_at, "datetime", :null=>false
       column :updated_at, "datetime", :null=>false
       column :enabled, "tinyint(1)", :default=>false
+      column :idp, "tinyint(1)", :default=>false
+      column :sp, "tinyint(1)", :default=>false
+      column :standalone_aa, "tinyint(1)", :default=>false
       
       index [:known_entity_id], :unique=>true
     end
@@ -839,5 +842,6 @@ self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151202040537_re
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151203020409_add_timestamps_to_keypair.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151203023101_remove_active_from_role_descriptor.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151203025816_rename_active_to_enabled.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151204023033_add_flags_to_raw_entity_descriptors.rb')"
                 end
               end

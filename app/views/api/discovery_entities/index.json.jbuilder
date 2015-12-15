@@ -5,12 +5,19 @@ def insert_localized_url(json, obj)
   json.lang obj.lang
 end
 
+def insert_logo(json, obj)
+  json.url obj.uri
+  json.lang obj.lang
+  json.width obj.width
+  json.height obj.height
+end
+
 def insert_ui_info(json, ui_info)
   display_names = ui_info.try(:display_names) || []
   json.names(display_names, :value, :lang)
 
   logos = ui_info.try(:logos) || []
-  json.logos(logos) { |logo| insert_localized_url(json, logo) }
+  json.logos(logos) { |logo| insert_logo(json, logo) }
 
   descriptions = ui_info.try(:descriptions) || []
   json.descriptions(descriptions, :value, :lang)
@@ -21,14 +28,19 @@ def insert_tags(json, entity)
   json.tags(tags.uniq)
 end
 
-json.identity_providers(@identity_providers) do |idp|
-  idp_sso_descriptor = idp.idp_sso_descriptors.first
-  ui_info = idp_sso_descriptor.ui_info
-  disco_hints = idp_sso_descriptor.disco_hints
+json.identity_providers(@identity_provider_entities) do |obj|
+  ui_info =
+    obj.try(:idp_sso_descriptors).try(:first).try(:ui_info) ||
+    obj.try(:ui_info) ||
+    []
 
-  json.entity_id(idp.entity_id.uri)
+  disco_hints =
+    obj.try(:idp_sso_descriptors).try(:first).try(:disco_hints) ||
+    obj.try(:disco_hints) || []
 
-  insert_tags(json, idp)
+  json.entity_id(obj.entity_id.uri)
+
+  insert_tags(json, obj)
   insert_ui_info(json, ui_info)
 
   geolocations = disco_hints.try(:geolocation_hints) || []
@@ -38,20 +50,26 @@ json.identity_providers(@identity_providers) do |idp|
   json.domains(domains.map(&:domain))
 end
 
-json.service_providers(@service_providers) do |sp|
-  sp_sso_descriptor = sp.sp_sso_descriptors.first
-  ui_info = sp_sso_descriptor.ui_info
+json.service_providers(@service_provider_entities) do |obj|
+  ui_info =
+    obj.try(:sp_sso_descriptors).try(:first).try(:ui_info) ||
+    obj.try(:ui_info) ||
+    []
 
-  json.entity_id(sp.entity_id.uri)
+  dre =
+    obj.try(:sp_sso_descriptors).try(:first)
+    .try(:discovery_response_services) ||
+    obj.try(:discovery_response_services) ||
+    []
+
+  json.entity_id(obj.entity_id.uri)
 
   discovery_response_endpoints =
-    sp_sso_descriptor.discovery_response_services
-    .sort_by { |e| [e.default? ? 0 : 1, e.id] }
-    .map(&:location)
+    dre.sort_by { |e| [e.default? ? 0 : 1, e.id] }.map(&:location)
   json.discovery_response(discovery_response_endpoints.first)
   json.all_discovery_response_endpoints(discovery_response_endpoints)
 
-  insert_tags(json, sp)
+  insert_tags(json, obj)
   insert_ui_info(json, ui_info)
 
   information_urls = ui_info.try(:information_urls) || []

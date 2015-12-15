@@ -57,7 +57,8 @@ RSpec.describe API::DiscoveryEntitiesController, type: :request do
 
       it 'includes the logo uri' do
         logo = role_descriptor.ui_info.logos.first
-        expect(entry[:logos]).to include(url: logo.uri, lang: logo.lang)
+        expect(entry[:logos]).to include(url: logo.uri, lang: logo.lang,
+                                         width: logo.width, height: logo.height)
       end
 
       it 'includes the descriptions' do

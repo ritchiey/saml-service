@@ -4,8 +4,12 @@ module API
 
     def index
       public_action
-      @identity_providers = identity_providers.select(&:functioning?)
-      @service_providers = service_providers.select(&:functioning?)
+      @identity_provider_entities =
+        ed_containing_idp.select(&:functioning?) +
+        red_containing_idp.select(&:functioning?)
+      @service_provider_entities =
+        ed_containing_sp.select(&:functioning?) +
+        red_containing_sp.select(&:functioning?)
     end
 
     private
@@ -35,14 +39,22 @@ module API
 
     private_constant :SP_EAGER_FETCH, :IDP_EAGER_FETCH
 
-    def service_providers
+    def ed_containing_sp
       entities_with_role_descriptor(:sp_sso_descriptors)
         .eager(SP_EAGER_FETCH).all
     end
 
-    def identity_providers
+    def red_containing_sp
+      RawEntityDescriptor.where(sp: true).eager(known_entity: :tags).all
+    end
+
+    def ed_containing_idp
       entities_with_role_descriptor(:idp_sso_descriptors)
         .eager(IDP_EAGER_FETCH).all
+    end
+
+    def red_containing_idp
+      RawEntityDescriptor.where(idp: true).eager(known_entity: :tags).all
     end
 
     def entities_with_role_descriptor(table)
