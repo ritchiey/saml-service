@@ -41,6 +41,26 @@ def insert_discovery_response_endpoints(json, obj)
   json.all_discovery_response_endpoints(discovery_response_endpoints)
 end
 
+def insert_single_sign_on_endpoints(json, obj)
+  json.single_sign_on_endpoints do
+    insert_single_sign_on_soap_endpoints(json, obj)
+  end
+end
+
+def insert_single_sign_on_soap_endpoints(json, obj)
+  se =
+    obj.try(:idp_sso_descriptors).try(:first)
+    .try(:single_sign_on_services) ||
+    obj.try(:single_sign_on_services) ||
+    []
+
+  sso_soap_endpoints =
+    se.select { |e| e.binding == 'urn:oasis:names:tc:SAML:2.0:bindings:SOAP' }
+    .sort_by(&:id).map(&:location)
+
+  json.soap(sso_soap_endpoints)
+end
+
 json.identity_providers(@identity_provider_entities) do |obj|
   ui_info =
     obj.try(:idp_sso_descriptors).try(:first).try(:ui_info) ||
@@ -55,6 +75,7 @@ json.identity_providers(@identity_provider_entities) do |obj|
 
   insert_tags(json, obj)
   insert_ui_info(json, ui_info)
+  insert_single_sign_on_endpoints(json, obj)
 
   geolocations = disco_hints.try(:geolocation_hints) || []
   json.geolocations(geolocations, :latitude, :longitude, :altitude)
