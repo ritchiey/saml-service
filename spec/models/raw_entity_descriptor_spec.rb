@@ -168,8 +168,20 @@ RSpec.describe RawEntityDescriptor do
       expect(subject.discovery_response_services).to be_present
       expect(subject.discovery_response_services)
         .to all(have_key(:location))
+        .and all(have_key(:binding))
         .and all(have_key(:index))
         .and all(have_key(:is_default))
+    end
+  end
+
+  describe '#single_sign_on_services' do
+    subject { create :raw_entity_descriptor_idp }
+
+    it 'populates an array when single_sign_on_services xml content present' do
+      expect(subject.single_sign_on_services).to be_present
+      expect(subject.single_sign_on_services)
+        .to all(have_key(:location))
+        .and all(have_key(:binding))
     end
   end
 end
