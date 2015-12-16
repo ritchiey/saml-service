@@ -28,6 +28,39 @@ def insert_tags(json, entity)
   json.tags(tags.uniq)
 end
 
+def insert_discovery_response_endpoints(json, obj)
+  dre =
+    obj.try(:sp_sso_descriptors).try(:first)
+    .try(:discovery_response_services) ||
+    obj.try(:discovery_response_services) ||
+    []
+
+  discovery_response_endpoints =
+    dre.sort_by { |e| [e.default? ? 0 : 1, e.id] }.map(&:location)
+  json.discovery_response(discovery_response_endpoints.first)
+  json.all_discovery_response_endpoints(discovery_response_endpoints)
+end
+
+def insert_single_sign_on_endpoints(json, obj)
+  json.single_sign_on_endpoints do
+    insert_single_sign_on_soap_endpoints(json, obj)
+  end
+end
+
+def insert_single_sign_on_soap_endpoints(json, obj)
+  se =
+    obj.try(:idp_sso_descriptors).try(:first)
+    .try(:single_sign_on_services) ||
+    obj.try(:single_sign_on_services) ||
+    []
+
+  sso_soap_endpoints =
+    se.select { |e| e.binding == 'urn:oasis:names:tc:SAML:2.0:bindings:SOAP' }
+    .sort_by(&:id).map(&:location)
+
+  json.soap(sso_soap_endpoints)
+end
+
 json.identity_providers(@identity_provider_entities) do |obj|
   ui_info =
     obj.try(:idp_sso_descriptors).try(:first).try(:ui_info) ||
@@ -42,6 +75,7 @@ json.identity_providers(@identity_provider_entities) do |obj|
 
   insert_tags(json, obj)
   insert_ui_info(json, ui_info)
+  insert_single_sign_on_endpoints(json, obj)
 
   geolocations = disco_hints.try(:geolocation_hints) || []
   json.geolocations(geolocations, :latitude, :longitude, :altitude)
@@ -56,21 +90,11 @@ json.service_providers(@service_provider_entities) do |obj|
     obj.try(:ui_info) ||
     []
 
-  dre =
-    obj.try(:sp_sso_descriptors).try(:first)
-    .try(:discovery_response_services) ||
-    obj.try(:discovery_response_services) ||
-    []
-
   json.entity_id(obj.entity_id.uri)
-
-  discovery_response_endpoints =
-    dre.sort_by { |e| [e.default? ? 0 : 1, e.id] }.map(&:location)
-  json.discovery_response(discovery_response_endpoints.first)
-  json.all_discovery_response_endpoints(discovery_response_endpoints)
 
   insert_tags(json, obj)
   insert_ui_info(json, ui_info)
+  insert_discovery_response_endpoints(json, obj)
 
   information_urls = ui_info.try(:information_urls) || []
   json.information_urls(information_urls) { |o| insert_localized_url(json, o) }

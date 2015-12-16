@@ -115,8 +115,8 @@ RSpec.describe API::DiscoveryEntitiesController, type: :request do
       let!(:identity_providers) { create_list(:entity_descriptor, 1) }
 
       let!(:idp_sso_descriptors) do
-        identity_providers.map do |idp|
-          create(:idp_sso_descriptor, entity_descriptor: idp)
+        identity_providers.map do |ed|
+          create(:idp_sso_descriptor, entity_descriptor: ed)
         end
       end
 
@@ -137,6 +137,30 @@ RSpec.describe API::DiscoveryEntitiesController, type: :request do
       subject { json[:identity_providers] }
 
       it_behaves_like 'a discovery entity'
+
+      context 'with no soap SSO endpoints' do
+        it 'includes an empty list of soap endpoint data' do
+          expect(entry[:single_sign_on_endpoints][:soap]).to eq([])
+        end
+      end
+
+      context 'with soap SSO endpoints' do
+        let(:ecp_location) { Faker::Internet.url }
+        let!(:idp_sso_descriptors) do
+          identity_providers.map do |ed|
+            idp = create(:idp_sso_descriptor, entity_descriptor: ed)
+            SingleSignOnService.create(
+              binding: 'urn:oasis:names:tc:SAML:2.0:bindings:SOAP',
+              location: ecp_location,
+              idp_sso_descriptor: idp)
+          end
+        end
+
+        it 'includes soap endpoints' do
+          expect(entry[:single_sign_on_endpoints][:soap])
+            .to contain_exactly(ecp_location)
+        end
+      end
 
       context 'with no disco hints' do
         it 'includes an empty list of geolocation data' do

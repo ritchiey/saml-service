@@ -40,6 +40,14 @@ module RawEntityDescriptorDeconstructor
     extract_discovery_response_services(discovery_response_node)
   end
 
+  def single_sign_on_services
+    doc = Nokogiri::XML.parse(xml)
+    single_sign_on_services_node = doc.xpath(SINGLE_SIGN_ON_SERVICE_PATH)
+    return unless single_sign_on_services_node.present?
+
+    extract_single_sign_on_services(single_sign_on_services_node)
+  end
+
   private
 
   def display_names(ui_info_node, ui_info)
@@ -110,8 +118,18 @@ module RawEntityDescriptorDeconstructor
     discovery_response_node.map do |ds|
       {
         location: ds.attributes['Location'].value,
+        binding: ds.attributes['Binding'].value,
         index: ds.attributes['index'].value,
         is_default: ds.attributes['isDefault'].value
+      }
+    end
+  end
+
+  def extract_single_sign_on_services(single_sign_on_services_node)
+    single_sign_on_services_node.map do |sso|
+      {
+        location: sso.attributes['Location'].value,
+        binding: sso.attributes['Binding'].value
       }
     end
   end
@@ -131,6 +149,11 @@ module RawEntityDescriptorDeconstructor
       uri = 'urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol'
       element_xpath(uri, name)
     end
+
+    def saml_element_xpath(name)
+      uri = 'urn:oasis:names:tc:SAML:2.0:metadata'
+      element_xpath(uri, name)
+    end
   end
 
   UI_INFO_PATH = mdui_element_xpath('UIInfo')
@@ -144,12 +167,14 @@ module RawEntityDescriptorDeconstructor
   DISCO_HINTS_DOMAIN_HINT_PATH = mdui_element_xpath('DomainHint')
   DISCO_HINTS_GEOLOCATION_HINT_PATH = mdui_element_xpath('GeolocationHint')
   DISCOVERY_RESPONSE_PATH = idpdisc_element_xpath('DiscoveryResponse')
+  SINGLE_SIGN_ON_SERVICE_PATH = saml_element_xpath('SingleSignOnService')
 
   private_constant :UI_INFO_PATH, :UI_INFO_DISPLAY_NAME_PATH,
                    :UI_INFO_DESCRIPTION_PATH, :UI_INFO_LOGO_PATH,
                    :UI_INFO_INFORMATION_URL_PATH,
                    :UI_INFO_PRIVACY_STATEMENT_URL_PATH, :DISCO_HINTS_PATH,
                    :DISCO_HINTS_IP_HINT_PATH, :DISCO_HINTS_DOMAIN_HINT_PATH,
-                   :DISCO_HINTS_GEOLOCATION_HINT_PATH, :DISCOVERY_RESPONSE_PATH
+                   :DISCO_HINTS_GEOLOCATION_HINT_PATH, :DISCOVERY_RESPONSE_PATH,
+                   :SINGLE_SIGN_ON_SERVICE_PATH
 end
 # rubocop:enable Metrics/ModuleLength
