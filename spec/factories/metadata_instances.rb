@@ -6,6 +6,7 @@ FactoryGirl.define do
 
     hash_algorithm 'sha256'
     validity_period { 1.hour }
+    cache_period { 6.hours }
     federation_identifier { Faker::Lorem.word }
 
     primary_tag { Faker::Lorem.word }
