@@ -4,11 +4,10 @@ module ETL
       org_data[:saml][:entity_descriptors].each do |ed_ref|
         ed_data = fr_entity_descriptors[ed_ref[:id]]
 
-        begin
+        if !ed_data[:functioning] || ed_data[:empty]
+          destroy_existing_ed(ed_data)
+        else
           create_or_update_ed(o, EntityDescriptor.dataset, ed_data)
-        rescue Sequel::ValidationFailed => e
-          Rails.logger.error "Evicted FR entity #{ed_data[:entity_id]}"
-          Rails.logger.error e
         end
       end
     end
@@ -16,15 +15,22 @@ module ETL
     def create_or_update_ed(o, ds, ed_data)
       Rails.logger.info "Processing FR entity #{ed_data[:entity_id]}"
 
-      ed =
-        create_or_update_by_fr_id(ds, ed_data[:id], ed_attrs(ed_data)) do |obj|
-          obj.organization = o
-          obj.known_entity = known_entity(ed_data)
-          add_ke_primary_tag(obj)
-        end
+      begin
+        ed = create_or_update_ed_from_fr(o, ds, ed_data)
+        ed_saml_core(ed, ed_data)
+        indicate_content_updated(ed.known_entity)
+      rescue Sequel::ValidationFailed => e
+        Rails.logger.error "Evicted FR entity #{ed_data[:entity_id]}"
+        Rails.logger.error e
+      end
+    end
 
-      ed_saml_core(ed, ed_data)
-      indicate_content_updated(ed.known_entity)
+    def create_or_update_ed_from_fr(o, ds, ed_data)
+      create_or_update_by_fr_id(ds, ed_data[:id], ed_attrs(ed_data)) do |obj|
+        obj.organization = o
+        obj.known_entity = known_entity(ed_data)
+        add_ke_primary_tag(obj)
+      end
     end
 
     def add_ke_primary_tag(ed)
@@ -71,6 +77,17 @@ module ETL
       # Changes updated_at timestamp for associated KnownEntity
       # which is used by MDQP for etag generation / caching.
       ke.touch
+    end
+
+    def destroy_existing_ed(ed_data)
+      ed =
+        FederationRegistryObject.local_instance(ed_data[:id],
+                                                EntityDescriptor.dataset)
+
+      return unless ed.present?
+
+      Rails.logger.info "Destroying FR entity #{ed_data[:entity_id]}"
+      ed.destroy
     end
   end
 end

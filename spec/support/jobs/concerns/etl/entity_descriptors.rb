@@ -1,6 +1,6 @@
 RSpec.shared_examples 'ETL::EntityDescriptors' do
   # rubocop:disable Metrics/MethodLength
-  def create_json(id)
+  def create_json(id, functioning = true, empty = false)
     {
       id: id,
       entity_id: Faker::Internet.url,
@@ -27,7 +27,8 @@ RSpec.shared_examples 'ETL::EntityDescriptors' do
       active: true,
       archived: false,
       approved: true,
-      functioning: true,
+      functioning: functioning,
+      empty: empty,
       created_at: fr_time(ed_created_at),
       saml: {
         identity_providers: [
@@ -83,6 +84,66 @@ RSpec.shared_examples 'ETL::EntityDescriptors' do
   def run
     described_class.new(id: fr_source.id, primary_tag: federation_tag)
       .entity_descriptors(organization, org_data)
+  end
+
+  context 'A non functioning EntityDescriptor' do
+    let(:entity_descriptor_count) { 1 }
+    let(:entity_descriptor_list) do
+      (0...entity_descriptor_count)
+        .reduce([]) { |a, e| a << create_json(1000 + e, false) }
+    end
+
+    it 'does not create an EntityDescriptor' do
+      expect { run }.not_to change { EntityDescriptor.count }
+    end
+
+    context 'with existing EntityDescriptor reference' do
+      subject { EntityDescriptor.last }
+      let(:entity_descriptor_list) do
+        (0...entity_descriptor_count)
+          .reduce([]) { |a, e| a << create_json(1000 + e) }
+      end
+
+      before do
+        run
+        entity_descriptor_list.first[:functioning] = false
+        stub_fr_request(:entity_descriptors)
+      end
+
+      it 'Deletes the existing EntityDescriptor reference' do
+        expect { run }.to change { EntityDescriptor.count }.by(-1)
+      end
+    end
+  end
+
+  context 'An empty EntityDescriptor' do
+    let(:entity_descriptor_count) { 1 }
+    let(:entity_descriptor_list) do
+      (0...entity_descriptor_count)
+        .reduce([]) { |a, e| a << create_json(1000 + e, true, true) }
+    end
+
+    it 'does not create an EntityDescriptor' do
+      expect { run }.not_to change { EntityDescriptor.count }
+    end
+
+    context 'with existing EntityDescriptor reference' do
+      subject { EntityDescriptor.last }
+      let(:entity_descriptor_list) do
+        (0...entity_descriptor_count)
+          .reduce([]) { |a, e| a << create_json(1000 + e) }
+      end
+
+      before do
+        run
+        entity_descriptor_list.first[:empty] = true
+        stub_fr_request(:entity_descriptors)
+      end
+
+      it 'Deletes the existing EntityDescriptor reference' do
+        expect { run }.to change { EntityDescriptor.count }.by(-1)
+      end
+    end
   end
 
   context 'creating an EntityDescriptor' do
