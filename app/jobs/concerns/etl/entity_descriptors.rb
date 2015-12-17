@@ -84,11 +84,10 @@ module ETL
         FederationRegistryObject.local_instance(ed_data[:id],
                                                 EntityDescriptor.dataset)
 
-      if ed.present?
-        Rails.logger.info "Destroying FR entity #{ed_data[:entity_id]}"
-      end
+      return unless ed.present?
 
-      ed.try(:destroy)
+      Rails.logger.info "Destroying FR entity #{ed_data[:entity_id]}"
+      ed.destroy
     end
   end
 end
