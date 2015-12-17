@@ -28,9 +28,9 @@ RSpec.shared_examples 'ETL::EntityDescriptors' do
       archived: false,
       approved: true,
       functioning: functioning,
-      empty: empty,
       created_at: fr_time(ed_created_at),
       saml: {
+        empty: empty,
         identity_providers: [
           {
             id: 3000 + id,
@@ -136,7 +136,7 @@ RSpec.shared_examples 'ETL::EntityDescriptors' do
 
       before do
         run
-        entity_descriptor_list.first[:empty] = true
+        entity_descriptor_list.first[:saml][:empty] = true
         stub_fr_request(:entity_descriptors)
       end
 
