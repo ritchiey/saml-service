@@ -4,7 +4,7 @@ module ETL
       org_data[:saml][:entity_descriptors].each do |ed_ref|
         ed_data = fr_entity_descriptors[ed_ref[:id]]
 
-        if !ed_data[:functioning] || ed_data[:empty]
+        if !ed_data[:functioning] || ed_data[:saml][:empty]
           destroy_existing_ed(ed_data)
         else
           create_or_update_ed(o, EntityDescriptor.dataset, ed_data)
