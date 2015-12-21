@@ -96,28 +96,26 @@ class MetadataQueryController < ApplicationController
     false
   end
 
-  def create_headers(obj, etag, expiry)
+  def create_headers(obj, etag)
     response.headers['ETag'] = etag
     response.headers['Last-Modified'] = obj.updated_at.rfc2822
     response.headers['Content-Type'] =
       "#{MetadataQueryController::SAML_CONTENT_TYPE}; charset=utf-8"
 
-    ttl = expiry - Time.now
-    expires_in ttl
+    expires_in @metadata_instance.cache_period
   end
 
   def create_known_entity_response(known_entity, etag)
     response = cache_descriptor_response(known_entity, etag)
 
-    create_headers(known_entity, etag, response[:expires])
+    create_headers(known_entity, etag)
     render body: response[:metadata]
   end
 
   def create_known_entities_response(known_entities, etag)
     response = cache_known_entities_response(known_entities, etag)
 
-    create_headers(known_entities.sort_by(&:updated_at).last,
-                   etag, response[:expires])
+    create_headers(known_entities.sort_by(&:updated_at).last, etag)
     render body: response[:metadata]
   end
 

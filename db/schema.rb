@@ -190,6 +190,7 @@ Sequel.migration do
       column :all_entities, "tinyint(1)", :default=>true, :null=>false
       column :federation_identifier, "varchar(255)", :null=>false
       column :validity_period, "int(11)", :null=>false
+      column :cache_period, "int(11)", :default=>21600, :null=>false
       
       index [:keypair_id], :name=>:keypair_id
       index [:primary_tag], :unique=>true
@@ -843,5 +844,6 @@ self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151203020409_ad
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151203023101_remove_active_from_role_descriptor.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151203025816_rename_active_to_enabled.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151204023033_add_flags_to_raw_entity_descriptors.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151217044855_add_cache_period_to_metadata_instance.rb')"
                 end
               end

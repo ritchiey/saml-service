@@ -111,7 +111,7 @@ class ConfigureCLI < Thor
 
     { name: opts[:name], federation_identifier: opts[:tag],
       hash_algorithm: opts[:hash].downcase, validity_period: 7.days,
-      keypair_id: keypair.id, all_entities: true }
+      cache_period: 6.hours, keypair_id: keypair.id, all_entities: true }
   end
 
   def update_publication_info(instance)
