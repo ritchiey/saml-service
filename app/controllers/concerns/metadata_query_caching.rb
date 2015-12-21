@@ -8,11 +8,23 @@ module MetadataQueryCaching
 
   def generate_known_entities_etag(known_entities)
     timestamps = known_entities.map(&:updated_at).map(&:to_i).join('.')
-    Digest::MD5.hexdigest("samlmetadata/#{timestamps}")
+    digest = Digest::MD5.hexdigest("samlmetadata/#{timestamps}")
+    generate_etag(digest)
   end
 
   def generate_descriptor_etag(desc)
-    Digest::MD5.hexdigest("samlmetadata/#{desc.id}-#{desc.updated_at}")
+    digest = Digest::MD5.hexdigest("samlmetadata/#{desc.id}-#{desc.updated_at}")
+    generate_etag(digest)
+  end
+
+  def generate_etag(digest)
+    # Ensure that metadata documents that expire in cache will
+    # have unique etag values even when Entities have not
+    # been updated in the interim.
+    last_cached_timestamp =
+      Rails.cache.fetch("ts:#{digest}", expires_in: ttl) { Time.now.to_i }
+
+    Digest::MD5.hexdigest("#{last_cached_timestamp}:#{digest}")
   end
 
   def known_entities_unmodified?(known_entities, etag)
@@ -34,24 +46,18 @@ module MetadataQueryCaching
   end
 
   def cache_descriptor_response(known_entity, etag)
-    cache_expiry_period = @metadata_instance.validity_period
-    cache_expiry = Time.now + cache_expiry_period
-
-    Rails.cache.fetch(etag, expires_in: cache_expiry_period) do
+    Rails.cache.fetch(metadata_cache_name(etag), expires_in: ttl) do
       @saml_renderer.root_entity_descriptor(known_entity)
       validate_xml
-      { expires: cache_expiry, metadata: @saml_renderer.sign }
+      { metadata: @saml_renderer.sign }
     end
   end
 
   def cache_known_entities_response(known_entities, etag)
-    cache_expiry_period = @metadata_instance.validity_period
-    cache_expiry = Time.now + cache_expiry_period
-
-    Rails.cache.fetch(etag, expires_in: cache_expiry_period) do
+    Rails.cache.fetch(metadata_cache_name(etag), expires_in: ttl) do
       @saml_renderer.entities_descriptor(known_entities)
       validate_xml
-      { expires: cache_expiry, metadata: @saml_renderer.sign }
+      { metadata: @saml_renderer.sign }
     end
   end
 
@@ -61,5 +67,13 @@ module MetadataQueryCaching
 
     fail Metadata::SchemaInvalidError, 'metadata is not schema valid\n' \
                                        "#{metadata_schema.validate(doc)}"
+  end
+
+  def ttl
+    @metadata_instance.try(:cache_period) || 6.hours
+  end
+
+  def metadata_cache_name(etag)
+    "metadata:#{etag}"
   end
 end
