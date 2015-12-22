@@ -76,10 +76,10 @@ module ETL
       cert = ki_data[:certificate]
       return unless cert.key?(:data)
 
-      cert_data = cert[:data].gsub(/(\n\n)/, "\n")
       ki = KeyInfo.create(key_name: ki_data.fetch(:name, nil),
                           subject: cert.fetch(:subject, nil),
-                          issuer: cert.fetch(:issuer, nil), data: cert_data)
+                          issuer: cert.fetch(:issuer, nil),
+                          data: clean_certificate_data(cert[:data]))
 
       kd.update(key_info: ki)
     end
@@ -93,6 +93,11 @@ module ETL
                                                      lang: 'en'))
       ui_info.add_description(MDUI::Description.new(value: description,
                                                     lang: 'en'))
+    end
+
+    def clean_certificate_data(data)
+      data.gsub(/\\n/, "\n").lines.map(&:strip)
+        .flat_map { |l| l.chars.each_slice(72).map(&:join).to_a }.join("\n")
     end
   end
 end

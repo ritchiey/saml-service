@@ -35,7 +35,7 @@ RSpec.shared_examples 'key_descriptors' do
 
     it 'sets certificate PEM data' do
       source.each_with_index do |s, i|
-        expect(target[i].key_info.data).to eq(s.key_info.data)
+        expect(target[i].key_info.data).to eq(s.key_info.data.strip)
       end
     end
   end
