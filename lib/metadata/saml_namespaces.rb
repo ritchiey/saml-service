@@ -10,7 +10,10 @@ module Metadata
       'xmlns:mdattr' => 'urn:oasis:names:tc:SAML:metadata:attribute',
       'xmlns:shibmd' => 'urn:mace:shibboleth:metadata:1.0',
       'xmlns:ds' => 'http://www.w3.org/2000/09/xmldsig#',
-      'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance'
+      'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance',
+      'xmlns:fed' => 'http://docs.oasis-open.org/wsfed/federation/200706',
+      'xmlns:auth' => 'http://docs.oasis-open.org/wsfed/authorization/200706',
+      'xmlns:privacy' => 'http://docs.oasis-open.org/wsfed/privacy/200706'
     }
 
     def root
@@ -43,6 +46,18 @@ module Metadata
 
     def ds
       builder['ds']
+    end
+
+    def fed
+      builder['fed']
+    end
+
+    def auth
+      builder['auth']
+    end
+
+    def privacy
+      builder['privacy']
     end
 
     def ns

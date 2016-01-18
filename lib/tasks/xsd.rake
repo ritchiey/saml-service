@@ -28,7 +28,28 @@ namespace :xsd do
     'http://docs.oasis-open.org/security/saml/Post2.0/sstc-metadata-attr.xsd',
 
     'schema/sstc-saml-idp-discovery.xsd' =>
-    'http://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-idp-discovery.xsd'
+    'http://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-idp-discovery.xsd',
+
+    'schema/oasis-200401-wss-wssecurity-utility-1.0.xsd' =>
+    'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd',
+
+    'schema/oasis-200401-wss-wssecurity-secext-1.0.xsd' =>
+    'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd',
+
+    'schema/ws-addr.xsd' =>
+    'http://www.w3.org/2006/03/addressing/ws-addr.xsd',
+
+    'schema/MetadataExchange.xsd' =>
+    'http://schemas.xmlsoap.org/ws/2004/09/mex/MetadataExchange.xsd',
+
+    'schema/ws-securitypolicy-1.2.xsd' =>
+    'http://docs.oasis-open.org/ws-sx/ws-securitypolicy/v1.2/errata01/os/schemas/ws-securitypolicy-1.2.xsd',
+
+    'schema/ws-federation.xsd' =>
+    'http://docs.oasis-open.org/wsfed/federation/v1.2/os/ws-federation.xsd',
+
+    'schema/ws-privacy.xsd' =>
+    'http://docs.oasis-open.org/wsfed/authorization/v1.2/os/ws-authorization.xsd'
   }
 
   task all: schemas.keys
@@ -40,7 +61,9 @@ namespace :xsd do
     response = Net::HTTP.get_response(URI.parse(uri))
     response.value
 
-    File.open(t.name, 'w') { |f| f.write(response.body) }
+    File.open(t.name, 'w') do |f|
+      f.syswrite(response.body)
+    end
     puts 'done.'
     puts "(sha256sum: #{OpenSSL::Digest::SHA256.hexdigest(response.body)})"
     puts
