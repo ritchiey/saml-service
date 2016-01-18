@@ -36,8 +36,17 @@ class UpdateEntitySource
     untouched = source.known_entities.to_a
 
     document(source).xpath(ENTITY_DESCRIPTOR_XPATH).each do |node|
-      entity = known_entity(source, node, primary_tag)
-      update_raw_entity_descriptor(entity, node)
+      # We represent each EntityDescriptor as a standalone piece of XML in the
+      # database for future processing.
+      #
+      # This approach reduces C14N calculation per EntityDescriptor by ~99.3%
+      partial_document = Nokogiri::XML::Document.new
+      partial_document.root = node
+
+      entity = known_entity(source, partial_document.root, primary_tag)
+
+      update_raw_entity_descriptor(entity, partial_document.root)
+
       indicate_content_updated(entity)
 
       untouched.reject! { |e| e.id == entity.id }
@@ -78,8 +87,8 @@ class UpdateEntitySource
          'Signature validation failed.')
   end
 
-  def known_entity(source, node, primary_tag)
-    entity_id = EntityId.find(uri: node['entityID'])
+  def known_entity(source, root_node, primary_tag)
+    entity_id = EntityId.find(uri: root_node['entityID'])
     return entity_id.parent.known_entity if entity_id
 
     ke = KnownEntity.create(entity_source: source, enabled: true)
@@ -87,22 +96,23 @@ class UpdateEntitySource
     ke
   end
 
-  def update_raw_entity_descriptor(entity, node)
+  def update_raw_entity_descriptor(entity, root_node)
     if entity.raw_entity_descriptor
-      entity.raw_entity_descriptor.update(xml: node.canonicalize)
+      entity.raw_entity_descriptor.update(xml: root_node)
     else
       red = RawEntityDescriptor.create(known_entity: entity,
-                                       xml: node.canonicalize)
-      EntityId.create(uri: node['entityID'], raw_entity_descriptor: red)
+                                       xml: root_node, enabled: true)
+      EntityId.create(uri: root_node['entityID'], raw_entity_descriptor: red)
     end
 
-    indicate_internal_type(entity.raw_entity_descriptor, node)
+    indicate_internal_type(entity.raw_entity_descriptor, root_node)
   end
 
   def sweep(untouched)
+    puts "sweeping #{untouched.inspect}"
     KnownEntity.where(id: untouched.map(&:id)).each do |ke|
-      ke.raw_entity_descriptor.entity_id.try(:destroy)
-      ke.raw_entity_descriptor.try(:destroy)
+      ke.try(:raw_entity_descriptor).try(:entity_id).try(:destroy)
+      ke.try(:raw_entity_descriptor).try(:destroy)
       ke.destroy
     end
   end
