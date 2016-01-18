@@ -102,7 +102,10 @@ RSpec.describe UpdateEntitySource do
 
     it 'sets the xml for the raw entity descriptor' do
       run
-      expect(subject.known_entities.last.raw_entity_descriptor.xml)
+      source_xml =
+        Nokogiri::XML(subject.known_entities.last.raw_entity_descriptor.xml,
+                      'UTF-8')
+      expect(source_xml.canonicalize)
         .to eq(Nokogiri::XML.parse(xml).root.elements[1].canonicalize)
     end
 
@@ -226,7 +229,8 @@ RSpec.describe UpdateEntitySource do
       subject.known_entities.each do |entity|
         e = doc.xpath('//*[local-name() = "EntityDescriptor" and ' \
                       "@entityID='#{entity.entity_id}']").first
-        expect(entity.raw_entity_descriptor.xml).to eq(e.canonicalize)
+        source_xml = Nokogiri::XML(entity.raw_entity_descriptor.xml, 'UTF-8')
+        expect(source_xml.canonicalize).to eq(e.canonicalize)
       end
     end
   end

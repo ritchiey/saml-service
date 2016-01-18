@@ -32,30 +32,39 @@ class UpdateEntitySource
   end
 
   def perform(id:, primary_tag:)
-    source = EntitySource[id]
-    untouched = source.known_entities.to_a
+    Sequel::Model.db.transaction do
+      source = EntitySource[id]
+      untouched = source.known_entities.to_a
 
-    document(source).xpath(ENTITY_DESCRIPTOR_XPATH).each do |node|
-      # We represent each EntityDescriptor as a standalone piece of XML in the
-      # database for future processing.
-      #
-      # This approach reduces C14N calculation per EntityDescriptor by ~99.3%
-      partial_document = Nokogiri::XML::Document.new
-      partial_document.root = node
+      document(source).xpath(ENTITY_DESCRIPTOR_XPATH).each do |node|
+        process_entity_descriptor(primary_tag, source, node, untouched)
+      end
 
-      entity = known_entity(source, partial_document.root, primary_tag)
-
-      update_raw_entity_descriptor(entity, partial_document.root)
-
-      indicate_content_updated(entity)
-
-      untouched.reject! { |e| e.id == entity.id }
+      sweep(untouched)
     end
-
-    sweep(untouched)
   end
 
   private
+
+  def process_entity_descriptor(primary_tag, source, node, untouched)
+    # We represent each EntityDescriptor as a standalone piece of XML in the
+    # database for future processing.
+    #
+    # This approach (creating new document) reduces C14N calculation per
+    # EntityDescriptor by ~99.3%
+    partial_document = Nokogiri::XML::Document.new
+    partial_document.root = node
+
+    ke = known_entity(source, partial_document.root, primary_tag)
+
+    update_raw_entity_descriptor(ke, partial_document.root)
+
+    # Changes updated_at timestamp for associated KnownEntity
+    # which is used by MDQP for etag generation / caching.
+    ke.touch
+
+    untouched.reject! { |e| e.id == ke.id }
+  end
 
   def retrieve(source)
     parsed_url = URI.parse(source.url)
@@ -97,11 +106,12 @@ class UpdateEntitySource
   end
 
   def update_raw_entity_descriptor(entity, root_node)
+    raw_xml = root_node.canonicalize
     if entity.raw_entity_descriptor
-      entity.raw_entity_descriptor.update(xml: root_node)
+      entity.raw_entity_descriptor.update(xml: raw_xml)
     else
       red = RawEntityDescriptor.create(known_entity: entity,
-                                       xml: root_node, enabled: true)
+                                       xml: raw_xml, enabled: true)
       EntityId.create(uri: root_node['entityID'], raw_entity_descriptor: red)
     end
 
@@ -109,18 +119,11 @@ class UpdateEntitySource
   end
 
   def sweep(untouched)
-    puts "sweeping #{untouched.inspect}"
     KnownEntity.where(id: untouched.map(&:id)).each do |ke|
       ke.try(:raw_entity_descriptor).try(:entity_id).try(:destroy)
       ke.try(:raw_entity_descriptor).try(:destroy)
       ke.destroy
     end
-  end
-
-  def indicate_content_updated(ke)
-    # Changes updated_at timestamp for associated KnownEntity
-    # which is used by MDQP for etag generation / caching.
-    ke.touch
   end
 
   def indicate_internal_type(red, ed_node)

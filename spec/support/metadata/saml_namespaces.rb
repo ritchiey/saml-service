@@ -14,8 +14,9 @@ RSpec.shared_examples 'SAML namespaces' do
     it { is_expected.to respond_to(:ds) }
     it { is_expected.to respond_to(:ns) }
 
-    it 'has 9 namespaces defined' do
-      expect(subject.ns.size).to eq(9)
+    it 'has 11 namespaces defined' do
+      expect(subject.ns.size).to eq(11)
+      expect(Metadata::SAMLNamespaces::NAMESPACES.size).to eq(11)
     end
 
     let(:ns) { subject.ns }
@@ -47,6 +48,12 @@ RSpec.shared_examples 'SAML namespaces' do
     end
     it 'supports SAML 2.0 assertion' do
       expect(ns['xmlns:saml']).to eq('urn:oasis:names:tc:SAML:2.0:assertion')
+    end
+    it 'supports SAML 2.0 assertion' do
+      expect(ns['xmlns:fed']).to eq('http://docs.oasis-open.org/wsfed/federation/200706')
+    end
+    it 'supports SAML 2.0 assertion' do
+      expect(ns['xmlns:privacy']).to eq('http://docs.oasis-open.org/wsfed/privacy/200706')
     end
   end
 end
