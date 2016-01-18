@@ -6,6 +6,8 @@ pid File.join(ROOT, 'tmp', 'pids', 'unicorn.pid')
 stdout_path '/var/log/aaf/saml/unicorn/stdout.log'
 stderr_path '/var/log/aaf/saml/unicorn/stderr.log'
 
+timeout 240
+
 before_fork do |server, _worker|
   Sequel::Model.db.disconnect
 
