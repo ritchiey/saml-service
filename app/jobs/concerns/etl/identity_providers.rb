@@ -22,7 +22,7 @@ module ETL
       idp = create_or_update_by_fr_id(ds, idp_data[:id], attrs) do |obj|
         obj.entity_descriptor = ed
         obj.organization = ed.organization
-        ed.known_entity.add_tag(Tag.new(name: 'idp'))
+        ed.known_entity.tag_as(Tag::IdP)
       end
 
       idp_saml_core(idp, idp_data)

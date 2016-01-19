@@ -20,8 +20,8 @@ class RawEntityDescriptor < Sequel::Model
     validates_presence [:known_entity, :xml, :created_at, :updated_at]
     validates_unique :known_entity
     validates_presence :entity_id, allow_missing: new?
-    # Any more than 65535, the column type needs to be upgraded.
-    validates_max_length 65_535, :xml
+    # Any more than 16_777_215, the column type needs to be upgraded (again).
+    validates_max_length 16_777_215, :xml
     validate_xml
   end
 

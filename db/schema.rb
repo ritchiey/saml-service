@@ -236,7 +236,7 @@ Sequel.migration do
     create_table(:raw_entity_descriptors) do
       primary_key :id, :type=>"int(11)"
       foreign_key :known_entity_id, :known_entities, :type=>"int(11)", :null=>false, :key=>[:id]
-      column :xml, "text", :null=>false
+      column :xml, "mediumtext", :null=>false
       column :created_at, "datetime", :null=>false
       column :updated_at, "datetime", :null=>false
       column :enabled, "tinyint(1)", :default=>false
@@ -845,5 +845,6 @@ self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151203023101_re
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151203025816_rename_active_to_enabled.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151204023033_add_flags_to_raw_entity_descriptors.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151217044855_add_cache_period_to_metadata_instance.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160114033904_change_raw_entity_descriptor_xml_to_medium_text.rb')"
                 end
               end

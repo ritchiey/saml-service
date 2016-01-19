@@ -31,6 +31,15 @@ class KnownEntity < Sequel::Model
       .group(:known_entity_id)
   end
 
+  def tag_as(name)
+    return if tags.any? { |t| t.name == name }
+    add_tag(Tag.new(name: name))
+  end
+
+  def untag_as(name)
+    tags.delete_if { |t| t.name == name }
+  end
+
   def entity_id
     return entity_descriptor.entity_id.uri if entity_descriptor
     return raw_entity_descriptor.entity_id.uri if raw_entity_descriptor

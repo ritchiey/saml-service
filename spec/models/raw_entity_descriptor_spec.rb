@@ -7,7 +7,7 @@ RSpec.describe RawEntityDescriptor do
   it { is_expected.to validate_presence :entity_id }
 
   it { is_expected.to validate_presence(:xml) }
-  it { is_expected.to validate_max_length(65_535, :xml) }
+  it { is_expected.to validate_max_length(16_777_215, :xml) }
   it { is_expected.to validate_presence(:known_entity) }
   it { is_expected.to validate_unique(:known_entity) }
 
