@@ -46,4 +46,54 @@ RSpec.describe KnownEntity do
       end
     end
   end
+
+  describe '#tag_as' do
+    let(:name) { Faker::Lorem.word }
+    subject { create :known_entity }
+
+    context 'tag already exists' do
+      before { subject.add_tag(Tag.new(name: name)) }
+
+      it 'does not increase tag count' do
+        expect { subject.tag_as(name) }.not_to change { subject.tags.length }
+      end
+    end
+
+    context 'tag does not already exist' do
+      it 'increases tag count' do
+        expect { subject.tag_as(name) }.to change { subject.tags.length }
+      end
+
+      it 'sets the tag to the provided name' do
+        expect(subject.tags.any? { |t| t.name == name }).to be_falsey
+        subject.tag_as(name)
+        expect(subject.tags.any? { |t| t.name == name }).to be_truthy
+      end
+    end
+  end
+
+  describe '#untag_as' do
+    let(:name) { Faker::Lorem.word }
+    subject { create :known_entity }
+
+    context 'tag already exists' do
+      before { subject.add_tag(Tag.new(name: name)) }
+
+      it 'decreases tag count' do
+        expect { subject.untag_as(name) }.to change { subject.tags.length }
+      end
+
+      it 'removes the tag with the provided name' do
+        expect(subject.tags.any? { |t| t.name == name }).to be_truthy
+        subject.untag_as(name)
+        expect(subject.tags.any? { |t| t.name == name }).to be_falsey
+      end
+    end
+
+    context 'tag does not already exist' do
+      it 'does not decrease tag count' do
+        expect { subject.untag_as(name) }.not_to change { subject.tags.length }
+      end
+    end
+  end
 end
