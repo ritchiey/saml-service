@@ -29,9 +29,9 @@ module ETL
 
     def add_aa_tag(ed)
       if ed.idp_sso_descriptors.present?
-        ed.known_entity.tag_as('aa')
+        ed.known_entity.tag_as(Tag::AA)
       else
-        ed.known_entity.tag_as('standalone-aa')
+        ed.known_entity.tag_as(Tag::StandaloneAA)
       end
     end
 
