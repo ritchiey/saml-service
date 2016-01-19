@@ -1,31 +1,8 @@
 require 'metadata/schema'
 
 class UpdateEntitySource
+  include SetSAMLTypeFromXML
   include Metadata::Schema
-
-  ENTITY_DESCRIPTOR_XPATH =
-    '//*[local-name() = "EntityDescriptor" and ' \
-    'namespace-uri() = "urn:oasis:names:tc:SAML:2.0:metadata"]'
-    .freeze
-  private_constant :ENTITY_DESCRIPTOR_XPATH
-
-  IDP_SSO_DESCRIPTOR_XPATH =
-    '//*[local-name() = "IDPSSODescriptor" and ' \
-    'namespace-uri() = "urn:oasis:names:tc:SAML:2.0:metadata"]'
-    .freeze
-  private_constant :IDP_SSO_DESCRIPTOR_XPATH
-
-  ATTRIBUTE_AUTHORITY_DESCRIPTOR_XPATH =
-    '//*[local-name() = "AttributeAuthorityDescriptor" and ' \
-    'namespace-uri() = "urn:oasis:names:tc:SAML:2.0:metadata"]'
-    .freeze
-  private_constant :ATTRIBUTE_AUTHORITY_DESCRIPTOR_XPATH
-
-  SP_SSO_DESCRIPTOR_XPATH =
-    '//*[local-name() = "SPSSODescriptor" and ' \
-    'namespace-uri() = "urn:oasis:names:tc:SAML:2.0:metadata"]'
-    .freeze
-  private_constant :SP_SSO_DESCRIPTOR_XPATH
 
   def self.perform(id:, primary_tag:)
     new.perform(id: id, primary_tag: primary_tag)
@@ -101,7 +78,7 @@ class UpdateEntitySource
     return entity_id.parent.known_entity if entity_id
 
     ke = KnownEntity.create(entity_source: source, enabled: true)
-    ke.add_tag(Tag.new(name: primary_tag))
+    ke.tag_as(primary_tag)
     ke
   end
 
@@ -115,7 +92,7 @@ class UpdateEntitySource
       EntityId.create(uri: root_node['entityID'], raw_entity_descriptor: red)
     end
 
-    indicate_internal_type(entity.raw_entity_descriptor, root_node)
+    set_saml_type(entity.raw_entity_descriptor, root_node)
   end
 
   def sweep(untouched)
@@ -124,17 +101,5 @@ class UpdateEntitySource
       ke.try(:raw_entity_descriptor).try(:destroy)
       ke.destroy
     end
-  end
-
-  def indicate_internal_type(red, ed_node)
-    red.update(idp: true) if ed_node.xpath(IDP_SSO_DESCRIPTOR_XPATH).present?
-
-    if ed_node.xpath(ATTRIBUTE_AUTHORITY_DESCRIPTOR_XPATH).present? &&
-       !ed_node.xpath(IDP_SSO_DESCRIPTOR_XPATH).present?
-      red.update(standalone_aa: true)
-    end
-
-    return unless ed_node.xpath(SP_SSO_DESCRIPTOR_XPATH).present?
-    red.update(sp: true)
   end
 end

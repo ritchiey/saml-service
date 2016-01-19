@@ -28,10 +28,10 @@ module ETL
     end
 
     def add_aa_tag(ed)
-      if ed.idp_sso_descriptors.empty?
-        ed.known_entity.add_tag(Tag.new(name: 'standalone-aa'))
+      if ed.idp_sso_descriptors.present?
+        ed.known_entity.tag_as('aa')
       else
-        ed.known_entity.add_tag(Tag.new(name: 'aa'))
+        ed.known_entity.tag_as('standalone-aa')
       end
     end
 

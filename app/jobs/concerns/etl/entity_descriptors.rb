@@ -34,7 +34,7 @@ module ETL
     end
 
     def add_ke_primary_tag(ed)
-      ed.known_entity.add_tag(Tag.new(name: @primary_tag))
+      ed.known_entity.tag_as(@primary_tag)
     end
 
     def known_entity(ed_data)
