@@ -10,7 +10,16 @@
 #   inflect.uncountable %w( fish sheep )
 # end
 
-# These inflection rules are supported but not enabled by default:
-# ActiveSupport::Inflector.inflections(:en) do |inflect|
-#   inflect.acronym 'RESTful'
-# end
+ActiveSupport::Inflector.inflections(:en) do |inflect|
+  inflect.acronym 'SSO'
+  inflect.acronym 'IDP'
+  inflect.acronym 'SP'
+  inflect.acronym 'URI'
+  inflect.acronym 'URL'
+  inflect.acronym 'MDUI'
+  inflect.acronym 'IP'
+  inflect.acronym 'UI'
+  inflect.acronym 'MDRPI'
+  inflect.acronym 'MDATTR'
+  inflect.acronym 'API'
+end

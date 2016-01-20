@@ -1,23 +1,30 @@
-development:
+default: &default
   adapter: mysql2
   encoding: utf8
-  database: saml_development
   username: saml_app
   password: password
-  host: localhost
+  host: 127.0.0.1
+  pool: 5
+  timeout: 5000
+
+development:
+  <<: *default
+  database: saml_development
 
 test:
-  adapter: mysql2
-  encoding: utf8
-  database: saml_test
-  username: saml_app
-  password: password
+  <<: *default
+  database:
+    <%= if ENV['TEST_ENV_NUMBER']
+          "test#{ENV['TEST_ENV_NUMBER']}"
+        else
+          'saml_test'
+        end %>
+  username: <%= ENV['MYSQL_USER'] || 'saml_app' %>
+  password: <%= ENV['MYSQL_PASSWORD'] || 'password' %>
   host: localhost
 
 production:
-  adapter: mysql2
-  encoding: utf8
-  database: saml
-  username: saml_app
-  password: <%= Rails.application.secrets.database_password %>
-  host: localhost
+  <<: *default
+  username: <%= ENV['SAML_DB_USERNAME'] %>
+  password: <%= ENV['SAML_DB_PASSWORD'] %>
+  database: <%= ENV['SAML_DB_NAME'] %>

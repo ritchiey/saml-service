@@ -1,8 +1,10 @@
+require 'simplecov'
+require 'webmock/rspec'
+require 'fakeredis/rspec'
+
 RSpec.configure do |config|
   config.filter_run :focus
   config.run_all_when_everything_filtered = true
-
-  config.default_formatter = 'doc' unless config.files_to_run.one?
 
   config.order = :random
   Kernel.srand config.seed
@@ -16,7 +18,12 @@ RSpec.configure do |config|
     mocks.verify_partial_doubles = true
   end
 
+  config.after(:suite) do
+    WebMock.disable_net_connect!(allow: 'codeclimate.com')
+  end
+
   config.alias_it_should_behave_like_to :has_behavior, 'has behavior:'
 
-  # config.profile_examples = 10
+  RSpec::Matchers.define_negated_matcher :not_include, :include
+  RSpec::Matchers.define_negated_matcher :not_change, :change
 end

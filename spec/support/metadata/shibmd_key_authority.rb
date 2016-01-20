@@ -1,0 +1,33 @@
+RSpec.shared_examples 'shibmd:KeyAuthority xml' do
+  context 'CA keys' do
+    let(:key_authority_path) { "#{extensions_path}/shibmd:KeyAuthority" }
+    let(:key_info_path) { "#{key_authority_path}/ds:KeyInfo" }
+
+    context 'without CA keys' do
+      it 'does not populate KeyAuthority node' do
+        expect(xml).not_to have_xpath(key_authority_path)
+      end
+    end
+
+    context 'with CA keys' do
+      let(:add_ca_keys) { true }
+      context 'KeyAuthority' do
+        it 'is created' do
+          expect(xml).to have_xpath(key_authority_path)
+        end
+        context 'attributes' do
+          let(:node) { xml.find(:xpath, key_authority_path) }
+          it 'sets VerifyDepth' do
+            expect(node['VerifyDepth'])
+              .to eq(metadata_instance.ca_verify_depth.to_s)
+          end
+        end
+        context 'KeyInfo' do
+          it 'creates two instances' do
+            expect(xml).to have_xpath(key_info_path, count: 2)
+          end
+        end
+      end
+    end
+  end
+end

@@ -1,19 +1,17 @@
-class SamlUri < Sequel::Model
-  TYPE = { attribute_name_format: 0, attribute_profile: 1,
-           name_identifier_format: 2, protocol_binding: 3,
-           protocol_support: 4 }
-
-  def type
-    TYPE.key(super)
-  end
-
-  def type=(t)
-    super TYPE[t]
-  end
+class SamlURI < Sequel::Model
+  # We use SamlURI as the parent class for all
+  # URI which the SAML Metadata spec defines as type anyURI.
+  # e.g.
+  # * ProtocolSupport ( RoleDescriptor > protocolSupportEnumeration )
+  # * NameIDFormat ( SSODescriptor > NameIDFormat )
+  #
+  # n.b. Types, such as LocalizedURI, which extend anyURI are standalone
+  # models and not part of the SamlURI hierachy as they are distinct types
+  # in their own right.
+  plugin :class_table_inheritance
 
   def validate
     super
-    validates_presence [:uri, :type, :created_at, :updated_at]
-    validates_includes TYPE.keys, :type
+    validates_presence [:uri, :created_at, :updated_at]
   end
 end

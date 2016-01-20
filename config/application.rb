@@ -5,13 +5,15 @@ require 'active_model/railtie'
 require 'action_controller/railtie'
 require 'action_mailer/railtie'
 require 'action_view/railtie'
-require 'sprockets/railtie'
+# require 'sprockets/railtie'
 # require 'active_record/railtie'
 # require 'rails/test_unit/railtie'
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
+
+Sequel.default_timezone = :utc
 
 module Saml
   class Application < Rails::Application
@@ -22,5 +24,10 @@ module Saml
       Sequel::Model.plugin :timestamps, update_on_create: true
       Sequel::Model.plugin :validation_helpers
     end
+
+    config.cache_store = :redis_store, 'redis://localhost:6379/0/cache'
+    config.autoload_paths << Rails.root.join('app', 'jobs', 'concerns')
+
+    config.sequel.logger = Logger.new($stderr) if ENV['AAF_DEBUG']
   end
 end
