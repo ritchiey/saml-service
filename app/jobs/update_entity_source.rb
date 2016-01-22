@@ -11,6 +11,7 @@ class UpdateEntitySource
   def perform(id:, primary_tag:)
     Sequel::Model.db.transaction do
       source = EntitySource[id]
+      fail("Unable to locate EntitySource(id=#{id})") unless source
       untouched = source.known_entities.to_a
 
       document(source).xpath(ENTITY_DESCRIPTOR_XPATH).each do |node|
@@ -19,6 +20,7 @@ class UpdateEntitySource
 
       sweep(untouched)
     end
+    true
   end
 
   private
@@ -74,8 +76,8 @@ class UpdateEntitySource
   end
 
   def known_entity(source, root_node, primary_tag)
-    entity_id = EntityId.find(uri: root_node['entityID'])
-    return entity_id.parent.known_entity if entity_id
+    ke = known_entity_within_entity_source(source, root_node)
+    return ke if ke.present?
 
     ke = KnownEntity.create(entity_source: source, enabled: true)
     ke.tag_as(primary_tag)
@@ -101,5 +103,12 @@ class UpdateEntitySource
       ke.try(:raw_entity_descriptor).try(:destroy)
       ke.destroy
     end
+  end
+
+  def known_entity_within_entity_source(source, root_node)
+    entity_id = EntityId.where(uri: root_node['entityID']).all.find do |eid|
+      eid.parent.known_entity.entity_source == source
+    end
+    entity_id.parent.known_entity if entity_id
   end
 end
