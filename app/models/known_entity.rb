@@ -38,6 +38,7 @@ class KnownEntity < Sequel::Model
 
   def untag_as(name)
     tags.delete_if { |t| t.name == name }
+    Tag.where(name: name, known_entity: self).destroy
   end
 
   def entity_id
