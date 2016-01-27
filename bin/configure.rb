@@ -3,6 +3,7 @@
 require_relative '../config/environment'
 require 'thor'
 
+# rubocop:disable ClassLength
 class ConfigureCLI < Thor
   desc 'fr_source [options...]', 'Create or update a Federation Registry source'
   option :hostname, desc: 'The hostname of the Federation Registry instance'
@@ -27,6 +28,34 @@ class ConfigureCLI < Thor
 
     update_registration_info(source)
     source.update(options.slice(:hostname, :secret))
+  end
+
+  desc 'raw_entity_source [options...]', 'Create or update a source of entities
+  from a remotely published SAML 2.0 compliant metadata document'
+  option :rank, desc: 'How this source should be considered in relation to other
+  EntitySources. Should the same EntityID exist in multiple EntitySource only
+  the version from the highest ranked source shall be used. Unqiue per SAML
+  service instance.'
+  option :url, desc: 'The URL of SAML metadata document to download'
+  option :cert, desc: 'A local file containing the metadata sources validation
+  certificate. The validity of this certificate should have previously been
+  proven out of band e.g. sha256hash compare.'
+
+  long_desc <<-LONGDESC
+    Configures the SAML Service to sync to an existing upstream SAML metadata
+    source, representing entities internally as RawEntityDescriptors for further
+    processing and mixing into local metadata feeds.
+
+    The provided certificate will be used to validate that the metadata source
+    being acquired was validly signed and published by the expected originator
+    (i.e. a 3rd party federation).
+  LONGDESC
+
+  def raw_entity_source
+    source =
+      EntitySource.find_or_create(rank: options[:rank]) { |e| e.enabled = true }
+
+    source.update(url: options[:url], certificate: load_certificate)
   end
 
   desc 'keypair [options...]', 'Create or update a Keypair for metadata signing'
@@ -131,5 +160,6 @@ class ConfigureCLI < Thor
               publication_info_id: publication_info.id)
   end
 end
+# rubocop:enable ClassLength
 
 ConfigureCLI.start(ARGV) if __FILE__ == $PROGRAM_NAME

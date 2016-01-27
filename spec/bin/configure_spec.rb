@@ -239,4 +239,71 @@ RSpec.describe ConfigureCLI do
       end
     end
   end
+
+  describe '#raw_entity_source' do
+    let(:rank) { Faker::Number.number(2).to_i }
+    let(:url) { Faker::Internet.url }
+    let(:cert_path) { "#{Rails.root}/spec/tmp/res_cert.pem" }
+    let(:rsa_key) { create(:rsa_key) }
+    let(:x509_certificate) { create(:certificate, rsa_key: rsa_key) }
+
+    before do
+      File.write(cert_path, x509_certificate)
+    end
+
+    after do
+      File.delete(cert_path)
+    end
+
+    def run(**overrides)
+      args = overrides.reverse_merge(
+        rank: rank,
+        url: url,
+        cert: cert_path
+      ).transform_keys { |sym| "--#{sym.to_s.dasherize}" }.to_a.flatten
+
+      ConfigureCLI.start(['raw_entity_source', *args])
+    end
+
+    context 'when a source exists' do
+      let(:cert_path2) { "#{Rails.root}/spec/tmp/res_cert_new.pem" }
+      let(:rsa_key2) { create(:rsa_key) }
+      let(:x509_certificate2) { create(:certificate, rsa_key: rsa_key) }
+      let!(:source) do
+        create(:entity_source, rank: rank, certificate: x509_certificate)
+      end
+
+      before do
+        File.write(cert_path2, x509_certificate2)
+      end
+
+      after do
+        File.delete(cert_path2)
+      end
+
+      it 'updates the URL' do
+        new_url = Faker::Internet.url
+        expect { run(url: new_url) }.to change { source.reload.url }.to(new_url)
+      end
+
+      it 'updates the certificate' do
+        expect { run(cert: cert_path2) }
+          .to change { source.reload.certificate }.to(x509_certificate2.to_pem)
+      end
+    end
+
+    context 'when no source exists' do
+      it 'creates a new source' do
+        expect { run }
+          .to change(EntitySource, :count).by(1)
+      end
+
+      it 'creates the expected EntitySource' do
+        run
+        expect(EntitySource.last)
+          .to have_attributes(enabled: true, rank: rank,
+                              url: url, certificate: x509_certificate.to_pem)
+      end
+    end
+  end
 end
