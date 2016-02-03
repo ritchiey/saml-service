@@ -8,6 +8,7 @@ RSpec.describe ConfigureCLI do
     let(:registration_authority) { Faker::Internet.domain_name }
     let(:registration_policy) { Faker::Internet.domain_name }
     let(:lang) { Faker::Lorem.word }
+    let(:source_tag) { Faker::Lorem.words.join('-') }
 
     def run(**overrides)
       args = overrides.reverse_merge(
@@ -15,7 +16,8 @@ RSpec.describe ConfigureCLI do
         secret: secret,
         registration_authority: registration_authority,
         registration_policy: registration_policy,
-        lang: lang
+        lang: lang,
+        source_tag: source_tag
       ).transform_keys { |sym| "--#{sym.to_s.dasherize}" }.to_a.flatten
 
       ConfigureCLI.start(['fr_source', *args])
@@ -70,7 +72,8 @@ RSpec.describe ConfigureCLI do
         expect { run }
           .to change(EntitySource, :count).by(1)
 
-        expect(EntitySource.last).to have_attributes(enabled: true, rank: 10)
+        expect(EntitySource.last)
+          .to have_attributes(enabled: true, rank: 10, source_tag: source_tag)
       end
 
       it 'sets the correct registration attributes on the new source' do
@@ -246,6 +249,7 @@ RSpec.describe ConfigureCLI do
     let(:cert_path) { "#{Rails.root}/spec/tmp/res_cert.pem" }
     let(:rsa_key) { create(:rsa_key) }
     let(:x509_certificate) { create(:certificate, rsa_key: rsa_key) }
+    let(:source_tag) { Faker::Lorem.words.join('-') }
 
     before do
       File.write(cert_path, x509_certificate)
@@ -259,7 +263,8 @@ RSpec.describe ConfigureCLI do
       args = overrides.reverse_merge(
         rank: rank,
         url: url,
-        cert: cert_path
+        cert: cert_path,
+        source_tag: source_tag
       ).transform_keys { |sym| "--#{sym.to_s.dasherize}" }.to_a.flatten
 
       ConfigureCLI.start(['raw_entity_source', *args])
@@ -270,7 +275,8 @@ RSpec.describe ConfigureCLI do
       let(:rsa_key2) { create(:rsa_key) }
       let(:x509_certificate2) { create(:certificate, rsa_key: rsa_key) }
       let!(:source) do
-        create(:entity_source, rank: rank, certificate: x509_certificate)
+        create(:entity_source, rank: rank, certificate: x509_certificate,
+                               source_tag: source_tag)
       end
 
       before do
@@ -302,7 +308,8 @@ RSpec.describe ConfigureCLI do
         run
         expect(EntitySource.last)
           .to have_attributes(enabled: true, rank: rank,
-                              url: url, certificate: x509_certificate.to_pem)
+                              url: url, certificate: x509_certificate.to_pem,
+                              source_tag: source_tag)
       end
     end
   end

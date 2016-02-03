@@ -73,7 +73,7 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
   end
 
   def run
-    described_class.new(id: fr_source.id, primary_tag: federation_tag)
+    described_class.new(id: fr_source.id)
       .identity_providers(entity_descriptor, ed_data)
   end
 

@@ -23,7 +23,7 @@ RSpec.describe UpdateEntitySource do
   end
 
   def run
-    described_class.perform(id: subject.id, primary_tag: federation_tag)
+    described_class.perform(id: subject.id)
   end
 
   def entity_descriptors(entities:, type:)
@@ -76,7 +76,7 @@ RSpec.describe UpdateEntitySource do
     let(:xml) { entities_descriptor(entities: 1) }
 
     it 'throws an exception' do
-      expect { described_class.perform(id: -1, primary_tag: Faker::Lorem.word) }
+      expect { described_class.perform(id: -1) }
         .to raise_error('Unable to locate EntitySource(id=-1)')
     end
   end
@@ -92,7 +92,8 @@ RSpec.describe UpdateEntitySource do
 
     it 'has known_entity with federation tag' do
       run
-      expect(subject.known_entities.last.tags.first.name).to eq(federation_tag)
+      expect(subject.known_entities.last.tags.first.name)
+        .to eq(subject.source_tag)
     end
 
     it 'creates the raw entity descriptor' do

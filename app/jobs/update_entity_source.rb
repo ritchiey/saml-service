@@ -4,18 +4,18 @@ class UpdateEntitySource
   include SetSAMLTypeFromXML
   include Metadata::Schema
 
-  def self.perform(id:, primary_tag:)
-    new.perform(id: id, primary_tag: primary_tag)
+  def self.perform(id:)
+    new.perform(id: id)
   end
 
-  def perform(id:, primary_tag:)
+  def perform(id:)
     Sequel::Model.db.transaction do
       source = EntitySource[id]
       fail("Unable to locate EntitySource(id=#{id})") unless source
       untouched = source.known_entities.to_a
 
       document(source).xpath(ENTITY_DESCRIPTOR_XPATH).each do |node|
-        process_entity_descriptor(primary_tag, source, node, untouched)
+        process_entity_descriptor(source, node, untouched)
       end
 
       sweep(untouched)
@@ -25,7 +25,7 @@ class UpdateEntitySource
 
   private
 
-  def process_entity_descriptor(primary_tag, source, node, untouched)
+  def process_entity_descriptor(source, node, untouched)
     # We represent each EntityDescriptor as a standalone piece of XML in the
     # database for future processing.
     #
@@ -34,7 +34,7 @@ class UpdateEntitySource
     partial_document = Nokogiri::XML::Document.new
     partial_document.root = node
 
-    ke = known_entity(source, partial_document.root, primary_tag)
+    ke = known_entity(source, partial_document.root)
 
     update_raw_entity_descriptor(ke, partial_document.root)
 
@@ -75,12 +75,12 @@ class UpdateEntitySource
          'Signature validation failed.')
   end
 
-  def known_entity(source, root_node, primary_tag)
+  def known_entity(source, root_node)
     ke = known_entity_within_entity_source(source, root_node)
     return ke if ke.present?
 
     ke = KnownEntity.create(entity_source: source, enabled: true)
-    ke.tag_as(primary_tag)
+    ke.tag_as(source.source_tag)
     ke
   end
 
