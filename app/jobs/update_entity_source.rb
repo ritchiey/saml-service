@@ -9,19 +9,17 @@ class UpdateEntitySource
   end
 
   def perform(id:)
-      source = EntitySource[id]
-      fail("Unable to locate EntitySource(id=#{id})") unless source
-      untouched = KnownEntity.where(entity_source: source).select_map(:id)
+    source = EntitySource[id]
+    fail("Unable to locate EntitySource(id=#{id})") unless source
+    untouched = KnownEntity.where(entity_source: source).select_map(:id)
 
-      document(source).xpath(ENTITY_DESCRIPTOR_XPATH).each do |node|
-        Sequel::Model.db.transaction do
-          process_entity_descriptor(source, node, untouched)
-        end
-      end
-
+    document(source).xpath(ENTITY_DESCRIPTOR_XPATH).each do |node|
       Sequel::Model.db.transaction do
-        sweep(untouched)
+        process_entity_descriptor(source, node, untouched)
       end
+    end
+
+    Sequel::Model.db.transaction { sweep(untouched) }
     true
   end
 
