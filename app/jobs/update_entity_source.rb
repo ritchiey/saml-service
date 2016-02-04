@@ -9,17 +9,19 @@ class UpdateEntitySource
   end
 
   def perform(id:)
-    Sequel::Model.db.transaction do
       source = EntitySource[id]
       fail("Unable to locate EntitySource(id=#{id})") unless source
-      untouched = source.known_entities.to_a
+      untouched = KnownEntity.where(entity_source: source).select_map(:id)
 
       document(source).xpath(ENTITY_DESCRIPTOR_XPATH).each do |node|
-        process_entity_descriptor(source, node, untouched)
+        Sequel::Model.db.transaction do
+          process_entity_descriptor(source, node, untouched)
+        end
       end
 
-      sweep(untouched)
-    end
+      Sequel::Model.db.transaction do
+        sweep(untouched)
+      end
     true
   end
 
@@ -42,7 +44,7 @@ class UpdateEntitySource
     # which is used by MDQP for etag generation / caching.
     ke.touch
 
-    untouched.reject! { |e| e.id == ke.id }
+    untouched.reject! { |id| id == ke.id }
   end
 
   def retrieve(source)
@@ -98,7 +100,7 @@ class UpdateEntitySource
   end
 
   def sweep(untouched)
-    KnownEntity.where(id: untouched.map(&:id)).each do |ke|
+    KnownEntity.where(id: untouched).each do |ke|
       ke.try(:raw_entity_descriptor).try(:entity_id).try(:destroy)
       ke.try(:raw_entity_descriptor).try(:destroy)
       ke.destroy
