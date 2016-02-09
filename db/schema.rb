@@ -43,7 +43,7 @@ Sequel.migration do
       column :updated_at, "datetime", :null=>false
       column :url, "varchar(255)"
       column :certificate, "varchar(4096)"
-      column :source_tag, "varchar(255)", :default=>"aaf", :null=>false
+      column :source_tag, "varchar(255)", :null=>false
       
       index [:source_tag], :name=>:source_tag, :unique=>true
     end
@@ -850,5 +850,6 @@ self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151204023033_ad
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151217044855_add_cache_period_to_metadata_instance.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160114033904_change_raw_entity_descriptor_xml_to_medium_text.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160203023734_add_source_tag_to_entity_source.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160209223646_remove_source_tag_default_value.rb')"
                 end
               end
