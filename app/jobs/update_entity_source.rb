@@ -42,7 +42,7 @@ class UpdateEntitySource
     # which is used by MDQP for etag generation / caching.
     ke.touch
 
-    untouched.reject! { |id| id == ke.id }
+    untouched.delete(ke.id)
   end
 
   def retrieve(source)
