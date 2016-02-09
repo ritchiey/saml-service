@@ -86,9 +86,10 @@ RSpec.describe KnownEntity do
       it 'removes the tag with the provided name' do
         expect(subject.tags.any? { |t| t.name == name }).to be_truthy
         expect(Tag.where(name: name).count).to eq(1)
-        subject.untag_as(name)
-        expect(subject.tags.any? { |t| t.name == name }).to be_falsey
-        expect(Tag.where(name: name).count).to eq(0)
+
+        expect { subject.untag_as(name) }
+          .to change(Tag.where(name: name), :count).by(-1)
+          .and change { subject.tags.any? { |t| t.name == name } }.to be_falsey
       end
     end
 
