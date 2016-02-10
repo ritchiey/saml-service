@@ -4,26 +4,28 @@ class UpdateEntitySource
   include SetSAMLTypeFromXML
   include Metadata::Schema
 
-  def self.perform(id:, primary_tag:)
-    new.perform(id: id, primary_tag: primary_tag)
+  def self.perform(id:)
+    new.perform(id: id)
   end
 
-  def perform(id:, primary_tag:)
-    Sequel::Model.db.transaction do
-      source = EntitySource[id]
-      untouched = source.known_entities.to_a
+  def perform(id:)
+    source = EntitySource[id]
+    fail("Unable to locate EntitySource(id=#{id})") unless source
+    untouched = KnownEntity.where(entity_source: source).select_map(:id)
 
-      document(source).xpath(ENTITY_DESCRIPTOR_XPATH).each do |node|
-        process_entity_descriptor(primary_tag, source, node, untouched)
+    document(source).xpath(ENTITY_DESCRIPTOR_XPATH).each do |node|
+      Sequel::Model.db.transaction do
+        process_entity_descriptor(source, node, untouched)
       end
-
-      sweep(untouched)
     end
+
+    Sequel::Model.db.transaction { sweep(untouched) }
+    true
   end
 
   private
 
-  def process_entity_descriptor(primary_tag, source, node, untouched)
+  def process_entity_descriptor(source, node, untouched)
     # We represent each EntityDescriptor as a standalone piece of XML in the
     # database for future processing.
     #
@@ -32,7 +34,7 @@ class UpdateEntitySource
     partial_document = Nokogiri::XML::Document.new
     partial_document.root = node
 
-    ke = known_entity(source, partial_document.root, primary_tag)
+    ke = known_entity(source, partial_document.root)
 
     update_raw_entity_descriptor(ke, partial_document.root)
 
@@ -40,7 +42,7 @@ class UpdateEntitySource
     # which is used by MDQP for etag generation / caching.
     ke.touch
 
-    untouched.reject! { |e| e.id == ke.id }
+    untouched.delete(ke.id)
   end
 
   def retrieve(source)
@@ -73,12 +75,12 @@ class UpdateEntitySource
          'Signature validation failed.')
   end
 
-  def known_entity(source, root_node, primary_tag)
-    entity_id = EntityId.find(uri: root_node['entityID'])
-    return entity_id.parent.known_entity if entity_id
+  def known_entity(source, root_node)
+    ke = known_entity_within_entity_source(source, root_node)
+    return ke if ke.present?
 
     ke = KnownEntity.create(entity_source: source, enabled: true)
-    ke.tag_as(primary_tag)
+    ke.tag_as(source.source_tag)
     ke
   end
 
@@ -96,10 +98,17 @@ class UpdateEntitySource
   end
 
   def sweep(untouched)
-    KnownEntity.where(id: untouched.map(&:id)).each do |ke|
+    KnownEntity.where(id: untouched).each do |ke|
       ke.try(:raw_entity_descriptor).try(:entity_id).try(:destroy)
       ke.try(:raw_entity_descriptor).try(:destroy)
       ke.destroy
     end
+  end
+
+  def known_entity_within_entity_source(source, root_node)
+    entity_id = EntityId.where(uri: root_node['entityID']).all.find do |eid|
+      eid.parent.known_entity.entity_source == source
+    end
+    entity_id.parent.known_entity if entity_id
   end
 end

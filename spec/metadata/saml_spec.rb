@@ -38,8 +38,11 @@ RSpec.describe Metadata::SAML do
 
   context 'EntitiesDescriptors' do
     let(:entity_source) { create :basic_federation }
+    let(:tag) { Faker::Lorem.word }
+    let(:all_tagged_known_entities) { KnownEntity.with_all_tags(tag) }
 
     context 'with only functioning entity descriptors' do
+      before { entity_source.known_entities.each { |ke| ke.tag_as(tag) } }
       include_examples 'EntitiesDescriptor xml' do
         it 'has 5 known entities' do
           expect(entity_source.known_entities.size).to eq(5)
@@ -63,6 +66,8 @@ RSpec.describe Metadata::SAML do
                                               known_entity: raw_aa,
                                               enabled: false)
         raw_aa.save
+
+        entity_source.known_entities.each { |ke| ke.tag_as(tag) }
       end
 
       include_examples 'EntitiesDescriptor xml' do
@@ -71,10 +76,34 @@ RSpec.describe Metadata::SAML do
         end
       end
     end
-  end
 
-  context 'RawEntityDescriptor' do
-    include_examples 'RawEntityDescriptor xml'
+    context 'with the same EntityDescriptor from multiple sources' do
+      let(:external_entity_source) do
+        create :entity_source, rank: entity_source.rank + 1
+      end
+
+      before do
+        idp = create(:basic_federation_entity, :idp,
+                     entity_source: external_entity_source, enabled: true)
+
+        idp.entity_descriptor.entity_id
+          .update(uri: entity_source.known_entities.first.entity_id)
+
+        entity_source.known_entities.each { |ke| ke.tag_as(tag) }
+        external_entity_source.known_entities.each { |ke| ke.tag_as(tag) }
+      end
+
+      include_examples 'EntitiesDescriptor xml' do
+        it 'has 6 known entities' do
+          expect(KnownEntity.with_all_tags(tag).length).to eq(6)
+        end
+
+        it 'only uses entities from the lowest ranked entity source' do
+          expect(subject.filter_known_entities(all_tagged_known_entities))
+            .to eq(entity_source.known_entities)
+        end
+      end
+    end
   end
 
   context 'KeyInfo' do
@@ -104,6 +133,10 @@ RSpec.describe Metadata::SAML do
 
   context 'EntityDescriptors' do
     include_examples 'EntityDescriptor xml'
+  end
+
+  context 'RawEntityDescriptor' do
+    include_examples 'RawEntityDescriptor xml'
   end
 
   context 'RegistrationInfo' do

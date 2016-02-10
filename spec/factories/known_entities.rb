@@ -1,6 +1,8 @@
 FactoryGirl.define do
   factory :known_entity do
-    transient { hostname { "e.#{Faker::Internet.domain_name}" } }
+    transient do
+      hostname { "e.#{Faker::Internet.domain_name}" }
+    end
 
     association :entity_source
     enabled true
@@ -15,7 +17,7 @@ FactoryGirl.define do
     trait :with_raw_entity_descriptor do
       after(:create) do |ke|
         red = create :raw_entity_descriptor, known_entity: ke
-        ke.entity_descriptor = red
+        ke.raw_entity_descriptor = red
       end
     end
   end
