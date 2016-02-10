@@ -37,7 +37,18 @@ module API
       }
     )
 
-    private_constant :SP_EAGER_FETCH, :IDP_EAGER_FETCH
+    RAW_COMMON_EAGER_FETCH = {
+      entity_id: [],
+      known_entity: :tags
+    }
+
+    RAW_IDP_EAGER_FETCH = RAW_COMMON_EAGER_FETCH
+
+    RAW_SP_EAGER_FETCH = RAW_COMMON_EAGER_FETCH
+
+    private_constant :COMMON_EAGER_FETCH, :SP_EAGER_FETCH, :IDP_EAGER_FETCH,
+                     :RAW_COMMON_EAGER_FETCH, :RAW_IDP_EAGER_FETCH,
+                     :RAW_SP_EAGER_FETCH
 
     def ed_containing_sp
       entities_with_role_descriptor(:sp_sso_descriptors)
@@ -45,7 +56,8 @@ module API
     end
 
     def red_containing_sp
-      RawEntityDescriptor.where(sp: true).eager(known_entity: :tags).all
+      RawEntityDescriptor.where(sp: true).eager(known_entity: :tags)
+        .eager(RAW_SP_EAGER_FETCH).all
     end
 
     def ed_containing_idp
@@ -54,7 +66,8 @@ module API
     end
 
     def red_containing_idp
-      RawEntityDescriptor.where(idp: true).eager(known_entity: :tags).all
+      RawEntityDescriptor.where(idp: true).eager(known_entity: :tags)
+        .eager(RAW_IDP_EAGER_FETCH).all
     end
 
     def entities_with_role_descriptor(table)
