@@ -39,6 +39,7 @@ RSpec.describe Metadata::SAML do
   context 'EntitiesDescriptors' do
     let(:entity_source) { create :basic_federation }
     let(:tag) { Faker::Lorem.word }
+    let(:all_tagged_known_entities) { KnownEntity.with_all_tags(tag) }
 
     context 'with only functioning entity descriptors' do
       before { entity_source.known_entities.each { |ke| ke.tag_as(tag) } }
@@ -80,6 +81,7 @@ RSpec.describe Metadata::SAML do
       let(:external_entity_source) do
         create :entity_source, rank: entity_source.rank + 1
       end
+
       before do
         idp = create(:basic_federation_entity, :idp,
                      entity_source: external_entity_source, enabled: true)
@@ -94,6 +96,11 @@ RSpec.describe Metadata::SAML do
       include_examples 'EntitiesDescriptor xml' do
         it 'has 6 known entities' do
           expect(KnownEntity.with_all_tags(tag).length).to eq(6)
+        end
+
+        it 'only uses entities from the lowest ranked entity source' do
+          expect(subject.filter_known_entities(all_tagged_known_entities))
+            .to eq(entity_source.known_entities)
         end
       end
     end
