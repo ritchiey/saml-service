@@ -18,10 +18,14 @@ class RawEntityDescriptor < Sequel::Model
   def validate
     super
     validates_presence [:known_entity, :xml, :created_at, :updated_at]
-    validates_unique :known_entity
     validates_presence :entity_id, allow_missing: new?
     # Any more than 16_777_215, the column type needs to be upgraded (again).
     validates_max_length 16_777_215, :xml
+
+    # The two remaining validations are very expensive and don't need to run
+    # when calling `functioning?` on an unmodified record.
+    return unless modified?
+    validates_unique :known_entity # Prevented by DB schema
     validate_xml
   end
 
