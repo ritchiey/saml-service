@@ -159,9 +159,17 @@ RSpec.describe RawEntityDescriptor do
         .and all(respond_to(:longitude))
         .and all(respond_to(:altitude))
     end
+
+    context 'with invalid geolocation uri' do
+      subject { create :raw_entity_descriptor_invalid_geo_location }
+
+      it 'ignores invalid geolocation URI values' do
+        expect(subject.disco_hints.geolocation_hints.size).to eq(1)
+      end
+    end
   end
 
-  describe '#disco_hints' do
+  describe '#discovery_response_services' do
     subject { create :raw_entity_descriptor_sp }
 
     it 'populates an array when discovery_response xml content present' do

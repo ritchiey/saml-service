@@ -102,7 +102,9 @@ module RawEntityDescriptorDeconstructor
 
   def geolocation_hints(disco_hints_node, disco_hints)
     disco_hints_node.xpath(DISCO_HINTS_GEOLOCATION_HINT_PATH).each do |glh|
-      uri_parts = geolocation_parts(glh.text.strip)
+      uri = glh.text.strip
+      next unless valid_geolocation_uri?(uri)
+      uri_parts = geolocation_parts(uri)
       disco_hints.geolocation_hints <<
         os(latitude: uri_parts[0], longitude: uri_parts[1],
            altitude: uri_parts[2])
@@ -111,6 +113,14 @@ module RawEntityDescriptorDeconstructor
 
   def geolocation_parts(uri)
     URI.parse(uri).opaque.split(',', 3)
+  end
+
+  def valid_geolocation_uri?(uri)
+    parsed_uri = URI.parse(uri)
+
+    parsed_uri.scheme == 'geo' &&
+      parsed_uri.opaque.present? &&
+      parsed_uri.opaque.include?(',')
   end
 
   def extract_discovery_response_services(discovery_response_node)
