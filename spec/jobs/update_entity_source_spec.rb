@@ -403,4 +403,61 @@ RSpec.describe UpdateEntitySource do
         .and match('Signature validation failed')
     end
   end
+
+  context 'with a non xmlns namespace for metadata' do
+    let(:xml) do
+      [
+        '<xyz:EntitiesDescriptor ' \
+        'xmlns:xyz="urn:oasis:names:tc:SAML:2.0:metadata" ',
+        'ID="_x">',
+        EMPTY_SIGNATURE.indent(2),
+        nil,
+        entity_descriptors(entities: 1,
+                           type: :raw_entity_descriptor_xyz_namespaced)
+          .indent(2),
+        '</xyz:EntitiesDescriptor>'
+      ].compact.join("\n")
+    end
+
+    let(:entity_id) { entity_ids.first }
+    let(:saml_md_uri) { 'urn:oasis:names:tc:SAML:2.0:metadata' }
+
+    it 'creates the known entity' do
+      expect { run }.to change { subject.known_entities(true).count }.by(1)
+    end
+
+    it 'has known_entity with federation tag' do
+      run
+      expect(subject.known_entities.last.tags.first.name)
+        .to eq(subject.source_tag)
+    end
+
+    it 'creates the raw entity descriptor' do
+      expect { run }.to change(RawEntityDescriptor, :count).by(1)
+    end
+
+    it 'uses the correct entity id' do
+      run
+      expect(subject.known_entities.last.entity_id).to eq(entity_id)
+    end
+
+    it 'sets the raw entity descriptor as enabled' do
+      run
+      expect(subject.known_entities.last).to be_enabled
+    end
+
+    context 'modifies namespace prefix' do
+      it 'has xyz as saml metadata prefix in source doc' do
+        ed = Nokogiri::XML.parse(xml).root.elements[1]
+        expect(ed.namespaces.key(saml_md_uri)).to eq('xmlns:xyz')
+      end
+
+      it 'changes the stored xml default xmlns to saml metadata' do
+        run
+        red = subject.known_entities.last.raw_entity_descriptor
+        doc = Nokogiri::XML.parse(red.xml)
+        expect(doc.root.namespaces.key(saml_md_uri)).to eq('xmlns')
+      end
+    end
+  end
 end
