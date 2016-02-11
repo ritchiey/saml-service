@@ -29,6 +29,8 @@ module MDUI
       parsed_uri.scheme == 'geo' &&
         parsed_uri.opaque.present? &&
         parsed_uri.opaque.include?(',')
+    rescue URI::InvalidURIError
+      false
     end
 
     private

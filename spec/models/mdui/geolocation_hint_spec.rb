@@ -67,6 +67,11 @@ RSpec.describe MDUI::GeolocationHint, type: :model do
     end
 
     context 'invalid uri' do
+      it 'not a URI' do
+        uri = "xyz:#{lat}, #{long}" # space is invalid
+        expect(MDUI::GeolocationHint.valid_uri?(uri)).to be_falsey
+      end
+
       it 'no geo scheme' do
         uri = "xyz:#{lat},#{long}"
         expect(MDUI::GeolocationHint.valid_uri?(uri)).to be_falsey
