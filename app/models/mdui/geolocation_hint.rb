@@ -24,15 +24,13 @@ module MDUI
     end
 
     def self.valid_uri?(uri)
-      begin
-        parsed_uri = URI.parse(uri)
+      parsed_uri = URI.parse(uri)
 
-        parsed_uri.scheme == 'geo' &&
-          parsed_uri.opaque.present? &&
-          parsed_uri.opaque.include?(',')
-      rescue URI::InvalidURIError => e
-        false
-      end
+      parsed_uri.scheme == 'geo' &&
+        parsed_uri.opaque.present? &&
+        parsed_uri.opaque.include?(',')
+    rescue URI::InvalidURIError
+      false
     end
 
     private
