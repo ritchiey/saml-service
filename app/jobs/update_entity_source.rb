@@ -46,12 +46,22 @@ class UpdateEntitySource
   end
 
   def retrieve(source)
-    parsed_url = URI.parse(source.url)
-    response = Net::HTTP.get_response(parsed_url)
+    url = URI.parse(source.url)
+    response = perform_http_client_request(url)
+
     return response.body if response.is_a?(Net::HTTPSuccess)
 
     fail("Unable to update EntitySource(id=#{source.id} url=#{source.url}). " \
          "Response was: #{response.code} #{response.message}")
+  end
+
+  def perform_http_client_request(url)
+    request = Net::HTTP::Get.new(url)
+    http = Net::HTTP.new(url.host, url.port)
+    http.use_ssl = (url.scheme == 'https')
+    http.read_timeout = 600
+
+    http.request(request)
   end
 
   def document(source)
