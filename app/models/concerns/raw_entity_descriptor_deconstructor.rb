@@ -125,7 +125,7 @@ module RawEntityDescriptorDeconstructor
         location: ds.attributes['Location'].value,
         binding: ds.attributes['Binding'].value,
         index: ds.attributes['index'].value,
-        is_default: ds.attributes['isDefault'].value
+        is_default: ds.attributes['isDefault'].try(:value)
       )
     end
   end
