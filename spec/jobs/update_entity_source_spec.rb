@@ -411,12 +411,11 @@ RSpec.describe UpdateEntitySource do
         'xmlns:xyz="urn:oasis:names:tc:SAML:2.0:metadata" ',
         'ID="_x">',
         EMPTY_SIGNATURE.indent(2),
-        nil,
         entity_descriptors(entities: 1,
                            type: :raw_entity_descriptor_xyz_namespaced)
           .indent(2),
         '</xyz:EntitiesDescriptor>'
-      ].compact.join("\n")
+      ].join("\n")
     end
 
     let(:entity_id) { entity_ids.first }
