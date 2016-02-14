@@ -197,5 +197,60 @@ FactoryGirl.define do
         EOF
       end
     end
+
+    factory :raw_entity_descriptor_xyz_namespaced do
+      transient do
+        hostname { "raw.#{Faker::Internet.domain_name}" }
+        entity_id_uri { "https://#{hostname}/shibboleth" }
+      end
+
+      enabled true
+
+      association :known_entity
+
+      xml do
+        <<-EOF.strip_heredoc
+          <xyz:EntityDescriptor xmlns:xyz="urn:oasis:names:tc:SAML:2.0:metadata"
+            xmlns:mdui="urn:oasis:names:tc:SAML:metadata:ui"
+            entityID="#{entity_id_uri}">
+            <xyz:Extensions>
+              <mdui:UIInfo>
+                <mdui:DisplayName xml:lang="en">
+                  #{Faker::Lorem.word}
+                </mdui:DisplayName>
+                <mdui:Description xml:lang="en">
+                  #{Faker::Lorem.sentence}
+                </mdui:Description>
+                <mdui:Logo height="16" width="16">
+                   https://example.edu/img.png
+               </mdui:Logo>
+               <mdui:InformationURL xml:lang="en">
+                  #{Faker::Internet.url}
+                </mdui:InformationURL>
+                <mdui:PrivacyStatementURL xml:lang="en">
+                  #{Faker::Internet.url}
+                </mdui:PrivacyStatementURL>
+              </mdui:UIInfo>
+              <mdui:DiscoHints>
+                <mdui:IPHint>2001:620::0/96</mdui:IPHint>
+                <mdui:DomainHint>example.edu</mdui:DomainHint>
+                <mdui:GeolocationHint>
+                  geo:47.37328,8.531126
+                </mdui:GeolocationHint>
+                <mdui:GeolocationHint>
+                  http://invalid.example.com
+                </mdui:GeolocationHint>
+              </mdui:DiscoHints>
+            </xyz:Extensions>
+            <xyz:AttributeAuthorityDescriptor
+              protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+              <xyz:AttributeService
+                Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
+                Location="https://#{hostname}/idp/profile/AttributeQuery/SOAP"/>
+            </xyz:AttributeAuthorityDescriptor>
+          </xyz:EntityDescriptor>
+        EOF
+      end
+    end
   end
 end

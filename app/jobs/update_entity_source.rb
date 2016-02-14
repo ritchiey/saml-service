@@ -33,7 +33,6 @@ class UpdateEntitySource
     # EntityDescriptor by ~99.3%
     partial_document = Nokogiri::XML::Document.new
     partial_document.root = node
-
     ke = known_entity(source, partial_document.root)
 
     update_raw_entity_descriptor(ke, partial_document.root)
@@ -60,12 +59,30 @@ class UpdateEntitySource
     errors = metadata_schema.validate(doc)
     if errors.empty?
       verify_signature(source, doc)
-      return doc
+      return doc_using_saml_metadata_as_default_ns(doc)
     end
 
     fail("Unable to update EntitySource(id=#{source.id} url=#{source.url}). " \
          'Schema validation errors prevented processing of the metadata ' \
          "document. Errors were: #{errors.join(', ')}")
+  end
+
+  def doc_using_saml_metadata_as_default_ns(doc)
+    saml_md_uri = 'urn:oasis:names:tc:SAML:2.0:metadata'
+    root = doc.root
+
+    # We work to: <.. xmlns='urn:oasis:names:tc:SAML:2.0:metadata' ...>
+    # Not: <.. xmlns:md='urn:oasis:names:tc:SAML:2.0:metadata' ...>
+    # The latter format being used by at least eduGAIN and possibly elsewhere.
+    return doc if root.namespaces.key(saml_md_uri) == 'xmlns'
+
+    # This has to be done manually due to limitiations
+    # within Nokogiri namespace manipulation functionality.
+    prev_prefix = doc.root.namespace.prefix
+    doc.root.default_namespace = saml_md_uri
+    new_doc_markup = doc.canonicalize.gsub(%r{([<|\/])(#{prev_prefix}:)}, '\1')
+
+    Nokogiri::XML.parse(new_doc_markup)
   end
 
   def verify_signature(source, doc)
