@@ -11,7 +11,7 @@ timeout 600
 before_fork do |server, _worker|
   # Ensure we don't keep connections
   Sequel::Model.db.disconnect
-  Sequel::DATABASES.each{|db| db.disconnect }
+  Sequel::DATABASES.each(&:disconnect)
 
   old_pid = File.join(ROOT, 'tmp', 'pids', 'unicorn.pid.oldbin')
   if File.exist?(old_pid) && server.pid != old_pid
@@ -23,7 +23,7 @@ before_fork do |server, _worker|
   end
 end
 
-after_fork do |server, worker|
+after_fork do |_server, _worker|
   SequelRails.setup Rails.env
 end
 
