@@ -9,7 +9,9 @@ stderr_path '/var/log/aaf/saml/unicorn/stderr.log'
 timeout 600
 
 before_fork do |server, _worker|
+  # Ensure we don't keep connections
   Sequel::Model.db.disconnect
+  Sequel::DATABASES.each{|db| db.disconnect }
 
   old_pid = File.join(ROOT, 'tmp', 'pids', 'unicorn.pid.oldbin')
   if File.exist?(old_pid) && server.pid != old_pid
@@ -19,6 +21,10 @@ before_fork do |server, _worker|
       :not_running
     end
   end
+end
+
+after_fork do |server, worker|
+  SequelRails.setup Rails.env
 end
 
 class Unicorn::HttpServer # rubocop:disable ClassAndModuleChildren
