@@ -29,7 +29,7 @@ RSpec.shared_examples 'EntitiesDescriptor xml' do
   end
 
   context 'Root EntitiesDescriptor' do
-    before { subject.entities_descriptor(entity_source.known_entities) }
+    before { subject.entities_descriptor(KnownEntity.with_all_tags(tag)) }
     include_examples 'shibmd:KeyAuthority xml'
     include_examples 'md:EntitiesDescriptor xml'
 

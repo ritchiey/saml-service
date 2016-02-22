@@ -3,9 +3,16 @@
 require_relative '../config/environment'
 
 class SyncCLI
-  def self.perform(hostname, tag)
-    fr_source = FederationRegistrySource[hostname: hostname]
-    UpdateFromFederationRegistry.perform(id: fr_source.id, primary_tag: tag)
+  def self.perform(source_tag)
+    entity_source = EntitySource[source_tag: source_tag]
+    fail("The source_tag #{source_tag} is invalid") unless entity_source
+
+    if entity_source.url
+      UpdateEntitySource.perform(id: entity_source.id)
+    else
+      fr_source = FederationRegistrySource[entity_source: entity_source]
+      UpdateFromFederationRegistry.perform(id: fr_source.id)
+    end
   end
 end
 

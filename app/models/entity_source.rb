@@ -3,9 +3,10 @@ class EntitySource < Sequel::Model
 
   def validate
     super
-    validates_presence [:rank, :enabled, :created_at, :updated_at]
+    validates_presence [:rank, :enabled, :source_tag, :created_at, :updated_at]
     validates_integer :rank
     validates_unique :rank
+    validates_unique :source_tag
     validate_url
     validate_certificate
   end

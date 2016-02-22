@@ -4,26 +4,28 @@ class UpdateEntitySource
   include SetSAMLTypeFromXML
   include Metadata::Schema
 
-  def self.perform(id:, primary_tag:)
-    new.perform(id: id, primary_tag: primary_tag)
+  def self.perform(id:)
+    new.perform(id: id)
   end
 
-  def perform(id:, primary_tag:)
-    Sequel::Model.db.transaction do
-      source = EntitySource[id]
-      untouched = source.known_entities.to_a
+  def perform(id:)
+    source = EntitySource[id]
+    fail("Unable to locate EntitySource(id=#{id})") unless source
+    untouched = KnownEntity.where(entity_source: source).select_map(:id)
 
-      document(source).xpath(ENTITY_DESCRIPTOR_XPATH).each do |node|
-        process_entity_descriptor(primary_tag, source, node, untouched)
+    document(source).xpath(ENTITY_DESCRIPTOR_XPATH).each do |node|
+      Sequel::Model.db.transaction do
+        process_entity_descriptor(source, node, untouched)
       end
-
-      sweep(untouched)
     end
+
+    Sequel::Model.db.transaction { sweep(untouched) }
+    true
   end
 
   private
 
-  def process_entity_descriptor(primary_tag, source, node, untouched)
+  def process_entity_descriptor(source, node, untouched)
     # We represent each EntityDescriptor as a standalone piece of XML in the
     # database for future processing.
     #
@@ -31,8 +33,7 @@ class UpdateEntitySource
     # EntityDescriptor by ~99.3%
     partial_document = Nokogiri::XML::Document.new
     partial_document.root = node
-
-    ke = known_entity(source, partial_document.root, primary_tag)
+    ke = known_entity(source, partial_document.root)
 
     update_raw_entity_descriptor(ke, partial_document.root)
 
@@ -40,16 +41,26 @@ class UpdateEntitySource
     # which is used by MDQP for etag generation / caching.
     ke.touch
 
-    untouched.reject! { |e| e.id == ke.id }
+    untouched.delete(ke.id)
   end
 
   def retrieve(source)
-    parsed_url = URI.parse(source.url)
-    response = Net::HTTP.get_response(parsed_url)
+    url = URI.parse(source.url)
+    response = perform_http_client_request(url)
+
     return response.body if response.is_a?(Net::HTTPSuccess)
 
     fail("Unable to update EntitySource(id=#{source.id} url=#{source.url}). " \
          "Response was: #{response.code} #{response.message}")
+  end
+
+  def perform_http_client_request(url)
+    request = Net::HTTP::Get.new(url)
+    http = Net::HTTP.new(url.host, url.port)
+    http.use_ssl = (url.scheme == 'https')
+    http.read_timeout = 600
+
+    http.request(request)
   end
 
   def document(source)
@@ -58,12 +69,30 @@ class UpdateEntitySource
     errors = metadata_schema.validate(doc)
     if errors.empty?
       verify_signature(source, doc)
-      return doc
+      return doc_using_saml_metadata_as_default_ns(doc)
     end
 
     fail("Unable to update EntitySource(id=#{source.id} url=#{source.url}). " \
          'Schema validation errors prevented processing of the metadata ' \
          "document. Errors were: #{errors.join(', ')}")
+  end
+
+  def doc_using_saml_metadata_as_default_ns(doc)
+    saml_md_uri = 'urn:oasis:names:tc:SAML:2.0:metadata'
+    root = doc.root
+
+    # We work to: <.. xmlns='urn:oasis:names:tc:SAML:2.0:metadata' ...>
+    # Not: <.. xmlns:md='urn:oasis:names:tc:SAML:2.0:metadata' ...>
+    # The latter format being used by at least eduGAIN and possibly elsewhere.
+    return doc if root.namespaces.key(saml_md_uri) == 'xmlns'
+
+    # This has to be done manually due to limitiations
+    # within Nokogiri namespace manipulation functionality.
+    prev_prefix = doc.root.namespace.prefix
+    doc.root.default_namespace = saml_md_uri
+    new_doc_markup = doc.canonicalize.gsub(%r{([<|\/])(#{prev_prefix}:)}, '\1')
+
+    Nokogiri::XML.parse(new_doc_markup)
   end
 
   def verify_signature(source, doc)
@@ -73,12 +102,12 @@ class UpdateEntitySource
          'Signature validation failed.')
   end
 
-  def known_entity(source, root_node, primary_tag)
-    entity_id = EntityId.find(uri: root_node['entityID'])
-    return entity_id.parent.known_entity if entity_id
+  def known_entity(source, root_node)
+    ke = known_entity_within_entity_source(source, root_node)
+    return ke if ke.present?
 
     ke = KnownEntity.create(entity_source: source, enabled: true)
-    ke.tag_as(primary_tag)
+    ke.tag_as(source.source_tag)
     ke
   end
 
@@ -96,10 +125,17 @@ class UpdateEntitySource
   end
 
   def sweep(untouched)
-    KnownEntity.where(id: untouched.map(&:id)).each do |ke|
+    KnownEntity.where(id: untouched).each do |ke|
       ke.try(:raw_entity_descriptor).try(:entity_id).try(:destroy)
       ke.try(:raw_entity_descriptor).try(:destroy)
       ke.destroy
     end
+  end
+
+  def known_entity_within_entity_source(source, root_node)
+    entity_id = EntityId.where(uri: root_node['entityID']).all.find do |eid|
+      eid.parent.known_entity.entity_source == source
+    end
+    entity_id.parent.known_entity if entity_id
   end
 end

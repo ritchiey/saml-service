@@ -53,6 +53,7 @@ module QueryFederationRegistry
 
     http = Net::HTTP.new(url.host, url.port)
     http.use_ssl = (url.scheme == 'https')
+    http.read_timeout = 600
     http.request(request)
   end
 end

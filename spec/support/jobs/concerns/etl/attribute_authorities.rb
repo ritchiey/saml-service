@@ -89,7 +89,7 @@ RSpec.shared_examples 'ETL::AttributeAuthorities' do
   end
 
   def run
-    described_class.new(id: fr_source.id, primary_tag: federation_tag)
+    described_class.new(id: fr_source.id)
       .attribute_authorities(entity_descriptor, ed_data)
   end
 

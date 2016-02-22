@@ -104,34 +104,34 @@ RSpec.describe RawEntityDescriptor do
 
     it 'populates MDUI DisplayNames' do
       expect(subject.ui_info.display_names).to be_present
-      expect(subject.ui_info.display_names).to all(have_key(:lang))
-        .and all(have_key(:value))
+      expect(subject.ui_info.display_names).to all(respond_to(:lang))
+        .and all(respond_to(:value))
     end
 
     it 'populates MDUI Description' do
       expect(subject.ui_info.descriptions).to be_present
-      expect(subject.ui_info.descriptions).to all(have_key(:lang))
-        .and all(have_key(:value))
+      expect(subject.ui_info.descriptions).to all(respond_to(:lang))
+        .and all(respond_to(:value))
     end
 
     it 'populates MDUI Logo' do
       expect(subject.ui_info.logos).to be_present
       expect(subject.ui_info.logos)
-        .to all(have_key(:width))
-        .and all(have_key(:height))
-        .and all(have_key(:uri))
+        .to all(respond_to(:width))
+        .and all(respond_to(:height))
+        .and all(respond_to(:uri))
     end
 
     it 'populates MDUI Information URL' do
       expect(subject.ui_info.information_urls).to be_present
-      expect(subject.ui_info.information_urls).to all(have_key(:lang))
-        .and all(have_key(:uri))
+      expect(subject.ui_info.information_urls).to all(respond_to(:lang))
+        .and all(respond_to(:uri))
     end
 
     it 'populates MDUI Privacy Statement URL' do
       expect(subject.ui_info.privacy_statement_urls).to be_present
-      expect(subject.ui_info.privacy_statement_urls).to all(have_key(:lang))
-        .and all(have_key(:uri))
+      expect(subject.ui_info.privacy_statement_urls).to all(respond_to(:lang))
+        .and all(respond_to(:uri))
     end
   end
 
@@ -144,33 +144,55 @@ RSpec.describe RawEntityDescriptor do
 
     it 'populates IPHints' do
       expect(subject.disco_hints.ip_hints).to be_present
-      expect(subject.disco_hints.ip_hints).to all(have_key(:block))
+      expect(subject.disco_hints.ip_hints).to all(respond_to(:block))
     end
 
     it 'populates DomainHints' do
       expect(subject.disco_hints.domain_hints).to be_present
-      expect(subject.disco_hints.domain_hints).to all(have_key(:domain))
+      expect(subject.disco_hints.domain_hints).to all(respond_to(:domain))
     end
 
     it 'populates GelocationHints' do
       expect(subject.disco_hints.geolocation_hints).to be_present
       expect(subject.disco_hints.geolocation_hints)
-        .to all(have_key(:latitude))
-        .and all(have_key(:longitude))
-        .and all(have_key(:altitude))
+        .to all(respond_to(:latitude))
+        .and all(respond_to(:longitude))
+        .and all(respond_to(:altitude))
+    end
+
+    context 'with invalid geolocation uri' do
+      subject { create :raw_entity_descriptor_invalid_geo_location }
+
+      it 'ignores invalid geolocation URI values' do
+        expect(subject.disco_hints.geolocation_hints.size).to eq(1)
+      end
     end
   end
 
-  describe '#disco_hints' do
+  describe '#discovery_response_services' do
     subject { create :raw_entity_descriptor_sp }
 
     it 'populates an array when discovery_response xml content present' do
       expect(subject.discovery_response_services).to be_present
       expect(subject.discovery_response_services)
-        .to all(have_key(:location))
-        .and all(have_key(:binding))
-        .and all(have_key(:index))
-        .and all(have_key(:is_default))
+        .to all(respond_to(:location))
+        .and all(respond_to(:binding))
+        .and all(respond_to(:index))
+        .and all(respond_to(:is_default))
+    end
+
+    context 'with a missing `isDefault` attribute' do
+      subject do
+        create(:raw_entity_descriptor_sp).tap do |red|
+          red.xml = red.xml.gsub(/isDefault="[^"]+"/, '')
+        end
+      end
+
+      it 'returns a nil value for `is_default`' do
+        expect(subject.discovery_response_services).to be_present
+        expect(subject.discovery_response_services)
+          .to all(have_attributes(is_default: nil))
+      end
     end
   end
 
@@ -180,8 +202,8 @@ RSpec.describe RawEntityDescriptor do
     it 'populates an array when single_sign_on_services xml content present' do
       expect(subject.single_sign_on_services).to be_present
       expect(subject.single_sign_on_services)
-        .to all(have_key(:location))
-        .and all(have_key(:binding))
+        .to all(respond_to(:location))
+        .and all(respond_to(:binding))
     end
   end
 end

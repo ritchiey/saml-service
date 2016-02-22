@@ -82,7 +82,7 @@ RSpec.shared_examples 'ETL::EntityDescriptors' do
   end
 
   def run
-    described_class.new(id: fr_source.id, primary_tag: federation_tag)
+    described_class.new(id: fr_source.id)
       .entity_descriptors(organization, org_data)
   end
 
@@ -184,7 +184,8 @@ RSpec.shared_examples 'ETL::EntityDescriptors' do
     end
 
     it 'has known_entity with federation tag' do
-      expect(subject.known_entity.tags.first.name).to eq(federation_tag)
+      expect(subject.known_entity.tags.first.name)
+        .to eq(subject.known_entity.entity_source.source_tag)
     end
   end
 
@@ -212,7 +213,8 @@ RSpec.shared_examples 'ETL::EntityDescriptors' do
       end
 
       it 'has known_entity with federation tag' do
-        expect(subject.known_entity.tags.first.name).to eq(federation_tag)
+        expect(subject.known_entity.tags.first.name)
+          .to eq(subject.known_entity.entity_source.source_tag)
       end
     end
   end

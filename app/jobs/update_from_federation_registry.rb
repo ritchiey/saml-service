@@ -12,17 +12,16 @@ class UpdateFromFederationRegistry
   include ETL::AttributeAuthorities
   include ETL::ServiceProviders
 
-  attr_reader :fr_source, :source, :primary_tag
+  attr_reader :fr_source, :source
 
-  def self.perform(id:, primary_tag:)
-    new(id: id, primary_tag: primary_tag).perform
+  def self.perform(id:)
+    new(id: id).perform
   end
 
-  def initialize(id:, primary_tag:)
+  def initialize(id:)
     @cache = {}
     @fr_source = FederationRegistrySource[id]
     @source = @fr_source.entity_source
-    @primary_tag = primary_tag
   end
 
   def perform

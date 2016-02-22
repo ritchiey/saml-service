@@ -23,7 +23,7 @@ RSpec.describe UpdateEntitySource do
   end
 
   def run
-    described_class.perform(id: subject.id, primary_tag: federation_tag)
+    described_class.perform(id: subject.id)
   end
 
   def entity_descriptors(entities:, type:)
@@ -72,6 +72,15 @@ RSpec.describe UpdateEntitySource do
     ].compact.join("\n")
   end
 
+  context 'with an invalid EntitySource ID' do
+    let(:xml) { entities_descriptor(entities: 1) }
+
+    it 'throws an exception' do
+      expect { described_class.perform(id: -1) }
+        .to raise_error('Unable to locate EntitySource(id=-1)')
+    end
+  end
+
   context 'with a single entity' do
     let(:xml) { entities_descriptor(entities: 1) }
 
@@ -83,7 +92,8 @@ RSpec.describe UpdateEntitySource do
 
     it 'has known_entity with federation tag' do
       run
-      expect(subject.known_entities.last.tags.first.name).to eq(federation_tag)
+      expect(subject.known_entities.last.tags.first.name)
+        .to eq(subject.source_tag)
     end
 
     it 'creates the raw entity descriptor' do
@@ -198,6 +208,51 @@ RSpec.describe UpdateEntitySource do
           Timecop.travel(1.second) do
             expect { run }
               .to change { red.reload.known_entity.updated_at }
+          end
+        end
+
+        context 'entity descriptor exists from a different source' do
+          let(:secondary_es) do
+            create(:entity_source, :external, certificate: certificate.to_pem)
+          end
+          let!(:additional_entity_reference) do
+            create :known_entity,
+                   :with_raw_entity_descriptor,
+                   entity_source: secondary_es, enabled: true
+          end
+
+          before do
+            additional_entity_reference.raw_entity_descriptor
+              .entity_id.update(uri: entity_id)
+          end
+
+          it 'results in two references for the same entity_id' do
+            expect(EntityId.where(uri: entity_id).count).to eq(2)
+          end
+
+          it 'has differing sources for each EntityId reference' do
+            es1 =
+              EntityId.where(uri: entity_id).first.parent
+              .known_entity.entity_source
+            es2 =
+              EntityId.where(uri: entity_id).last.parent
+              .known_entity.entity_source
+
+            expect(es1 == es2).to be_falsey
+          end
+
+          it 'updates the known_entity for this source' do
+            Timecop.travel(1.second) do
+              expect { run }
+                .to change { red.reload.known_entity.updated_at }
+            end
+          end
+
+          it 'does not update other known_entity instances' do
+            Timecop.travel(1.second) do
+              expect { run }
+                .not_to change { additional_entity_reference.reload.updated_at }
+            end
           end
         end
       end
@@ -346,6 +401,62 @@ RSpec.describe UpdateEntitySource do
         .to match('Unable to update EntitySource')
         .and match(subject.url)
         .and match('Signature validation failed')
+    end
+  end
+
+  context 'with a non xmlns namespace for metadata' do
+    let(:xml) do
+      [
+        '<xyz:EntitiesDescriptor ' \
+        'xmlns:xyz="urn:oasis:names:tc:SAML:2.0:metadata" ',
+        'ID="_x">',
+        EMPTY_SIGNATURE.indent(2),
+        entity_descriptors(entities: 1,
+                           type: :raw_entity_descriptor_xyz_namespaced)
+          .indent(2),
+        '</xyz:EntitiesDescriptor>'
+      ].join("\n")
+    end
+
+    let(:entity_id) { entity_ids.first }
+    let(:saml_md_uri) { 'urn:oasis:names:tc:SAML:2.0:metadata' }
+
+    it 'creates the known entity' do
+      expect { run }.to change { subject.known_entities(true).count }.by(1)
+    end
+
+    it 'has known_entity with federation tag' do
+      run
+      expect(subject.known_entities.last.tags.first.name)
+        .to eq(subject.source_tag)
+    end
+
+    it 'creates the raw entity descriptor' do
+      expect { run }.to change(RawEntityDescriptor, :count).by(1)
+    end
+
+    it 'uses the correct entity id' do
+      run
+      expect(subject.known_entities.last.entity_id).to eq(entity_id)
+    end
+
+    it 'sets the raw entity descriptor as enabled' do
+      run
+      expect(subject.known_entities.last).to be_enabled
+    end
+
+    context 'modifies namespace prefix' do
+      it 'has xyz as saml metadata prefix in source doc' do
+        ed = Nokogiri::XML.parse(xml).root.elements[1]
+        expect(ed.namespaces.key(saml_md_uri)).to eq('xmlns:xyz')
+      end
+
+      it 'changes the stored xml default xmlns to saml metadata' do
+        run
+        red = subject.known_entities.last.raw_entity_descriptor
+        doc = Nokogiri::XML.parse(red.xml)
+        expect(doc.root.namespaces.key(saml_md_uri)).to eq('xmlns')
+      end
     end
   end
 end

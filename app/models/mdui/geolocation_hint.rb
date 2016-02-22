@@ -19,10 +19,24 @@ module MDUI
       uri_parts[2]
     end
 
+    def self.parse_uri_into_parts(uri)
+      URI.parse(uri).opaque.partition(';').first.split(',', 3)
+    end
+
+    def self.valid_uri?(uri)
+      parsed_uri = URI.parse(uri)
+
+      parsed_uri.scheme == 'geo' &&
+        parsed_uri.opaque.present? &&
+        parsed_uri.opaque.include?(',')
+    rescue URI::InvalidURIError
+      false
+    end
+
     private
 
     def uri_parts
-      @uri_parts ||= URI.parse(uri).opaque.split(',', 3)
+      @uri_parts ||= MDUI::GeolocationHint.parse_uri_into_parts(uri)
     end
   end
 end

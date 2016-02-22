@@ -43,4 +43,92 @@ RSpec.describe MDUI::GeolocationHint, type: :model do
       end
     end
   end
+
+  describe '#valid_uri?' do
+    let(:lat) { Faker::Number.decimal(5) }
+    let(:long) { Faker::Number.decimal(5) }
+    let(:alt) { Faker::Number.decimal(2) }
+
+    context 'valid uri values' do
+      it 'minimal uri' do
+        uri = "geo:#{lat},#{long}"
+        expect(MDUI::GeolocationHint.valid_uri?(uri)).to be_truthy
+      end
+
+      it 'extended uri' do
+        uri = "geo:#{lat},#{long},#{alt}"
+        expect(MDUI::GeolocationHint.valid_uri?(uri)).to be_truthy
+      end
+
+      it 'with parameters' do
+        uri = "geo:#{lat},#{long},#{alt};u=35"
+        expect(MDUI::GeolocationHint.valid_uri?(uri)).to be_truthy
+      end
+    end
+
+    context 'invalid uri' do
+      it 'not a URI' do
+        uri = "xyz:#{lat}, #{long}" # space is invalid
+        expect(MDUI::GeolocationHint.valid_uri?(uri)).to be_falsey
+      end
+
+      it 'no geo scheme' do
+        uri = "xyz:#{lat},#{long}"
+        expect(MDUI::GeolocationHint.valid_uri?(uri)).to be_falsey
+      end
+
+      it 'no opaque component' do
+        uri = 'geo:'
+        expect(MDUI::GeolocationHint.valid_uri?(uri)).to be_falsey
+      end
+
+      it 'values are not comma seperated' do
+        uri = "geo:#{lat}:#{long}"
+        expect(MDUI::GeolocationHint.valid_uri?(uri)).to be_falsey
+      end
+    end
+  end
+
+  describe '#parse_uri_into_parts' do
+    let(:lat) { Faker::Number.decimal(5) }
+    let(:long) { Faker::Number.decimal(5) }
+    let(:alt) { Faker::Number.decimal(2) }
+    let(:parsed_uri) { MDUI::GeolocationHint.parse_uri_into_parts(uri) }
+
+    shared_examples 'provides minimal values correctly' do
+      it 'provides expected values' do
+        expect(parsed_uri[0]).to eq(lat)
+        expect(parsed_uri[1]).to eq(long)
+        expect(parsed_uri[2]).to be_nil
+      end
+    end
+
+    shared_examples 'provides extended values correctly' do
+      it 'provides expected values including altitude' do
+        expect(parsed_uri[0]).to eq(lat)
+        expect(parsed_uri[1]).to eq(long)
+        expect(parsed_uri[2]).to eq(alt)
+      end
+    end
+
+    context 'with lat and long' do
+      let(:uri) { "geo:#{lat},#{long}" }
+      include_examples 'provides minimal values correctly'
+
+      context 'with additional parameters' do
+        let(:uri) { "geo:#{lat},#{long};u=#{Faker::Number.number(2)}" }
+        include_examples 'provides minimal values correctly'
+      end
+    end
+
+    context 'with lat, long and alt' do
+      let(:uri) { "geo:#{lat},#{long},#{alt}" }
+      include_examples 'provides extended values correctly'
+
+      context 'with additional parameters' do
+        let(:uri) { "geo:#{lat},#{long},#{alt};u=#{Faker::Number.number(2)}" }
+        include_examples 'provides extended values correctly'
+      end
+    end
+  end
 end

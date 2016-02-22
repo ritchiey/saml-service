@@ -58,7 +58,7 @@ module Metadata
         signature_element
         entities_descriptor_extensions
 
-        known_entities.each do |ke|
+        filter_known_entities(known_entities).each do |ke|
           known_entity(ke)
         end
       end
@@ -73,6 +73,22 @@ module Metadata
         key_authority(mi) if mi.ca_key_infos.present?
         entity_attribute(mi.entity_attribute) if mi.entity_attribute.present?
       end
+    end
+
+    # Lowest rank for EntitySource where multiple instances of
+    # EntityDescriptor represented by the same EntityId exist is authoritative.
+    def filter_known_entities(known_entities)
+      group_by_eid(known_entities).flat_map do |_, entities|
+        sort_eid_hash_by_source_rank(entities).first
+      end
+    end
+
+    def group_by_eid(known_entities)
+      known_entities.group_by(&:entity_id)
+    end
+
+    def sort_eid_hash_by_source_rank(entities)
+      entities.sort_by { |ke| ke.entity_source.try(:rank) }
     end
 
     def known_entity(ke)
