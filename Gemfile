@@ -4,7 +4,6 @@ source 'https://rubygems.org'
 gem 'rails', '~> 4.2'
 gem 'mysql2', '0.4.2'
 gem 'sequel-rails'
-# TODO: sequel >= 4.24 causes mass test failures, unpin this and fix the problem
 gem 'sequel', '~> 4.31.0'
 gem 'aaf-gumboot', git: 'https://github.com/ausaccessfed/aaf-gumboot.git',
                    branch: 'develop'
