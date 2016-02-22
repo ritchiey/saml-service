@@ -21,6 +21,8 @@ module Saml
     # specified here.
 
     config.sequel.after_connect = proc do
+      Sequel::Model.db.extension :connection_validator
+      Sequel::Model.db.pool.connection_validation_timeout = -1
       Sequel::Model.plugin :timestamps, update_on_create: true
       Sequel::Model.plugin :validation_helpers
     end
