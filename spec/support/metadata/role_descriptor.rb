@@ -16,8 +16,9 @@ RSpec.shared_examples 'RoleDescriptor xml' do
   context 'attributes' do
     context 'protocol supports' do
       it 'is rendered' do
+        expect(role_descriptor.protocol_supports.length).to eq(2)
         expect(node['protocolSupportEnumeration'])
-          .to eq(role_descriptor.protocol_supports.map(&:uri).join(','))
+          .to eq(role_descriptor.protocol_supports.map(&:uri).join(' '))
       end
     end
     context 'error URL' do
