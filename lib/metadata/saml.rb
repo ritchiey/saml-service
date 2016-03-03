@@ -312,7 +312,7 @@ module Metadata
 
     def role_descriptor(rd, scope)
       scope.parent[:protocolSupportEnumeration] =
-        rd.protocol_supports.map(&:uri).sort.join(',')
+        rd.protocol_supports.map(&:uri).sort.join(' ')
       scope.parent[:errorURL] = rd.error_url if rd.error_url.present?
 
       role_descriptor_extensions(rd, scope)
