@@ -9,7 +9,7 @@ FactoryGirl.define do
     cache_period { 6.hours }
     federation_identifier { Faker::Lorem.word }
 
-    primary_tag { Faker::Lorem.word }
+    primary_tag { SecureRandom.urlsafe_base64(16) }
     all_entities true
 
     after :create do |mi|

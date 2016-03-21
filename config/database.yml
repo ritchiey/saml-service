@@ -1,11 +1,12 @@
 default: &default
   adapter: mysql2
-  encoding: utf8
   username: saml_app
   password: password
   host: 127.0.0.1
   pool: 5
   timeout: 5000
+  encoding: utf8
+  collation: utf8_bin
 
 development:
   <<: *default
@@ -13,15 +14,7 @@ development:
 
 test:
   <<: *default
-  database:
-    <%= if ENV['TEST_ENV_NUMBER']
-          "test#{ENV['TEST_ENV_NUMBER']}"
-        else
-          'saml_test'
-        end %>
-  username: <%= ENV['MYSQL_USER'] || 'saml_app' %>
-  password: <%= ENV['MYSQL_PASSWORD'] || 'password' %>
-  host: localhost
+  database: saml_test
 
 production:
   <<: *default
