@@ -6,7 +6,7 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
     {
       id: sp.id,
       display_name: Faker::Lorem.sentence,
-      description: Faker::Lorem.sentence,
+      description: description,
       functioning: sp.functioning?,
       created_at: sp_created_at,
       saml: {

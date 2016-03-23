@@ -91,7 +91,7 @@ module ETL
 
       ui_info.add_display_name(MDUI::DisplayName.new(value: display_name,
                                                      lang: 'en'))
-      ui_info.add_description(MDUI::Description.new(value: description,
+      ui_info.add_description(MDUI::Description.new(value: description.squish,
                                                     lang: 'en'))
     end
 
