@@ -81,6 +81,10 @@ RSpec.shared_examples 'ETL::Common' do
   end
   # rubocop:enable Metrics/MethodLength
 
+  def description
+    @description ||= "#{Faker::Lorem.sentence}\r\n\t#{Faker::Lorem.sentence}"
+  end
+
   let(:scope) { 'example.edu' }
 
   let(:contact_instances) do
@@ -152,6 +156,12 @@ RSpec.shared_examples 'ETL::Common' do
 
     it 'updates mdui descriptions' do
       expect { run }.to change { subject.reload.ui_info.descriptions }
+    end
+
+    it 'squishes incoming description' do
+      run
+      expect(subject.reload.ui_info.descriptions.first.value)
+        .to eq(description.squish)
     end
   end
 

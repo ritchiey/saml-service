@@ -851,5 +851,7 @@ self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20151217044855_ad
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160114033904_change_raw_entity_descriptor_xml_to_medium_text.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160203023734_add_source_tag_to_entity_source.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160209223646_remove_source_tag_default_value.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160314045620_set_correct_encoding_collation.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160316030021_change_collation_to_binary.rb')"
                 end
               end
