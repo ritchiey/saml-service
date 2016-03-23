@@ -1,4 +1,13 @@
 GIT
+  remote: git://github.com/bradleybeddoes/nokogiri.git
+  revision: 29b165b75d8cf90bc4deb7dd286339cdcb3eac48
+  branch: gem-with-namespace-pruning-fix
+  specs:
+    nokogiri (1.6.8.aaf.rc)
+      mini_portile2 (~> 2.1.0)
+      pkg-config (~> 1.1.7)
+
+GIT
   remote: https://github.com/ausaccessfed/aaf-gumboot.git
   revision: 5cfdaec49d44e1cecb48371d4234341e487b2ac5
   branch: develop
@@ -154,19 +163,18 @@ GEM
       mime-types (>= 1.16, < 3)
     method_source (0.8.2)
     mime-types (2.6.1)
-    mini_portile2 (2.0.0)
+    mini_portile2 (2.1.0)
     minitest (5.8.4)
     mono_logger (1.1.0)
     multi_json (1.11.2)
     mysql2 (0.4.2)
     nenv (0.2.0)
-    nokogiri (1.6.7.2)
-      mini_portile2 (~> 2.0.0.rc2)
     notiffany (0.0.7)
       nenv (~> 0.1)
       shellany (~> 0.0)
     parser (2.2.2.6)
       ast (>= 1.1, < 3.0)
+    pkg-config (1.1.7)
     powerpack (0.1.1)
     pry (0.10.1)
       coderay (~> 1.1.0)
@@ -361,7 +369,7 @@ DEPENDENCIES
   implicit-schema
   jbuilder
   mysql2 (= 0.4.2)
-  nokogiri (~> 1.6)
+  nokogiri!
   pry-byebug
   pry-rails
   rails (~> 4.2)
