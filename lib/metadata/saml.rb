@@ -50,16 +50,18 @@ module Metadata
     end
 
     def entities_descriptor(known_entities)
-      attributes = { ID: instance_id,
-                     Name: metadata_instance.name,
-                     validUntil: expires_at.xmlschema }
+      Sequel::Model.db.transaction(isolation: :repeatable) do
+        attributes = { ID: instance_id,
+                       Name: metadata_instance.name,
+                       validUntil: expires_at.xmlschema }
 
-      root.EntitiesDescriptor(ns, attributes) do |_|
-        signature_element
-        entities_descriptor_extensions
+        root.EntitiesDescriptor(ns, attributes) do |_|
+          signature_element
+          entities_descriptor_extensions
 
-        filter_known_entities(known_entities).each do |ke|
-          known_entity(ke)
+          filter_known_entities(known_entities).each do |ke|
+            known_entity(ke)
+          end
         end
       end
     end
@@ -100,11 +102,13 @@ module Metadata
     end
 
     def root_entity_descriptor(ke)
-      attributes = { ID: instance_id, validUntil: expires_at.xmlschema }
-      if ke.entity_descriptor.try(:functioning?)
-        entity_descriptor(ke.entity_descriptor, attributes, true)
-      elsif ke.raw_entity_descriptor.try(:functioning?)
-        raw_entity_descriptor(ke.raw_entity_descriptor, attributes, true)
+      Sequel::Model.db.transaction(isolation: :repeatable) do
+        attributes = { ID: instance_id, validUntil: expires_at.xmlschema }
+        if ke.entity_descriptor.try(:functioning?)
+          entity_descriptor(ke.entity_descriptor, attributes, true)
+        elsif ke.raw_entity_descriptor.try(:functioning?)
+          raw_entity_descriptor(ke.raw_entity_descriptor, attributes, true)
+        end
       end
     end
 
