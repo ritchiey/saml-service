@@ -3,13 +3,15 @@ module API
     skip_before_action :ensure_authenticated
 
     def index
-      public_action
-      @identity_provider_entities =
-        ed_containing_idp.select(&:functioning?) +
-        red_containing_idp.select(&:functioning?)
-      @service_provider_entities =
-        ed_containing_sp.select(&:functioning?) +
-        red_containing_sp.select(&:functioning?)
+      Sequel::Model.db.transaction(isolation: :repeatable) do
+        public_action
+        @identity_provider_entities =
+          ed_containing_idp.select(&:functioning?) +
+          red_containing_idp.select(&:functioning?)
+        @service_provider_entities =
+          ed_containing_sp.select(&:functioning?) +
+          red_containing_sp.select(&:functioning?)
+      end
     end
 
     private

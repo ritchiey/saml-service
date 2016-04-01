@@ -42,25 +42,29 @@ class MetadataQueryController < ApplicationController
   private
 
   def handle_entities_request(tags)
-    known_entities = KnownEntity.with_all_tags(tags)
-    return not_found unless known_entities.present?
+    Sequel::Model.db.transaction(isolation: :repeatable) do
+      known_entities = KnownEntity.with_all_tags(tags)
+      return not_found unless known_entities.present?
 
-    etag = generate_known_entities_etag(known_entities)
-    if known_entities_unmodified?(known_entities, etag)
-      return head :not_modified
+      etag = generate_known_entities_etag(known_entities)
+      if known_entities_unmodified?(known_entities, etag)
+        return head :not_modified
+      end
+
+      create_known_entities_response(known_entities, etag)
     end
-
-    create_known_entities_response(known_entities, etag)
   end
 
   def handle_entity_request(entity_id)
     return not_found unless entity_id
 
-    known_entity = entity_id.parent.known_entity
-    etag = generate_descriptor_etag(known_entity)
-    return head :not_modified if known_entity_unmodified?(known_entity, etag)
+    Sequel::Model.db.transaction(isolation: :repeatable) do
+      known_entity = entity_id.parent.known_entity
+      etag = generate_descriptor_etag(known_entity)
+      return head :not_modified if known_entity_unmodified?(known_entity, etag)
 
-    create_known_entity_response(known_entity, etag)
+      create_known_entity_response(known_entity, etag)
+    end
   end
 
   def ensure_get_request
