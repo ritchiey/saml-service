@@ -30,6 +30,7 @@ Rails.application.routes.draw do
       scope 'discovery' do
         resources :discovery_entities, path: 'entities'
       end
+      resources 'entity_source', only: %i(update), param: :source_tag
     end
   end
 end

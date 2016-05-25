@@ -10,6 +10,9 @@ module API
     private_constant :Unauthorized
     rescue_from Unauthorized, with: :unauthorized
 
+    ResourceNotFound = Class.new(StandardError)
+    rescue_from ResourceNotFound, with: :resource_not_found
+
     protect_from_forgery with: :null_session
     before_action :ensure_authenticated
     after_action :ensure_access_checked
@@ -68,6 +71,11 @@ module API
     def forbidden(_exception)
       message = 'The request was understood but explicitly denied.'
       render json: { message: message }, status: :forbidden
+    end
+
+    def resource_not_found(_exception)
+      message = 'Resource not found.'
+      render json: { message: message }, status: :not_found
     end
   end
 end
