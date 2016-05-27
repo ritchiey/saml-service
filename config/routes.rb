@@ -30,7 +30,9 @@ Rails.application.routes.draw do
       scope 'discovery' do
         resources :discovery_entities, path: 'entities'
       end
-      resources 'entity_source', only: %i(update), param: :source_tag
+      post 'entity_sources/:tag/raw_entity_descriptors',
+           to: 'raw_entity_descriptors#create',
+           as: 'raw_entity_descriptors'
     end
   end
 end
