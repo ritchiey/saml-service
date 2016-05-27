@@ -5,10 +5,17 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
     let(:entity_source) { create(:entity_source) }
     let(:source_tag) { entity_source.source_tag }
 
+    let(:raw_idp) { create(:raw_entity_descriptor_idp) }
+    let(:keys) { [:xml, :created_at, :updated_at, :enabled] }
+    let(:idp_values) { raw_idp.values.slice(*keys) }
+    let(:idp_tags) { { tags: [Faker::Lorem.word, Faker::Lorem.word] } }
+
+    let(:raw_entity_descriptor) { idp_values.merge(idp_tags) }
+
     def run
       request.env['HTTP_X509_DN'] = "CN=#{api_subject.x509_cn}" if api_subject
-      post :create, tag: source_tag
-      puts request.path
+      post :create, tag: source_tag,
+                    raw_entity_descriptor: raw_entity_descriptor
     end
 
     context 'not permitted' do
