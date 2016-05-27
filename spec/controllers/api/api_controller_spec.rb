@@ -29,8 +29,35 @@ RSpec.describe API::APIController, type: :controller do
     it { is_expected.to have_http_status(:not_found) }
 
     it 'responds with the exception' do
-      puts data
       expect(data['message']).to match(/Resource not found/)
+    end
+  end
+
+  context 'a bad request' do
+    let(:api_subject) { create(:api_subject) }
+    before { request.env['HTTP_X509_DN'] = "CN=#{api_subject.x509_cn}" }
+
+    controller(API::APIController) do
+      def a_bad_request
+        public_action
+        fail(API::APIController::BadRequest)
+      end
+    end
+
+    before do
+      @routes.draw do
+        get '/api/a_bad_request' => 'api/api#a_bad_request'
+      end
+    end
+
+    before { get :a_bad_request }
+    subject { response }
+    let(:data) { JSON.parse(response.body) }
+
+    it { is_expected.to have_http_status(:bad_request) }
+
+    it 'responds with the exception' do
+      expect(data['message']).to match(/Bad request/)
     end
   end
 end

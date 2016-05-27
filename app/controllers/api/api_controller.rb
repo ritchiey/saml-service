@@ -13,6 +13,9 @@ module API
     ResourceNotFound = Class.new(StandardError)
     rescue_from ResourceNotFound, with: :resource_not_found
 
+    BadRequest = Class.new(StandardError)
+    rescue_from BadRequest, with: :bad_request
+
     protect_from_forgery with: :null_session
     before_action :ensure_authenticated
     after_action :ensure_access_checked
@@ -76,6 +79,11 @@ module API
     def resource_not_found(_exception)
       message = 'Resource not found.'
       render json: { message: message }, status: :not_found
+    end
+
+    def bad_request(_exception)
+      message = 'Bad request.'
+      render json: { message: message }, status: :bad_request
     end
   end
 end
