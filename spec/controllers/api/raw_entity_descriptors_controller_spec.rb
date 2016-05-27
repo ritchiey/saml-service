@@ -31,13 +31,45 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
 
     context 'permitted' do
       let(:api_subject) { create(:api_subject, :authorized, permission: '*') }
-      before { run }
-      subject { response }
-      it { is_expected.to have_http_status(:ok) }
+
+      subject do
+        run
+        response
+      end
 
       context 'with an entity source that does not exist' do
         let(:source_tag) { Faker::Lorem.word }
         it { is_expected.to have_http_status(:not_found) }
+      end
+
+      context 'with valid params' do
+        it { is_expected.to have_http_status(:ok) }
+      end
+
+      context 'with empty raw entity descriptor' do
+        let(:raw_entity_descriptor) { {} }
+        subject { -> { run } }
+        it { is_expected.to raise_error(ActionController::ParameterMissing) }
+      end
+
+      context 'with missing xml' do
+        let(:keys) { [:created_at, :updated_at, :enabled] }
+        it { is_expected.to have_http_status(:bad_request) }
+      end
+
+      context 'with missing created at' do
+        let(:keys) { [:xml, :updated_at, :enabled] }
+        it { is_expected.to have_http_status(:bad_request) }
+      end
+
+      context 'with missing updated at' do
+        let(:keys) { [:xml, :created_at, :enabled] }
+        it { is_expected.to have_http_status(:bad_request) }
+      end
+
+      context 'with missing enabled flag' do
+        let(:keys) { [:xml, :created_at, :updated_at, :updated_at] }
+        it { is_expected.to have_http_status(:bad_request) }
       end
     end
   end
