@@ -15,11 +15,12 @@ module API
 
     def post_params
       params.require(:raw_entity_descriptor)
-        .permit(:xml, :created_at, :updated_at, :enabled)
+        .permit(:xml, :entity_id, :created_at, :updated_at, :enabled)
     end
 
     def valid_post_params?
-      [:xml, :created_at, :updated_at, :enabled].all? { |k| post_params.key? k }
+      required_keys = [:xml, :entity_id, :created_at, :updated_at, :enabled]
+      required_keys.all? { |k| post_params.key? k }
     end
 
     def access_path
