@@ -10,6 +10,7 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
     let(:idp_values) { raw_idp.values.slice(*keys) }
     let(:idp_tags) { { tags: [Faker::Lorem.word, Faker::Lorem.word] } }
     let(:entity_id) { raw_idp.entity_id.uri }
+
     let(:raw_entity_descriptor) do
       hash = idp_values.merge(idp_tags)
       hash[:entity_id] = entity_id
@@ -57,27 +58,27 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
       end
 
       context 'with missing xml' do
-        let(:keys) { [:entity_id, :created_at, :updated_at, :enabled] }
+        before { raw_entity_descriptor.delete(:xml) }
         it { is_expected.to have_http_status(:bad_request) }
       end
 
       context 'with a missing entity id' do
-        let(:raw_entity_descriptor) { idp_values.merge(idp_tags) }
+        before { raw_entity_descriptor.delete(:entity_id) }
         it { is_expected.to have_http_status(:bad_request) }
       end
 
       context 'with missing created at' do
-        let(:keys) { [:xml, :entity_id, :updated_at, :enabled] }
+        before { raw_entity_descriptor.delete(:created_at) }
         it { is_expected.to have_http_status(:bad_request) }
       end
 
       context 'with missing updated at' do
-        let(:keys) { [:xml, :entity_id, :created_at, :enabled] }
+        before { raw_entity_descriptor.delete(:updated_at) }
         it { is_expected.to have_http_status(:bad_request) }
       end
 
       context 'with missing enabled flag' do
-        let(:keys) { [:xml, :entity_id, :created_at, :updated_at] }
+        before { raw_entity_descriptor.delete(:enabled) }
         it { is_expected.to have_http_status(:bad_request) }
       end
     end
