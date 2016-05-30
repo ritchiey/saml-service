@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 FactoryGirl.define do
-  TEST_RSA_KEYS = {}.freeze
+  TEST_RSA_KEYS = {} # rubocop:disable Style/MutableConstant
 
   factory :rsa_key, class: OpenSSL::PKey::RSA do
     transient { bits 2048 }
