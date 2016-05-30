@@ -65,7 +65,7 @@ module MetadataQueryCaching
     doc = @saml_renderer.builder.doc
     return if metadata_schema.valid?(doc)
 
-    fail Metadata::SchemaInvalidError, 'metadata is not schema valid\n' \
+    raise Metadata::SchemaInvalidError, 'metadata is not schema valid\n' \
                                        "#{metadata_schema.validate(doc)}"
   end
 
