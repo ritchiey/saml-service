@@ -4,8 +4,8 @@ FactoryGirl.define do
     enabled true
 
     after(:create) do |rd|
-      rd.add_protocol_support(create :protocol_support, role_descriptor: rd)
-      rd.add_protocol_support(create :protocol_support, role_descriptor: rd)
+      rd.add_protocol_support(create(:protocol_support, role_descriptor: rd))
+      rd.add_protocol_support(create(:protocol_support, role_descriptor: rd))
     end
 
     trait :with_error_url do

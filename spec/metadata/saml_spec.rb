@@ -87,7 +87,7 @@ RSpec.describe Metadata::SAML do
                      entity_source: external_entity_source, enabled: true)
 
         idp.entity_descriptor.entity_id
-          .update(uri: entity_source.known_entities.first.entity_id)
+           .update(uri: entity_source.known_entities.first.entity_id)
 
         entity_source.known_entities.each { |ke| ke.tag_as(tag) }
         external_entity_source.known_entities.each { |ke| ke.tag_as(tag) }

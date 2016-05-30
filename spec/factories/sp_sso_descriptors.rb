@@ -5,8 +5,8 @@ FactoryGirl.define do
     want_assertions_signed false
 
     after(:create) do |sp|
-      sp.add_assertion_consumer_service(create :assertion_consumer_service,
-                                               sp_sso_descriptor: sp)
+      sp.add_assertion_consumer_service(create(:assertion_consumer_service,
+                                               sp_sso_descriptor: sp))
     end
 
     trait :with_key_descriptors do
@@ -62,8 +62,8 @@ FactoryGirl.define do
 
     trait :request_attributes do
       after(:create) do |sp|
-        sp.add_attribute_consuming_service(create :attribute_consuming_service,
-                                                  sp_sso_descriptor: sp)
+        sp.add_attribute_consuming_service(create(:attribute_consuming_service,
+                                                  sp_sso_descriptor: sp))
       end
     end
 

@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Keypair do
   def pem_jumble(pem)
     parts = pem.split("\n").map do |s|
-      next s if s.start_with?('-----') || s.start_with?('MII')
+      next s if s.start_with?('-----', 'MII')
       s.reverse
     end
 

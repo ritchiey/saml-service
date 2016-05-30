@@ -38,7 +38,8 @@ RSpec.describe UpdateFromFederationRegistry do
       "#{kind.to_s.sub('_', '')}"
 
     stub_request(:get, url).with(headers: request_headers)
-      .to_return(status: 200, body: JSON.generate(kind => send(kind)))
+                           .to_return(status: 200,
+                                      body: JSON.generate(kind => send(kind)))
   end
 
   def self.verify_attributes(attr_generators)

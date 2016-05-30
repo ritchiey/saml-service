@@ -1,5 +1,5 @@
 FactoryGirl.define do
-  TEST_RSA_KEYS = {}
+  TEST_RSA_KEYS = {}.freeze
 
   factory :rsa_key, class: OpenSSL::PKey::RSA do
     transient { bits 2048 }

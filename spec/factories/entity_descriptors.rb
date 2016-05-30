@@ -52,7 +52,8 @@ FactoryGirl.define do
     trait :with_aa do
       after :create do |ed|
         ed.add_attribute_authority_descriptor(
-          create :attribute_authority_descriptor, entity_descriptor: ed)
+          create(:attribute_authority_descriptor, entity_descriptor: ed)
+        )
       end
     end
   end

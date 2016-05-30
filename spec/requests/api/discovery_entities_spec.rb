@@ -152,7 +152,8 @@ RSpec.describe API::DiscoveryEntitiesController, type: :request do
             SingleSignOnService.create(
               binding: 'urn:oasis:names:tc:SAML:2.0:bindings:SOAP',
               location: ecp_location,
-              idp_sso_descriptor: idp)
+              idp_sso_descriptor: idp
+            )
           end
         end
 

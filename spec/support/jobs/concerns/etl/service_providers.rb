@@ -85,7 +85,7 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
 
   def run
     described_class.new(id: fr_source.id)
-      .service_providers(entity_descriptor, ed_data)
+                   .service_providers(entity_descriptor, ed_data)
   end
 
   let(:service_provider_instances) do

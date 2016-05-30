@@ -32,7 +32,7 @@ RSpec.describe 'BasicFederation' do
   context 'RoleDescriptors' do
     subject do
       @entity_source.known_entities
-        .map(&:entity_descriptor).flat_map(&:role_descriptors)
+                    .map(&:entity_descriptor).flat_map(&:role_descriptors)
     end
 
     it 'has protocol supports' do
@@ -51,7 +51,7 @@ RSpec.describe 'BasicFederation' do
   context 'IDPSSODescriptors' do
     subject do
       @entity_source.known_entities
-        .map(&:entity_descriptor).flat_map(&:idp_sso_descriptors)
+                    .map(&:entity_descriptor).flat_map(&:idp_sso_descriptors)
     end
 
     it 'has single sign on service' do
@@ -62,7 +62,7 @@ RSpec.describe 'BasicFederation' do
   context 'SPSSODescriptors' do
     subject do
       @entity_source.known_entities
-        .map(&:entity_descriptor).flat_map(&:sp_sso_descriptors)
+                    .map(&:entity_descriptor).flat_map(&:sp_sso_descriptors)
     end
 
     it 'has assertion consumer services' do
@@ -75,7 +75,7 @@ RSpec.describe 'BasicFederation' do
   context 'AttributeAuthorityDescriptors' do
     subject do
       @entity_source.known_entities.map(&:entity_descriptor)
-        .flat_map(&:attribute_authority_descriptors)
+                    .flat_map(&:attribute_authority_descriptors)
     end
 
     it 'has attribute_services' do
@@ -86,7 +86,7 @@ RSpec.describe 'BasicFederation' do
   context 'REFEDS entity category' do
     subject do
       @entity_source.known_entities.map(&:entity_descriptor)
-        .find_all { |ed| ed.sp_sso_descriptors.any? }
+                    .find_all { |ed| ed.sp_sso_descriptors.any? }
     end
 
     context 'Research and Scholarship' do
@@ -117,7 +117,7 @@ RSpec.describe 'BasicFederation' do
     context 'RegistrationInfo' do
       subject do
         @entity_source.known_entities
-          .map(&:entity_descriptor).map(&:registration_info)
+                      .map(&:entity_descriptor).map(&:registration_info)
       end
 
       it 'is created for each EntityDescriptor' do
@@ -136,7 +136,7 @@ RSpec.describe 'BasicFederation' do
     context 'Organization' do
       subject do
         @entity_source.known_entities
-          .map(&:entity_descriptor).map(&:organization)
+                      .map(&:entity_descriptor).map(&:organization)
       end
 
       it 'is created for each EntityDescriptor' do
@@ -159,7 +159,7 @@ RSpec.describe 'BasicFederation' do
     context 'ContactPerson' do
       subject do
         @entity_source.known_entities
-          .map(&:entity_descriptor).flat_map(&:contact_people)
+                      .map(&:entity_descriptor).flat_map(&:contact_people)
       end
 
       it 'has contact_person' do
@@ -174,7 +174,7 @@ RSpec.describe 'BasicFederation' do
     context 'SPSSODescriptor' do
       subject do
         @entity_source.known_entities
-          .map(&:entity_descriptor).flat_map(&:sp_sso_descriptors)
+                      .map(&:entity_descriptor).flat_map(&:sp_sso_descriptors)
       end
 
       context 'mdui' do
