@@ -16,6 +16,9 @@ module API
       validates_presence [:x509_cn, :description,
                           :contact_name, :contact_mail, :enabled,
                           :created_at, :updated_at]
+
+      validates_unique :x509_cn
+      validates_format /\A[\w-]+\z/, :x509_cn
     end
   end
 end
