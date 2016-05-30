@@ -32,7 +32,7 @@ module ETL
       if ed.idp_sso_descriptors.present?
         ed.known_entity.tag_as(Tag::AA)
       else
-        ed.known_entity.tag_as(Tag::StandaloneAA)
+        ed.known_entity.tag_as(Tag::STANDALONE_AA)
       end
     end
 

@@ -34,7 +34,7 @@ module SetSAMLTypeFromXML
     return unless ed_node.xpath(IDP_SSO_DESCRIPTOR_XPATH).present?
 
     red.update(idp: true)
-    red.known_entity.tag_as(Tag::IdP)
+    red.known_entity.tag_as(Tag::IDP)
   end
 
   def set_as_aa(red, ed_node)
@@ -45,7 +45,7 @@ module SetSAMLTypeFromXML
       red.known_entity.tag_as(Tag::AA)
     else
       red.update(standalone_aa: true)
-      red.known_entity.tag_as(Tag::StandaloneAA)
+      red.known_entity.tag_as(Tag::STANDALONE_AA)
     end
   end
 

@@ -10,8 +10,8 @@ class Tag < Sequel::Model
     validates_presence [:known_entity, :name, :created_at, :updated_at]
   end
 
-  IdP = 'idp'
+  IDP = 'idp'
   AA = 'aa'
-  StandaloneAA = 'standalone-aa'
+  STANDALONE_AA = 'standalone-aa'
   SP = 'sp'
 end
