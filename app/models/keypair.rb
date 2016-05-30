@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class Keypair < Sequel::Model
   def validate
     super

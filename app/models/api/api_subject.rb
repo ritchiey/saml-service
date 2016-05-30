@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module API
   class APISubject < Sequel::Model
     include Accession::Principal

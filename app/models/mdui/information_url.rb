@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module MDUI
   class InformationURL < LocalizedURI
     many_to_one :ui_info

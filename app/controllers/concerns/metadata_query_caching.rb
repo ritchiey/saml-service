@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'metadata/schema'
 require 'metadata/schema_invalid_error'
 

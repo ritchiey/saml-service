@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module MDUI
   class UIInfo < Sequel::Model
     many_to_one :role_descriptor, class: 'RoleDescriptor'

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 FactoryGirl.define do
   TEST_RSA_KEYS = {}.freeze
 

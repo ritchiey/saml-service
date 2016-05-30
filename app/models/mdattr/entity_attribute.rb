@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module MDATTR
   class EntityAttribute < Sequel::Model
     include Parents

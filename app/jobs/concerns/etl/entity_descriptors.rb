@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module ETL
   module EntityDescriptors
     def entity_descriptors(o, org_data)

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class Tag < Sequel::Model
   include Parents
   plugin :validation_helpers
@@ -9,8 +10,8 @@ class Tag < Sequel::Model
     validates_presence [:known_entity, :name, :created_at, :updated_at]
   end
 
-  IdP = 'idp'.freeze
-  AA = 'aa'.freeze
-  StandaloneAA = 'standalone-aa'.freeze
-  SP = 'sp'.freeze
+  IdP = 'idp'
+  AA = 'aa'
+  StandaloneAA = 'standalone-aa'
+  SP = 'sp'
 end

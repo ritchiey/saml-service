@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class EntityDescriptor < Sequel::Model
   many_to_one :known_entity
   many_to_one :organization

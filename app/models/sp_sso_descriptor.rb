@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class SPSSODescriptor < SSODescriptor
   one_to_many :assertion_consumer_services
   one_to_many :attribute_consuming_services

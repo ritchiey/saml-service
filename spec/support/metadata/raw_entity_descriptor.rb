@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 RSpec.shared_examples 'RawEntityDescriptor xml' do
   let(:ed_xml) do
     <<-EOF.strip_heredoc

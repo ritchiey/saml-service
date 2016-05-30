@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class Endpoint < Sequel::Model
   plugin :class_table_inheritance
 

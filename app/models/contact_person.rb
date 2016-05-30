@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class ContactPerson < Sequel::Model
   many_to_one :contact
   many_to_one :entity_descriptor

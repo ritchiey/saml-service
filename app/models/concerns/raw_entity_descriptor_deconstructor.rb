@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # rubocop:disable Metrics/ModuleLength
 module RawEntityDescriptorDeconstructor
   extend ActiveSupport::Concern
@@ -147,7 +148,7 @@ module RawEntityDescriptorDeconstructor
     private
 
     def element_xpath(uri, name)
-      %(.//*[local-name() = "#{name}" and namespace-uri() = "#{uri}"]).freeze
+      %(.//*[local-name() = "#{name}" and namespace-uri() = "#{uri}"])
     end
 
     def mdui_element_xpath(name)

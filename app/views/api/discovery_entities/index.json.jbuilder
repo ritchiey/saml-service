@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 json.ignore_nil!
 
 def insert_localized_url(json, obj)
