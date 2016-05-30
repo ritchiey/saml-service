@@ -24,7 +24,7 @@ class ConfigureCLI < Thor
 
   def fr_source
     source, other = FederationRegistrySource.all
-    fail('Multiple FederationRegistrySource objects exist') if other
+    raise('Multiple FederationRegistrySource objects exist') if other
 
     source ||= new_federation_registry_source(options[:source_tag])
 
@@ -145,7 +145,7 @@ class ConfigureCLI < Thor
     fingerprint = sha1_fingerprint(load_certificate)
     keypair = Keypair.first_where(fingerprint: fingerprint)
 
-    keypair || fail('The provided certificate has not been registered')
+    keypair || raise('The provided certificate has not been registered')
 
     { name: opts[:name], federation_identifier: opts[:tag],
       hash_algorithm: opts[:hash].downcase, validity_period: 7.days,
@@ -163,7 +163,7 @@ class ConfigureCLI < Thor
     up, up2 = publication_info.usage_policies
     up ||= MDRPI::UsagePolicy.new
 
-    up2 && fail("Can't PublicationInfo with multiple usage policies")
+    up2 && raise("Can't PublicationInfo with multiple usage policies")
 
     up.update(uri: options[:usage_policy], lang: options[:lang],
               publication_info_id: publication_info.id)
