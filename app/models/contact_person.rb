@@ -4,7 +4,7 @@ class ContactPerson < Sequel::Model
   many_to_one :role_descriptor
 
   TYPE = { technical: 0, support: 1, administrative: 2,
-           billing: 3, other: 4 }
+           billing: 3, other: 4 }.freeze
 
   def contact_type
     TYPE.key(contact_type_id)

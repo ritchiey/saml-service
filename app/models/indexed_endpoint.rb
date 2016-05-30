@@ -1,5 +1,5 @@
 class IndexedEndpoint < Endpoint
-  alias_method :default?, :is_default
+  alias default? is_default
 
   def validate
     super

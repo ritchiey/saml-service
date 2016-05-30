@@ -47,8 +47,6 @@ module RawEntityDescriptorDeconstructor
     extract_single_sign_on_services(single_sign_on_services_node)
   end
 
-  private
-
   def display_names(ui_info_node, ui_info)
     ui_info_node.xpath(UI_INFO_DISPLAY_NAME_PATH).each do |dn|
       ui_info.display_names <<

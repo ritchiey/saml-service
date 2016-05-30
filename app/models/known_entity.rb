@@ -11,7 +11,7 @@ class KnownEntity < Sequel::Model
                                     raw_entity_descriptor: :destroy,
                                     tags: :destroy
 
-  alias_method :enabled?, :enabled
+  alias enabled? enabled
 
   def validate
     super
@@ -28,7 +28,7 @@ class KnownEntity < Sequel::Model
 
   def self.join_tags(tags)
     qualify.join(:tags, known_entity_id: :id, name: tags)
-      .group(:known_entity_id)
+           .group(:known_entity_id)
   end
 
   def tag_as(name)

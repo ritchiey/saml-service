@@ -18,7 +18,7 @@ module API
                           :created_at, :updated_at]
 
       validates_unique :x509_cn
-      validates_format /\A[\w-]+\z/, :x509_cn
+      validates_format(/\A[\w-]+\z/, :x509_cn)
     end
   end
 end

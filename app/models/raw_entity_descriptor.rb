@@ -11,9 +11,9 @@ class RawEntityDescriptor < Sequel::Model
 
   plugin :association_dependencies, entity_id: :destroy
 
-  alias_method :idp?, :idp
-  alias_method :sp?, :sp
-  alias_method :standalone_aa?, :standalone_aa
+  alias idp? idp
+  alias sp? sp
+  alias standalone_aa? standalone_aa
 
   def validate
     super

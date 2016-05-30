@@ -75,18 +75,18 @@ class EntityDescriptor < Sequel::Model
 
   def technical_contact_count
     ContactPerson.join(:entity_descriptors, id: :entity_descriptor_id)
-      .where(Sequel.qualify(:entity_descriptors, :id) => id)
-      .and(Sequel.qualify(:contact_people, :contact_type_id) =>
+                 .where(Sequel.qualify(:entity_descriptors, :id) => id)
+                 .and(Sequel.qualify(:contact_people, :contact_type_id) =>
            ContactPerson::TYPE[:technical])
-      .count
+                 .count
   end
 
   def support_contact_count
     ContactPerson.join(:entity_descriptors, id: :entity_descriptor_id)
-      .where(Sequel.qualify(:entity_descriptors, :id) => id)
-      .and(Sequel.qualify(:contact_people, :contact_type_id) =>
+                 .where(Sequel.qualify(:entity_descriptors, :id) => id)
+                 .and(Sequel.qualify(:contact_people, :contact_type_id) =>
            ContactPerson::TYPE[:support])
-      .count
+                 .count
   end
 
   def functional_role_descriptor?
