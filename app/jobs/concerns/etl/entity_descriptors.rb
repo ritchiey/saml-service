@@ -61,12 +61,18 @@ module ETL
       ri = MDRPI::RegistrationInfo.create(
         registration_authority: @fr_source.registration_authority,
         registration_instant: Time.parse(ed_data[:created_at]),
-        entity_descriptor: ed)
+        entity_descriptor: ed
+      )
 
+      create_registration_info(ri)
+    end
+
+    def create_registration_info(ri)
       MDRPI::RegistrationPolicy.create(
         registration_info: ri,
         uri: @fr_source.registration_policy_uri,
-        lang: @fr_source.registration_policy_uri_lang)
+        lang: @fr_source.registration_policy_uri_lang
+      )
     end
 
     def indicate_content_updated(ke)

@@ -72,7 +72,7 @@ module ETL
     def attribute_consuming_services(sp, acservices_data)
       sp.attribute_consuming_services.each(&:destroy)
       acservices_data.each_with_index do |ac_data, i|
-        next unless ac_data[:attributes].size > 0
+        next if ac_data[:attributes].empty?
 
         service_name = ServiceName.new(value: ac_data[:names][0], lang: 'en')
         acs = AttributeConsumingService.create(index: i + 1,

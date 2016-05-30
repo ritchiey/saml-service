@@ -10,7 +10,7 @@ class UpdateEntitySource
 
   def perform(id:)
     source = EntitySource[id]
-    fail("Unable to locate EntitySource(id=#{id})") unless source
+    raise("Unable to locate EntitySource(id=#{id})") unless source
     untouched = KnownEntity.where(entity_source: source).select_map(:id)
 
     document(source).xpath(ENTITY_DESCRIPTOR_XPATH).each do |node|
@@ -50,7 +50,7 @@ class UpdateEntitySource
 
     return response.body if response.is_a?(Net::HTTPSuccess)
 
-    fail("Unable to update EntitySource(id=#{source.id} url=#{source.url}). " \
+    raise("Unable to update EntitySource(id=#{source.id} url=#{source.url}). " \
          "Response was: #{response.code} #{response.message}")
   end
 
@@ -72,7 +72,7 @@ class UpdateEntitySource
       return doc_using_saml_metadata_as_default_ns(doc)
     end
 
-    fail("Unable to update EntitySource(id=#{source.id} url=#{source.url}). " \
+    raise("Unable to update EntitySource(id=#{source.id} url=#{source.url}). " \
          'Schema validation errors prevented processing of the metadata ' \
          "document. Errors were: #{errors.join(', ')}")
   end
@@ -98,7 +98,7 @@ class UpdateEntitySource
   def verify_signature(source, doc)
     return if Xmldsig::SignedDocument.new(doc).validate(source.x509_certificate)
 
-    fail("Unable to update EntitySource(id=#{source.id} url=#{source.url}. " \
+    raise("Unable to update EntitySource(id=#{source.id} url=#{source.url}. " \
          'Signature validation failed.')
   end
 

@@ -42,7 +42,7 @@ module QueryFederationRegistry
     response = do_request(url)
     return response.body if response.is_a?(Net::HTTPSuccess)
 
-    fail("Unable to update FederationRegistrySource(id=#{source.id} " \
+    raise("Unable to update FederationRegistrySource(id=#{source.id} " \
          "url=#{url}). Response was: #{response.code} #{response.message}")
   end
 

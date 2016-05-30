@@ -50,7 +50,7 @@ module ETL
       if standalone_aa?(aa_data)
         extract_aa_data_idp(aa_data)
       else
-        fail 'Does not support AA (even standalone) who do not derive from IdP'
+        raise 'Does not support AA (even standalone) who do not derive from IdP'
       end
     end
 
