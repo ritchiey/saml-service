@@ -18,7 +18,10 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
     end
 
     def run
-      request.env['HTTP_X509_DN'] = "CN=#{api_subject.x509_cn}" if api_subject
+      if api_subject
+        request.env['HTTP_X509_DN'] = "CN=#{api_subject.x509_cn}".dup
+      end
+
       post :create, tag: source_tag,
                     raw_entity_descriptor: raw_entity_descriptor
     end

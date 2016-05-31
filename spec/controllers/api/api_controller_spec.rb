@@ -8,7 +8,7 @@ RSpec.describe API::APIController, type: :controller do
 
   context 'requesting resource that does not exist' do
     let(:api_subject) { create(:api_subject) }
-    before { request.env['HTTP_X509_DN'] = "CN=#{api_subject.x509_cn}" }
+    before { request.env['HTTP_X509_DN'] = "CN=#{api_subject.x509_cn}".dup }
 
     controller(API::APIController) do
       def missing_resource
@@ -36,7 +36,7 @@ RSpec.describe API::APIController, type: :controller do
 
   context 'a bad request' do
     let(:api_subject) { create(:api_subject) }
-    before { request.env['HTTP_X509_DN'] = "CN=#{api_subject.x509_cn}" }
+    before { request.env['HTTP_X509_DN'] = "CN=#{api_subject.x509_cn}".dup }
 
     controller(API::APIController) do
       def a_bad_request

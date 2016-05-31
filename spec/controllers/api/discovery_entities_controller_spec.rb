@@ -23,7 +23,7 @@ RSpec.describe API::DiscoveryEntitiesController, type: :controller do
   end
 
   before do
-    request.env['HTTP_X509_DN'] = "CN=#{api_subject.x509_cn}" if api_subject
+    request.env['HTTP_X509_DN'] = "CN=#{api_subject.x509_cn}".dup if api_subject
   end
 
   subject { response }
