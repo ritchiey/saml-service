@@ -2,13 +2,13 @@
 FactoryGirl.define do
   factory :tag do
     sequence :name do |n|
-      "#{Faker::Lorem.word}-#{n}"
+      "#{Faker::Lorem.characters(20)}-#{n}"
     end
     association :known_entity
   end
 
   factory :known_entity_tag, class: 'Tag' do
-    name { Faker::Lorem.word }
+    sequence(:name) { |n| "#{Faker::Lorem.characters(20)}-#{n}" }
     association :known_entity
   end
 end
