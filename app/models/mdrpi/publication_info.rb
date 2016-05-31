@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module MDRPI
   class PublicationInfo < Sequel::Model
     include Parents

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 RSpec.shared_examples 'ETL::Organizations' do
   # rubocop:disable Metrics/MethodLength
   def create_json(id)

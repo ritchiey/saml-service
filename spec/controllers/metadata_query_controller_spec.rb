@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'rails_helper'
 
 RSpec.describe MetadataQueryController, type: :controller do
@@ -254,7 +255,7 @@ RSpec.describe MetadataQueryController, type: :controller do
               context 'when resource modified' do
                 before do
                   request.headers['If-Modified-Since'] =
-                  @last_modified - 1.second
+                    @last_modified - 1.second
                   run
                 end
 
@@ -395,7 +396,7 @@ RSpec.describe MetadataQueryController, type: :controller do
                 context 'when resource modified' do
                   before do
                     request.headers['If-Modified-Since'] =
-                    @last_modified - 1.second
+                      @last_modified - 1.second
                     run
                   end
 
@@ -594,7 +595,8 @@ RSpec.describe MetadataQueryController, type: :controller do
 
                 it 'renders only the 2 matching entities in metadata xml' do
                   xml = Capybara::Node::Simple.new(
-                    Nokogiri::XML.parse(response.body))
+                    Nokogiri::XML.parse(response.body)
+                  )
 
                   path = '/xmlns:EntitiesDescriptor/xmlns:EntityDescriptor'
                   expect(xml.all(:xpath, path).count).to eq(4)
@@ -673,7 +675,7 @@ RSpec.describe MetadataQueryController, type: :controller do
               context 'when resource modified' do
                 before do
                   request.headers['If-Modified-Since'] =
-                  @last_modified - 1.second
+                    @last_modified - 1.second
                   run
                 end
 

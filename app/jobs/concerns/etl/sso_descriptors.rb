@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module ETL
   module SSODescriptors
     include RoleDescriptors

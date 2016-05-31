@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class KeyDescriptor < Sequel::Model
   one_to_one :key_info
   one_to_many :encryption_method
@@ -7,7 +8,7 @@ class KeyDescriptor < Sequel::Model
   plugin :association_dependencies, key_info: :destroy,
                                     encryption_method: :destroy
 
-  KEY_TYPE = { encryption: 1, signing: 2 }
+  KEY_TYPE = { encryption: 1, signing: 2 }.freeze
 
   def key_type
     KEY_TYPE.key(key_type_id)

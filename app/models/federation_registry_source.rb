@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class FederationRegistrySource < Sequel::Model
   many_to_one :entity_source
 

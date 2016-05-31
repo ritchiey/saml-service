@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module MDRPI
   class RegistrationInfo < Sequel::Model
     include Parents

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 RSpec.shared_examples 'ETL::IdentityProviders' do
   include_examples 'ETL::Common'
 
@@ -28,7 +29,7 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
               idp.protocol_supports.map { |pse| saml_uri_json(pse) },
             key_descriptors:
               idp.key_descriptors.map { |kd| key_descriptor_json(kd) }
-                .push(bad_key_descriptor_json),
+                 .push(bad_key_descriptor_json),
             contact_people:
               contact_instances.map { |cp| contact_person_json(cp) },
             error_url: idp.error_url
@@ -74,7 +75,7 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
 
   def run
     described_class.new(id: fr_source.id)
-      .identity_providers(entity_descriptor, ed_data)
+                   .identity_providers(entity_descriptor, ed_data)
   end
 
   let(:identity_provider_instances) do

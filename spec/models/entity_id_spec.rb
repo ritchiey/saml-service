@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'rails_helper'
 require 'digest/sha1'
 
@@ -25,7 +26,7 @@ RSpec.describe EntityId, type: :model do
       end
 
       it 'calculates sha1 from uri' do
-        expect(subject.sha1).to eq(Digest::SHA1.hexdigest subject.uri)
+        expect(subject.sha1).to eq(Digest::SHA1.hexdigest(subject.uri))
       end
     end
 

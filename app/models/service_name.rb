@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class ServiceName < LocalizedName
   many_to_one :attribute_consuming_service
 

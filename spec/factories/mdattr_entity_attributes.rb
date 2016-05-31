@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 FactoryGirl.define do
   factory :mdattr_entity_attribute, class: 'MDATTR::EntityAttribute' do
     transient { provides_attribute false }

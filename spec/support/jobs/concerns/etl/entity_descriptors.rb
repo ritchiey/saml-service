@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 RSpec.shared_examples 'ETL::EntityDescriptors' do
   # rubocop:disable Metrics/MethodLength
   def create_json(id, functioning = true, empty = false)
@@ -83,7 +84,7 @@ RSpec.shared_examples 'ETL::EntityDescriptors' do
 
   def run
     described_class.new(id: fr_source.id)
-      .entity_descriptors(organization, org_data)
+                   .entity_descriptors(organization, org_data)
   end
 
   context 'A non functioning EntityDescriptor' do

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 RSpec.shared_examples 'Organization xml' do
   let(:organization_path) { '/Organization' }
   let(:organization_name_path) { "#{organization_path}/OrganizationName" }

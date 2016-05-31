@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module MDRPI
   class UsagePolicy < LocalizedURI
     many_to_one :publication_info

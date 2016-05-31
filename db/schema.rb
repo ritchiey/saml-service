@@ -9,6 +9,8 @@ Sequel.migration do
       column :enabled, "tinyint(1)"
       column :created_at, "datetime"
       column :updated_at, "datetime"
+      
+      index [:x509_cn], :name=>:x509_cn, :unique=>true
     end
     
     create_table(:authz_services) do
@@ -853,5 +855,6 @@ self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160203023734_ad
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160209223646_remove_source_tag_default_value.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160314045620_set_correct_encoding_collation.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160316030021_change_collation_to_binary.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160530102028_api_subject_unique_x509.rb')"
                 end
               end

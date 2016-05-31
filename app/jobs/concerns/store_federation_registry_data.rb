@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module StoreFederationRegistryData
   def create_or_update_by_fr_id(dataset, fr_id, **attrs)
     update_by_fr_id(dataset, fr_id, attrs) ||

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 RSpec.shared_examples 'ds:Signature xml' do
   let(:sig_xpath) { "/#{root_node}/ds:Signature" }
   let(:doc_sig_xpath) { "/xmlns:#{root_node}/ds:Signature" }
@@ -13,7 +14,7 @@ RSpec.shared_examples 'ds:Signature xml' do
   end
 
   it 'has a <Signature> element' do
-    expect(xml).to have_xpath("#{sig_xpath}")
+    expect(xml).to have_xpath(sig_xpath.to_s)
   end
 
   it 'specifies the c14n method' do
@@ -44,7 +45,7 @@ RSpec.shared_examples 'ds:Signature xml' do
 
   it 'specifies the transform algorithms' do
     transforms = reference.all(:xpath, 'ds:Transforms/ds:Transform')
-                 .map { |transform| transform['Algorithm'] }
+                          .map { |transform| transform['Algorithm'] }
     expect(transforms).to contain_exactly(
       'http://www.w3.org/2000/09/xmldsig#enveloped-signature',
       'http://www.w3.org/2001/10/xml-exc-c14n#'
@@ -112,7 +113,7 @@ RSpec.shared_examples 'ds:Signature xml' do
         Nokogiri::XML(raw_xml, nil, nil, Nokogiri::XML::ParseOptions::STRICT)
 
       doc.at_xpath("#{doc_sig_xpath}/ds:SignedInfo")
-        .canonicalize(Nokogiri::XML::XML_C14N_EXCLUSIVE_1_0)
+         .canonicalize(Nokogiri::XML::XML_C14N_EXCLUSIVE_1_0)
     end
 
     context 'using sha1' do

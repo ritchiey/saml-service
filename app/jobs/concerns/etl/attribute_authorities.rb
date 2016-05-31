@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module ETL
   module AttributeAuthorities
     include RoleDescriptors
@@ -31,7 +32,7 @@ module ETL
       if ed.idp_sso_descriptors.present?
         ed.known_entity.tag_as(Tag::AA)
       else
-        ed.known_entity.tag_as(Tag::StandaloneAA)
+        ed.known_entity.tag_as(Tag::STANDALONE_AA)
       end
     end
 
@@ -50,7 +51,7 @@ module ETL
       if standalone_aa?(aa_data)
         extract_aa_data_idp(aa_data)
       else
-        fail 'Does not support AA (even standalone) who do not derive from IdP'
+        raise 'Does not support AA (even standalone) who do not derive from IdP'
       end
     end
 

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'rails_helper'
 
 RSpec.describe UpdateEntitySource do
@@ -29,8 +30,8 @@ RSpec.describe UpdateEntitySource do
   def entity_descriptors(entities:, type:)
     fragments = (1..entities).map do
       attributes_for(type)[:xml]
-      .gsub('xmlns="urn:oasis:names:tc:SAML:2.0:metadata"', '')
-      .strip
+        .gsub('xmlns="urn:oasis:names:tc:SAML:2.0:metadata"', '')
+        .strip
     end
     fragments.join("\n")
   end
@@ -223,7 +224,7 @@ RSpec.describe UpdateEntitySource do
 
           before do
             additional_entity_reference.raw_entity_descriptor
-              .entity_id.update(uri: entity_id)
+                                       .entity_id.update(uri: entity_id)
           end
 
           it 'results in two references for the same entity_id' do
@@ -233,10 +234,10 @@ RSpec.describe UpdateEntitySource do
           it 'has differing sources for each EntityId reference' do
             es1 =
               EntityId.where(uri: entity_id).first.parent
-              .known_entity.entity_source
+                      .known_entity.entity_source
             es2 =
               EntityId.where(uri: entity_id).last.parent
-              .known_entity.entity_source
+                      .known_entity.entity_source
 
             expect(es1 == es2).to be_falsey
           end
@@ -356,7 +357,6 @@ RSpec.describe UpdateEntitySource do
       expect(@exception.message)
         .to match(/Unable to update EntitySource/)
         .and match(subject.url)
-        .and match(/Schema validation errors prevented processing/)
         .and match(/Element.*EntityDescriptor.*entityID.*is required/)
     end
   end
@@ -398,9 +398,8 @@ RSpec.describe UpdateEntitySource do
     it 'raises an informative message' do
       swallow { run }
       expect(@exception.message)
-        .to match('Unable to update EntitySource')
-        .and match(subject.url)
-        .and match('Signature validation failed')
+        .to match("Signature invalid on EntitySource(id=#{subject.id} " \
+                  "url=#{subject.url}).")
     end
   end
 

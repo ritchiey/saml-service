@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module ETL
   module RoleDescriptors
     def role_descriptor(rd, rd_data, scopes_data)
@@ -52,11 +53,16 @@ module ETL
         begin
           rd.add_key_descriptor(key_descriptor(kd_data))
         rescue OpenSSL::X509::CertificateError => e
-          Rails.logger.info(
-            "FR certificate \n#{kd_data[:key_info][:certificate][:data]}\n" \
-            "was invalid and not persisted due to: #{e.message}")
+          log_key_descriptor_error(kd_data, e)
         end
       end
+    end
+
+    def log_key_descriptor_error(kd_data, e)
+      Rails.logger.info(
+        "FR Certificate \n#{kd_data[:key_info][:certificate][:data]}\n" \
+        "was invalid and not persisted due to: #{e.message}"
+      )
     end
 
     def key_descriptor(kd_data)
@@ -97,7 +103,7 @@ module ETL
 
     def clean_certificate_data(data)
       data.gsub(/\\n/, "\n").lines.map(&:strip)
-        .flat_map { |l| l.chars.each_slice(72).map(&:join).to_a }.join("\n")
+          .flat_map { |l| l.chars.each_slice(72).map(&:join).to_a }.join("\n")
     end
   end
 end
