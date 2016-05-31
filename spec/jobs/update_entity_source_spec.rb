@@ -357,7 +357,6 @@ RSpec.describe UpdateEntitySource do
       expect(@exception.message)
         .to match(/Unable to update EntitySource/)
         .and match(subject.url)
-        .and match(/Schema validation errors prevented processing/)
         .and match(/Element.*EntityDescriptor.*entityID.*is required/)
     end
   end
@@ -399,9 +398,8 @@ RSpec.describe UpdateEntitySource do
     it 'raises an informative message' do
       swallow { run }
       expect(@exception.message)
-        .to match('Unable to update EntitySource')
-        .and match(subject.url)
-        .and match('Signature validation failed')
+        .to match("Signature invalid on EntitySource(id=#{subject.id} " \
+                  "url=#{subject.url}).")
     end
   end
 

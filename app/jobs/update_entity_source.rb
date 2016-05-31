@@ -51,8 +51,9 @@ class UpdateEntitySource
 
     return response.body if response.is_a?(Net::HTTPSuccess)
 
-    raise("Unable to update EntitySource(id=#{source.id} url=#{source.url}). " \
-         "Response was: #{response.code} #{response.message}")
+    pe = "Unable to update EntitySource(id=#{source.id} url=#{source.url})."
+    se = "Response was: #{response.code} #{response.message}"
+    raise(error_message(pe, se))
   end
 
   def perform_http_client_request(url)
@@ -73,9 +74,8 @@ class UpdateEntitySource
       return doc_using_saml_metadata_as_default_ns(doc)
     end
 
-    raise("Unable to update EntitySource(id=#{source.id} url=#{source.url}). " \
-         'Schema validation errors prevented processing of the metadata ' \
-         "document. Errors were: #{errors.join(', ')}")
+    pe = "Unable to update EntitySource(id=#{source.id} url=#{source.url})."
+    raise(error_message(pe, errors.join(', ')))
   end
 
   def doc_using_saml_metadata_as_default_ns(doc)
@@ -99,8 +99,8 @@ class UpdateEntitySource
   def verify_signature(source, doc)
     return if Xmldsig::SignedDocument.new(doc).validate(source.x509_certificate)
 
-    raise("Unable to update EntitySource(id=#{source.id} url=#{source.url}. " \
-         'Signature validation failed.')
+    pe = "Signature invalid on EntitySource(id=#{source.id} url=#{source.url})."
+    raise(error_message(pe))
   end
 
   def known_entity(source, root_node)
@@ -138,5 +138,11 @@ class UpdateEntitySource
       eid.parent.known_entity.entity_source == source
     end
     entity_id.parent.known_entity if entity_id
+  end
+
+  def error_message(primary_error, secondary_error = nil)
+    return primary_error unless secondary_error
+
+    "#{primary_error}\n#{secondary_error}"
   end
 end
