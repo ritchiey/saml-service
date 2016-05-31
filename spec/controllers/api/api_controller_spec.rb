@@ -13,7 +13,7 @@ RSpec.describe API::APIController, type: :controller do
     controller(API::APIController) do
       def missing_resource
         public_action
-        fail(API::APIController::ResourceNotFound)
+        raise(API::APIController::ResourceNotFound)
       end
     end
 
@@ -41,7 +41,7 @@ RSpec.describe API::APIController, type: :controller do
     controller(API::APIController) do
       def a_bad_request
         public_action
-        fail(API::APIController::BadRequest)
+        raise(API::APIController::BadRequest)
       end
     end
 
