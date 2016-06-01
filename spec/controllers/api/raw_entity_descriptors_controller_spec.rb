@@ -183,68 +183,89 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
         end
       end
 
-      context 'with empty raw entity descriptor' do
-        let(:raw_entity_descriptor) { {} }
-        subject { -> { run } }
-        it { is_expected.to raise_error(ActionController::ParameterMissing) }
-      end
-
-      context 'with missing xml' do
-        before { raw_entity_descriptor.delete(:xml) }
-        it { is_expected.to have_http_status(:bad_request) }
-      end
-
-      context 'with a missing entity id' do
-        before { raw_entity_descriptor.delete(:entity_id) }
-        it { is_expected.to have_http_status(:bad_request) }
-      end
-
-      context 'with missing enabled flag' do
-        before { raw_entity_descriptor.delete(:enabled) }
-        it { is_expected.to have_http_status(:bad_request) }
-      end
-
-      context 'with missing tags' do
-        before { raw_entity_descriptor.delete(:tags) }
-        it { is_expected.to have_http_status(:bad_request) }
-      end
-
       RSpec.shared_examples 'no state changed' do
+        subject { -> { swallow { run } } }
+
         context 'known entities' do
-          subject { -> { run } }
           it { is_expected.to_not change(KnownEntity, :count) }
         end
 
         context 'raw entity descriptors' do
-          subject { -> { run } }
           it { is_expected.to_not change(RawEntityDescriptor, :count) }
         end
 
         context 'entity ids' do
-          subject { -> { run } }
           it { is_expected.to_not change(EntityId, :count) }
         end
       end
 
+      context 'with empty raw entity descriptor' do
+        let(:raw_entity_descriptor) { {} }
+        subject { -> { run } }
+
+        it { is_expected.to raise_error(ActionController::ParameterMissing) }
+        it_behaves_like 'no state changed'
+      end
+
+      context 'with missing xml' do
+        before { raw_entity_descriptor.delete(:xml) }
+        subject { -> { run } }
+        let(:message) { /xml is not present/ }
+
+        it { is_expected.to raise_error(Sequel::ValidationFailed, message) }
+        it_behaves_like 'no state changed'
+      end
+
+      context 'with a missing entity id' do
+        before { raw_entity_descriptor.delete(:entity_id) }
+        subject { -> { run } }
+        let(:message) { /uri is not present/ }
+
+        it { is_expected.to raise_error(Sequel::ValidationFailed, message) }
+        it_behaves_like 'no state changed'
+      end
+
+      context 'with missing enabled flag' do
+        before { raw_entity_descriptor.delete(:enabled) }
+
+        it { is_expected.to have_http_status(:bad_request) }
+        it_behaves_like 'no state changed'
+      end
+
+      context 'with missing tags' do
+        before { raw_entity_descriptor.delete(:tags) }
+
+        it { is_expected.to have_http_status(:bad_request) }
+        it_behaves_like 'no state changed'
+      end
+
       context 'with an invalid enabled flag' do
         let(:enabled) { Faker::Lorem.characters }
+
         it { is_expected.to have_http_status(:bad_request) }
         it_behaves_like 'no state changed'
       end
 
       context 'with invalid entity id' do
         let(:entity_id) { Faker::Lorem.characters }
-        it { is_expected.to have_http_status(:bad_request) }
+        subject { -> { run } }
+        let(:message) { /uri is not a valid uri/ }
+
+        it { is_expected.to raise_error(Sequel::ValidationFailed, message) }
         it_behaves_like 'no state changed'
       end
 
       context 'with invalid tags' do
         let(:tags) { ['@*!', '^'] }
-        it { is_expected.to have_http_status(:bad_request) }
+        subject { -> { run } }
+        let(:message) { /name is not in base64 urlsafe alphabet/ }
+
+        it { is_expected.to raise_error(Sequel::ValidationFailed, message) }
         it_behaves_like 'no state changed'
       end
 
       context 'with invalid xml' do
+        subject { -> { run } }
         let(:xml) do
           <<-EOF.strip_heredoc
             <IDPSSODescriptor
@@ -256,23 +277,10 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
           EOF
         end
 
-        subject { -> { run } }
-        it { is_expected.to raise_error(Sequel::ValidationFailed) }
+        let(:message) { /xml is not valid per the XML Schema/ }
 
-        context 'known entities' do
-          subject { -> { swallow { run } } }
-          it { is_expected.to_not change(KnownEntity, :count) }
-        end
-
-        context 'raw entity descriptors' do
-          subject { -> { swallow { run } } }
-          it { is_expected.to_not change(RawEntityDescriptor, :count) }
-        end
-
-        context 'entity ids' do
-          subject { -> { swallow { run } } }
-          it { is_expected.to_not change(EntityId, :count) }
-        end
+        it { is_expected.to raise_error(Sequel::ValidationFailed, message) }
+        it_behaves_like 'no state changed'
       end
     end
   end

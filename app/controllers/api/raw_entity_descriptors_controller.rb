@@ -1,9 +1,6 @@
 # frozen_string_literal: true
 module API
   class RawEntityDescriptorsController < APIController
-    VALID_URI_REGEX = /\A#{URI.regexp(%w(http https))}\z/
-    URL_SAFE_BASE_64_ALPHABET = /^[a-zA-Z0-9_-]+$/
-
     before_action do
       @entity_source = EntitySource[source_tag: params[:tag]]
       raise(ResourceNotFound) if @entity_source.nil?
@@ -42,23 +39,7 @@ module API
     end
 
     def valid_post_params?
-      required_keys? && valid_enabled_flag? && valid_entity_id? && valid_tags?
-    end
-
-    def valid_tags?
-      post_params[:tags].all? { |t| t =~ URL_SAFE_BASE_64_ALPHABET }
-    end
-
-    def valid_entity_id?
-      post_params[:entity_id] =~ VALID_URI_REGEX
-    end
-
-    def valid_enabled_flag?
-      [true, false].include?(post_params[:enabled])
-    end
-
-    def required_keys?
-      [:xml, :entity_id, :enabled, :tags].all? { |k| post_params.key? k }
+      post_params[:tags] && [true, false].include?(post_params[:enabled])
     end
 
     def access_path
