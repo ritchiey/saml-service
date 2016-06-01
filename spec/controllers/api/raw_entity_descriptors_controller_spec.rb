@@ -134,7 +134,8 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
 
             context 'tags' do
               subject { record.tags.map(&:name) }
-              it { is_expected.to eq(tags) }
+              let(:all_tags) { tags.append(source_tag) }
+              it { is_expected.to eq(all_tags) }
             end
           end
         end
