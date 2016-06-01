@@ -55,6 +55,34 @@ RSpec.describe EntityId, type: :model do
         expect(subject).not_to be_valid
       end
     end
+
+    context 'uri' do
+      let(:entity_id) { build(:entity_id, uri: uri) }
+      before { entity_id.valid? }
+      subject { entity_id }
+
+      context 'valid url' do
+        let(:uri) { Faker::Internet.url }
+        it { is_expected.to be_valid }
+      end
+
+      context 'valid uri' do
+        let(:scheme) { Faker::Lorem.word }
+        let(:namespace) { Faker::Internet.domain_word }
+        let(:uri_parts) { (1..10).to_a.sample }
+        let(:uri) { Array.new(uri_parts) { Faker::Lorem.word }.join(':') }
+        it { is_expected.to be_valid }
+      end
+
+      context 'as characters' do
+        let(:uri) { Faker::Lorem.characters }
+        it { is_expected.to_not be_valid }
+        context 'the errors' do
+          subject { entity_id.errors }
+          it { is_expected.to eq(uri: ['is not a valid uri']) }
+        end
+      end
+    end
   end
 
   describe '#parent' do
