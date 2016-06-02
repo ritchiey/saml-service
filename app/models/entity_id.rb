@@ -2,7 +2,6 @@
 require 'digest/sha1'
 
 class EntityId < SamlURI
-  VALID_URI_REGEX = /\A#{URI.regexp}\z/
   include Parents
 
   many_to_one :entity_descriptor
@@ -12,8 +11,6 @@ class EntityId < SamlURI
     super
     validates_presence :sha1
     validates_max_length 1024, :uri
-    validates_format(VALID_URI_REGEX, :uri, message: 'is not a valid uri')
-
     return if new?
 
     single_parent [:entity_descriptor, :raw_entity_descriptor]

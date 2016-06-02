@@ -9,10 +9,13 @@ class SamlURI < Sequel::Model
   # n.b. Types, such as LocalizedURI, which extend anyURI are standalone
   # models and not part of the SamlURI hierachy as they are distinct types
   # in their own right.
+
+  VALID_URI_REGEX = /\A#{URI.regexp}\z/
   plugin :class_table_inheritance
 
   def validate
     super
     validates_presence [:uri, :created_at, :updated_at]
+    validates_format(VALID_URI_REGEX, :uri, message: 'is not a valid uri')
   end
 end
