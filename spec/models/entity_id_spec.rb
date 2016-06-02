@@ -61,25 +61,43 @@ RSpec.describe EntityId, type: :model do
       before { entity_id.valid? }
       subject { entity_id }
 
-      context 'valid url' do
+      context 'as url' do
         let(:uri) { Faker::Internet.url }
         it { is_expected.to be_valid }
       end
 
-      context 'valid uri' do
-        let(:scheme) { Faker::Lorem.word }
-        let(:namespace) { Faker::Internet.domain_word }
-        let(:uri_parts) { (1..10).to_a.sample }
-        let(:uri) { Array.new(uri_parts) { Faker::Lorem.word }.join(':') }
-        it { is_expected.to be_valid }
-      end
+      context 'as uri (but not url)' do
+        context 'without a method' do
+          let(:uri) { Faker::Lorem.characters }
+          it { is_expected.to_not be_valid }
+          context 'the errors' do
+            subject { entity_id.errors }
+            it { is_expected.to eq(uri: ['is not a valid uri']) }
+          end
+        end
 
-      context 'as characters' do
-        let(:uri) { Faker::Lorem.characters }
-        it { is_expected.to_not be_valid }
-        context 'the errors' do
-          subject { entity_id.errors }
-          it { is_expected.to eq(uri: ['is not a valid uri']) }
+        context 'with a method' do
+          let(:method) { Faker::Lorem.word }
+          let(:parts) { Faker::Lorem.characters(5) }
+          let(:uri) { "#{method}:#{parts}" }
+          it { is_expected.to be_valid }
+
+          context 'that does not start with an alphabetical character' do
+            let(:method) { [Faker::Number.number(2), '.', '-'].sample }
+            context 'the errors' do
+              subject { entity_id.errors }
+              it { is_expected.to eq(uri: ['is not a valid uri']) }
+            end
+          end
+
+          context 'and parts with numbers, letters, hyphens and periods' do
+            def part
+              [Faker::Lorem.characters(5), '.', '-'].sample
+            end
+            let(:sections) { (1..10).to_a.sample }
+            let(:parts) { Array.new(sections) { part }.join(':') }
+            it { is_expected.to be_valid }
+          end
         end
       end
     end
