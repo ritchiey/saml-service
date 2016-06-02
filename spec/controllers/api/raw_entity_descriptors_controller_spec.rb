@@ -6,16 +6,27 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
     let(:entity_source) { create(:entity_source) }
     let(:source_tag) { entity_source.source_tag }
 
-    let(:raw_idp) { create(:raw_entity_descriptor_idp) }
-    let(:keys) { [:xml, :created_at, :updated_at, :enabled] }
-    let(:idp_values) { raw_idp.values.slice(*keys) }
-    let(:idp_tags) { { tags: [Faker::Lorem.word, Faker::Lorem.word] } }
-    let(:entity_id) { raw_idp.entity_id.uri }
+    let(:tags) { [Faker::Lorem.word, Faker::Lorem.word] }
+    let(:host_name) { Faker::Internet.domain_name }
+    let(:entity_id) { "https://#{host_name}/shibboleth" }
+    let(:enabled) { [true, false].sample }
+    let(:xml) do
+      <<-EOF.strip_heredoc
+          <EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata"
+            xmlns:mdui="urn:oasis:names:tc:SAML:metadata:ui"
+            entityID="#{entity_id}">
+            <IDPSSODescriptor
+              protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+              <SingleSignOnService
+                Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
+                Location="https://#{host_name}/idp/profile/SAML2/Redirect/SSO"/>
+            </IDPSSODescriptor>
+          </EntityDescriptor>
+        EOF
+    end
 
     let(:raw_entity_descriptor) do
-      hash = idp_values.merge(idp_tags)
-      hash[:entity_id] = entity_id
-      hash
+      { xml: xml, tags: tags, entity_id: entity_id, enabled: enabled }
     end
 
     def run
@@ -25,6 +36,12 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
 
       post :create, tag: source_tag,
                     raw_entity_descriptor: raw_entity_descriptor
+    end
+
+    def swallow
+      yield
+    rescue
+      nil
     end
 
     context 'not permitted' do
@@ -52,38 +69,218 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
       end
 
       context 'with valid params' do
-        it { is_expected.to have_http_status(:ok) }
+        it { is_expected.to have_http_status(:created) }
+
+        context 'raw entity descriptors' do
+          subject { -> { run } }
+          it { is_expected.to change(RawEntityDescriptor, :count).by(1) }
+          context 'record' do
+            before { run }
+            let(:record) { RawEntityDescriptor.last }
+            subject { record }
+            it { is_expected.to_not be_nil }
+
+            context 'known entity' do
+              subject { record.known_entity }
+              it { is_expected.to eq(KnownEntity.last) }
+            end
+
+            context 'xml' do
+              subject { record.xml }
+              it { is_expected.to eq(raw_entity_descriptor[:xml]) }
+            end
+
+            context 'enabled' do
+              subject { record.enabled }
+              it { is_expected.to eq(raw_entity_descriptor[:enabled]) }
+            end
+
+            context 'idp' do
+              subject { record.idp }
+              it { is_expected.to be_truthy }
+            end
+
+            context 'sp' do
+              subject { record.sp }
+              it { is_expected.to be_falsey }
+            end
+
+            context 'standalone aa' do
+              subject { record.standalone_aa }
+              it { is_expected.to be_falsey }
+            end
+          end
+        end
+
+        context 'known entities' do
+          subject { -> { run } }
+          it { is_expected.to change(KnownEntity, :count).by(1) }
+
+          context 'record' do
+            before { run }
+            let(:record) { KnownEntity.last }
+            subject { record }
+            it { is_expected.to_not be_nil }
+
+            context 'enabled' do
+              subject { record.enabled }
+              it { is_expected.to eq(raw_entity_descriptor[:enabled]) }
+            end
+
+            context 'entity source' do
+              subject { record.entity_source }
+              it { is_expected.to eq(entity_source) }
+            end
+
+            context 'tags' do
+              subject { record.tags.map(&:name) }
+              let(:all_tags) { tags.append(source_tag) }
+              it { is_expected.to eq(all_tags) }
+            end
+          end
+        end
+
+        context 'entity ids' do
+          subject { -> { run } }
+          it { is_expected.to change(EntityId, :count).by(1) }
+
+          context 'record' do
+            before { run }
+            let(:record) { EntityId.last }
+            subject { record }
+            it { is_expected.to_not be_nil }
+
+            context 'uri' do
+              subject { record.uri }
+              it { is_expected.to eq(entity_id) }
+            end
+
+            context 'description' do
+              subject { record.description }
+              it { is_expected.to be_nil }
+            end
+
+            context 'role descriptor id' do
+              subject { record.role_descriptor_id }
+              it { is_expected.to be_nil }
+            end
+
+            context 'entity descriptor' do
+              subject { record.entity_descriptor }
+              it { is_expected.to be_nil }
+            end
+
+            context 'raw entity descriptor' do
+              subject { record.raw_entity_descriptor }
+              it { is_expected.to eq(RawEntityDescriptor.last) }
+            end
+
+            context 'sha1' do
+              subject { record.sha1 }
+              it { is_expected.to eq(Digest::SHA1.hexdigest(entity_id)) }
+            end
+          end
+        end
+      end
+
+      RSpec.shared_examples 'no state changed' do
+        subject { -> { swallow { run } } }
+
+        context 'known entities' do
+          it { is_expected.to_not change(KnownEntity, :count) }
+        end
+
+        context 'raw entity descriptors' do
+          it { is_expected.to_not change(RawEntityDescriptor, :count) }
+        end
+
+        context 'entity ids' do
+          it { is_expected.to_not change(EntityId, :count) }
+        end
       end
 
       context 'with empty raw entity descriptor' do
         let(:raw_entity_descriptor) { {} }
         subject { -> { run } }
+
         it { is_expected.to raise_error(ActionController::ParameterMissing) }
+        it_behaves_like 'no state changed'
       end
 
       context 'with missing xml' do
         before { raw_entity_descriptor.delete(:xml) }
-        it { is_expected.to have_http_status(:bad_request) }
+        subject { -> { run } }
+        let(:message) { /xml is not present/ }
+
+        it { is_expected.to raise_error(Sequel::ValidationFailed, message) }
+        it_behaves_like 'no state changed'
       end
 
       context 'with a missing entity id' do
         before { raw_entity_descriptor.delete(:entity_id) }
-        it { is_expected.to have_http_status(:bad_request) }
-      end
+        subject { -> { run } }
+        let(:message) { /uri is not present/ }
 
-      context 'with missing created at' do
-        before { raw_entity_descriptor.delete(:created_at) }
-        it { is_expected.to have_http_status(:bad_request) }
-      end
-
-      context 'with missing updated at' do
-        before { raw_entity_descriptor.delete(:updated_at) }
-        it { is_expected.to have_http_status(:bad_request) }
+        it { is_expected.to raise_error(Sequel::ValidationFailed, message) }
+        it_behaves_like 'no state changed'
       end
 
       context 'with missing enabled flag' do
         before { raw_entity_descriptor.delete(:enabled) }
+
         it { is_expected.to have_http_status(:bad_request) }
+        it_behaves_like 'no state changed'
+      end
+
+      context 'with missing tags' do
+        before { raw_entity_descriptor.delete(:tags) }
+
+        it { is_expected.to have_http_status(:bad_request) }
+        it_behaves_like 'no state changed'
+      end
+
+      context 'with an invalid enabled flag' do
+        let(:enabled) { Faker::Lorem.characters }
+
+        it { is_expected.to have_http_status(:bad_request) }
+        it_behaves_like 'no state changed'
+      end
+
+      context 'with invalid entity id' do
+        let(:entity_id) { Faker::Lorem.characters }
+        subject { -> { run } }
+        let(:message) { /uri is not a valid uri/ }
+
+        it { is_expected.to raise_error(Sequel::ValidationFailed, message) }
+        it_behaves_like 'no state changed'
+      end
+
+      context 'with invalid tags' do
+        let(:tags) { ['@*!', '^'] }
+        subject { -> { run } }
+        let(:message) { /name is not in base64 urlsafe alphabet/ }
+
+        it { is_expected.to raise_error(Sequel::ValidationFailed, message) }
+        it_behaves_like 'no state changed'
+      end
+
+      context 'with invalid xml' do
+        subject { -> { run } }
+        let(:xml) do
+          <<-EOF.strip_heredoc
+            <IDPSSODescriptor
+              protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+              <SingleSignOnService
+                Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
+                Location="https://#{host_name}/idp/profile/SAML2/Redirect/SSO"/>
+            </IDPSSODescriptor>
+          EOF
+        end
+
+        let(:message) { /xml is not valid per the XML Schema/ }
+
+        it { is_expected.to raise_error(Sequel::ValidationFailed, message) }
+        it_behaves_like 'no state changed'
       end
     end
   end
