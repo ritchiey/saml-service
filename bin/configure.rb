@@ -38,9 +38,9 @@ class ConfigureCLI < Thor
   option :source_tag,
          desc: 'Unique tag to apply to all entities resolved from this source'
   option :rank, desc: 'How this source should be considered in relation to other
-  EntitySources. Should the same EntityID exist in multiple EntitySource only
-  the version from the highest ranked source shall be used. Unqiue per SAML
-  service instance.'
+  EntitySources. Should the same EntityID exist in multiple EntitySource, the
+  source with the lowest numeric rank shall be used. Unique per SAML service
+  instance.'
   option :url, desc: 'The URL of SAML metadata document to download'
   option :cert, desc: 'A local file containing the metadata sources validation
   certificate. The validity of this certificate should have previously been
