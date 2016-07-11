@@ -5,7 +5,7 @@ Sequel.migration do
       add_index [:entity_source_id, :sha1], unique: true
     end
 
-    execute <<~SQL
+    execute <<-SQL.strip_heredoc
       UPDATE entity_ids ei
       LEFT OUTER JOIN entity_descriptors ed
       ON ed.id = ei.entity_descriptor_id
