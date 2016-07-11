@@ -22,6 +22,14 @@ RSpec.describe EntityId, type: :model do
       expect(subject.entity_source_id).to be_nil
     end
 
+    it 'ensures uniqueness of sha1 per entity_source_id' do
+      conflict = create(:entity_id,
+                        entity_descriptor: subject.entity_descriptor)
+
+      subject.uri = conflict.uri
+      expect(subject).not_to be_valid
+    end
+
     context 'post validation' do
       before { subject.valid? }
 

@@ -11,6 +11,7 @@ class EntityId < SamlURI
     super
     validates_presence :sha1
     validates_max_length 1024, :uri
+    validates_unique [:entity_source_id, :sha1]
     return if new?
 
     single_parent [:entity_descriptor, :raw_entity_descriptor]
