@@ -19,6 +19,7 @@ class EntityId < SamlURI
   def before_validation
     super
     self.sha1 = Digest::SHA1.hexdigest uri if uri
+    self.entity_source_id = parent.try(:known_entity).try(:entity_source_id)
   end
 
   def parent

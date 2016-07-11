@@ -18,6 +18,10 @@ RSpec.describe EntityId, type: :model do
       expect(subject.sha1).to be_nil
     end
 
+    it 'has no entity_source_id before validation' do
+      expect(subject.entity_source_id).to be_nil
+    end
+
     context 'post validation' do
       before { subject.valid? }
 
@@ -27,6 +31,36 @@ RSpec.describe EntityId, type: :model do
 
       it 'calculates sha1 from uri' do
         expect(subject.sha1).to eq(Digest::SHA1.hexdigest(subject.uri))
+      end
+
+      context 'when owned by an entity_descriptor' do
+        let(:entity_descriptor) { create(:entity_descriptor) }
+        let(:known_entity) { entity_descriptor.known_entity }
+
+        subject do
+          build(:entity_id, entity_descriptor: entity_descriptor,
+                            raw_entity_descriptor: nil)
+        end
+
+        it 'inherits entity_source_id from ancestor' do
+          expect(subject.entity_source_id)
+            .to eq(known_entity.entity_source_id)
+        end
+      end
+
+      context 'when owned by a raw_entity_descriptor' do
+        let(:raw_entity_descriptor) { create(:raw_entity_descriptor) }
+        let(:known_entity) { raw_entity_descriptor.known_entity }
+
+        subject do
+          build(:entity_id, raw_entity_descriptor: raw_entity_descriptor,
+                            entity_descriptor: nil)
+        end
+
+        it 'inherits entity_source_id from ancestor' do
+          expect(subject.entity_source_id)
+            .to eq(known_entity.entity_source_id)
+        end
       end
     end
 
