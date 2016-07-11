@@ -62,6 +62,17 @@ RSpec.describe EntityId, type: :model do
             .to eq(known_entity.entity_source_id)
         end
       end
+
+      context 'when owned by no parent' do
+        subject do
+          build(:entity_id, entity_descriptor: nil,
+                            raw_entity_descriptor: nil)
+        end
+
+        it 'gets a nil entity_source_id' do
+          expect(subject.entity_source_id).to be_nil
+        end
+      end
     end
 
     context 'ownership' do
