@@ -8,14 +8,14 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
 
     let(:tags) { [Faker::Lorem.word, Faker::Lorem.word] }
     let(:host_name) { Faker::Internet.domain_name }
-    let(:entity_id) { "https://#{host_name}/shibboleth" }
-    let(:base64_urlsafe_entity_id) { Base64.urlsafe_encode64(entity_id) }
+    let(:entity_id_uri) { "https://#{host_name}/shibboleth" }
+    let(:base64_urlsafe_entity_id) { Base64.urlsafe_encode64(entity_id_uri) }
     let(:enabled) { [true, false].sample }
     let(:xml) do
       <<-EOF.strip_heredoc
           <EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata"
             xmlns:mdui="urn:oasis:names:tc:SAML:metadata:ui"
-            entityID="#{entity_id}">
+            entityID="#{entity_id_uri}">
             <IDPSSODescriptor
               protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
               <SingleSignOnService
@@ -152,7 +152,7 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
 
             context 'uri' do
               subject { record.uri }
-              it { is_expected.to eq(entity_id) }
+              it { is_expected.to eq(entity_id_uri) }
             end
 
             context 'description' do
@@ -177,7 +177,7 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
 
             context 'sha1' do
               subject { record.sha1 }
-              it { is_expected.to eq(Digest::SHA1.hexdigest(entity_id)) }
+              it { is_expected.to eq(Digest::SHA1.hexdigest(entity_id_uri)) }
             end
           end
         end
@@ -191,7 +191,7 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
           <<-EOF.strip_heredoc
             <EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata"
               xmlns:mdui="urn:oasis:names:tc:SAML:metadata:ui"
-              entityID="#{entity_id}">
+              entityID="#{entity_id_uri}">
               <IDPSSODescriptor
              protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
                 <SingleSignOnService
@@ -213,7 +213,7 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
         end
 
         before do
-          EntityId.create(uri: entity_id,
+          EntityId.create(uri: entity_id_uri,
                           raw_entity_descriptor: original_raw_entity_descriptor)
           original_tags.each { |t| original_known_entity.tag_as(t) }
         end
@@ -316,7 +316,7 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
               subject { record.uri }
 
               it 'has not changed' do
-                expect(subject).to eq(entity_id)
+                expect(subject).to eq(entity_id_uri)
               end
             end
 
@@ -350,7 +350,7 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
 
             context 'sha1' do
               subject { record.sha1 }
-              it { is_expected.to eq(Digest::SHA1.hexdigest(entity_id)) }
+              it { is_expected.to eq(Digest::SHA1.hexdigest(entity_id_uri)) }
             end
           end
         end
@@ -419,8 +419,8 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
         it_behaves_like 'no state changed'
       end
 
-      context 'with invalid entity id' do
-        let(:entity_id) { SecureRandom.urlsafe_base64 }
+      context 'with invalid entity id uri' do
+        let(:entity_id_uri) { SecureRandom.urlsafe_base64 }
         subject { -> { run } }
         let(:message) { /uri is not a valid uri/ }
 
