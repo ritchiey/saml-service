@@ -31,9 +31,10 @@ Rails.application.routes.draw do
       scope 'discovery' do
         resources :discovery_entities, path: 'entities'
       end
-      post 'entity_sources/:tag/raw_entity_descriptors',
-           to: 'raw_entity_descriptors#create',
-           as: 'raw_entity_descriptors'
+      patch 'entity_sources/:tag/raw_entity_descriptors/'\
+            ':base64_urlsafe_entity_id',
+            to: 'raw_entity_descriptors#update',
+            as: 'raw_entity_descriptors'
     end
   end
 end

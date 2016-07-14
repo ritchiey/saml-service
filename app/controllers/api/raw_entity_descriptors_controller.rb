@@ -6,40 +6,67 @@ module API
       raise(ResourceNotFound) if @entity_source.nil?
     end
 
-    def create
+    def update
       check_access!(access_path)
-      raise(BadRequest) unless valid_post_params?
-      persist
-      render status: :created, nothing: true
+      raise(BadRequest) unless valid_patch_params?
+      if existing_entity_id
+        update_raw_entity_descriptor
+        render status: :no_content, nothing: true
+      else
+        create_raw_entity_descriptor
+        render status: :created, nothing: true
+      end
     end
 
     private
 
-    def persist
+    def update_raw_entity_descriptor
+      red = existing_entity_id.raw_entity_descriptor
+      red.xml = patch_params[:xml]
+      red.enabled = patch_params[:enabled]
+      ke = red.known_entity
+      ke.enabled = patch_params[:enabled]
+      Sequel::Model.db.transaction(isolation: :repeatable) do
+        red.save
+        ke.save
+        tag_known_entity(ke)
+      end
+    end
+
+    def create_raw_entity_descriptor
       Sequel::Model.db.transaction(isolation: :repeatable) do
         ke = KnownEntity.create(entity_source: @entity_source,
-                                enabled: post_params[:enabled])
+                                enabled: patch_params[:enabled])
         red = RawEntityDescriptor
-              .create(known_entity: ke, xml: post_params[:xml],
-                      enabled: post_params[:enabled], idp: true, sp: false)
-        EntityId.create(uri: post_params[:entity_id],
+              .create(known_entity: ke, xml: patch_params[:xml],
+                      enabled: patch_params[:enabled], idp: true, sp: false)
+        EntityId.create(uri: entity_id_uri,
                         raw_entity_descriptor: red)
         tag_known_entity(ke)
       end
     end
 
+    def existing_entity_id
+      EntityId.first(entity_source_id: @entity_source.id,
+                     uri: entity_id_uri)
+    end
+
     def tag_known_entity(known_entity)
-      post_params[:tags].each { |t| known_entity.tag_as(t) }
+      patch_params[:tags].each { |t| known_entity.tag_as(t) }
       known_entity.tag_as(params[:tag])
     end
 
-    def post_params
+    def patch_params
       params.require(:raw_entity_descriptor)
             .permit(:xml, :entity_id, :enabled, tags: [])
     end
 
-    def valid_post_params?
-      post_params[:tags] && [true, false].include?(post_params[:enabled])
+    def entity_id_uri
+      Base64.urlsafe_decode64(params[:base64_urlsafe_entity_id])
+    end
+
+    def valid_patch_params?
+      patch_params[:tags] && [true, false].include?(patch_params[:enabled])
     end
 
     def access_path
