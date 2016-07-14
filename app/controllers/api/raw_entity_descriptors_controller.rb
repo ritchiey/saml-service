@@ -20,19 +20,6 @@ module API
 
     private
 
-    def update_raw_entity_descriptor
-      red = existing_entity_id.raw_entity_descriptor
-      red.xml = patch_params[:xml]
-      red.enabled = patch_params[:enabled]
-      ke = red.known_entity
-      ke.enabled = patch_params[:enabled]
-      Sequel::Model.db.transaction(isolation: :repeatable) do
-        red.save
-        ke.save
-        tag_known_entity(ke)
-      end
-    end
-
     def create_raw_entity_descriptor
       Sequel::Model.db.transaction(isolation: :repeatable) do
         ke = KnownEntity.create(entity_source: @entity_source,
@@ -42,6 +29,16 @@ module API
                       enabled: patch_params[:enabled], idp: true, sp: false)
         EntityId.create(uri: entity_id_uri,
                         raw_entity_descriptor: red)
+        tag_known_entity(ke)
+      end
+    end
+
+    def update_raw_entity_descriptor
+      red = existing_entity_id.raw_entity_descriptor
+      ke = red.known_entity
+      Sequel::Model.db.transaction(isolation: :repeatable) do
+        red.update(xml: patch_params[:xml], enabled: patch_params[:enabled])
+        ke.update(enabled: patch_params[:enabled])
         tag_known_entity(ke)
       end
     end
