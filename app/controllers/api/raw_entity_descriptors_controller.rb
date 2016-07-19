@@ -24,11 +24,12 @@ module API
 
     def create_raw_entity_descriptor
       Sequel::Model.db.transaction(isolation: :repeatable) do
-        attrs = { enabled: patch_params[:enabled], xml: patch_params[:xml] }
+        ke = KnownEntity.new(entity_source: @entity_source)
+        persist_known_entity(ke)
 
-        ke = KnownEntity.create(entity_source: @entity_source,
-                                enabled: attrs[:enabled])
-        red = RawEntityDescriptor.create(known_entity: ke, **attrs)
+        red = RawEntityDescriptor.new(known_entity: ke)
+        persist_raw_entity_descriptor(red)
+
         EntityId.create(uri: entity_id_uri, raw_entity_descriptor: red)
 
         set_saml_type(red, xml_node)
@@ -39,11 +40,22 @@ module API
     def update_raw_entity_descriptor
       red = existing_entity_id.raw_entity_descriptor
       ke = red.known_entity
+
       Sequel::Model.db.transaction(isolation: :repeatable) do
-        red.update(xml: patch_params[:xml], enabled: patch_params[:enabled])
-        ke.update(enabled: patch_params[:enabled])
+        persist_known_entity(ke)
+        persist_raw_entity_descriptor(red)
+
+        set_saml_type(red, xml_node)
         tag_known_entity(ke)
       end
+    end
+
+    def persist_known_entity(ke)
+      ke.update(enabled: patch_params[:enabled])
+    end
+
+    def persist_raw_entity_descriptor(red)
+      red.update(enabled: patch_params[:enabled], xml: patch_params[:xml])
     end
 
     def existing_entity_id
