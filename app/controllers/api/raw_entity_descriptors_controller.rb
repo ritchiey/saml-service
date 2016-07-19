@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 module API
   class RawEntityDescriptorsController < APIController
+    include SetSAMLTypeFromXML
+
     before_action do
       @entity_source = EntitySource[source_tag: params[:tag]]
       raise(ResourceNotFound) if @entity_source.nil?
@@ -22,13 +24,14 @@ module API
 
     def create_raw_entity_descriptor
       Sequel::Model.db.transaction(isolation: :repeatable) do
+        attrs = { enabled: patch_params[:enabled], xml: patch_params[:xml] }
+
         ke = KnownEntity.create(entity_source: @entity_source,
-                                enabled: patch_params[:enabled])
-        red = RawEntityDescriptor
-              .create(known_entity: ke, xml: patch_params[:xml],
-                      enabled: patch_params[:enabled], idp: true, sp: false)
-        EntityId.create(uri: entity_id_uri,
-                        raw_entity_descriptor: red)
+                                enabled: attrs[:enabled])
+        red = RawEntityDescriptor.create(known_entity: ke, **attrs)
+        EntityId.create(uri: entity_id_uri, raw_entity_descriptor: red)
+
+        set_saml_type(red, xml_node)
         tag_known_entity(ke)
       end
     end
@@ -69,6 +72,10 @@ module API
     def access_path
       "entity_sources:#{@entity_source.source_tag}:raw_entity_descriptors:"\
       'create'
+    end
+
+    def xml_node
+      Nokogiri::XML.parse(patch_params[:xml]).root
     end
   end
 end

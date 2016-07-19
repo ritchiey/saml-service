@@ -109,6 +109,44 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
               subject { record.standalone_aa }
               it { is_expected.to be_falsey }
             end
+
+            context 'for a service provider' do
+              let(:xml) { attributes_for(:raw_entity_descriptor_sp)[:xml] }
+
+              context 'idp' do
+                subject { record.idp }
+                it { is_expected.to be_falsey }
+              end
+
+              context 'sp' do
+                subject { record.sp }
+                it { is_expected.to be_truthy }
+              end
+
+              context 'standalone aa' do
+                subject { record.standalone_aa }
+                it { is_expected.to be_falsey }
+              end
+            end
+
+            context 'for a standalone aa' do
+              let(:xml) { attributes_for(:raw_entity_descriptor)[:xml] }
+
+              context 'idp' do
+                subject { record.idp }
+                it { is_expected.to be_falsey }
+              end
+
+              context 'sp' do
+                subject { record.sp }
+                it { is_expected.to be_falsey }
+              end
+
+              context 'standalone aa' do
+                subject { record.standalone_aa }
+                it { is_expected.to be_truthy }
+              end
+            end
           end
         end
 
@@ -134,8 +172,8 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
 
             context 'tags' do
               subject { record.tags.map(&:name) }
-              let(:all_tags) { tags.append(source_tag) }
-              it { is_expected.to eq(all_tags) }
+              let(:all_tags) { tags + [source_tag, 'idp'] }
+              it { is_expected.to match_array(all_tags) }
             end
           end
         end
