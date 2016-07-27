@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 module API
   class RawEntityDescriptorsController < APIController
+    include SetSAMLTypeFromXML
+
     before_action do
       @entity_source = EntitySource[source_tag: params[:tag]]
       raise(ResourceNotFound) if @entity_source.nil?
@@ -22,13 +24,15 @@ module API
 
     def create_raw_entity_descriptor
       Sequel::Model.db.transaction(isolation: :repeatable) do
-        ke = KnownEntity.create(entity_source: @entity_source,
-                                enabled: patch_params[:enabled])
-        red = RawEntityDescriptor
-              .create(known_entity: ke, xml: patch_params[:xml],
-                      enabled: patch_params[:enabled], idp: true, sp: false)
-        EntityId.create(uri: entity_id_uri,
-                        raw_entity_descriptor: red)
+        ke = KnownEntity.new(entity_source: @entity_source)
+        persist_known_entity(ke)
+
+        red = RawEntityDescriptor.new(known_entity: ke)
+        persist_raw_entity_descriptor(red)
+
+        EntityId.create(uri: entity_id_uri, raw_entity_descriptor: red)
+
+        set_saml_type(red, xml_node)
         tag_known_entity(ke)
       end
     end
@@ -36,11 +40,22 @@ module API
     def update_raw_entity_descriptor
       red = existing_entity_id.raw_entity_descriptor
       ke = red.known_entity
+
       Sequel::Model.db.transaction(isolation: :repeatable) do
-        red.update(xml: patch_params[:xml], enabled: patch_params[:enabled])
-        ke.update(enabled: patch_params[:enabled])
+        persist_known_entity(ke)
+        persist_raw_entity_descriptor(red)
+
+        set_saml_type(red, xml_node)
         tag_known_entity(ke)
       end
+    end
+
+    def persist_known_entity(ke)
+      ke.update(enabled: patch_params[:enabled])
+    end
+
+    def persist_raw_entity_descriptor(red)
+      red.update(enabled: patch_params[:enabled], xml: patch_params[:xml])
     end
 
     def existing_entity_id
@@ -69,6 +84,10 @@ module API
     def access_path
       "entity_sources:#{@entity_source.source_tag}:raw_entity_descriptors:"\
       'create'
+    end
+
+    def xml_node
+      Nokogiri::XML.parse(patch_params[:xml]).root
     end
   end
 end
