@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module API
   class DiscoveryEntitiesController < APIController
     skip_before_action :ensure_authenticated
@@ -22,7 +23,7 @@ module API
       role_descriptors: [],
       organization: [],
       registration_info: []
-    }
+    }.freeze
 
     SP_EAGER_FETCH = COMMON_EAGER_FETCH.merge(
       sp_sso_descriptors: {
@@ -42,7 +43,7 @@ module API
     RAW_COMMON_EAGER_FETCH = {
       entity_id: [],
       known_entity: :tags
-    }
+    }.freeze
 
     RAW_IDP_EAGER_FETCH = RAW_COMMON_EAGER_FETCH
 
@@ -59,7 +60,7 @@ module API
 
     def red_containing_sp
       RawEntityDescriptor.where(sp: true).eager(known_entity: :tags)
-        .eager(RAW_SP_EAGER_FETCH).all
+                         .eager(RAW_SP_EAGER_FETCH).all
     end
 
     def ed_containing_idp
@@ -69,12 +70,12 @@ module API
 
     def red_containing_idp
       RawEntityDescriptor.where(idp: true).eager(known_entity: :tags)
-        .eager(RAW_IDP_EAGER_FETCH).all
+                         .eager(RAW_IDP_EAGER_FETCH).all
     end
 
     def entities_with_role_descriptor(table)
       EntityDescriptor.qualify.distinct(:id)
-        .join(table, entity_descriptor_id: :id)
+                      .join(table, entity_descriptor_id: :id)
     end
   end
 end

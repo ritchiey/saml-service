@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # rubocop:disable Metrics/ModuleLength
 module RawEntityDescriptorDeconstructor
   extend ActiveSupport::Concern
@@ -46,8 +47,6 @@ module RawEntityDescriptorDeconstructor
 
     extract_single_sign_on_services(single_sign_on_services_node)
   end
-
-  private
 
   def display_names(ui_info_node, ui_info)
     ui_info_node.xpath(UI_INFO_DISPLAY_NAME_PATH).each do |dn|
@@ -149,7 +148,7 @@ module RawEntityDescriptorDeconstructor
     private
 
     def element_xpath(uri, name)
-      %(.//*[local-name() = "#{name}" and namespace-uri() = "#{uri}"]).freeze
+      %(.//*[local-name() = "#{name}" and namespace-uri() = "#{uri}"])
     end
 
     def mdui_element_xpath(name)

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class AttributeConsumingService < Sequel::Model
   many_to_one :sp_sso_descriptor
   one_to_many :service_names

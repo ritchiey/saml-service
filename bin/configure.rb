@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 require_relative '../config/environment'
 require 'thor'
@@ -24,7 +25,7 @@ class ConfigureCLI < Thor
 
   def fr_source
     source, other = FederationRegistrySource.all
-    fail('Multiple FederationRegistrySource objects exist') if other
+    raise('Multiple FederationRegistrySource objects exist') if other
 
     source ||= new_federation_registry_source(options[:source_tag])
 
@@ -37,9 +38,9 @@ class ConfigureCLI < Thor
   option :source_tag,
          desc: 'Unique tag to apply to all entities resolved from this source'
   option :rank, desc: 'How this source should be considered in relation to other
-  EntitySources. Should the same EntityID exist in multiple EntitySource only
-  the version from the highest ranked source shall be used. Unqiue per SAML
-  service instance.'
+  EntitySources. Should the same EntityID exist in multiple EntitySource, the
+  source with the lowest numeric rank shall be used. Unique per SAML service
+  instance.'
   option :url, desc: 'The URL of SAML metadata document to download'
   option :cert, desc: 'A local file containing the metadata sources validation
   certificate. The validity of this certificate should have previously been
@@ -145,7 +146,7 @@ class ConfigureCLI < Thor
     fingerprint = sha1_fingerprint(load_certificate)
     keypair = Keypair.first_where(fingerprint: fingerprint)
 
-    keypair || fail('The provided certificate has not been registered')
+    keypair || raise('The provided certificate has not been registered')
 
     { name: opts[:name], federation_identifier: opts[:tag],
       hash_algorithm: opts[:hash].downcase, validity_period: 7.days,
@@ -163,7 +164,7 @@ class ConfigureCLI < Thor
     up, up2 = publication_info.usage_policies
     up ||= MDRPI::UsagePolicy.new
 
-    up2 && fail("Can't PublicationInfo with multiple usage policies")
+    up2 && raise("Can't PublicationInfo with multiple usage policies")
 
     up.update(uri: options[:usage_policy], lang: options[:lang],
               publication_info_id: publication_info.id)

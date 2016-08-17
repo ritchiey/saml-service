@@ -1,11 +1,12 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 require_relative '../config/environment'
 
 class SyncCLI
   def self.perform(source_tag)
     entity_source = EntitySource[source_tag: source_tag]
-    fail("The source_tag #{source_tag} is invalid") unless entity_source
+    raise("The source_tag #{source_tag} is invalid") unless entity_source
 
     if entity_source.url
       UpdateEntitySource.perform(id: entity_source.id)

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Metadata
   module SAMLNamespaces
     NAMESPACES = {
@@ -13,7 +14,7 @@ module Metadata
       'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance',
       'xmlns:fed' => 'http://docs.oasis-open.org/wsfed/federation/200706',
       'xmlns:privacy' => 'http://docs.oasis-open.org/wsfed/privacy/200706'
-    }
+    }.freeze
 
     def root
       builder

@@ -1,11 +1,12 @@
+# frozen_string_literal: true
 FactoryGirl.define do
-  TEST_RSA_KEYS = {}
+  test_rsa_keys = {}
 
   factory :rsa_key, class: OpenSSL::PKey::RSA do
     transient { bits 2048 }
 
     initialize_with do
-      TEST_RSA_KEYS[bits.to_i] ||= OpenSSL::PKey::RSA.new(bits)
+      test_rsa_keys[bits.to_i] ||= OpenSSL::PKey::RSA.new(bits)
     end
 
     skip_create

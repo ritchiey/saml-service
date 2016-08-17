@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 RSpec.shared_examples 'SPSSODescriptor xml' do
   let(:assertion_consumer_service_path) do
     "#{sp_sso_descriptor_path}/AssertionConsumerService"

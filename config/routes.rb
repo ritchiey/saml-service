@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'api_constraints'
 
 Rails.application.routes.draw do
@@ -30,6 +31,10 @@ Rails.application.routes.draw do
       scope 'discovery' do
         resources :discovery_entities, path: 'entities'
       end
+      patch 'entity_sources/:tag/raw_entity_descriptors/'\
+            ':base64_urlsafe_entity_id',
+            to: 'raw_entity_descriptors#update',
+            as: 'raw_entity_descriptors'
     end
   end
 end

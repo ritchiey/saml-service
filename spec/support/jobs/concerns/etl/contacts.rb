@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 RSpec.shared_examples 'ETL::Contacts' do
   def create_json(id)
     {

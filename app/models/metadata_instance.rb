@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class MetadataInstance < Sequel::Model
   plugin :update_or_create
 

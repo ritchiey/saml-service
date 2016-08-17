@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 ROOT = File.expand_path(File.join(File.dirname(__FILE__), '..'))
 
 worker_processes 5
@@ -29,7 +30,7 @@ end
 
 class Unicorn::HttpServer # rubocop:disable ClassAndModuleChildren
   def proc_name(tag)
-    $0 = ([File.basename(START_CTX[0]), 'saml',
-           tag]).concat(START_CTX[:argv]).join(' ')
+    $0 = [File.basename(START_CTX[0]), 'saml',
+          tag].concat(START_CTX[:argv]).join(' ')
   end
 end

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 RSpec.shared_examples 'RequestedAttribute xml' do
   it 'is created' do
     expect(xml).to have_xpath(requested_attribute_path)

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'metadata/schema'
 require 'metadata/schema_invalid_error'
 
@@ -65,8 +66,8 @@ module MetadataQueryCaching
     doc = @saml_renderer.builder.doc
     return if metadata_schema.valid?(doc)
 
-    fail Metadata::SchemaInvalidError, 'metadata is not schema valid\n' \
-                                       "#{metadata_schema.validate(doc)}"
+    raise Metadata::SchemaInvalidError,
+          "Metadata is not schema valid #{metadata_schema.validate(doc)}"
   end
 
   def ttl

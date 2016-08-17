@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 RSpec.shared_examples 'mdrpi:PublisherInfo xml' do
   context 'MDRPI Publisher Info' do
     let(:publication_info_path) { '/mdrpi:PublicationInfo' }

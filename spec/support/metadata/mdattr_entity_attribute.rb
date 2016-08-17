@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 RSpec.shared_examples 'mdattr:EntityAttribute xml' do
   let(:entity_attribute_path) { '/mdattr:EntityAttributes' }
   let(:attribute_path) { "#{entity_attribute_path}/saml:Attribute" }

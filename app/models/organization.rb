@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class Organization < Sequel::Model
   one_to_many :organization_names
   one_to_many :organization_display_names

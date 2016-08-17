@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'metadata/saml_namespaces'
 
 module Metadata
@@ -116,7 +117,7 @@ module Metadata
     TRANSFORM_METHODS = %w(
       http://www.w3.org/2000/09/xmldsig#enveloped-signature
       http://www.w3.org/2001/10/xml-exc-c14n#
-    )
+    ).freeze
 
     SIGNATURE_METHOD = {
       sha1: 'http://www.w3.org/2000/09/xmldsig#rsa-sha1',
@@ -275,7 +276,7 @@ module Metadata
       attributes = {
         registrationAuthority: mi.registration_info.registration_authority,
         registrationInstant: mi.registration_info
-                             .registration_instant_utc.xmlschema
+                               .registration_instant_utc.xmlschema
       }
       mdrpi.RegistrationInfo(ns, attributes) do |_|
         mi.registration_info.registration_policies.each do |rp|

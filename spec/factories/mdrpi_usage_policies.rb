@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 FactoryGirl.define do
   factory :mdrpi_usage_policy, class: 'MDRPI::UsagePolicy',
                                parent: :localized_uri do

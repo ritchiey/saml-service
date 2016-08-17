@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module MDUI
   class GeolocationHint < Sequel::Model
     many_to_one :disco_hints

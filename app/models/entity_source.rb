@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class EntitySource < Sequel::Model
   one_to_many :known_entities
 

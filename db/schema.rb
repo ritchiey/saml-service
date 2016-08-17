@@ -9,6 +9,8 @@ Sequel.migration do
       column :enabled, "tinyint(1)"
       column :created_at, "datetime"
       column :updated_at, "datetime"
+      
+      index [:x509_cn], :name=>:x509_cn, :unique=>true
     end
     
     create_table(:authz_services) do
@@ -317,8 +319,10 @@ Sequel.migration do
       foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :key=>[:id]
       column :sha1, "varchar(255)", :null=>false
       foreign_key :raw_entity_descriptor_id, :raw_entity_descriptors, :type=>"int(11)", :key=>[:id]
+      foreign_key :entity_source_id, :entity_sources, :type=>"int(11)", :key=>[:id]
       
       index [:entity_descriptor_id], :name=>:eid_ed_fkey
+      index [:entity_source_id, :sha1], :unique=>true
       index [:raw_entity_descriptor_id], :name=>:red_eid_fkey
     end
     
@@ -853,5 +857,7 @@ self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160203023734_ad
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160209223646_remove_source_tag_default_value.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160314045620_set_correct_encoding_collation.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160316030021_change_collation_to_binary.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160530102028_api_subject_unique_x509.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160711003010_add_entity_source_id_to_entity_ids.rb')"
                 end
               end
