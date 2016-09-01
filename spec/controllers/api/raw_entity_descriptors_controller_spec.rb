@@ -496,9 +496,9 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
       end
 
       context 'with invalid entity id uri' do
-        let(:entity_id_uri) { SecureRandom.urlsafe_base64 }
+        let(:entity_id_uri) { '' }
         subject { -> { run } }
-        let(:message) { /uri is not a valid uri/ }
+        let(:message) { /uri is not present/ }
 
         it { is_expected.to raise_error(Sequel::ValidationFailed, message) }
         it_behaves_like 'no state changed'
