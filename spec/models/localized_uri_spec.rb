@@ -27,6 +27,18 @@ describe LocalizedURI do
         expect(subject).to be_valid
       end
 
+      it 'supports hTtP' do
+        subject.lang = 'en'
+        subject.uri = 'hTtP://example.org'
+        expect(subject).to be_valid
+      end
+
+      it 'supports HttpS' do
+        subject.lang = 'en'
+        subject.uri = 'HttpS://example.org'
+        expect(subject).to be_valid
+      end
+
       it 'allows port number' do
         subject.lang = 'en'
         subject.uri = 'https://example.org:8080'

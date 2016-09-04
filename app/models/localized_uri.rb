@@ -4,7 +4,7 @@ class LocalizedURI < Sequel::Model
 
   def validate
     super
-    uri_regexp = URI.regexp(%w(http https))
+    uri_regexp = URI.regexp(/(http|https)/i)
     validates_presence [:uri, :lang, :created_at, :updated_at]
     validates_format uri_regexp, :uri
   end
