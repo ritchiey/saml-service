@@ -16,7 +16,8 @@ describe MetadataInstance do
   it { is_expected.to validate_presence :cache_period }
 
   it { is_expected.to validate_presence :primary_tag }
-  it { is_expected.to validate_unique :primary_tag }
+  it { is_expected.to validate_presence :identifier }
+  it { is_expected.to validate_unique :identifier }
   it { is_expected.to validate_presence :all_entities }
 
   context 'optional attributes' do
