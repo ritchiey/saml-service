@@ -136,6 +136,7 @@ RSpec.describe ConfigureCLI do
     let(:hash) { nil }
     let(:name) { "#{Faker::Lorem.word}.#{Faker::Internet.domain_name}" }
     let(:tag) { Faker::Lorem.word }
+    let(:identifier) { SecureRandom.urlsafe_base64 }
     let(:publisher) { Faker::Internet.url }
     let(:usage_policy) { Faker::Internet.url }
     let(:lang) { 'en' }
@@ -152,6 +153,7 @@ RSpec.describe ConfigureCLI do
       args = ['md_instance',
               '--cert', cert_file,
               '--name', name,
+              '--identifier', identifier,
               '--tag', tag,
               '--publisher', publisher,
               '--usage-policy', usage_policy,
@@ -163,7 +165,7 @@ RSpec.describe ConfigureCLI do
     end
 
     context 'when the metadata instance exists' do
-      let!(:instance) { create(:metadata_instance, primary_tag: tag) }
+      let!(:instance) { create(:metadata_instance, identifier: identifier) }
 
       it 'does not create a new metadata instance' do
         expect { run }.not_to change(MetadataInstance, :count)
