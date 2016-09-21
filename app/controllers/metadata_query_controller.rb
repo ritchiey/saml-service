@@ -90,8 +90,8 @@ class MetadataQueryController < ApplicationController
   end
 
   def ensure_metadata_instance
-    @metadata_instance =
-      MetadataInstance[primary_tag: params[:primary_tag]]
+    @metadata_instance = MetadataInstance[identifier: params[:instance]]
+
     if @metadata_instance
       @saml_renderer = Metadata::SAML.new(metadata_instance: @metadata_instance)
       return
