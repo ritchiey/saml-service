@@ -47,7 +47,7 @@ class MetadataQueryController < ApplicationController
       known_entities = KnownEntity.with_all_tags(tags)
       return not_found unless known_entities.present?
 
-      etag = generate_known_entities_etag(known_entities)
+      etag = generate_document_entities_etag(@metadata_instance, known_entities)
       if known_entities_unmodified?(known_entities, etag)
         return head :not_modified
       end
@@ -61,7 +61,7 @@ class MetadataQueryController < ApplicationController
 
     Sequel::Model.db.transaction(isolation: :repeatable) do
       known_entity = entity_id.parent.known_entity
-      etag = generate_descriptor_etag(known_entity)
+      etag = generate_document_entities_etag(@metadata_instance, [known_entity])
       return head :not_modified if known_entity_unmodified?(known_entity, etag)
 
       create_known_entity_response(known_entity, etag)

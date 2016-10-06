@@ -2,6 +2,9 @@
 require 'rails_helper'
 
 RSpec.describe MetadataQueryController, type: :controller do
+  let(:caching_klass) { Class.new { include MetadataQueryCaching } }
+  let(:caching) { caching_klass.new }
+
   around { |example| Timecop.freeze { example.run } }
 
   RSpec.shared_examples 'invalid requests' do
@@ -154,7 +157,8 @@ RSpec.describe MetadataQueryController, type: :controller do
             create_list :known_entity, 2, :with_idp
           end
           let(:etag) do
-            controller.send(:generate_known_entities_etag, known_entities)
+            caching.generate_document_entities_etag(metadata_instance,
+                                                    known_entities)
           end
 
           before do
@@ -296,8 +300,9 @@ RSpec.describe MetadataQueryController, type: :controller do
         before { request.accept = saml_content }
         context 'valid client request' do
           let(:etag) do
-            controller
-              .send(:generate_descriptor_etag, entity_descriptor.known_entity)
+            caching.generate_document_entities_etag(
+              metadata_instance, [entity_descriptor.known_entity]
+            )
           end
           context 'valid entity_descriptor' do
             context 'initial request' do
@@ -538,7 +543,8 @@ RSpec.describe MetadataQueryController, type: :controller do
             create_list :known_entity, 2, :with_idp
           end
           let(:etag) do
-            controller.send(:generate_known_entities_etag, known_entities)
+            caching.generate_document_entities_etag(metadata_instance,
+                                                    known_entities)
           end
 
           before do
