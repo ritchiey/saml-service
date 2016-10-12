@@ -7,14 +7,13 @@ module MetadataQueryCaching
 
   include Metadata::Schema
 
-  def generate_known_entities_etag(known_entities)
-    timestamps = known_entities.map(&:updated_at).map(&:to_i).join('.')
-    digest = Digest::MD5.hexdigest("samlmetadata/#{timestamps}")
-    generate_etag(digest)
-  end
+  def generate_document_entities_etag(metadata_instance, known_entities)
+    keys = known_entities.sort_by(&:id)
+                         .map { |ke| "#{ke.id}-#{ke.updated_at.to_i}" }
 
-  def generate_descriptor_etag(desc)
-    digest = Digest::MD5.hexdigest("samlmetadata/#{desc.id}-#{desc.updated_at}")
+    payload = "samlmetadata/#{metadata_instance.identifier}/#{keys.join('.')}"
+
+    digest = Digest::MD5.hexdigest(payload)
     generate_etag(digest)
   end
 

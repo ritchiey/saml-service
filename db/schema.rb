@@ -191,14 +191,15 @@ Sequel.migration do
       column :ca_verify_depth, "int(11)"
       column :hash_algorithm, "varchar(255)", :null=>false
       foreign_key :keypair_id, :keypairs, :type=>"int(11)", :null=>false, :key=>[:id]
-      column :primary_tag, "varchar(255)", :null=>false
+      column :identifier, "varchar(255)", :null=>false
       column :all_entities, "tinyint(1)", :default=>true, :null=>false
       column :federation_identifier, "varchar(255)", :null=>false
       column :validity_period, "int(11)", :null=>false
       column :cache_period, "int(11)", :default=>21600, :null=>false
+      column :primary_tag, "varchar(255)", :null=>false
       
       index [:keypair_id], :name=>:keypair_id
-      index [:primary_tag], :unique=>true
+      index [:identifier], :unique=>true
     end
     
     create_table(:organization_display_names) do
@@ -859,5 +860,7 @@ self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160314045620_se
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160316030021_change_collation_to_binary.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160530102028_api_subject_unique_x509.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160711003010_add_entity_source_id_to_entity_ids.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160920023804_rename_primary_tag_to_identifier_in_metadata_instance.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160920024949_add_primary_tag_to_metadata_instances.rb')"
                 end
               end

@@ -2,6 +2,9 @@
 require 'rails_helper'
 
 RSpec.describe MetadataQueryController, type: :controller do
+  let(:caching_klass) { Class.new { include MetadataQueryCaching } }
+  let(:caching) { caching_klass.new }
+
   around { |example| Timecop.freeze { example.run } }
 
   RSpec.shared_examples 'invalid requests' do
@@ -26,8 +29,10 @@ RSpec.describe MetadataQueryController, type: :controller do
       it { is_expected.to have_http_status(:not_acceptable) }
     end
 
-    context 'with invalid primary_tag (MetadataInstance)' do
-      let(:fake_primary_tag) { Faker::Lorem.word }
+    context 'with invalid instance identifier' do
+      let(:instance_identifier) { Faker::Lorem.word }
+      let!(:metadata_instance) { nil }
+
       before do
         request.accept = saml_content
         query
@@ -110,7 +115,12 @@ RSpec.describe MetadataQueryController, type: :controller do
   end
 
   let(:saml_content) { MetadataQueryController::SAML_CONTENT_TYPE }
+  let(:instance_identifier) { metadata_instance.identifier }
   let(:primary_tag) { Faker::Lorem.word }
+
+  let!(:metadata_instance) do
+    create :metadata_instance, primary_tag: primary_tag
+  end
 
   describe '#all_entities' do
     context 'GET' do
@@ -123,7 +133,7 @@ RSpec.describe MetadataQueryController, type: :controller do
 
           before do
             request.accept = saml_content
-            get :all_entities, primary_tag: primary_tag
+            get :all_entities, instance: instance_identifier
           end
 
           context 'response' do
@@ -147,7 +157,8 @@ RSpec.describe MetadataQueryController, type: :controller do
             create_list :known_entity, 2, :with_idp
           end
           let(:etag) do
-            controller.send(:generate_known_entities_etag, known_entities)
+            caching.generate_document_entities_etag(metadata_instance,
+                                                    known_entities)
           end
 
           before do
@@ -160,7 +171,7 @@ RSpec.describe MetadataQueryController, type: :controller do
 
           context 'initial request' do
             def run
-              get :all_entities, primary_tag: primary_tag
+              get :all_entities, instance: instance_identifier
             end
 
             context 'uncached server side' do
@@ -202,7 +213,7 @@ RSpec.describe MetadataQueryController, type: :controller do
 
           context 'subsequent requests' do
             def run
-              get :all_entities, primary_tag: primary_tag
+              get :all_entities, instance: instance_identifier
             end
 
             before do
@@ -273,13 +284,13 @@ RSpec.describe MetadataQueryController, type: :controller do
 
       context 'invalid client request' do
         it_behaves_like 'invalid requests' do
-          let(:query) { get :all_entities, primary_tag: primary_tag }
+          let(:query) { get :all_entities, instance: instance_identifier }
         end
       end
     end
 
     include_examples 'non get request' do
-      let(:query) { post :all_entities, primary_tag: primary_tag }
+      let(:query) { post :all_entities, instance: instance_identifier }
     end
   end
 
@@ -288,12 +299,10 @@ RSpec.describe MetadataQueryController, type: :controller do
       context 'GET' do
         before { request.accept = saml_content }
         context 'valid client request' do
-          let!(:metadata_instance) do
-            create :metadata_instance, primary_tag: primary_tag
-          end
           let(:etag) do
-            controller
-              .send(:generate_descriptor_etag, entity_descriptor.known_entity)
+            caching.generate_document_entities_etag(
+              metadata_instance, [entity_descriptor.known_entity]
+            )
           end
           context 'valid entity_descriptor' do
             context 'initial request' do
@@ -413,7 +422,7 @@ RSpec.describe MetadataQueryController, type: :controller do
 
           context 'invalid entity_descriptor' do
             before do
-              get :specific_entity, primary_tag: primary_tag,
+              get :specific_entity, instance: instance_identifier,
                                     identifier: 'https://example.edu/shibboleth'
             end
 
@@ -433,7 +442,7 @@ RSpec.describe MetadataQueryController, type: :controller do
         context 'invalid client request' do
           it_behaves_like 'invalid requests' do
             let(:query) do
-              get :specific_entity, primary_tag: primary_tag,
+              get :specific_entity, instance: instance_identifier,
                                     identifier: entity_id
             end
           end
@@ -442,14 +451,15 @@ RSpec.describe MetadataQueryController, type: :controller do
 
       include_examples 'non get request' do
         let(:query) do
-          post :specific_entity, primary_tag: primary_tag, identifier: entity_id
+          post :specific_entity, instance: instance_identifier,
+                                 identifier: entity_id
         end
       end
     end
 
     context 'With URI identifier' do
       def run
-        get :specific_entity, primary_tag: primary_tag,
+        get :specific_entity, instance: instance_identifier,
                               identifier: entity_id
       end
 
@@ -472,7 +482,7 @@ RSpec.describe MetadataQueryController, type: :controller do
     context 'With sha1 identifier' do
       def run
         identifier = "{sha1}#{Digest::SHA1.hexdigest(entity_id)}"
-        get :specific_entity_sha1, primary_tag: primary_tag,
+        get :specific_entity_sha1, instance: instance_identifier,
                                    identifier: identifier
       end
 
@@ -500,13 +510,9 @@ RSpec.describe MetadataQueryController, type: :controller do
     context 'GET' do
       context 'valid client request' do
         context 'MetadataInstance has no entities matching tag' do
-          let!(:metadata_instance) do
-            create :metadata_instance, primary_tag: primary_tag
-          end
-
           before do
             request.accept = saml_content
-            get :tagged_entities, primary_tag: primary_tag,
+            get :tagged_entities, instance: instance_identifier,
                                   identifier: secondary_tag
           end
 
@@ -523,9 +529,6 @@ RSpec.describe MetadataQueryController, type: :controller do
         end
 
         context 'MetadataInstance has entities matching tag' do
-          let!(:metadata_instance) do
-            create :metadata_instance, primary_tag: primary_tag
-          end
           let!(:known_entities) do
             create_list(:known_entity, 2, :with_idp) +
               create_list(:known_entity, 2, :with_raw_entity_descriptor)
@@ -540,7 +543,8 @@ RSpec.describe MetadataQueryController, type: :controller do
             create_list :known_entity, 2, :with_idp
           end
           let(:etag) do
-            controller.send(:generate_known_entities_etag, known_entities)
+            caching.generate_document_entities_etag(metadata_instance,
+                                                    known_entities)
           end
 
           before do
@@ -560,7 +564,7 @@ RSpec.describe MetadataQueryController, type: :controller do
           end
 
           def run
-            get :tagged_entities, primary_tag: primary_tag,
+            get :tagged_entities, instance: instance_identifier,
                                   identifier: secondary_tag
           end
 
@@ -694,7 +698,7 @@ RSpec.describe MetadataQueryController, type: :controller do
       context 'invalid client request' do
         it_behaves_like 'invalid requests' do
           let(:query) do
-            get :tagged_entities, primary_tag: primary_tag,
+            get :tagged_entities, instance: instance_identifier,
                                   identifier: secondary_tag
           end
         end
@@ -703,7 +707,7 @@ RSpec.describe MetadataQueryController, type: :controller do
 
     include_examples 'non get request' do
       let(:query) do
-        post :tagged_entities, primary_tag: primary_tag,
+        post :tagged_entities, instance: instance_identifier,
                                identifier: secondary_tag
       end
     end
