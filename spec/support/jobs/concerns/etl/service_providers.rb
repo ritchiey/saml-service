@@ -133,13 +133,11 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
         oid: "#{Faker::Number.number(4)}:#{Faker::Number.number(4)}"
       }
     end.push(
-      {
-        id: attribute_count,
-        description: Faker::Lorem.sentence,
-        oid: "#{Faker::Number.number(4)}:#{Faker::Number.number(4)}",
-        values: [],
-        specificationRequired: true
-      }
+      id: attribute_count,
+      description: Faker::Lorem.sentence,
+      oid: "#{Faker::Number.number(4)}:#{Faker::Number.number(4)}",
+      values: [],
+      specificationRequired: true
     )
   end
 
