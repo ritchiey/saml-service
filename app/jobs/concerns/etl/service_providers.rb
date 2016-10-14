@@ -86,6 +86,15 @@ module ETL
 
     def acs_attributes(acs, ac_data)
       ac_data[:attributes].each do |attr_data|
+        # Don't represent attributes that require specification but
+        # have not yet had specific values associated.
+        # For example eduPersonEntitlement but no entitlement values
+        # requested by the SP using our tooling as yet.
+        if attr_data[:specificationRequired].present? &&
+           attr_data[:specificationRequired] &&
+           !attr_data[:values].present?
+          next
+        end
         base = fr_attributes[attr_data[:id]]
         ra = requested_attribute(acs, attr_data, base)
         acs.add_requested_attribute(ra)
