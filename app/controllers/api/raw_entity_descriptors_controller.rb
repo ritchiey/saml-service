@@ -52,6 +52,7 @@ module API
 
     def persist_known_entity(ke)
       ke.update(enabled: patch_params[:enabled])
+      ke.touch
     end
 
     def persist_raw_entity_descriptor(red)

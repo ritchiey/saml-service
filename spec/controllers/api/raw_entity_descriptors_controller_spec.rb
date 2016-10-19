@@ -343,6 +343,13 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
           subject { -> { run } }
           it { is_expected.to_not change(KnownEntity, :count) }
 
+          it 'invalidates the MDQ cache' do
+            run
+            Timecop.travel(1.second) do
+              expect { run }.to change { KnownEntity.last.updated_at }
+            end
+          end
+
           context 'record' do
             before { run }
             let(:record) { KnownEntity.last }
