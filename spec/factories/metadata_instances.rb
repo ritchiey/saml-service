@@ -11,6 +11,7 @@ FactoryGirl.define do
     federation_identifier { Faker::Lorem.word }
 
     primary_tag { SecureRandom.urlsafe_base64(16) }
+    identifier { SecureRandom.urlsafe_base64(16) }
     all_entities true
 
     after :create do |mi|

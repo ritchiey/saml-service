@@ -89,6 +89,7 @@ class ConfigureCLI < Thor
   desc 'md_instance [options...]', 'Create or update a Metadata Instance'
   option :cert, desc: 'The file containing the metadata certificate'
   option :name, desc: 'The <EntitesDescriptor> name included in the XML'
+  option :identifier, desc: 'The identifier for the metadata instance'
   option :tag, desc: 'The primary tag for the metadata instance'
   option :hash, desc: 'The hash algorithm for signing (default: SHA256)',
                 default: 'SHA256'
@@ -107,7 +108,7 @@ class ConfigureCLI < Thor
     instance with the same tag will be updated with new configuration.
   LONGDESC
   def md_instance
-    instance = MetadataInstance.find_or_new(primary_tag: options[:tag])
+    instance = MetadataInstance.find_or_new(identifier: options[:identifier])
     instance.update(md_instance_attrs)
 
     update_publication_info(instance)
@@ -149,8 +150,9 @@ class ConfigureCLI < Thor
     keypair || raise('The provided certificate has not been registered')
 
     { name: opts[:name], federation_identifier: opts[:tag],
-      hash_algorithm: opts[:hash].downcase, validity_period: 7.days,
-      cache_period: 6.hours, keypair_id: keypair.id, all_entities: true }
+      primary_tag: opts[:tag], hash_algorithm: opts[:hash].downcase,
+      validity_period: 7.days, cache_period: 6.hours,
+      keypair_id: keypair.id, all_entities: true }
   end
 
   def update_publication_info(instance)

@@ -343,6 +343,13 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
           subject { -> { run } }
           it { is_expected.to_not change(KnownEntity, :count) }
 
+          it 'invalidates the MDQ cache' do
+            run
+            Timecop.travel(1.second) do
+              expect { run }.to change { KnownEntity.last.updated_at }
+            end
+          end
+
           context 'record' do
             before { run }
             let(:record) { KnownEntity.last }
@@ -496,9 +503,9 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
       end
 
       context 'with invalid entity id uri' do
-        let(:entity_id_uri) { SecureRandom.urlsafe_base64 }
+        let(:entity_id_uri) { '' }
         subject { -> { run } }
-        let(:message) { /uri is not a valid uri/ }
+        let(:message) { /uri is not present/ }
 
         it { is_expected.to raise_error(Sequel::ValidationFailed, message) }
         it_behaves_like 'no state changed'
