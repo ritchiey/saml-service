@@ -421,9 +421,7 @@ module Metadata
     end
 
     def idp_sso_descriptor(idp)
-      attributes = {}
-      attributes[:WantAuthnRequestsSigned] = idp.want_authn_requests_signed
-      root.IDPSSODescriptor(ns, attributes) do |idp_node|
+      root.IDPSSODescriptor(ns) do |idp_node|
         sso_descriptor(idp, idp_node)
 
         idp.single_sign_on_services.each do |ssos|
@@ -467,10 +465,7 @@ module Metadata
     end
 
     def sp_sso_descriptor(sp)
-      attributes = {}
-      attributes[:AuthnRequestsSigned] = sp.authn_requests_signed
-      attributes[:WantAssertionsSigned] = sp.want_assertions_signed
-      root.SPSSODescriptor(ns, attributes) do |sp_node|
+      root.SPSSODescriptor(ns) do |sp_node|
         sso_descriptor(sp, sp_node)
 
         sp.assertion_consumer_services.each do |acs|

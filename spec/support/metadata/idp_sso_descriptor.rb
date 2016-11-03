@@ -27,17 +27,8 @@ RSpec.shared_examples 'IDPSSODescriptor xml' do
 
   context 'attributes' do
     context 'WantAuthnRequestsSigned' do
-      it 'is rendered' do
-        expect(node['WantAuthnRequestsSigned']).to be_truthy
-      end
-      context 'when explicitly set' do
-        let(:idp_sso_descriptor) do
-          create :idp_sso_descriptor, :with_requests_signed
-        end
-        it 'is rendered' do
-          expect(node['WantAuthnRequestsSigned'])
-            .to eq(idp_sso_descriptor.want_authn_requests_signed.to_s)
-        end
+      it 'is not rendered' do
+        expect(node['WantAuthnRequestsSigned']).to be_falsey
       end
     end
   end
