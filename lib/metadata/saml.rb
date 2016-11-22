@@ -348,7 +348,8 @@ module Metadata
 
         # SPSSODescriptor specific
         if rd.is_a? SPSSODescriptor
-          rd.discovery_response_services.each do |rds|
+          rdss = rd.discovery_response_services{|ds| ds.order(:index, :id)}
+          rdss.each do |rds|
             idpdisc.DiscoveryResponse do |rds_node|
               indexed_endpoint(rds, rds_node)
             end
@@ -371,15 +372,15 @@ module Metadata
     def sso_descriptor(sso, scope)
       role_descriptor(sso, scope)
 
-      sso.artifact_resolution_services.each do |ars|
+      sso.artifact_resolution_services{|ds| ds.order(:index, :id)}.each do |ars|
         artifact_resolution_service(ars)
       end
 
-      sso.single_logout_services.each do |slo|
+      sso.single_logout_services{|ds| ds.order(:id)}.each do |slo|
         single_logout_service(slo)
       end
 
-      sso.manage_name_id_services.each do |slo|
+      sso.manage_name_id_services{|ds| ds.order(:id)}.each do |slo|
         manage_name_id_service(slo)
       end
 
@@ -424,15 +425,15 @@ module Metadata
       root.IDPSSODescriptor(ns) do |idp_node|
         sso_descriptor(idp, idp_node)
 
-        idp.single_sign_on_services.each do |ssos|
+        idp.single_sign_on_services{|ds| ds.order(:id)}.each do |ssos|
           single_sign_on_service(ssos)
         end
 
-        idp.name_id_mapping_services.each do |nidms|
+        idp.name_id_mapping_services{|ds| ds.order(:id)}.each do |nidms|
           name_id_mapping_service(nidms)
         end
 
-        idp.assertion_id_request_services.each do |aidrs|
+        idp.assertion_id_request_services{|ds| ds.order(:id)}.each do |aidrs|
           assertion_id_request_service(aidrs)
         end
 
@@ -468,7 +469,7 @@ module Metadata
       root.SPSSODescriptor(ns) do |sp_node|
         sso_descriptor(sp, sp_node)
 
-        sp.assertion_consumer_services.each do |acs|
+        sp.assertion_consumer_services{|ds| ds.order(:index, :id)}.each do |acs|
           assertion_consumer_service(acs)
         end
 
@@ -516,11 +517,11 @@ module Metadata
       root.AttributeAuthorityDescriptor(ns) do |aad_node|
         role_descriptor(aad, aad_node)
 
-        aad.attribute_services.each do |as|
+        aad.attribute_services{|ds| ds.order(:id)}.each do |as|
           attribute_service(as)
         end
 
-        aad.assertion_id_request_services.each do |aidrs|
+        aad.assertion_id_request_services{|ds| ds.order(:id)}.each do |aidrs|
           assertion_id_request_service(aidrs)
         end
 
