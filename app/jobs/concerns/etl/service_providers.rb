@@ -100,8 +100,8 @@ module ETL
       # have not yet had specific values associated.
       # For example eduPersonEntitlement but no entitlement values
       # requested by the SP using our tooling as yet.
-      attr_data.fetch(:specificationRequired, nil).blank? ||
-        (attr_data[:specificationRequired] && attr_data[:values].present?)
+      attr_data.fetch(:specification, false) == false ||
+        (attr_data[:specification] && attr_data[:values].present?)
     end
 
     def requested_attribute(acs, attr_data, base)
