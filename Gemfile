@@ -10,16 +10,7 @@ gem 'aaf-gumboot', git: 'https://github.com/ausaccessfed/aaf-gumboot.git',
                    branch: 'develop'
 gem 'accession'
 
-# TODO
-# Return this to 1.6.8 once released assumimg either:
-#
-# * https://github.com/sparklemotion/nokogiri/pull/1333 OR
-# * https://github.com/sparklemotion/nokogiri/pull/1444
-#
-# is actually merged by that time. The AAF can't wait any longer
-# so have had to cut our own release to move forward.
-gem 'nokogiri', github: 'bradleybeddoes/nokogiri',
-                branch: 'gem-with-namespace-pruning-fix'
+gem 'nokogiri'
 gem 'xmldsig'
 
 gem 'resque'
