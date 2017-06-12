@@ -140,7 +140,7 @@ RSpec.shared_examples 'ds:Signature xml' do
 
       it 'includes the signature value' do
         rsa_sig = key.sign(OpenSSL::Digest::SHA1.new, c14n_signed_info)
-        expected = Base64.encode64(rsa_sig).strip
+        expected = Base64.strict_encode64(rsa_sig).strip
 
         expect(signature.find(:xpath, 'ds:SignatureValue').text.strip)
           .to eq(expected)
@@ -175,7 +175,7 @@ RSpec.shared_examples 'ds:Signature xml' do
 
       it 'includes the signature value' do
         rsa_sig = key.sign(OpenSSL::Digest::SHA256.new, c14n_signed_info)
-        expected = Base64.encode64(rsa_sig).strip
+        expected = Base64.strict_encode64(rsa_sig).strip
 
         expect(signature.find(:xpath, 'ds:SignatureValue').text.strip)
           .to eq(expected)
