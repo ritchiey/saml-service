@@ -2,7 +2,7 @@
 source 'https://rubygems.org'
 
 # Core
-gem 'rails', '~> 4.2'
+gem 'rails', '~> 5.0'
 gem 'mysql2', '0.4.2'
 gem 'sequel-rails'
 gem 'sequel', '~> 4.31.0'
