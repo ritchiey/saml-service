@@ -13,10 +13,10 @@ module API
       raise(BadRequest) unless valid_patch_params?
       if existing_entity_id
         update_raw_entity_descriptor
-        render status: :no_content, nothing: true
+        head :no_content
       else
         create_raw_entity_descriptor
-        render status: :created, nothing: true
+        head :created
       end
     end
 
