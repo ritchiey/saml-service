@@ -1,13 +1,11 @@
-# No need for API documentation.
-Documentation:
-  Enabled: false
+---
+inherit_gem:
+  aaf-gumboot: aaf-rubocop.yml
 
 AllCops:
   TargetRubyVersion: 2.3
   Exclude:
-    - config/initializers/secret_token.rb
     - db/**/*
-    - Guardfile
 
 AbcSize:
   Exclude:
