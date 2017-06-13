@@ -79,7 +79,7 @@ module API
     end
 
     def valid_patch_params?
-      patch_params[:tags] && [true, false].include?(patch_params[:enabled])
+      patch_params[:tags] && ['true', 'false'].include?(patch_params[:enabled])
     end
 
     def access_path
