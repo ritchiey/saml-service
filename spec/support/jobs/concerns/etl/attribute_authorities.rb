@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 RSpec.shared_examples 'ETL::AttributeAuthorities' do
   include_examples 'ETL::Common'
 

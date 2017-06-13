@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 RSpec.shared_examples 'ds:Signature xml' do
   let(:sig_xpath) { "/#{root_node}/ds:Signature" }
   let(:doc_sig_xpath) { "/xmlns:#{root_node}/ds:Signature" }

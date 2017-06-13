@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class Tag < Sequel::Model
   URL_SAFE_BASE_64_ALPHABET = /^[a-zA-Z0-9_-]+$/
 

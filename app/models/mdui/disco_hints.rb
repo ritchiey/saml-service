@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module MDUI
   class DiscoHints < Sequel::Model
     many_to_one :idp_sso_descriptor, class: 'IDPSSODescriptor'

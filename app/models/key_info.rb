@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class KeyInfo < Sequel::Model
   ANCHOR_BEGIN = '-----BEGIN CERTIFICATE-----'
   ANCHOR_END = '-----END CERTIFICATE-----'

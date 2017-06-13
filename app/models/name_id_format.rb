@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class NameIdFormat < SamlURI
   include Parents
 

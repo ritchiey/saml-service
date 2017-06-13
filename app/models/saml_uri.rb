@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class SamlURI < Sequel::Model
   # We use SamlURI as the parent class for all
   # URI which the SAML Metadata spec defines as type anyURI.

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 namespace :xsd do
   schemas = {
     'schema/xml.xsd' =>

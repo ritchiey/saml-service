@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class EncryptionMethod < Sequel::Model
   many_to_one :key_descriptor
 

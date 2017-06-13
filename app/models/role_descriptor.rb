@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class RoleDescriptor < Sequel::Model
   many_to_one :entity_descriptor
   many_to_one :organization

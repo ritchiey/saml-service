@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module API
   class DiscoveryEntitiesController < APIController
     skip_before_action :ensure_authenticated

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 RSpec.shared_examples 'IDPSSODescriptor xml' do
   let(:single_sign_on_service_path) do
     "#{idp_sso_descriptor_path}/SingleSignOnService"

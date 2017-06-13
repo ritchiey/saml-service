@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class AttributeValue < Sequel::Model
   many_to_one :attribute
 

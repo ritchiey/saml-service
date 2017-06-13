@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'metadata/saml_namespaces'
 
 module Metadata

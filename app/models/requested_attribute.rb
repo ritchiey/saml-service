@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class RequestedAttribute < Attribute
   many_to_one :attribute_consuming_service
 

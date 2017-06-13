@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module MDUI
   class IPHint < Sequel::Model
     many_to_one :disco_hints

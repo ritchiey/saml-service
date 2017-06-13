@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module MDUI
   class KeywordList < Sequel::Model
     many_to_one :ui_info

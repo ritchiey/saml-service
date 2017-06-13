@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module SHIBMD
   class Scope < Sequel::Model
     many_to_one :role_descriptor, class: 'RoleDescriptor'

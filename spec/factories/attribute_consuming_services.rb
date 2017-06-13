@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 FactoryGirl.define do
   factory :attribute_consuming_service do
     index { Faker::Number.number 2 }
