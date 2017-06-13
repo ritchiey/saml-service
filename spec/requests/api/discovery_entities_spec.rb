@@ -72,7 +72,7 @@ RSpec.describe API::DiscoveryEntitiesController, type: :request do
 
   context 'get /api/discovery/entities' do
     def run
-      get '/api/discovery/entities', nil, headers
+      get '/api/discovery/entities', headers: headers
     end
 
     context 'response' do
