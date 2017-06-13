@@ -71,7 +71,7 @@ module API
 
     def patch_params
       params.require(:raw_entity_descriptor)
-            .permit(:xml, :entity_id, :enabled, tags: [])
+            .permit(:xml, :enabled, tags: [])
     end
 
     def entity_id_uri
