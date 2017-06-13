@@ -40,6 +40,7 @@ gem 'unicorn', require: false
 group :development, :test do
   gem 'rspec-rails', '~> 3.1'
   gem 'rspec-retry'
+  gem 'rails-controller-testing'
   gem 'shoulda-matchers'
   gem 'rspec_sequel_matchers', git: 'https://github.com/bradleybeddoes/rspec_sequel_matchers.git'
   gem 'factory_girl_rails'
