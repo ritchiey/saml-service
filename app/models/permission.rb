@@ -5,8 +5,8 @@ class Permission < Sequel::Model
 
   def validate
     super
-    validates_presence [:role, :value]
+    validates_presence %i[role value]
     validates_format Accession::Permission.regexp, :value
-    validates_unique [:value, :role_id]
+    validates_unique %i[value role_id]
   end
 end

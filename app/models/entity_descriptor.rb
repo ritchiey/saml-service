@@ -31,7 +31,7 @@ class EntityDescriptor < Sequel::Model
 
   def validate
     super
-    validates_presence [:known_entity, :created_at, :updated_at]
+    validates_presence %i[known_entity created_at updated_at]
     validates_presence :entity_id, allow_missing: new?
     validates_presence :role_descriptors, allow_missing: new?
     validates_presence :organization, allow_missing: new?

@@ -15,6 +15,6 @@ class SamlURI < Sequel::Model
 
   def validate
     super
-    validates_presence [:uri, :created_at, :updated_at]
+    validates_presence %i[uri created_at updated_at]
   end
 end

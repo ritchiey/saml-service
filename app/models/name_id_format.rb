@@ -10,6 +10,6 @@ class NameIdFormat < SamlURI
     super
     return if new?
 
-    single_parent [:sso_descriptor, :attribute_authority_descriptor]
+    single_parent %i[sso_descriptor attribute_authority_descriptor]
   end
 end

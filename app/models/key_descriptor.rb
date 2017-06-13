@@ -21,9 +21,9 @@ class KeyDescriptor < Sequel::Model
 
   def validate
     super
-    validates_presence [:created_at, :updated_at]
+    validates_presence %i[created_at updated_at]
     validates_presence :key_info, allow_missing: new?
-    validates_includes [:encryption, :signing], :key_type if key_type?
+    validates_includes %i[encryption signing], :key_type if key_type?
   end
 
   def key_type?

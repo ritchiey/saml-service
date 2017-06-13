@@ -6,7 +6,7 @@ module MDUI
 
     def validate
       super
-      validates_presence [:ui_info, :lang, :created_at, :updated_at]
+      validates_presence %i[ui_info lang created_at updated_at]
     end
 
     def to_xml_list

@@ -45,7 +45,7 @@ RSpec.describe Tag, type: :model do
       subject { tag.errors }
       it 'is expected to be a uniqueness validation' do
         expect(subject)
-          .to eq([:name, :known_entity] => ['is already taken'])
+          .to eq(%i[name known_entity] => ['is already taken'])
       end
     end
   end

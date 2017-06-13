@@ -174,4 +174,4 @@ class ConfigureCLI < Thor
 end
 # rubocop:enable ClassLength
 
-ConfigureCLI.start(ARGV) if __FILE__ == $PROGRAM_NAME
+ConfigureCLI.start(ARGV) if $PROGRAM_NAME == __FILE__

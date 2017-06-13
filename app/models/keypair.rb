@@ -4,8 +4,8 @@ class Keypair < Sequel::Model
   def validate
     super
 
-    validates_presence [:certificate, :key, :fingerprint]
-    validates_max_length 4096, [:certificate, :key]
+    validates_presence %i[certificate key fingerprint]
+    validates_max_length 4096, %i[certificate key]
     validates_unique :fingerprint
 
     validate_keypair_content

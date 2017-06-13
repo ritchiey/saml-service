@@ -9,8 +9,8 @@ class Tag < Sequel::Model
 
   def validate
     super
-    validates_unique([:name, :known_entity])
-    validates_presence [:known_entity, :name, :created_at, :updated_at]
+    validates_unique(%i[name known_entity])
+    validates_presence %i[known_entity name created_at updated_at]
     validates_format(URL_SAFE_BASE_64_ALPHABET,
                      :name, message: 'is not in base64 urlsafe alphabet')
   end

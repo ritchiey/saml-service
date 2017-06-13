@@ -14,7 +14,7 @@ module MDUI
 
     def validate
       super
-      validates_presence [:idp_sso_descriptor, :created_at, :updated_at]
+      validates_presence %i[idp_sso_descriptor created_at updated_at]
     end
   end
 end

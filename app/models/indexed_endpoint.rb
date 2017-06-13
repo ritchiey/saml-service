@@ -5,6 +5,6 @@ class IndexedEndpoint < Endpoint
 
   def validate
     super
-    validates_presence [:is_default, :index]
+    validates_presence %i[is_default index]
   end
 end

@@ -6,7 +6,7 @@ module MDUI
 
     def validate
       super
-      validates_presence [:disco_hints, :domain, :created_at, :updated_at]
+      validates_presence %i[disco_hints domain created_at updated_at]
     end
   end
 end

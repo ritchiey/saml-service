@@ -5,7 +5,7 @@ class AttributeValue < Sequel::Model
 
   def validate
     super
-    validates_presence [:value, :created_at, :updated_at]
+    validates_presence %i[value created_at updated_at]
     validates_presence :attribute
   end
 end

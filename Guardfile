@@ -1,12 +1,13 @@
+# frozen_string_literal: true
 guard :bundler do
   watch('Gemfile')
 end
 
 guard :rspec, cmd: 'bundle exec rspec' do
-  watch('spec/spec_helper.rb')                        { "spec" }
-  watch('config/routes.rb')                           { "spec/routing" }
-  watch('app/controllers/application_controller.rb')  { "spec/controllers" }
-  watch(%r{^spec/factories/(.+)\.rb$})                { "spec/support/factories_spec.rb" }
+  watch('spec/spec_helper.rb')                        { 'spec' }
+  watch('config/routes.rb')                           { 'spec/routing' }
+  watch('app/controllers/application_controller.rb')  { 'spec/controllers' }
+  watch(%r{^spec/factories/(.+)\.rb$})                { 'spec/support/factories_spec.rb' }
 
   watch(%r{^spec/.+_spec\.rb$})
   watch(%r{^spec/support/metadata/.+\.rb$})           { 'spec/metadata' }
@@ -20,7 +21,7 @@ guard :rspec, cmd: 'bundle exec rspec' do
 end
 
 guard :rubocop do
-  watch(%r{.+\.rb$})
+  watch(/.+\.rb$/)
   watch(%r{(?:.+/)?\.rubocop\.yml$}) { |m| File.dirname(m[0]) }
 end
 

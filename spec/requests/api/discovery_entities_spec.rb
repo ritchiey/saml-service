@@ -21,7 +21,7 @@ RSpec.describe API::DiscoveryEntitiesController, type: :request do
 
     context 'with tags on the known entity' do
       let!(:tags) do
-        %w(tag_a tag_b tag_c).map do |tag|
+        %w[tag_a tag_b tag_c].map do |tag|
           create(:known_entity_tag,
                  name: tag, known_entity: entity.known_entity)
         end

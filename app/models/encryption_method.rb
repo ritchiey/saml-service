@@ -5,6 +5,6 @@ class EncryptionMethod < Sequel::Model
 
   def validate
     super
-    validates_presence [:key_descriptor, :algorithm, :created_at, :updated_at]
+    validates_presence %i[key_descriptor algorithm created_at updated_at]
   end
 end

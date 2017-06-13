@@ -10,6 +10,6 @@ class AttributeProfile < SamlURI
     super
     return if new?
 
-    single_parent [:idp_sso_descriptor, :attribute_authority_descriptor]
+    single_parent %i[idp_sso_descriptor attribute_authority_descriptor]
   end
 end

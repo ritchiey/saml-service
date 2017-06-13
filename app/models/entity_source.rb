@@ -5,7 +5,7 @@ class EntitySource < Sequel::Model
 
   def validate
     super
-    validates_presence [:rank, :enabled, :source_tag, :created_at, :updated_at]
+    validates_presence %i[rank enabled source_tag created_at updated_at]
     validates_integer :rank
     validates_unique :rank
     validates_unique :source_tag
@@ -16,7 +16,7 @@ class EntitySource < Sequel::Model
   def validate_url
     return if url.nil?
 
-    validates_format URI.regexp(%w(http https)), :url
+    validates_format URI.regexp(%w[http https]), :url
     URI.parse(url)
   rescue URI::InvalidURIError
     errors.add(:url, 'could not be parsed as a valid URI')

@@ -111,7 +111,7 @@ module ETL
 
     def destroy_attributes(idp)
       idp.attributes.each do |attr|
-        attr.name_format.destroy if attr.name_format
+        attr.name_format&.destroy
         attr.destroy
       end
     end

@@ -16,7 +16,7 @@ class KeyInfo < Sequel::Model
 
   def validate
     super
-    validates_presence [:data, :created_at, :updated_at]
+    validates_presence %i[data created_at updated_at]
   end
 
   def data=(data)
