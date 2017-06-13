@@ -7,8 +7,8 @@ module MDUI
     def validate
       super
       uri_regexp = URI.regexp(%w[http https])
-      validates_presence %i[ui_info uri width height 
-created_at updated_at]
+      validates_presence %i[ui_info uri width height
+                            created_at updated_at]
       validates_format uri_regexp, :uri
 
       validate_width

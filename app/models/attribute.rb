@@ -19,7 +19,7 @@ class Attribute < Sequel::Model
     validates_presence %i[name created_at updated_at]
     return if new?
 
-    single_parent %i[idp_sso_descriptor attribute_authority_descriptor 
-entity_attribute]
+    single_parent %i[idp_sso_descriptor attribute_authority_descriptor
+                     entity_attribute]
   end
 end

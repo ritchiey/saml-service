@@ -266,7 +266,7 @@ RSpec.describe UpdateEntitySource do
 
     it 'creates the raw entity descriptors' do
       expect { run }.to change { subject.known_entities(true).count }.by(3)
-        .and change(RawEntityDescriptor, :count).by(3)
+                                                                     .and change(RawEntityDescriptor, :count).by(3)
     end
 
     it 'uses the correct entity id' do
@@ -375,7 +375,7 @@ RSpec.describe UpdateEntitySource do
 
     it 'creates the entity record' do
       expect { run }.to change { subject.known_entities(true).count }.by(1)
-        .and change(RawEntityDescriptor, :count).by(1)
+                                                                     .and change(RawEntityDescriptor, :count).by(1)
     end
   end
 

@@ -13,13 +13,13 @@ Rails.application.routes.draw do
     match '/:instance/entities/:identifier',
           to: 'metadata_query#specific_entity_sha1',
           constraints: # check regexp against decoded URI params
-            -> (r) { r.path_parameters[:identifier].match(SHA1_REGEXP) },
+            ->(r) { r.path_parameters[:identifier].match(SHA1_REGEXP) },
           via: :all
 
     match '/:instance/entities/:identifier',
           to: 'metadata_query#tagged_entities',
           constraints:
-            -> (r) { !r.path_parameters[:identifier].match(URN_REGEXP) },
+            ->(r) { !r.path_parameters[:identifier].match(URN_REGEXP) },
           via: :all
 
     match '/:instance/entities/*identifier',

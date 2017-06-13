@@ -12,9 +12,9 @@ class MetadataInstance < Sequel::Model
 
   def validate
     super
-    validates_presence %i[name created_at updated_at hash_algorithm 
-keypair federation_identifier validity_period 
-primary_tag identifier all_entities cache_period]
+    validates_presence %i[name created_at updated_at hash_algorithm
+                          keypair federation_identifier validity_period
+                          primary_tag identifier all_entities cache_period]
     validates_presence :ca_verify_depth if ca_key_infos.present?
     validates_presence :publication_info unless new?
 

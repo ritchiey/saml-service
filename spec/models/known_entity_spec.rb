@@ -90,7 +90,7 @@ RSpec.describe KnownEntity do
 
         expect { subject.untag_as(name) }
           .to change(Tag.where(name: name), :count).by(-1)
-          .and change { subject.tags.any? { |t| t.name == name } }.to be_falsey
+                                                   .and change { subject.tags.any? { |t| t.name == name } }.to be_falsey
       end
     end
 

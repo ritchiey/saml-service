@@ -5,9 +5,9 @@ class FederationRegistrySource < Sequel::Model
 
   def validate
     validates_presence %i[created_at updated_at]
-    validates_presence %i[entity_source hostname secret 
-registration_authority registration_policy_uri 
-registration_policy_uri_lang]
+    validates_presence %i[entity_source hostname secret
+                          registration_authority registration_policy_uri
+                          registration_policy_uri_lang]
     validates_format(/\A[\w-]+\z/, :secret)
     validate_hostname
   end

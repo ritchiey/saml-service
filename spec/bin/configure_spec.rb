@@ -99,7 +99,7 @@ RSpec.describe ConfigureCLI do
 
     before do
       allow(File).to receive(:read).with(cert_file)
-        .and_return(x509_certificate.to_pem)
+                                   .and_return(x509_certificate.to_pem)
       allow(File).to receive(:read).with(key_file).and_return(rsa_key.to_pem)
     end
 
@@ -147,7 +147,7 @@ RSpec.describe ConfigureCLI do
 
     before do
       allow(File).to receive(:read).with(cert_file)
-        .and_return(keypair.certificate)
+                                   .and_return(keypair.certificate)
     end
 
     def run
@@ -217,7 +217,7 @@ RSpec.describe ConfigureCLI do
 
       it 'creates a valid PublicationInfo' do
         expect { run }.to change(MDRPI::PublicationInfo, :count).by(1)
-          .and change(MDRPI::UsagePolicy, :count).by(1)
+                                                                .and change(MDRPI::UsagePolicy, :count).by(1)
 
         md_instance = MetadataInstance.last
 
