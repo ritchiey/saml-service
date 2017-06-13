@@ -310,7 +310,7 @@ module Metadata
         root.Company(c.company) if c.company.present?
         root.GivenName(c.given_name) if c.given_name.present?
         root.SurName(c.surname) if c.surname.present?
-        unless c.email_address.blank?
+        if c.email_address.present?
           root.EmailAddress("mailto:#{c.email_address}")
         end
         root.TelephoneNumber(c.telephone_number) if c.telephone_number.present?

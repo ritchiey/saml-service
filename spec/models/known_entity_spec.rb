@@ -16,7 +16,7 @@ RSpec.describe KnownEntity do
     subject { create :known_entity }
 
     it 'modifies parent EntityDescriptor on save' do
-      Timecop.travel(1.seconds) do
+      Timecop.travel(1.second) do
         expect { subject.touch }.to change { subject.updated_at }
       end
     end

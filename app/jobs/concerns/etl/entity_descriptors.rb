@@ -88,7 +88,7 @@ module ETL
         FederationRegistryObject.local_instance(ed_data[:id],
                                                 EntityDescriptor.dataset)
 
-      return unless ed.present?
+      return if ed.blank?
 
       Rails.logger.info "Destroying FR entity #{ed_data[:entity_id]}"
       ed.destroy

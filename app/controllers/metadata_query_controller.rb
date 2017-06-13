@@ -46,7 +46,7 @@ class MetadataQueryController < ApplicationController
   def handle_entities_request(tags)
     Sequel::Model.db.transaction(isolation: :repeatable) do
       known_entities = KnownEntity.with_all_tags(tags)
-      return not_found unless known_entities.present?
+      return not_found if known_entities.blank?
 
       etag = generate_document_entities_etag(@metadata_instance, known_entities)
       if known_entities_unmodified?(known_entities, etag)
