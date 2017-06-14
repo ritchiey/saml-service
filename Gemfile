@@ -5,8 +5,8 @@ source 'https://rubygems.org'
 gem 'rails', '~> 5.0'
 
 gem 'accession'
-gem 'mysql2', '0.4.2'
-gem 'sequel', '~> 4.31.0'
+gem 'mysql2'
+gem 'sequel'
 gem 'sequel-rails'
 
 gem 'nokogiri'
@@ -32,8 +32,8 @@ gem 'god', require: false
 gem 'unicorn', require: false
 
 group :development, :test do
-  gem 'capybara', '~> 2.4'
-  gem 'rspec-rails', '~> 3.1'
+  gem 'capybara'
+  gem 'rspec-rails'
   gem 'rspec-retry'
   gem 'webmock', require: false
 
@@ -48,7 +48,7 @@ group :development, :test do
   gem 'codeclimate-test-reporter', require: false
   gem 'fakeredis', require: false
   gem 'simplecov', require: false
-  gem 'timecop', '~> 0.7'
+  gem 'timecop'
 
   gem 'guard', require: false
   gem 'guard-brakeman', require: false
