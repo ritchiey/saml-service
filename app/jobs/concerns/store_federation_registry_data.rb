@@ -25,7 +25,7 @@ module StoreFederationRegistryData
   def record_fr_id(object, fr_id)
     ds = FederationRegistryObject[internal_class_name: object.class.name,
                                   fr_id: fr_id]
-    ds&.delete
+    ds.try!(&:delete)
 
     FederationRegistryObject.create(internal_class_name: object.class.name,
                                     internal_id: object.id,

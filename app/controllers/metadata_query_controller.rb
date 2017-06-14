@@ -4,7 +4,7 @@ require 'metadata/saml'
 require 'metadata/schema_invalid_error'
 
 class MetadataQueryController < ApplicationController
-  SAML_CONTENT_TYPE = 'application/samlmetadata+xml'
+  SAML_CONTENT_TYPE = 'application/samlmetadata+xml'.freeze
   SHA1_REGEX = /{sha1}(.*)?/
 
   include MetadataQueryCaching

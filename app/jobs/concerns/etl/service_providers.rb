@@ -6,10 +6,11 @@ module ETL
 
     def service_providers(ed, ed_data)
       ed_data[:saml][:service_providers].each do |sp_ref|
-        sp_data = fr_service_providers[sp_ref[:id]]
-        next unless sp_data.dig(:saml, :attribute_consuming_services)&.any?
+        data = fr_service_providers[sp_ref[:id]]
+        acs = data[:saml].try!(:[], :attribute_consuming_services)
+        next unless acs.try!(&:any?)
 
-        create_or_update_sp(ed, SPSSODescriptor.dataset, sp_data)
+        create_or_update_sp(ed, SPSSODescriptor.dataset, data)
       end
     end
 

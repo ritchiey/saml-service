@@ -15,8 +15,8 @@ class Tag < Sequel::Model
                      :name, message: 'is not in base64 urlsafe alphabet')
   end
 
-  IDP = 'idp'
-  AA = 'aa'
-  STANDALONE_AA = 'standalone-aa'
-  SP = 'sp'
+  IDP = 'idp'.freeze
+  AA = 'aa'.freeze
+  STANDALONE_AA = 'standalone-aa'.freeze
+  SP = 'sp'.freeze
 end

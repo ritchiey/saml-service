@@ -114,7 +114,7 @@ module Metadata
       end
     end
 
-    C14N_METHOD = 'http://www.w3.org/2001/10/xml-exc-c14n#'
+    C14N_METHOD = 'http://www.w3.org/2001/10/xml-exc-c14n#'.freeze
     TRANSFORM_METHODS = %w[
       http://www.w3.org/2000/09/xmldsig#enveloped-signature
       http://www.w3.org/2001/10/xml-exc-c14n#

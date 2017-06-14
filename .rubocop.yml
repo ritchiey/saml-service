@@ -3,7 +3,7 @@ inherit_gem:
   aaf-gumboot: aaf-rubocop.yml
 
 AllCops:
-  TargetRubyVersion: 2.3
+  TargetRubyVersion: 2.2
   Exclude:
     - db/**/*
 

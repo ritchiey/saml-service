@@ -27,6 +27,6 @@ class KeyDescriptor < Sequel::Model
   end
 
   def key_type?
-    key_type_id&.positive?
+    key_type_id.try!(:positive?)
   end
 end
