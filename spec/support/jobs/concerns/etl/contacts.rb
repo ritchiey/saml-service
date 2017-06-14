@@ -13,7 +13,7 @@ RSpec.shared_examples 'ETL::Contacts' do
     }
   end
 
-  let(:contact_created_at) { Time.at(rand(Time.now.utc.to_i)) }
+  let(:contact_created_at) { Time.zone.at(rand(Time.now.utc.to_i)) }
   let(:contact_list) do
     (0...contact_count).reduce([]) { |a, e| a << create_json(1000 + e) }
   end

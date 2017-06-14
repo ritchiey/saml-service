@@ -17,7 +17,7 @@ RSpec.describe KnownEntity do
 
     it 'modifies parent EntityDescriptor on save' do
       Timecop.travel(1.second) do
-        expect { subject.touch }.to change { subject.updated_at }
+        expect { subject.touch }.to(change { subject.updated_at })
       end
     end
   end
@@ -57,13 +57,13 @@ RSpec.describe KnownEntity do
       before { subject.add_tag(Tag.new(name: name)) }
 
       it 'does not increase tag count' do
-        expect { subject.tag_as(name) }.not_to change { subject.tags.length }
+        expect { subject.tag_as(name) }.not_to(change { subject.tags.length })
       end
     end
 
     context 'tag does not already exist' do
       it 'increases tag count' do
-        expect { subject.tag_as(name) }.to change { subject.tags.length }
+        expect { subject.tag_as(name) }.to(change { subject.tags.length })
       end
 
       it 'sets the tag to the provided name' do
@@ -82,21 +82,23 @@ RSpec.describe KnownEntity do
       before { subject.add_tag(Tag.new(name: name)) }
 
       it 'decreases tag count' do
-        expect { subject.untag_as(name) }.to change { subject.tags.length }
+        expect { subject.untag_as(name) }.to(change { subject.tags.length })
       end
 
       it 'removes the tag with the provided name' do
         expect(subject.tags.any? { |t| t.name == name }).to be_truthy
 
-        expect { subject.untag_as(name) }
-          .to change(Tag.where(name: name), :count).by(-1)
-                                                   .and change { subject.tags.any? { |t| t.name == name } }.to be_falsey
+        expect { subject.untag_as(name) }.to(
+          change(Tag.where(name: name), :count)
+            .by(-1)
+            .and(change { subject.tags.map(&:name) }.to(not_include(name)))
+        )
       end
     end
 
     context 'tag does not already exist' do
       it 'does not decrease tag count' do
-        expect { subject.untag_as(name) }.not_to change { subject.tags.length }
+        expect { subject.untag_as(name) }.not_to(change { subject.tags.length })
       end
     end
   end

@@ -48,7 +48,7 @@ module ETL
     end
 
     def ed_attrs(ed_data)
-      { created_at: Time.parse(ed_data[:created_at]),
+      { created_at: Time.zone.parse(ed_data[:created_at]),
         enabled: ed_data[:functioning] }
     end
 
@@ -62,7 +62,7 @@ module ETL
 
       ri = MDRPI::RegistrationInfo.create(
         registration_authority: @fr_source.registration_authority,
-        registration_instant: Time.parse(ed_data[:created_at]),
+        registration_instant: Time.zone.parse(ed_data[:created_at]),
         entity_descriptor: ed
       )
 

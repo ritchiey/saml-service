@@ -7,8 +7,7 @@ module ETL
     def service_providers(ed, ed_data)
       ed_data[:saml][:service_providers].each do |sp_ref|
         sp_data = fr_service_providers[sp_ref[:id]]
-        next unless sp_data[:saml].key?(:attribute_consuming_services) &&
-                    sp_data[:saml][:attribute_consuming_services].count > 0
+        next unless sp_data.dig(:saml, :attribute_consuming_services)&.any?
 
         create_or_update_sp(ed, SPSSODescriptor.dataset, sp_data)
       end
@@ -29,7 +28,7 @@ module ETL
     def sp_attrs(sp_data)
       saml = sp_data[:saml]
       {
-        created_at: Time.parse(sp_data[:created_at]),
+        created_at: Time.zone.parse(sp_data[:created_at]),
         enabled: sp_data[:functioning],
         authn_requests_signed: saml[:authnrequests_signed],
         want_assertions_signed: saml[:assertions_signed]

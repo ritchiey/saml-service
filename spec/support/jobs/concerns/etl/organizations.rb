@@ -24,7 +24,7 @@ RSpec.shared_examples 'ETL::Organizations' do
   end
   # rubocop:enable Metrics/MethodLength
 
-  let(:org_created_at) { Time.at(rand(Time.now.utc.to_i)) }
+  let(:org_created_at) { Time.zone.at(rand(Time.now.utc.to_i)) }
   let(:organization_list) do
     (0...organization_count).reduce([]) { |a, e| a << create_json(1000 + e) }
   end

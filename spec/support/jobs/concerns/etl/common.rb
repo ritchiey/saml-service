@@ -36,7 +36,7 @@ RSpec.shared_examples 'ETL::Common' do
       surname: c.surname,
       email: c.email_address,
       work_phone: c.telephone_number,
-      created_at: Time.at(rand(Time.now.utc.to_i))
+      created_at: Time.zone.at(rand(Time.now.utc.to_i))
     }
   end
 
@@ -134,30 +134,30 @@ RSpec.shared_examples 'ETL::Common' do
 
   shared_examples 'updating a RoleDescriptor' do
     it 're-uses contact instances' do
-      expect { run }.not_to change { Contact.count }
+      expect { run }.not_to(change { Contact.count })
     end
 
     it 'updates contact people' do
       expect { run }
-        .to change { subject.entity_descriptor.reload.contact_people }
+        .to(change { subject.entity_descriptor.reload.contact_people })
     end
 
     it 'updates protocol supports' do
-      expect { run }.to change { subject.reload.protocol_supports }
+      expect { run }.to(change { subject.reload.protocol_supports })
     end
 
     it 'updates key descriptors' do
-      expect { run }.to change { subject.reload.key_descriptors }
+      expect { run }.to(change { subject.reload.key_descriptors })
     end
   end
 
   shared_examples 'updating MDUI content' do
     it 'updates mdui display_names' do
-      expect { run }.to change { subject.reload.ui_info.display_names }
+      expect { run }.to(change { subject.reload.ui_info.display_names })
     end
 
     it 'updates mdui descriptions' do
-      expect { run }.to change { subject.reload.ui_info.descriptions }
+      expect { run }.to(change { subject.reload.ui_info.descriptions })
     end
 
     it 'squishes incoming description' do
@@ -171,19 +171,19 @@ RSpec.shared_examples 'ETL::Common' do
     include_examples 'updating a RoleDescriptor'
 
     it 'updates name id formats' do
-      expect { run }.to change { subject.reload.name_id_formats }
+      expect { run }.to(change { subject.reload.name_id_formats })
     end
 
     it 'updates artifact resolution services' do
-      expect { run }.to change { subject.reload.artifact_resolution_services }
+      expect { run }.to(change { subject.reload.artifact_resolution_services })
     end
 
     it 'updates single_logout_services' do
-      expect { run }.to change { subject.reload.single_logout_services }
+      expect { run }.to(change { subject.reload.single_logout_services })
     end
 
     it 'updates manage name id services' do
-      expect { run }.to change { subject.reload.manage_name_id_services }
+      expect { run }.to(change { subject.reload.manage_name_id_services })
     end
   end
 end

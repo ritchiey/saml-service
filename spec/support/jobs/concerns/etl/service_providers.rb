@@ -111,7 +111,7 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
 
   let(:service_providers) { service_providers_list }
 
-  let(:sp_created_at) { Time.at(rand(Time.now.utc.to_i)) }
+  let(:sp_created_at) { Time.zone.at(rand(Time.now.utc.to_i)) }
 
   let(:entity_descriptor) { create :entity_descriptor }
 
@@ -279,23 +279,23 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
     include_examples 'updating MDUI content'
 
     it 'uses the existing instance' do
-      expect { run }.not_to change { SPSSODescriptor.count }
+      expect { run }.not_to(change { SPSSODescriptor.count })
     end
 
     it 'does not create more tags' do
-      expect { run }.not_to change { Tag.count }
+      expect { run }.not_to(change { Tag.count })
     end
 
     it 'updates assertion_consumer_services' do
-      expect { run }.to change { subject.reload.assertion_consumer_services }
+      expect { run }.to(change { subject.reload.assertion_consumer_services })
     end
 
     it 'updates discovery_response_services' do
-      expect { run }.to change { subject.reload.discovery_response_services }
+      expect { run }.to(change { subject.reload.discovery_response_services })
     end
 
     it 'updates attribute_consuming_services' do
-      expect { run }.to change { subject.reload.attribute_consuming_services }
+      expect { run }.to(change { subject.reload.attribute_consuming_services })
     end
   end
 end

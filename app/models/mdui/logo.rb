@@ -18,11 +18,11 @@ module MDUI
     private
 
     def validate_width
-      errors.add(:width, 'must specify pixels') unless width && width > 0
+      errors.add(:width, 'must specify pixels') unless width&.positive?
     end
 
     def validate_height
-      errors.add(:height, 'must specify pixels') unless height && height > 0
+      errors.add(:height, 'must specify pixels') unless height&.positive?
     end
   end
 end

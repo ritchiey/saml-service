@@ -30,7 +30,7 @@ RSpec.describe UpdateFromFederationRegistry do
     %(AAF-FR-EXPORT service="saml-service", key="#{fr_source.secret}")
   end
   let(:request_headers) { { 'Authorization' => authorization } }
-  let(:truncated_now) { Time.at(Time.now.to_i) }
+  let(:truncated_now) { Time.zone.at(Time.now.to_i) }
 
   delegate :entity_source, to: :fr_source
   delegate :known_entities, to: :entity_source

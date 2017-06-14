@@ -15,7 +15,7 @@ module ETL
     end
 
     def contact_attrs(contact_data)
-      { created_at: Time.parse(contact_data[:created_at]),
+      { created_at: Time.zone.parse(contact_data[:created_at]),
         given_name: contact_data[:given_name],
         surname: contact_data[:surname],
         email_address: contact_data[:email],

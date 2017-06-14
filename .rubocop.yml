@@ -27,6 +27,14 @@ PerceivedComplexity:
   Exclude:
     - lib/metadata/saml.rb
 
+BlockLength:
+  Exclude:
+    - lib/metadata/saml.rb
+    - spec/**/*.rb
+    - lib/tasks/*.rake
+    - config/**/*.rb
+    - db/**/*.rb
+
 # List duplicated from here, but with `touch` removed:
 # https://github.com/bbatsov/rubocop/blob/863037ac719d3539c1dd7e7f7715915f5b612c93/config/default.yml#L1539-L1551
 Rails/SkipsModelValidations:

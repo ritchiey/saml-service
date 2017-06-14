@@ -62,10 +62,12 @@ RSpec.describe MetadataQueryController, type: :controller do
 
     context 'headers' do
       it 'has relevant MUST/SHOULD headers per specification' do
+        cache_period = metadata_instance.cache_period
+
         expected = {
           'Content-Type' => "#{saml_content}; charset=utf-8",
           'ETag' => etag,
-          'Cache-Control' => "max-age=#{metadata_instance.cache_period}, private"
+          'Cache-Control' => "max-age=#{cache_period}, private"
         }
 
         expected.each do |k, v|
@@ -141,7 +143,8 @@ RSpec.describe MetadataQueryController, type: :controller do
             subject { response }
             it { is_expected.to have_http_status(:not_found) }
             it 'has relevant MUST/SHOULD headers per specification' do
-              expect(subject.headers['Cache-Control']).to eq('max-age=600, private')
+              expect(subject.headers['Cache-Control'])
+                .to eq('max-age=600, private')
             end
           end
         end
@@ -184,7 +187,7 @@ RSpec.describe MetadataQueryController, type: :controller do
               context 'cache' do
                 it 'updates server side cache' do
                   expect { run }
-                    .to change { Rails.cache.fetch("metadata:#{etag}") }
+                    .to(change { Rails.cache.fetch("metadata:#{etag}") })
                 end
               end
             end
@@ -203,7 +206,7 @@ RSpec.describe MetadataQueryController, type: :controller do
               context 'cache' do
                 it 'does not modify server side cache' do
                   expect { run }
-                    .not_to change { Rails.cache.fetch("metadata:#{etag}") }
+                    .not_to(change { Rails.cache.fetch("metadata:#{etag}") })
                 end
               end
             end
@@ -320,7 +323,7 @@ RSpec.describe MetadataQueryController, type: :controller do
                 context 'cache' do
                   it 'updates server side cache' do
                     expect { run }
-                      .to change { Rails.cache.fetch("metadata:#{etag}") }
+                      .to(change { Rails.cache.fetch("metadata:#{etag}") })
                   end
                 end
               end
@@ -339,7 +342,7 @@ RSpec.describe MetadataQueryController, type: :controller do
                 context 'cache' do
                   it 'does not modify server side cache' do
                     expect { run }
-                      .not_to change { Rails.cache.fetch("metadata:#{etag}") }
+                      .not_to(change { Rails.cache.fetch("metadata:#{etag}") })
                   end
                 end
               end
@@ -434,7 +437,8 @@ RSpec.describe MetadataQueryController, type: :controller do
               subject { response }
               it { is_expected.to have_http_status(:not_found) }
               it 'has relevant MUST/SHOULD headers per specification' do
-                expect(subject.headers['Cache-Control']).to eq('max-age=600, private')
+                expect(subject.headers['Cache-Control'])
+                  .to eq('max-age=600, private')
               end
             end
           end
@@ -531,7 +535,8 @@ RSpec.describe MetadataQueryController, type: :controller do
             subject { response }
             it { is_expected.to have_http_status(:not_found) }
             it 'has relevant MUST/SHOULD headers per specification' do
-              expect(subject.headers['Cache-Control']).to eq('max-age=600, private')
+              expect(subject.headers['Cache-Control'])
+                .to eq('max-age=600, private')
             end
           end
         end
@@ -591,7 +596,7 @@ RSpec.describe MetadataQueryController, type: :controller do
               context 'cache' do
                 it 'updates server side cache' do
                   expect { run }
-                    .to change { Rails.cache.fetch("metadata:#{etag}") }
+                    .to(change { Rails.cache.fetch("metadata:#{etag}") })
                 end
               end
 
@@ -632,7 +637,7 @@ RSpec.describe MetadataQueryController, type: :controller do
               context 'cache' do
                 it 'does not modify server side cache' do
                   expect { run }
-                    .not_to change { Rails.cache.fetch("metadata:#{etag}") }
+                    .not_to(change { Rails.cache.fetch("metadata:#{etag}") })
                 end
               end
             end

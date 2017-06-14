@@ -24,7 +24,7 @@ module ETL
 
     def aa_attrs(aa_data)
       {
-        created_at: Time.parse(aa_data[:created_at]),
+        created_at: Time.zone.parse(aa_data[:created_at]),
         enabled: aa_data[:functioning]
       }
     end
@@ -49,11 +49,8 @@ module ETL
     end
 
     def extract_aa_data(aa_data)
-      if standalone_aa?(aa_data)
-        extract_aa_data_idp(aa_data)
-      else
-        raise 'Does not support AA (even standalone) who do not derive from IdP'
-      end
+      return extract_aa_data_idp(aa_data) if standalone_aa?(aa_data)
+      raise 'Does not support AA (even standalone) who do not derive from IdP'
     end
 
     def extract_aa_data_idp(aa_data)

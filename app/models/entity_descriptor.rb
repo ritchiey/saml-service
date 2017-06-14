@@ -50,7 +50,7 @@ class EntityDescriptor < Sequel::Model
   end
 
   def edugain_compliant_contacts?
-    technical_contact_count > 0 || support_contact_count > 0
+    technical_contact_count.positive? || support_contact_count.positive?
   end
 
   def edugain_compliant_idp?
