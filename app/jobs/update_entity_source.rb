@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'metadata/schema'
 
 class UpdateEntitySource

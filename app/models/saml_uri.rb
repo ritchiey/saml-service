@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class SamlURI < Sequel::Model
   # We use SamlURI as the parent class for all
   # URI which the SAML Metadata spec defines as type anyURI.
@@ -14,6 +15,6 @@ class SamlURI < Sequel::Model
 
   def validate
     super
-    validates_presence [:uri, :created_at, :updated_at]
+    validates_presence %i[uri created_at updated_at]
   end
 end

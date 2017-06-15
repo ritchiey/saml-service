@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'rails_helper'
 require_relative '../../bin/configure'
 
@@ -98,7 +99,7 @@ RSpec.describe ConfigureCLI do
 
     before do
       allow(File).to receive(:read).with(cert_file)
-        .and_return(x509_certificate.to_pem)
+                                   .and_return(x509_certificate.to_pem)
       allow(File).to receive(:read).with(key_file).and_return(rsa_key.to_pem)
     end
 
@@ -118,7 +119,7 @@ RSpec.describe ConfigureCLI do
       end
 
       it 'does not change the existing keypair' do
-        expect { run }.not_to change { keypair.reload.to_hash }
+        expect { run }.not_to(change { keypair.reload.to_hash })
       end
     end
 
@@ -146,7 +147,7 @@ RSpec.describe ConfigureCLI do
 
     before do
       allow(File).to receive(:read).with(cert_file)
-        .and_return(keypair.certificate)
+                                   .and_return(keypair.certificate)
     end
 
     def run
@@ -215,7 +216,8 @@ RSpec.describe ConfigureCLI do
       end
 
       it 'creates a valid PublicationInfo' do
-        expect { run }.to change(MDRPI::PublicationInfo, :count).by(1)
+        expect { run }.to change(MDRPI::PublicationInfo, :count)
+          .by(1)
           .and change(MDRPI::UsagePolicy, :count).by(1)
 
         md_instance = MetadataInstance.last
@@ -249,7 +251,7 @@ RSpec.describe ConfigureCLI do
   describe '#raw_entity_source' do
     let(:rank) { Faker::Number.number(2).to_i }
     let(:url) { Faker::Internet.url }
-    let(:cert_path) { "#{Rails.root}/spec/tmp/res_cert.pem" }
+    let(:cert_path) { Rails.root.join('spec', 'tmp', 'res_cert.pem') }
     let(:rsa_key) { create(:rsa_key) }
     let(:x509_certificate) { create(:certificate, rsa_key: rsa_key) }
     let(:source_tag) { Faker::Lorem.words.join('-') }
@@ -274,7 +276,7 @@ RSpec.describe ConfigureCLI do
     end
 
     context 'when a source exists' do
-      let(:cert_path2) { "#{Rails.root}/spec/tmp/res_cert_new.pem" }
+      let(:cert_path2) { Rails.root.join('spec', 'tmp', 'res_cert_new.pem') }
       let(:rsa_key2) { create(:rsa_key) }
       let(:x509_certificate2) { create(:certificate, rsa_key: rsa_key) }
       let!(:source) do

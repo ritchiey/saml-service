@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class KeyDescriptor < Sequel::Model
   one_to_one :key_info
   one_to_many :encryption_method
@@ -20,12 +21,12 @@ class KeyDescriptor < Sequel::Model
 
   def validate
     super
-    validates_presence [:created_at, :updated_at]
+    validates_presence %i[created_at updated_at]
     validates_presence :key_info, allow_missing: new?
-    validates_includes [:encryption, :signing], :key_type if key_type?
+    validates_includes %i[encryption signing], :key_type if key_type?
   end
 
   def key_type?
-    key_type_id && key_type_id > 0
+    key_type_id.try!(:positive?)
   end
 end

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'metadata/saml_namespaces'
 
 module Metadata
@@ -113,11 +114,11 @@ module Metadata
       end
     end
 
-    C14N_METHOD = 'http://www.w3.org/2001/10/xml-exc-c14n#'
-    TRANSFORM_METHODS = %w(
+    C14N_METHOD = 'http://www.w3.org/2001/10/xml-exc-c14n#'.freeze
+    TRANSFORM_METHODS = %w[
       http://www.w3.org/2000/09/xmldsig#enveloped-signature
       http://www.w3.org/2001/10/xml-exc-c14n#
-    ).freeze
+    ].freeze
 
     SIGNATURE_METHOD = {
       sha1: 'http://www.w3.org/2000/09/xmldsig#rsa-sha1',
@@ -309,7 +310,7 @@ module Metadata
         root.Company(c.company) if c.company.present?
         root.GivenName(c.given_name) if c.given_name.present?
         root.SurName(c.surname) if c.surname.present?
-        unless c.email_address.blank?
+        if c.email_address.present?
           root.EmailAddress("mailto:#{c.email_address}")
         end
         root.TelephoneNumber(c.telephone_number) if c.telephone_number.present?

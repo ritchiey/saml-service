@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class EntityDescriptor < Sequel::Model
   many_to_one :known_entity
   many_to_one :organization
@@ -30,7 +31,7 @@ class EntityDescriptor < Sequel::Model
 
   def validate
     super
-    validates_presence [:known_entity, :created_at, :updated_at]
+    validates_presence %i[known_entity created_at updated_at]
     validates_presence :entity_id, allow_missing: new?
     validates_presence :role_descriptors, allow_missing: new?
     validates_presence :organization, allow_missing: new?
@@ -49,7 +50,7 @@ class EntityDescriptor < Sequel::Model
   end
 
   def edugain_compliant_contacts?
-    technical_contact_count > 0 || support_contact_count > 0
+    technical_contact_count.positive? || support_contact_count.positive?
   end
 
   def edugain_compliant_idp?

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe API::RawEntityDescriptorsController, type: :controller do
@@ -33,9 +34,11 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
         request.env['HTTP_X509_DN'] = "CN=#{api_subject.x509_cn}".dup
       end
 
-      patch :update, tag: source_tag,
-                     base64_urlsafe_entity_id: base64_urlsafe_entity_id,
-                     raw_entity_descriptor: raw_entity_descriptor
+      patch :update, params: {
+        tag: source_tag,
+        base64_urlsafe_entity_id: base64_urlsafe_entity_id,
+        raw_entity_descriptor: raw_entity_descriptor
+      }
     end
 
     def swallow
@@ -50,7 +53,7 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
       subject { response }
       it { is_expected.to have_http_status(:forbidden) }
       it 'responds with a message' do
-        data = JSON.load(response.body)
+        data = JSON.parse(response.body)
         expect(data['message']).to match(/explicitly denied/)
       end
     end
@@ -346,7 +349,7 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
           it 'invalidates the MDQ cache' do
             run
             Timecop.travel(1.second) do
-              expect { run }.to change { KnownEntity.last.updated_at }
+              expect { run }.to(change { KnownEntity.last.updated_at })
             end
           end
 

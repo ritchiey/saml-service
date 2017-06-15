@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module SetSAMLTypeFromXML
   def self.xpath_for_metadata_element(name)
     "//*[local-name() = \"#{name}\" and " \

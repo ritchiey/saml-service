@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module API
   class RawEntityDescriptorsController < APIController
     include SetSAMLTypeFromXML
@@ -13,10 +14,10 @@ module API
       raise(BadRequest) unless valid_patch_params?
       if existing_entity_id
         update_raw_entity_descriptor
-        render status: :no_content, nothing: true
+        head :no_content
       else
         create_raw_entity_descriptor
-        render status: :created, nothing: true
+        head :created
       end
     end
 
@@ -71,7 +72,7 @@ module API
 
     def patch_params
       params.require(:raw_entity_descriptor)
-            .permit(:xml, :entity_id, :enabled, tags: [])
+            .permit(:xml, :enabled, tags: [])
     end
 
     def entity_id_uri
@@ -79,7 +80,7 @@ module API
     end
 
     def valid_patch_params?
-      patch_params[:tags] && [true, false].include?(patch_params[:enabled])
+      patch_params[:tags] && %w[true false].include?(patch_params[:enabled])
     end
 
     def access_path

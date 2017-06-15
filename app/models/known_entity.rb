@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class KnownEntity < Sequel::Model
   plugin :touch
 
@@ -16,7 +17,7 @@ class KnownEntity < Sequel::Model
 
   def validate
     super
-    validates_presence [:entity_source, :enabled, :created_at, :updated_at]
+    validates_presence %i[entity_source enabled created_at updated_at]
   end
 
   def self.with_any_tag(tags)

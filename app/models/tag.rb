@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class Tag < Sequel::Model
   URL_SAFE_BASE_64_ALPHABET = /^[a-zA-Z0-9_-]+$/
 
@@ -8,14 +9,14 @@ class Tag < Sequel::Model
 
   def validate
     super
-    validates_unique([:name, :known_entity])
-    validates_presence [:known_entity, :name, :created_at, :updated_at]
+    validates_unique(%i[name known_entity])
+    validates_presence %i[known_entity name created_at updated_at]
     validates_format(URL_SAFE_BASE_64_ALPHABET,
                      :name, message: 'is not in base64 urlsafe alphabet')
   end
 
-  IDP = 'idp'
-  AA = 'aa'
-  STANDALONE_AA = 'standalone-aa'
-  SP = 'sp'
+  IDP = 'idp'.freeze
+  AA = 'aa'.freeze
+  STANDALONE_AA = 'standalone-aa'.freeze
+  SP = 'sp'.freeze
 end

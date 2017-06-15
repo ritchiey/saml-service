@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class CaKeyInfo < KeyInfo
   many_to_one :metadata_instance
 

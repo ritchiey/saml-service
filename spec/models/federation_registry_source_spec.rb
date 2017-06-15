@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe FederationRegistrySource do
@@ -28,7 +29,7 @@ RSpec.describe FederationRegistrySource do
     end
 
     it 'rejects special characters' do
-      %w(! @ # $ % ^ & * ( ) + =).each do |c|
+      %w[! @ # $ % ^ & * ( ) + =].each do |c|
         subject.secret = "invalidsecret#{c}"
         expect(subject).not_to be_valid
       end
