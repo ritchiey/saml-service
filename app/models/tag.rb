@@ -19,4 +19,7 @@ class Tag < Sequel::Model
   AA = 'aa'.freeze
   STANDALONE_AA = 'standalone-aa'.freeze
   SP = 'sp'.freeze
+  RESEARCH_SCHOLARSHIP = 'research-scholarship'.freeze
+  SIRTFI = 'sirtfi'.freeze
+  BLACKLIST = 'blacklist'.freeze
 end

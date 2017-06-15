@@ -12,6 +12,32 @@ RSpec.describe SetSAMLTypeFromXML do
   let(:idp_sso_descriptor) { absent_role_descriptor }
   let(:attribute_authority_descriptor) { absent_role_descriptor }
   let(:sp_sso_descriptor) { absent_role_descriptor }
+  let(:entity_attributes) { {} }
+
+  def attribute_value(value)
+    double(Nokogiri::XML::Node, text: value)
+  end
+
+  let(:sirtfi) do
+    {
+      'urn:oasis:names:tc:SAML:attribute:assurance-certification' =>
+      [attribute_value('https://refeds.org/sirtfi')]
+    }
+  end
+
+  let(:supports_research_scholarship) do
+    {
+      'http://macedir.org/entity-category-support' =>
+      [attribute_value('http://refeds.org/category/research-and-scholarship')]
+    }
+  end
+
+  let(:conforms_to_research_scholarship) do
+    {
+      'http://macedir.org/entity-category' =>
+      [attribute_value('http://refeds.org/category/research-and-scholarship')]
+    }
+  end
 
   let(:xpath_results) do
     {
@@ -25,14 +51,35 @@ RSpec.describe SetSAMLTypeFromXML do
 
   before do
     allow(ed_node).to receive(:xpath) do |path|
-      prefix = '//*[local-name() = "'
-      suffix = '" and namespace-uri() = "urn:oasis:names:tc:SAML:2.0:metadata"]'
-      pattern = "#{Regexp.escape(prefix)}(\\w+)#{Regexp.escape(suffix)}"
+      if path =~ /EntityAttributes/
+        prefix = './/*[local-name() = "EntityAttributes" ' \
+          'and namespace-uri() = "urn:oasis:names:tc:SAML:metadata:attribute"]'\
+          '/*[local-name() = "Attribute" ' \
+          'and namespace-uri() = "urn:oasis:names:tc:SAML:2.0:assertion" ' \
+          'and @Name = "'
+
+        suffix = '"]' \
+          '/*[local-name() = "AttributeValue" ' \
+          'and namespace-uri() = "urn:oasis:names:tc:SAML:2.0:assertion"]'
+
+        getter = ->(v) { entity_attributes.fetch(v, []) }
+      else
+        prefix = '//*[local-name() = "'
+
+        suffix = '" and namespace-uri() = ' \
+          '"urn:oasis:names:tc:SAML:2.0:metadata"]'
+
+        getter = lambda do |v|
+          expect(xpath_results).to have_key(v)
+          xpath_results[v]
+        end
+      end
+
+      pattern = "#{Regexp.escape(prefix)}(.+)#{Regexp.escape(suffix)}"
       match = Regexp.new(pattern).match(path)
 
       expect(match).to be_present
-      expect(xpath_results).to have_key(match[1])
-      xpath_results[match[1]]
+      getter.call(match[1])
     end
   end
 
@@ -51,6 +98,9 @@ RSpec.describe SetSAMLTypeFromXML do
         expect(known_entity).to have_received(:untag_as).with('aa')
         expect(known_entity).to have_received(:untag_as).with('sp')
         expect(known_entity).to have_received(:untag_as).with('standalone-aa')
+        expect(known_entity).to have_received(:untag_as).with('sirtfi')
+        expect(known_entity).to have_received(:untag_as)
+          .with('research-scholarship')
       end
     end
 
@@ -71,6 +121,23 @@ RSpec.describe SetSAMLTypeFromXML do
         expect(known_entity).to have_received(:untag_as).with('sp')
         expect(known_entity).to have_received(:untag_as).with('standalone-aa')
       end
+
+      context 'when SIRTFI is asserted' do
+        let(:entity_attributes) { sirtfi }
+
+        it 'adds the tag' do
+          expect(known_entity).to have_received(:tag_as).with('sirtfi')
+        end
+      end
+
+      context 'when R&S is supported' do
+        let(:entity_attributes) { supports_research_scholarship }
+
+        it 'adds the tag' do
+          expect(known_entity).to have_received(:tag_as)
+            .with('research-scholarship')
+        end
+      end
     end
 
     context 'with an SPSSODescriptor' do
@@ -89,6 +156,23 @@ RSpec.describe SetSAMLTypeFromXML do
         expect(known_entity).to have_received(:untag_as).with('idp')
         expect(known_entity).to have_received(:untag_as).with('aa')
         expect(known_entity).to have_received(:untag_as).with('standalone-aa')
+      end
+
+      context 'when SIRTFI is asserted' do
+        let(:entity_attributes) { sirtfi }
+
+        it 'adds the tag' do
+          expect(known_entity).to have_received(:tag_as).with('sirtfi')
+        end
+      end
+
+      context 'when conforming to R&S' do
+        let(:entity_attributes) { conforms_to_research_scholarship }
+
+        it 'adds the tag' do
+          expect(known_entity).to have_received(:tag_as)
+            .with('research-scholarship')
+        end
       end
     end
 
