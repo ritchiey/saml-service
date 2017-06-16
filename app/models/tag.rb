@@ -15,6 +15,31 @@ class Tag < Sequel::Model
                      :name, message: 'is not in base64 urlsafe alphabet')
   end
 
+  class <<self
+    def update_derived_tags(known_entity)
+      tags = Tag.where(known_entity_id: known_entity.id).all.map(&:name)
+
+      derived_tag_config =
+        Rails.application.config.saml_service.metadata.derived_tags
+
+      derived_tag_config.each do |tag:, **conds|
+        if tag_conditions_match?(tags, conds)
+          known_entity.tag_as(tag)
+        else
+          known_entity.untag_as(tag)
+        end
+      end
+    end
+
+    private
+
+    def tag_conditions_match?(tags, conds)
+      cond_when = conds.fetch(:when, [])
+      cond_unless = conds.fetch(:unless, [])
+      (tags & cond_when == cond_when) && (tags & cond_unless).empty?
+    end
+  end
+
   IDP = 'idp'.freeze
   AA = 'aa'.freeze
   STANDALONE_AA = 'standalone-aa'.freeze
