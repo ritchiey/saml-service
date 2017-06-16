@@ -169,4 +169,102 @@ RSpec.describe KnownEntity do
       end
     end
   end
+
+  describe '#update_derived_tags' do
+    let(:tags) { Faker::Lorem.words(10).uniq }
+    let(:derived_tag) { Faker::Lorem.words.join('-') }
+    let(:negative_tags) { Faker::Lorem.words(100).uniq - tags }
+
+    let(:config) { { metadata: { derived_tags: derived_tags_config } } }
+
+    let(:derived_tags_config) do
+      [{ tag: derived_tag, when: tags, unless: negative_tags }]
+    end
+
+    let(:known_entity) { create(:known_entity) }
+
+    before do
+      allow(Rails)
+        .to receive_message_chain(:application, :config, :saml_service)
+        .and_return(RecursiveOpenStruct.new(config))
+    end
+
+    def run
+      known_entity.update_derived_tags
+    end
+
+    def tag_names
+      Tag.where(known_entity_id: known_entity.id).all.map(&:name)
+    end
+
+    def create_derived_tag
+      known_entity.add_tag(name: derived_tag, derived: true)
+    end
+
+    context 'when the tags are present' do
+      before { tags.each { |tag| known_entity.tag_as(tag) } }
+
+      context 'with derived tag already present' do
+        before { create_derived_tag }
+
+        it 'changes nothing' do
+          expect { run }.not_to change { tag_names }
+        end
+      end
+
+      context 'without the derived tag' do
+        it 'adds the derived tag' do
+          expect { run }.to change { tag_names }.to include(derived_tag)
+          expect(known_entity.tags.last).to have_attributes(derived: true)
+        end
+      end
+
+      context 'when a negative tag is present' do
+        before { known_entity.tag_as(negative_tags.sample) }
+
+        context 'with derived tag already present' do
+          before { create_derived_tag }
+
+          it 'removes the derived tag' do
+            expect { run }.to change { tag_names }.to not_include(derived_tag)
+          end
+        end
+
+        context 'without the derived tag' do
+          it 'changes nothing' do
+            expect { run }.not_to change { tag_names }
+          end
+        end
+      end
+    end
+
+    context 'when a tag is not present' do
+      before do
+        tags.each { |tag| known_entity.tag_as(tag) }
+        known_entity.untag_as(tags.sample)
+      end
+
+      context 'with derived tag already present' do
+        before { create_derived_tag }
+
+        it 'removes the derived tag' do
+          expect { run }.to change { tag_names }.to not_include(derived_tag)
+        end
+      end
+
+      context 'with the derived tag manually applied' do
+        before { known_entity.tag_as(derived_tag) }
+
+        it 'changes nothing' do
+          expect { run }.not_to change { tag_names }
+        end
+      end
+
+      context 'without the derived tag' do
+        it 'changes nothing' do
+          expect { run }.not_to change { tag_names }
+        end
+      end
+    end
+  end
 end

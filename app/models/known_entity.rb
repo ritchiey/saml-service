@@ -64,4 +64,37 @@ class KnownEntity < Sequel::Model
 
     nil
   end
+
+  def update_derived_tags
+    current_tags = tags.map(&:name)
+
+    derived_tag_config =
+      Rails.application.config.saml_service.metadata.derived_tags
+
+    derived_tag_config.each do |tag:, **conds|
+      if tag_conditions_match?(current_tags, conds)
+        apply_derived_tag(tag)
+      else
+        remove_derived_tag(tag)
+      end
+    end
+  end
+
+  private
+
+  def tag_conditions_match?(tags, conds)
+    cond_when = conds.fetch(:when, [])
+    cond_unless = conds.fetch(:unless, [])
+    (tags & cond_when == cond_when) && (tags & cond_unless).empty?
+  end
+
+  def apply_derived_tag(name)
+    return if tags.any? { |t| t.name == name }
+    add_tag(name: name, derived: true)
+  end
+
+  def remove_derived_tag(name)
+    tags.delete_if { |t| t.name == name && t.derived }
+    Tag.where(known_entity_id: id, name: name, derived: true).destroy
+  end
 end
