@@ -274,6 +274,7 @@ Sequel.migration do
       column :created_at, "datetime"
       column :updated_at, "datetime"
       foreign_key :known_entity_id, :known_entities, :type=>"int(11)", :key=>[:id]
+      column :derived, "tinyint(1)", :default=>false
       
       index [:known_entity_id], :name=>:known_entity_id
       index [:name, :known_entity_id], :name=>:name_known_entity_id_un, :unique=>true
@@ -862,5 +863,6 @@ self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160530102028_ap
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160711003010_add_entity_source_id_to_entity_ids.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160920023804_rename_primary_tag_to_identifier_in_metadata_instance.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160920024949_add_primary_tag_to_metadata_instances.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20170616045451_add_derived_flag_to_tags.rb')"
                 end
               end
