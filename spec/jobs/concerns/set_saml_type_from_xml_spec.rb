@@ -100,7 +100,7 @@ RSpec.describe SetSAMLTypeFromXML do
         expect(known_entity).to have_received(:untag_as).with('standalone-aa')
         expect(known_entity).to have_received(:untag_as).with('sirtfi')
         expect(known_entity).to have_received(:untag_as)
-          .with('research-scholarship')
+          .with('research-and-scholarship')
       end
     end
 
@@ -135,7 +135,7 @@ RSpec.describe SetSAMLTypeFromXML do
 
         it 'adds the tag' do
           expect(known_entity).to have_received(:tag_as)
-            .with('research-scholarship')
+            .with('research-and-scholarship')
         end
       end
     end
@@ -171,7 +171,7 @@ RSpec.describe SetSAMLTypeFromXML do
 
         it 'adds the tag' do
           expect(known_entity).to have_received(:tag_as)
-            .with('research-scholarship')
+            .with('research-and-scholarship')
         end
       end
     end
