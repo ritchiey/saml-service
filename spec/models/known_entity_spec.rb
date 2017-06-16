@@ -102,4 +102,71 @@ RSpec.describe KnownEntity do
       end
     end
   end
+
+  describe '::with_any_tag' do
+    let!(:blacklisted_entity) { create(:known_entity) }
+    let!(:allowed_entity) { create(:known_entity) }
+
+    let!(:tags) do
+      [
+        create(:tag, name: 'aaf', known_entity: allowed_entity),
+        create(:tag, name: 'aaf', known_entity: blacklisted_entity),
+        create(:tag, name: 'blacklist', known_entity: blacklisted_entity)
+      ]
+    end
+
+    it 'filters the blacklisted entity' do
+      expect(KnownEntity.with_any_tag('aaf')).not_to include(blacklisted_entity)
+    end
+
+    it 'includes the allowed entity' do
+      expect(KnownEntity.with_any_tag('aaf')).to include(allowed_entity)
+    end
+
+    context 'with `include_blacklisted: true`' do
+      it 'includes the blacklisted entity' do
+        expect(KnownEntity.with_any_tag('aaf', include_blacklisted: true))
+          .to include(blacklisted_entity)
+      end
+
+      it 'includes the allowed entity' do
+        expect(KnownEntity.with_any_tag('aaf', include_blacklisted: true))
+          .to include(allowed_entity)
+      end
+    end
+  end
+
+  describe '::with_all_tags' do
+    let!(:blacklisted_entity) { create(:known_entity) }
+    let!(:allowed_entity) { create(:known_entity) }
+
+    let!(:tags) do
+      [
+        create(:tag, name: 'aaf', known_entity: allowed_entity),
+        create(:tag, name: 'aaf', known_entity: blacklisted_entity),
+        create(:tag, name: 'blacklist', known_entity: blacklisted_entity)
+      ]
+    end
+
+    it 'filters the blacklisted entity' do
+      expect(KnownEntity.with_all_tags('aaf'))
+        .not_to include(blacklisted_entity)
+    end
+
+    it 'includes the allowed entity' do
+      expect(KnownEntity.with_all_tags('aaf')).to include(allowed_entity)
+    end
+
+    context 'with `include_blacklisted: true`' do
+      it 'includes the blacklisted entity' do
+        expect(KnownEntity.with_all_tags('aaf', include_blacklisted: true))
+          .to include(blacklisted_entity)
+      end
+
+      it 'includes the allowed entity' do
+        expect(KnownEntity.with_all_tags('aaf', include_blacklisted: true))
+          .to include(allowed_entity)
+      end
+    end
+  end
 end
