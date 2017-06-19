@@ -14,4 +14,10 @@ class DerivedTag < Sequel::Model
     validates_format VALID_TAG, :tag_name
     validates_format VALID_TAG_LIST, %i[when_tags unless_tags]
   end
+
+  def matches?(tags)
+    cond_when = when_tags.split(',')
+    cond_unless = unless_tags.split(',')
+    (tags & cond_when == cond_when) && (tags & cond_unless).empty?
+  end
 end

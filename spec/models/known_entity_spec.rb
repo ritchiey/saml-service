@@ -171,22 +171,18 @@ RSpec.describe KnownEntity do
   end
 
   describe '#update_derived_tags' do
+    before { DerivedTag.all.each(&:destroy) }
+
     let(:tags) { Faker::Lorem.words(10).uniq }
-    let(:derived_tag) { Faker::Lorem.words.join('-') }
-    let(:negative_tags) { Faker::Lorem.words(100).uniq - tags }
-
-    let(:config) { { metadata: { derived_tags: derived_tags_config } } }
-
-    let(:derived_tags_config) do
-      [{ tag: derived_tag, when: tags, unless: negative_tags }]
-    end
-
+    let(:derived_tag_name) { Faker::Lorem.words.join('-') }
+    let(:negative_tags) { (Faker::Lorem.words(100).uniq - tags).take(10) }
     let(:known_entity) { create(:known_entity) }
 
-    before do
-      allow(Rails)
-        .to receive_message_chain(:application, :config, :saml_service)
-        .and_return(RecursiveOpenStruct.new(config))
+    let!(:derived_tag) do
+      create(:derived_tag,
+             tag_name: derived_tag_name,
+             when_tags: tags.join(','),
+             unless_tags: negative_tags.join(','))
     end
 
     def run
@@ -198,7 +194,7 @@ RSpec.describe KnownEntity do
     end
 
     def create_derived_tag
-      known_entity.add_tag(name: derived_tag, derived: true)
+      known_entity.add_tag(name: derived_tag_name, derived: true)
     end
 
     context 'when the tags are present' do
@@ -214,7 +210,7 @@ RSpec.describe KnownEntity do
 
       context 'without the derived tag' do
         it 'adds the derived tag' do
-          expect { run }.to change { tag_names }.to include(derived_tag)
+          expect { run }.to change { tag_names }.to include(derived_tag_name)
           expect(known_entity.tags.last).to have_attributes(derived: true)
         end
       end
@@ -226,7 +222,8 @@ RSpec.describe KnownEntity do
           before { create_derived_tag }
 
           it 'removes the derived tag' do
-            expect { run }.to change { tag_names }.to not_include(derived_tag)
+            expect { run }.to change { tag_names }
+              .to not_include(derived_tag_name)
           end
         end
 
@@ -248,12 +245,13 @@ RSpec.describe KnownEntity do
         before { create_derived_tag }
 
         it 'removes the derived tag' do
-          expect { run }.to change { tag_names }.to not_include(derived_tag)
+          expect { run }.to change { tag_names }
+            .to not_include(derived_tag_name)
         end
       end
 
       context 'with the derived tag manually applied' do
-        before { known_entity.tag_as(derived_tag) }
+        before { known_entity.tag_as(derived_tag_name) }
 
         it 'changes nothing' do
           expect { run }.not_to change { tag_names }
