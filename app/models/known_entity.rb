@@ -85,7 +85,7 @@ class KnownEntity < Sequel::Model
   end
 
   def remove_derived_tag(name)
-    tags.delete_if { |t| t.name == name && t.derived }
+    tags.delete_if { |t| t.name == name && t.derived? }
     Tag.where(known_entity_id: id, name: name, derived: true).destroy
   end
 end
