@@ -28,6 +28,19 @@ Sequel.migration do
       column :updated_at, "datetime"
     end
     
+    create_table(:derived_tags) do
+      primary_key :id, :type=>"int(11)"
+      column :rank, "int(11)", :null=>false
+      column :tag_name, "varchar(255)", :null=>false
+      column :when_tags, "varchar(255)", :null=>false
+      column :unless_tags, "varchar(255)", :null=>false
+      column :created_at, "datetime", :null=>false
+      column :updated_at, "datetime", :null=>false
+      column :enabled, "tinyint(1)", :null=>false
+      
+      index [:rank, :enabled]
+    end
+    
     create_table(:endpoints) do
       primary_key :id, :type=>"int(11)"
       column :binding, "varchar(255)", :null=>false
@@ -864,5 +877,6 @@ self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160711003010_ad
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160920023804_rename_primary_tag_to_identifier_in_metadata_instance.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160920024949_add_primary_tag_to_metadata_instances.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20170616045451_add_derived_flag_to_tags.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20170619194544_create_derived_tags.rb')"
                 end
               end
