@@ -213,6 +213,19 @@ RSpec.describe KnownEntity do
           expect { run }.to change { tag_names }.to include(derived_tag_name)
           expect(known_entity.tags.last).to have_attributes(derived: true)
         end
+
+        context 'when one of the condition tags is derived' do
+          before do
+            tag_name = tags.sample
+            known_entity.untag_as(tag_name)
+            known_entity.add_tag(name: tag_name, derived: true)
+            known_entity.reload
+          end
+
+          it 'changes nothing' do
+            expect { run }.not_to change { tag_names }
+          end
+        end
       end
 
       context 'when a negative tag is present' do

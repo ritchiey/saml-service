@@ -16,8 +16,8 @@ class DerivedTag < Sequel::Model
   end
 
   def matches?(tags)
-    cond_when = when_tags.split(',')
-    cond_unless = unless_tags.split(',')
-    (tags & cond_when == cond_when) && (tags & cond_unless).empty?
+    cond_when = when_tags.split(',').sort
+    cond_unless = unless_tags.split(',').sort
+    (tags.sort & cond_when == cond_when) && (tags & cond_unless).empty?
   end
 end

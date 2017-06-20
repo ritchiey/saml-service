@@ -66,7 +66,7 @@ class KnownEntity < Sequel::Model
   end
 
   def update_derived_tags
-    current_tags = tags.map(&:name)
+    current_tags = tags.reject(&:derived?).map(&:name)
 
     DerivedTag.all.each do |derived_tag|
       if derived_tag.matches?(current_tags)
