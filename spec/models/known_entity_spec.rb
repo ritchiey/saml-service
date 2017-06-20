@@ -204,7 +204,7 @@ RSpec.describe KnownEntity do
         before { create_derived_tag }
 
         it 'changes nothing' do
-          expect { run }.not_to change { tag_names }
+          expect { run }.not_to(change { tag_names })
         end
       end
 
@@ -223,7 +223,7 @@ RSpec.describe KnownEntity do
           end
 
           it 'changes nothing' do
-            expect { run }.not_to change { tag_names }
+            expect { run }.not_to(change { tag_names })
           end
         end
       end
@@ -242,7 +242,7 @@ RSpec.describe KnownEntity do
 
         context 'without the derived tag' do
           it 'changes nothing' do
-            expect { run }.not_to change { tag_names }
+            expect { run }.not_to(change { tag_names })
           end
         end
       end
@@ -267,13 +267,13 @@ RSpec.describe KnownEntity do
         before { known_entity.tag_as(derived_tag_name) }
 
         it 'changes nothing' do
-          expect { run }.not_to change { tag_names }
+          expect { run }.not_to(change { tag_names })
         end
       end
 
       context 'without the derived tag' do
         it 'changes nothing' do
-          expect { run }.not_to change { tag_names }
+          expect { run }.not_to(change { tag_names })
         end
       end
     end
