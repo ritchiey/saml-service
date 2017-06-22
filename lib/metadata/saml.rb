@@ -529,7 +529,7 @@ module Metadata
           assertion_id_request_service(aidrs)
         end
 
-        aad.name_id_formats { |ds| ds.order(:id) }.each do |nidf|
+        aad.name_id_formats { |ds| ds.order(:uri) }.each do |nidf|
           root.NameIDFormat(nidf.uri)
         end
 
