@@ -259,7 +259,7 @@ module Metadata
 
         organization(ed.organization)
 
-        ed.contact_people { |ds| ds.order(:id) }.each do |cp|
+        ed.contact_people { |ds| ds.order(:contact_id) }.each do |cp|
           contact_person(cp)
         end
       end
