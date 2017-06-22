@@ -206,7 +206,7 @@ module Metadata
 
     def entity_attribute(ea)
       mdattr.EntityAttributes(ns) do |_|
-        ea.attributes { |ds| ds.order(:id) }.each do |attr|
+        ea.attributes { |ds| ds.order(:name) }.each do |attr|
           attribute(attr)
         end
       end
@@ -259,7 +259,11 @@ module Metadata
 
         organization(ed.organization)
 
-        ed.contact_people { |ds| ds.order(:id) }.each do |cp|
+        contact_people = ed.contact_people do |ds|
+          ds.order(:contact_type_id, :contact_id)
+        end
+
+        contact_people.each do |cp|
           contact_person(cp)
         end
       end
@@ -444,7 +448,7 @@ module Metadata
           root.AttributeProfile(ap.uri)
         end
 
-        idp.attributes { |ds| ds.order(:id) }.each do |a|
+        idp.attributes { |ds| ds.order(:name) }.each do |a|
           attribute(a)
         end
       end
@@ -529,7 +533,7 @@ module Metadata
           assertion_id_request_service(aidrs)
         end
 
-        aad.name_id_formats { |ds| ds.order(:id) }.each do |nidf|
+        aad.name_id_formats { |ds| ds.order(:uri) }.each do |nidf|
           root.NameIDFormat(nidf.uri)
         end
 
@@ -537,7 +541,7 @@ module Metadata
           root.AttributeProfile(ap.uri)
         end
 
-        aad.attributes { |ds| ds.order(:id) }.each do |attr|
+        aad.attributes { |ds| ds.order(:name) }.each do |attr|
           attribute(attr)
         end
       end
