@@ -206,7 +206,7 @@ module Metadata
 
     def entity_attribute(ea)
       mdattr.EntityAttributes(ns) do |_|
-        ea.attributes { |ds| ds.order(:id) }.each do |attr|
+        ea.attributes { |ds| ds.order(:name) }.each do |attr|
           attribute(attr)
         end
       end
@@ -444,7 +444,7 @@ module Metadata
           root.AttributeProfile(ap.uri)
         end
 
-        idp.attributes { |ds| ds.order(:id) }.each do |a|
+        idp.attributes { |ds| ds.order(:name) }.each do |a|
           attribute(a)
         end
       end
@@ -537,7 +537,7 @@ module Metadata
           root.AttributeProfile(ap.uri)
         end
 
-        aad.attributes { |ds| ds.order(:id) }.each do |attr|
+        aad.attributes { |ds| ds.order(:name) }.each do |attr|
           attribute(attr)
         end
       end
