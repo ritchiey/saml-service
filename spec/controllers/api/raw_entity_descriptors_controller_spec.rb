@@ -34,7 +34,7 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
         request.env['HTTP_X509_DN'] = "CN=#{api_subject.x509_cn}".dup
       end
 
-      patch :update, params: {
+      patch :update, as: :json, params: {
         tag: source_tag,
         base64_urlsafe_entity_id: base64_urlsafe_entity_id,
         raw_entity_descriptor: raw_entity_descriptor
