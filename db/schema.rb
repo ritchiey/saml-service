@@ -30,15 +30,11 @@ Sequel.migration do
     
     create_table(:derived_tags) do
       primary_key :id, :type=>"int(11)"
-      column :rank, "int(11)", :null=>false
       column :tag_name, "varchar(255)", :null=>false
       column :when_tags, "varchar(255)", :null=>false
       column :unless_tags, "varchar(255)", :null=>false
       column :created_at, "datetime", :null=>false
       column :updated_at, "datetime", :null=>false
-      column :enabled, "tinyint(1)", :null=>false
-      
-      index [:rank, :enabled]
     end
     
     create_table(:endpoints) do

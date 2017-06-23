@@ -8,8 +8,6 @@ RSpec.describe DerivedTag do
   context 'validations' do
     subject { build(:derived_tag) }
 
-    it { is_expected.to validate_presence(:enabled) }
-    it { is_expected.to validate_presence(:rank) }
     it { is_expected.to validate_presence(:tag_name) }
     it { is_expected.to validate_presence(:when_tags) }
     it { is_expected.to validate_presence(:unless_tags) }
