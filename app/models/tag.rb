@@ -7,6 +7,8 @@ class Tag < Sequel::Model
   plugin :validation_helpers
   many_to_one :known_entity
 
+  alias derived? derived
+
   def validate
     super
     validates_unique(%i[name known_entity])

@@ -51,11 +51,13 @@ class KnownEntity < Sequel::Model
   def tag_as(name)
     return if tags.any? { |t| t.name == name }
     add_tag(Tag.new(name: name))
+    update_derived_tags
   end
 
   def untag_as(name)
     tags.delete_if { |t| t.name == name }
     Tag.where(name: name, known_entity: self).destroy
+    update_derived_tags
   end
 
   def entity_id
@@ -63,5 +65,29 @@ class KnownEntity < Sequel::Model
     return raw_entity_descriptor.entity_id.uri if raw_entity_descriptor
 
     nil
+  end
+
+  def update_derived_tags
+    current_tags = tags.reject(&:derived?).map(&:name)
+
+    DerivedTag.all.each do |derived_tag|
+      if derived_tag.matches?(current_tags)
+        apply_derived_tag(derived_tag.tag_name)
+      else
+        remove_derived_tag(derived_tag.tag_name)
+      end
+    end
+  end
+
+  private
+
+  def apply_derived_tag(name)
+    return if tags.any? { |t| t.name == name }
+    add_tag(name: name, derived: true)
+  end
+
+  def remove_derived_tag(name)
+    tags.delete_if { |t| t.name == name && t.derived? }
+    Tag.where(known_entity_id: id, name: name, derived: true).destroy
   end
 end

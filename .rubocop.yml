@@ -49,3 +49,6 @@ Rails/SkipsModelValidations:
     - update_column
     - update_columns
     - update_counters
+
+Rails/FindEach:
+  Enabled: false
