@@ -51,11 +51,13 @@ class KnownEntity < Sequel::Model
   def tag_as(name)
     return if tags.any? { |t| t.name == name }
     add_tag(Tag.new(name: name))
+    update_derived_tags
   end
 
   def untag_as(name)
     tags.delete_if { |t| t.name == name }
     Tag.where(name: name, known_entity: self).destroy
+    update_derived_tags
   end
 
   def entity_id

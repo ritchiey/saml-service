@@ -72,6 +72,20 @@ RSpec.describe KnownEntity do
         expect(subject.tags.any? { |t| t.name == name }).to be_truthy
       end
     end
+
+    context 'with a derived tag' do
+      let(:derived_tag_name) { Faker::Lorem.words.join('-') }
+
+      let!(:derived_tag) do
+        create(:derived_tag, tag_name: derived_tag_name, when_tags: name)
+      end
+
+      it 'derives the tag' do
+        expect { subject.tag_as(name) }
+          .to(change { KnownEntity.with_all_tags([derived_tag_name]) }
+          .to(include(subject)))
+      end
+    end
   end
 
   describe '#untag_as' do
@@ -99,6 +113,22 @@ RSpec.describe KnownEntity do
     context 'tag does not already exist' do
       it 'does not decrease tag count' do
         expect { subject.untag_as(name) }.not_to(change { subject.tags.length })
+      end
+    end
+
+    context 'with a derived tag' do
+      let(:derived_tag_name) { Faker::Lorem.words.join('-') }
+
+      let!(:derived_tag) do
+        create(:derived_tag, tag_name: derived_tag_name, when_tags: name)
+      end
+
+      before { subject.tag_as(name) }
+
+      it 'derives the tag' do
+        expect { subject.untag_as(name) }
+          .to(change { KnownEntity.with_all_tags([derived_tag_name]) }
+          .to(not_include(subject)))
       end
     end
   end
@@ -198,7 +228,7 @@ RSpec.describe KnownEntity do
     end
 
     context 'when the tags are present' do
-      before { tags.each { |tag| known_entity.tag_as(tag) } }
+      before { tags.each { |tag| known_entity.add_tag(name: tag) } }
 
       context 'with derived tag already present' do
         before { create_derived_tag }
@@ -217,7 +247,7 @@ RSpec.describe KnownEntity do
         context 'when one of the condition tags is derived' do
           before do
             tag_name = tags.sample
-            known_entity.untag_as(tag_name)
+            Tag.where(known_entity: known_entity, name: tag_name).destroy
             known_entity.add_tag(name: tag_name, derived: true)
             known_entity.reload
           end
@@ -229,7 +259,7 @@ RSpec.describe KnownEntity do
       end
 
       context 'when a negative tag is present' do
-        before { known_entity.tag_as(negative_tags.sample) }
+        before { known_entity.add_tag(name: negative_tags.sample) }
 
         context 'with derived tag already present' do
           before { create_derived_tag }
@@ -250,8 +280,8 @@ RSpec.describe KnownEntity do
 
     context 'when a tag is not present' do
       before do
-        tags.each { |tag| known_entity.tag_as(tag) }
-        known_entity.untag_as(tags.sample)
+        tags.each { |tag| known_entity.add_tag(name: tag) }
+        Tag.where(known_entity_id: known_entity.id, name: tags.sample).destroy
       end
 
       context 'with derived tag already present' do
@@ -264,7 +294,7 @@ RSpec.describe KnownEntity do
       end
 
       context 'with the derived tag manually applied' do
-        before { known_entity.tag_as(derived_tag_name) }
+        before { known_entity.add_tag(name: derived_tag_name) }
 
         it 'changes nothing' do
           expect { run }.not_to(change { tag_names })
