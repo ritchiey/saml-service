@@ -61,10 +61,21 @@ module Metadata
           signature_element
           entities_descriptor_extensions
 
-          filter_known_entities(known_entities).each do |ke_list|
-            known_entity(ke_list)
-          end
+          render_known_entities(known_entity_list(known_entities))
         end
+      end
+    end
+
+    def render_known_entities(known_entity_list)
+      known_entity_list.each do |e|
+        entity_descriptor(e) if e.instance_of? EntityDescriptor
+        raw_entity_descriptor(e) if e.instance_of? RawEntityDescriptor
+      end
+    end
+
+    def known_entity_list(known_entities)
+      filter_known_entities(known_entities).map do |ke_list|
+        known_entity(ke_list)
       end
     end
 
@@ -95,12 +106,12 @@ module Metadata
       entities.sort_by { |ke| ke.entity_source.try(:rank) }
     end
 
-    def known_entity(ke_list)
-      ke_list.each do |ke|
+    def known_entity(known_entity_by_rank)
+      known_entity_by_rank.each do |ke|
         ed = ke.entity_descriptor
         rad = ke.raw_entity_descriptor
-        return entity_descriptor(ed) if ed.try(:functioning?)
-        return raw_entity_descriptor(rad) if rad.try(:functioning?)
+        return ed if ed.try(:functioning?)
+        return rad if rad.try(:functioning?)
       end
     end
 

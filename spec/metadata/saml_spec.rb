@@ -96,23 +96,17 @@ RSpec.describe Metadata::SAML do
         external_entity_source.known_entities.each { |ke| ke.tag_as(tag) }
       end
 
-      let(:organization) { entity.entity_descriptor.organization }
-
       let(:external_entity) { external_entity_source.known_entities.first }
-
-      let(:external_organization) do
-        external_entity.entity_descriptor.organization
-      end
 
       let(:entity_ordered_by_rank) do
         [entity, external_entity].sort_by { |e| e.entity_source.try(:rank) }
       end
 
-      describe '#filter_known_entities' do
-        let(:other_entities) do
-          entity_source.known_entities.tap { |a| a.delete(entity) }
-        end
+      let(:other_entities) do
+        entity_source.known_entities.tap { |a| a.delete(entity) }
+      end
 
+      describe '#filter_known_entities' do
         let(:other_entities_as_list) { other_entities.map { |e| [e] } }
 
         it 'returns enabled and disabled entities as lists ordered by rank' do
@@ -121,41 +115,26 @@ RSpec.describe Metadata::SAML do
         end
       end
 
-      include_examples 'EntitiesDescriptor xml' do
-        let(:entity_path) do
-          "#{entity_descriptor_path}[@entityID='#{entity_id}']"
-        end
-
-        it 'has 6 known entities' do
-          expect(KnownEntity.with_all_tags(tag).length).to eq(6)
-        end
-
-        it 'includes the EntityDescriptor' do
-          subject.entities_descriptor(KnownEntity.with_all_tags(tag))
-          expect(xml).to have_xpath(entity_path)
-        end
-
-        let(:node) { xml.find(:xpath, entity_path) }
-
-        let(:organization_path) { 'Organization' }
-        let(:organization_name_path) { "#{organization_path}/OrganizationName" }
-
-        let(:organization_node) { node.find(organization_name_path) }
-
+      describe '#known_entity_list' do
         let(:highest_ranked_functioning_entity) do
           entity_ordered_by_rank.find { |e| e.entity_descriptor.functioning? }
         end
 
-        let(:entity_organization_name) do
-          highest_ranked_functioning_entity.entity_descriptor.organization
-                                           .organization_names.first.value
+        let(:expected_entity_descriptors) do
+          [highest_ranked_functioning_entity, *other_entities]
+            .map(&:entity_descriptor)
         end
 
-        it 'includes the highest ranked functioning EntityDescriptor' do
-          subject.entities_descriptor(KnownEntity.with_all_tags(tag))
+        it 'returns functional entities ordered by rank' do
+          result = subject.known_entity_list(all_tagged_known_entities)
 
-          expect(organization).to_not eq(external_organization)
-          expect(organization_node.text).to eq(entity_organization_name)
+          expect(result).to eq(expected_entity_descriptors)
+        end
+      end
+
+      include_examples 'EntitiesDescriptor xml' do
+        it 'has 6 known entities' do
+          expect(KnownEntity.with_all_tags(tag).length).to eq(6)
         end
       end
     end
