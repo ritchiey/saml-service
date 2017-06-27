@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 FactoryGirl.define do
   test_rsa_keys = {}
 
@@ -24,7 +25,7 @@ FactoryGirl.define do
     issuer { OpenSSL::X509::Name.parse(issuer_dn) }
     subject { OpenSSL::X509::Name.parse(subject_dn) }
 
-    not_before { Time.now }
+    not_before { Time.zone.now }
     not_after { 1.hour.from_now }
     serial 0
     version 2

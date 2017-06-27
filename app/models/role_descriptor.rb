@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class RoleDescriptor < Sequel::Model
   many_to_one :entity_descriptor
   many_to_one :organization
@@ -19,7 +20,7 @@ class RoleDescriptor < Sequel::Model
 
   def validate
     super
-    validates_presence [:entity_descriptor, :enabled, :created_at, :updated_at]
+    validates_presence %i[entity_descriptor enabled created_at updated_at]
     return if new?
 
     validates_presence :protocol_supports

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module ETL
   module RoleDescriptors
     def role_descriptor(rd, rd_data, scopes_data)

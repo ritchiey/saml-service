@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'rails_helper'
 
 require 'metadata/saml'
@@ -10,7 +11,7 @@ RSpec.describe Metadata::SAML do
 
   let(:federation_identifier) { Faker::Internet.domain_word }
   let(:metadata_name) { "urn:mace:#{federation_identifier}.edu:test" }
-  let(:metadata_validity_period) { 1.weeks }
+  let(:metadata_validity_period) { 1.week }
   let(:entity_descriptors) { entity_source.entity_descriptors }
   let(:hash_algorithm) { 'sha256' }
 

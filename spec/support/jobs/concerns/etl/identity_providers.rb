@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 RSpec.shared_examples 'ETL::IdentityProviders' do
   include_examples 'ETL::Common'
 
@@ -100,7 +101,7 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
 
   let(:identity_providers) { identity_providers_list }
 
-  let(:idp_created_at) { Time.at(rand(Time.now.utc.to_i)) }
+  let(:idp_created_at) { Time.zone.at(rand(Time.now.utc.to_i)) }
 
   let(:attribute_instances) do
     (0..attribute_count).map do |i|
@@ -294,32 +295,32 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
     include_examples 'updating MDUI content'
 
     it 'uses the existing instance' do
-      expect { run }.not_to change { IDPSSODescriptor.count }
+      expect { run }.not_to(change { IDPSSODescriptor.count })
     end
 
     it 'does not create more tags' do
-      expect { run }.not_to change { Tag.count }
+      expect { run }.not_to(change { Tag.count })
     end
 
     it 'updates single sign on services' do
-      expect { run }.to change { subject.reload.single_sign_on_services }
+      expect { run }.to(change { subject.reload.single_sign_on_services })
     end
 
     it 'updates name id mapping services' do
-      expect { run }.to change { subject.reload.name_id_mapping_services }
+      expect { run }.to(change { subject.reload.name_id_mapping_services })
     end
 
     it 'updates assertion id request services' do
       expect { run }
-        .to change { subject.reload.assertion_id_request_services }
+        .to(change { subject.reload.assertion_id_request_services })
     end
 
     it 'updates attribute profiles' do
-      expect { run }.to change { subject.reload.attribute_profiles }
+      expect { run }.to(change { subject.reload.attribute_profiles })
     end
 
     it 'updates attributes' do
-      expect { run }.to change { subject.reload.attributes }
+      expect { run }.to(change { subject.reload.attributes })
     end
   end
 end

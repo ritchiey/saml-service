@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class KnownEntity < Sequel::Model
   plugin :touch
 
@@ -16,30 +17,47 @@ class KnownEntity < Sequel::Model
 
   def validate
     super
-    validates_presence [:entity_source, :enabled, :created_at, :updated_at]
+    validates_presence %i[entity_source enabled created_at updated_at]
   end
 
-  def self.with_any_tag(tags)
-    join_tags(tags).all
+  def self.permitted_entities
+    dataset.qualify
+           .left_outer_join(Sequel.as(:tags, :blacklist_tags),
+                            known_entity_id: :id,
+                            name: Tag::BLACKLIST)
+           .where(Sequel.qualify(:blacklist_tags, :id) => nil)
   end
 
-  def self.with_all_tags(tags)
-    join_tags(tags).having { "count(*) = #{[tags].flatten.length}" }.all
+  def self.with_any_tag(tags, include_blacklisted: false)
+    join_tags(tags, include_blacklisted: include_blacklisted).all
   end
 
-  def self.join_tags(tags)
-    qualify.join(:tags, known_entity_id: :id, name: tags)
-           .group(:known_entity_id)
+  def self.with_all_tags(tags, include_blacklisted: false)
+    join_tags(tags, include_blacklisted: include_blacklisted)
+      .having { "count(*) = #{[tags].flatten.length}" }.all
+  end
+
+  def self.join_tags(tags, include_blacklisted: false)
+    dataset = if include_blacklisted
+                self.dataset.qualify
+              else
+                qualify.from(Sequel.as(permitted_entities, :known_entities))
+              end
+
+    dataset.join(:tags, known_entity_id: :id, name: tags)
+           .group(Sequel.qualify(:tags, :known_entity_id))
   end
 
   def tag_as(name)
     return if tags.any? { |t| t.name == name }
     add_tag(Tag.new(name: name))
+    update_derived_tags
   end
 
   def untag_as(name)
     tags.delete_if { |t| t.name == name }
     Tag.where(name: name, known_entity: self).destroy
+    update_derived_tags
   end
 
   def entity_id
@@ -47,5 +65,29 @@ class KnownEntity < Sequel::Model
     return raw_entity_descriptor.entity_id.uri if raw_entity_descriptor
 
     nil
+  end
+
+  def update_derived_tags
+    current_tags = tags.reject(&:derived?).map(&:name)
+
+    DerivedTag.all.each do |derived_tag|
+      if derived_tag.matches?(current_tags)
+        apply_derived_tag(derived_tag.tag_name)
+      else
+        remove_derived_tag(derived_tag.tag_name)
+      end
+    end
+  end
+
+  private
+
+  def apply_derived_tag(name)
+    return if tags.any? { |t| t.name == name }
+    add_tag(name: name, derived: true)
+  end
+
+  def remove_derived_tag(name)
+    tags.delete_if { |t| t.name == name && t.derived? }
+    Tag.where(known_entity_id: id, name: name, derived: true).destroy
   end
 end

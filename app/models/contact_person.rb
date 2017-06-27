@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class ContactPerson < Sequel::Model
   many_to_one :contact
   many_to_one :entity_descriptor
@@ -17,9 +18,9 @@ class ContactPerson < Sequel::Model
 
   def validate
     super
-    validates_presence [:contact_type_id, :contact_type, :contact,
-                        :created_at, :updated_at]
-    validates_includes [:technical, :support, :administrative,
-                        :billing, :other], :contact_type
+    validates_presence %i[contact_type_id contact_type contact
+                          created_at updated_at]
+    validates_includes %i[technical support administrative
+                          billing other], :contact_type
   end
 end

@@ -1,15 +1,16 @@
 # frozen_string_literal: true
+
 module ETL
   module ServiceProviders
     include SSODescriptors
 
     def service_providers(ed, ed_data)
       ed_data[:saml][:service_providers].each do |sp_ref|
-        sp_data = fr_service_providers[sp_ref[:id]]
-        next unless sp_data[:saml].key?(:attribute_consuming_services) &&
-                    sp_data[:saml][:attribute_consuming_services].count > 0
+        data = fr_service_providers[sp_ref[:id]]
+        acs = data[:saml].try!(:[], :attribute_consuming_services)
+        next unless acs.try!(&:any?)
 
-        create_or_update_sp(ed, SPSSODescriptor.dataset, sp_data)
+        create_or_update_sp(ed, SPSSODescriptor.dataset, data)
       end
     end
 
@@ -28,7 +29,7 @@ module ETL
     def sp_attrs(sp_data)
       saml = sp_data[:saml]
       {
-        created_at: Time.parse(sp_data[:created_at]),
+        created_at: Time.zone.parse(sp_data[:created_at]),
         enabled: sp_data[:functioning],
         authn_requests_signed: saml[:authnrequests_signed],
         want_assertions_signed: saml[:assertions_signed]
@@ -100,8 +101,8 @@ module ETL
       # have not yet had specific values associated.
       # For example eduPersonEntitlement but no entitlement values
       # requested by the SP using our tooling as yet.
-      attr_data.fetch(:specificationRequired, nil).blank? ||
-        (attr_data[:specificationRequired] && attr_data[:values].present?)
+      attr_data.fetch(:specification, false) == false ||
+        (attr_data[:specification] && attr_data[:values].present?)
     end
 
     def requested_attribute(acs, attr_data, base)

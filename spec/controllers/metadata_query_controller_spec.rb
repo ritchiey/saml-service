@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe MetadataQueryController, type: :controller do
@@ -40,10 +41,7 @@ RSpec.describe MetadataQueryController, type: :controller do
 
       it { is_expected.to have_http_status(:not_found) }
       it 'has relevant MUST/SHOULD headers per specification' do
-        expect(subject.headers).to include(
-          'Cache-Control' =>
-            'max-age=600, private'
-        )
+        expect(subject.headers['Cache-Control']).to eq('max-age=600, private')
       end
     end
   end
@@ -64,12 +62,17 @@ RSpec.describe MetadataQueryController, type: :controller do
 
     context 'headers' do
       it 'has relevant MUST/SHOULD headers per specification' do
-        expect(subject.headers).to include(
+        cache_period = metadata_instance.cache_period
+
+        expected = {
           'Content-Type' => "#{saml_content}; charset=utf-8",
           'ETag' => etag,
-          'Cache-Control' =>
-            "max-age=#{metadata_instance.cache_period}, private"
-        )
+          'Cache-Control' => "max-age=#{cache_period}, private"
+        }
+
+        expected.each do |k, v|
+          expect(subject.headers[k]).to eq(v)
+        end
       end
     end
   end
@@ -133,17 +136,15 @@ RSpec.describe MetadataQueryController, type: :controller do
 
           before do
             request.accept = saml_content
-            get :all_entities, instance: instance_identifier
+            get :all_entities, params: { instance: instance_identifier }
           end
 
           context 'response' do
             subject { response }
             it { is_expected.to have_http_status(:not_found) }
             it 'has relevant MUST/SHOULD headers per specification' do
-              expect(subject.headers).to include(
-                'Cache-Control' =>
-                  'max-age=600, private'
-              )
+              expect(subject.headers['Cache-Control'])
+                .to eq('max-age=600, private')
             end
           end
         end
@@ -171,7 +172,7 @@ RSpec.describe MetadataQueryController, type: :controller do
 
           context 'initial request' do
             def run
-              get :all_entities, instance: instance_identifier
+              get :all_entities, params: { instance: instance_identifier }
             end
 
             context 'uncached server side' do
@@ -186,7 +187,7 @@ RSpec.describe MetadataQueryController, type: :controller do
               context 'cache' do
                 it 'updates server side cache' do
                   expect { run }
-                    .to change { Rails.cache.fetch("metadata:#{etag}") }
+                    .to(change { Rails.cache.fetch("metadata:#{etag}") })
                 end
               end
             end
@@ -205,7 +206,7 @@ RSpec.describe MetadataQueryController, type: :controller do
               context 'cache' do
                 it 'does not modify server side cache' do
                   expect { run }
-                    .not_to change { Rails.cache.fetch("metadata:#{etag}") }
+                    .not_to(change { Rails.cache.fetch("metadata:#{etag}") })
                 end
               end
             end
@@ -213,7 +214,7 @@ RSpec.describe MetadataQueryController, type: :controller do
 
           context 'subsequent requests' do
             def run
-              get :all_entities, instance: instance_identifier
+              get :all_entities, params: { instance: instance_identifier }
             end
 
             before do
@@ -284,13 +285,17 @@ RSpec.describe MetadataQueryController, type: :controller do
 
       context 'invalid client request' do
         it_behaves_like 'invalid requests' do
-          let(:query) { get :all_entities, instance: instance_identifier }
+          let(:query) do
+            get :all_entities, params: { instance: instance_identifier }
+          end
         end
       end
     end
 
     include_examples 'non get request' do
-      let(:query) { post :all_entities, instance: instance_identifier }
+      let(:query) do
+        post :all_entities, params: { instance: instance_identifier }
+      end
     end
   end
 
@@ -318,7 +323,7 @@ RSpec.describe MetadataQueryController, type: :controller do
                 context 'cache' do
                   it 'updates server side cache' do
                     expect { run }
-                      .to change { Rails.cache.fetch("metadata:#{etag}") }
+                      .to(change { Rails.cache.fetch("metadata:#{etag}") })
                   end
                 end
               end
@@ -337,7 +342,7 @@ RSpec.describe MetadataQueryController, type: :controller do
                 context 'cache' do
                   it 'does not modify server side cache' do
                     expect { run }
-                      .not_to change { Rails.cache.fetch("metadata:#{etag}") }
+                      .not_to(change { Rails.cache.fetch("metadata:#{etag}") })
                   end
                 end
               end
@@ -422,18 +427,18 @@ RSpec.describe MetadataQueryController, type: :controller do
 
           context 'invalid entity_descriptor' do
             before do
-              get :specific_entity, instance: instance_identifier,
-                                    identifier: 'https://example.edu/shibboleth'
+              get :specific_entity, params: {
+                instance: instance_identifier,
+                identifier: 'https://example.edu/shibboleth'
+              }
             end
 
             context 'response' do
               subject { response }
               it { is_expected.to have_http_status(:not_found) }
               it 'has relevant MUST/SHOULD headers per specification' do
-                expect(subject.headers).to include(
-                  'Cache-Control' =>
-                    'max-age=600, private'
-                )
+                expect(subject.headers['Cache-Control'])
+                  .to eq('max-age=600, private')
               end
             end
           end
@@ -442,8 +447,10 @@ RSpec.describe MetadataQueryController, type: :controller do
         context 'invalid client request' do
           it_behaves_like 'invalid requests' do
             let(:query) do
-              get :specific_entity, instance: instance_identifier,
-                                    identifier: entity_id
+              get :specific_entity, params: {
+                instance: instance_identifier,
+                identifier: entity_id
+              }
             end
           end
         end
@@ -451,16 +458,20 @@ RSpec.describe MetadataQueryController, type: :controller do
 
       include_examples 'non get request' do
         let(:query) do
-          post :specific_entity, instance: instance_identifier,
-                                 identifier: entity_id
+          post :specific_entity, params: {
+            instance: instance_identifier,
+            identifier: entity_id
+          }
         end
       end
     end
 
     context 'With URI identifier' do
       def run
-        get :specific_entity, instance: instance_identifier,
-                              identifier: entity_id
+        get :specific_entity, params: {
+          instance: instance_identifier,
+          identifier: entity_id
+        }
       end
 
       context 'EntityDescriptor' do
@@ -482,8 +493,10 @@ RSpec.describe MetadataQueryController, type: :controller do
     context 'With sha1 identifier' do
       def run
         identifier = "{sha1}#{Digest::SHA1.hexdigest(entity_id)}"
-        get :specific_entity_sha1, instance: instance_identifier,
-                                   identifier: identifier
+        get :specific_entity_sha1, params: {
+          instance: instance_identifier,
+          identifier: identifier
+        }
       end
 
       context 'EntityDescriptor' do
@@ -512,18 +525,18 @@ RSpec.describe MetadataQueryController, type: :controller do
         context 'MetadataInstance has no entities matching tag' do
           before do
             request.accept = saml_content
-            get :tagged_entities, instance: instance_identifier,
-                                  identifier: secondary_tag
+            get :tagged_entities, params: {
+              instance: instance_identifier,
+              identifier: secondary_tag
+            }
           end
 
           context 'response' do
             subject { response }
             it { is_expected.to have_http_status(:not_found) }
             it 'has relevant MUST/SHOULD headers per specification' do
-              expect(subject.headers).to include(
-                'Cache-Control' =>
-                  'max-age=600, private'
-              )
+              expect(subject.headers['Cache-Control'])
+                .to eq('max-age=600, private')
             end
           end
         end
@@ -564,8 +577,10 @@ RSpec.describe MetadataQueryController, type: :controller do
           end
 
           def run
-            get :tagged_entities, instance: instance_identifier,
-                                  identifier: secondary_tag
+            get :tagged_entities, params: {
+              instance: instance_identifier,
+              identifier: secondary_tag
+            }
           end
 
           context 'initial request' do
@@ -581,7 +596,7 @@ RSpec.describe MetadataQueryController, type: :controller do
               context 'cache' do
                 it 'updates server side cache' do
                   expect { run }
-                    .to change { Rails.cache.fetch("metadata:#{etag}") }
+                    .to(change { Rails.cache.fetch("metadata:#{etag}") })
                 end
               end
 
@@ -622,7 +637,7 @@ RSpec.describe MetadataQueryController, type: :controller do
               context 'cache' do
                 it 'does not modify server side cache' do
                   expect { run }
-                    .not_to change { Rails.cache.fetch("metadata:#{etag}") }
+                    .not_to(change { Rails.cache.fetch("metadata:#{etag}") })
                 end
               end
             end
@@ -698,8 +713,10 @@ RSpec.describe MetadataQueryController, type: :controller do
       context 'invalid client request' do
         it_behaves_like 'invalid requests' do
           let(:query) do
-            get :tagged_entities, instance: instance_identifier,
-                                  identifier: secondary_tag
+            get :tagged_entities, params: {
+              instance: instance_identifier,
+              identifier: secondary_tag
+            }
           end
         end
       end
@@ -707,8 +724,10 @@ RSpec.describe MetadataQueryController, type: :controller do
 
     include_examples 'non get request' do
       let(:query) do
-        post :tagged_entities, instance: instance_identifier,
-                               identifier: secondary_tag
+        post :tagged_entities, params: {
+          instance: instance_identifier,
+          identifier: secondary_tag
+        }
       end
     end
   end

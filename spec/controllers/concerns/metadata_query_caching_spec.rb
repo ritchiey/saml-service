@@ -41,7 +41,7 @@ RSpec.describe MetadataQueryCaching do
     context 'when an entity changes its timestamp' do
       let(:replacement) do
         e = initial_entities.first
-        double(KnownEntity, id: e.id, updated_at: Time.now)
+        double(KnownEntity, id: e.id, updated_at: Time.zone.now)
       end
 
       let(:entities) { [mocked_entity, *initial_entities.drop(1)] }

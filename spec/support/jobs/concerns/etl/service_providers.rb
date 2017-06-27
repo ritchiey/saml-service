@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 RSpec.shared_examples 'ETL::ServiceProviders' do
   include_examples 'ETL::Common'
 
@@ -64,8 +65,8 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
       name: Faker::Lorem.word,
       is_required: false,
       reason: Faker::Lorem.word,
-      specificationRequired: ra[:specificationRequired] ||= false,
-      values: []
+      specification: ra[:specification] ||= false,
+      values: ra[:values]
     }
   end
 
@@ -110,7 +111,7 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
 
   let(:service_providers) { service_providers_list }
 
-  let(:sp_created_at) { Time.at(rand(Time.now.utc.to_i)) }
+  let(:sp_created_at) { Time.zone.at(rand(Time.now.utc.to_i)) }
 
   let(:entity_descriptor) { create :entity_descriptor }
 
@@ -130,14 +131,22 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
       {
         id: i,
         description: Faker::Lorem.sentence,
-        oid: "#{Faker::Number.number(4)}:#{Faker::Number.number(4)}"
+        oid: "#{Faker::Number.number(4)}:#{Faker::Number.number(4)}",
+        values: []
       }
     end.push(
       id: attribute_count,
       description: Faker::Lorem.sentence,
       oid: "#{Faker::Number.number(4)}:#{Faker::Number.number(4)}",
       values: [],
-      specificationRequired: true
+      specification: true
+    ).push(
+      id: attribute_count + 1,
+      description: Faker::Lorem.sentence,
+      oid: "#{Faker::Number.number(4)}:#{Faker::Number.number(4)}",
+      values: [{ approved: true, value: Faker::Number.number(4) },
+               { approved: false, value: Faker::Number.number(3) }],
+      specification: true
     )
   end
 
@@ -180,13 +189,13 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
       before { run }
 
       it 'is provided with attributes that are not acceptable' do
-        expect(attribute_instances.size).to eq(attribute_count + 1)
+        expect(attribute_instances.size).to eq(attribute_count + 2)
       end
 
       it 'requests expected number of attributes' do
         run
         expect(AttributeConsumingService.last.reload.requested_attributes.size)
-          .to eq(attribute_count)
+          .to eq(attribute_count + 1)
       end
 
       context 'assertion_consumer_services' do
@@ -270,23 +279,23 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
     include_examples 'updating MDUI content'
 
     it 'uses the existing instance' do
-      expect { run }.not_to change { SPSSODescriptor.count }
+      expect { run }.not_to(change { SPSSODescriptor.count })
     end
 
     it 'does not create more tags' do
-      expect { run }.not_to change { Tag.count }
+      expect { run }.not_to(change { Tag.count })
     end
 
     it 'updates assertion_consumer_services' do
-      expect { run }.to change { subject.reload.assertion_consumer_services }
+      expect { run }.to(change { subject.reload.assertion_consumer_services })
     end
 
     it 'updates discovery_response_services' do
-      expect { run }.to change { subject.reload.discovery_response_services }
+      expect { run }.to(change { subject.reload.discovery_response_services })
     end
 
     it 'updates attribute_consuming_services' do
-      expect { run }.to change { subject.reload.attribute_consuming_services }
+      expect { run }.to(change { subject.reload.attribute_consuming_services })
     end
   end
 end

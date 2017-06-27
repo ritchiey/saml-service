@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe UpdateEntitySource do
@@ -208,7 +209,7 @@ RSpec.describe UpdateEntitySource do
         it 'modifies KnownEntity updated_at' do
           Timecop.travel(1.second) do
             expect { run }
-              .to change { red.reload.known_entity.updated_at }
+              .to(change { red.reload.known_entity.updated_at })
           end
         end
 
@@ -245,14 +246,14 @@ RSpec.describe UpdateEntitySource do
           it 'updates the known_entity for this source' do
             Timecop.travel(1.second) do
               expect { run }
-                .to change { red.reload.known_entity.updated_at }
+                .to(change { red.reload.known_entity.updated_at })
             end
           end
 
           it 'does not update other known_entity instances' do
             Timecop.travel(1.second) do
-              expect { run }
-                .not_to change { additional_entity_reference.reload.updated_at }
+              other = additional_entity_reference
+              expect { run }.not_to(change { other.reload.updated_at })
             end
           end
         end
@@ -264,8 +265,11 @@ RSpec.describe UpdateEntitySource do
     let(:xml) { entities_descriptor(entities: 3) }
 
     it 'creates the raw entity descriptors' do
-      expect { run }.to change { subject.known_entities(true).count }.by(3)
-        .and change(RawEntityDescriptor, :count).by(3)
+      expect { run }.to(
+        change { subject.known_entities(true).count }
+          .by(3)
+          .and(change(RawEntityDescriptor, :count).by(3))
+      )
     end
 
     it 'uses the correct entity id' do
@@ -349,7 +353,7 @@ RSpec.describe UpdateEntitySource do
 
     it 'creates no records' do
       expect { swallow { run } }
-        .not_to change { KnownEntity.count + RawEntityDescriptor.count }
+        .not_to(change { KnownEntity.count + RawEntityDescriptor.count })
     end
 
     it 'raises an informative exception' do
@@ -373,8 +377,11 @@ RSpec.describe UpdateEntitySource do
     end
 
     it 'creates the entity record' do
-      expect { run }.to change { subject.known_entities(true).count }.by(1)
-        .and change(RawEntityDescriptor, :count).by(1)
+      expect { run }.to(
+        change { subject.known_entities(true).count }
+          .by(1)
+          .and(change(RawEntityDescriptor, :count).by(1))
+      )
     end
   end
 

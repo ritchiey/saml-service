@@ -1,12 +1,19 @@
 # frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe API::RawEntityDescriptorsController, type: :controller do
+  def unique_words(count)
+    words = []
+    words << Faker::Lorem.word until words.uniq.length == count
+    words.uniq
+  end
+
   describe 'patch :update' do
     let(:entity_source) { create(:entity_source) }
     let(:source_tag) { entity_source.source_tag }
 
-    let(:tags) { [Faker::Lorem.word, Faker::Lorem.word] }
+    let(:tags) { unique_words(2) }
     let(:host_name) { Faker::Internet.domain_name }
     let(:entity_id_uri) { "https://#{host_name}/shibboleth" }
     let(:base64_urlsafe_entity_id) { Base64.urlsafe_encode64(entity_id_uri) }
@@ -33,9 +40,11 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
         request.env['HTTP_X509_DN'] = "CN=#{api_subject.x509_cn}".dup
       end
 
-      patch :update, tag: source_tag,
-                     base64_urlsafe_entity_id: base64_urlsafe_entity_id,
-                     raw_entity_descriptor: raw_entity_descriptor
+      patch :update, as: :json, params: {
+        tag: source_tag,
+        base64_urlsafe_entity_id: base64_urlsafe_entity_id,
+        raw_entity_descriptor: raw_entity_descriptor
+      }
     end
 
     def swallow
@@ -50,7 +59,7 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
       subject { response }
       it { is_expected.to have_http_status(:forbidden) }
       it 'responds with a message' do
-        data = JSON.load(response.body)
+        data = JSON.parse(response.body)
         expect(data['message']).to match(/explicitly denied/)
       end
     end
@@ -222,7 +231,7 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
       end
 
       context 'when the raw entity descriptor exists' do
-        let(:original_tags) { [Faker::Lorem.word, Faker::Lorem.word] }
+        let(:original_tags) { unique_words(2) }
         let(:original_host_name) { Faker::Internet.domain_name }
         let(:original_enabled) { [true, false].sample }
         let(:original_xml) do
@@ -346,7 +355,7 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
           it 'invalidates the MDQ cache' do
             run
             Timecop.travel(1.second) do
-              expect { run }.to change { KnownEntity.last.updated_at }
+              expect { run }.to(change { KnownEntity.last.updated_at })
             end
           end
 

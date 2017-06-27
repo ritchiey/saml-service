@@ -17,4 +17,4 @@ class SyncCLI
   end
 end
 
-SyncCLI.perform(*ARGV) if __FILE__ == $PROGRAM_NAME
+SyncCLI.perform(*ARGV) if $PROGRAM_NAME == __FILE__
