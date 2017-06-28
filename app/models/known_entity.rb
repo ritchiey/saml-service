@@ -68,15 +68,17 @@ class KnownEntity < Sequel::Model
   end
 
   def update_derived_tags
-    current_tags = tags.reject(&:derived?).map(&:name)
+    current_derived_tags, current_tags =
+      tags.partition(&:derived?).map { |t| t.map(&:name) }
 
-    DerivedTag.all.each do |derived_tag|
-      if derived_tag.matches?(current_tags)
-        apply_derived_tag(derived_tag.tag_name)
-      else
-        remove_derived_tag(derived_tag.tag_name)
-      end
+    desired_derived_tags = DerivedTag.all.flat_map do |dt|
+      [dt.tag_name].select { dt.matches?(current_tags) }
     end
+
+    (current_derived_tags - desired_derived_tags)
+      .each { |tag| remove_derived_tag(tag) }
+
+    desired_derived_tags.each { |tag| apply_derived_tag(tag) }
   end
 
   private
