@@ -7,7 +7,8 @@ class DerivedTag < Sequel::Model
 
   def validate
     super
-    validates_presence %i[tag_name when_tags unless_tags created_at updated_at]
+    validates_presence %i[tag_name created_at updated_at]
+    validates_not_null %i[when_tags unless_tags]
     validates_format VALID_TAG, :tag_name
     validates_format VALID_TAG_LIST, %i[when_tags unless_tags]
   end
