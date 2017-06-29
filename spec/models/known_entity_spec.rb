@@ -248,12 +248,34 @@ RSpec.describe KnownEntity do
           before do
             tag_name = tags.sample
             Tag.where(known_entity: known_entity, name: tag_name).destroy
+
+            create(:derived_tag,
+                   tag_name: tag_name,
+                   when_tags: (tags - [tag_name]).join(','),
+                   unless_tags: negative_tags.join(','))
+
             known_entity.add_tag(name: tag_name, derived: true)
             known_entity.reload
           end
 
           it 'changes nothing' do
             expect { run }.not_to(change { tag_names })
+          end
+        end
+      end
+
+      context 'with another derived tag with the same name' do
+        context 'when the other tag does not match' do
+          let!(:other) do
+            create(:derived_tag,
+                   tag_name: derived_tag_name,
+                   when_tags: 'never-gonna-give-you-up',
+                   unless_tags: 'never-gonna-let-you-down')
+          end
+
+          it 'adds the derived tag' do
+            expect { run }.to change { tag_names }.to include(derived_tag_name)
+            expect(known_entity.tags.last).to have_attributes(derived: true)
           end
         end
       end
@@ -275,6 +297,17 @@ RSpec.describe KnownEntity do
             expect { run }.not_to(change { tag_names })
           end
         end
+      end
+    end
+
+    context 'when a derived tag is removed' do
+      before do
+        create_derived_tag
+        derived_tag.destroy
+      end
+
+      it 'removes the tag' do
+        expect { run }.to change { tag_names }.to not_include(derived_tag_name)
       end
     end
 

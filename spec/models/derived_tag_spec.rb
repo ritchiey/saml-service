@@ -9,8 +9,22 @@ RSpec.describe DerivedTag do
     subject { build(:derived_tag) }
 
     it { is_expected.to validate_presence(:tag_name) }
-    it { is_expected.to validate_presence(:when_tags) }
-    it { is_expected.to validate_presence(:unless_tags) }
+
+    it 'requires when_tags but allows blank' do
+      subject.when_tags = ''
+      expect(subject).to be_valid
+
+      subject.when_tags = nil
+      expect(subject).not_to be_valid
+    end
+
+    it 'requires unless_tags but allows blank' do
+      subject.unless_tags = ''
+      expect(subject).to be_valid
+
+      subject.unless_tags = nil
+      expect(subject).not_to be_valid
+    end
 
     it 'permits only a valid tag_name' do
       valid = SecureRandom.urlsafe_base64
