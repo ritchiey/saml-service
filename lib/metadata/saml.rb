@@ -391,7 +391,7 @@ module Metadata
         manage_name_id_service(slo)
       end
 
-      sso.name_id_formats { |ds| ds.order(:id) }.each do |ndif|
+      sso.name_id_formats { |ds| ds.order(:uri) }.each do |ndif|
         root.NameIDFormat(ndif.uri)
       end
     end
