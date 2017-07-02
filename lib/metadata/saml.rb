@@ -61,10 +61,21 @@ module Metadata
           signature_element
           entities_descriptor_extensions
 
-          filter_known_entities(known_entities).each do |ke|
-            known_entity(ke)
-          end
+          render_known_entities(known_entity_list(known_entities))
         end
+      end
+    end
+
+    def render_known_entities(known_entity_list)
+      known_entity_list.each do |e|
+        entity_descriptor(e) if e.instance_of? EntityDescriptor
+        raw_entity_descriptor(e) if e.instance_of? RawEntityDescriptor
+      end
+    end
+
+    def known_entity_list(known_entities)
+      filter_known_entities(known_entities).map do |ke_list|
+        known_entity(ke_list)
       end
     end
 
@@ -82,8 +93,8 @@ module Metadata
     # Lowest rank for EntitySource where multiple instances of
     # EntityDescriptor represented by the same EntityId exist is authoritative.
     def filter_known_entities(known_entities)
-      group_by_eid(known_entities).flat_map do |_, entities|
-        sort_eid_hash_by_source_rank(entities).first
+      group_by_eid(known_entities).map do |_, entities|
+        sort_eid_hash_by_source_rank(entities)
       end
     end
 
@@ -95,11 +106,12 @@ module Metadata
       entities.sort_by { |ke| ke.entity_source.try(:rank) }
     end
 
-    def known_entity(ke)
-      if ke.entity_descriptor.try(:functioning?)
-        entity_descriptor(ke.entity_descriptor)
-      elsif ke.raw_entity_descriptor.try(:functioning?)
-        raw_entity_descriptor(ke.raw_entity_descriptor)
+    def known_entity(known_entity_by_rank)
+      known_entity_by_rank.each do |ke|
+        ed = ke.entity_descriptor
+        rad = ke.raw_entity_descriptor
+        return ed if ed.try(:functioning?)
+        return rad if rad.try(:functioning?)
       end
     end
 

@@ -80,29 +80,61 @@ RSpec.describe Metadata::SAML do
     end
 
     context 'with the same EntityDescriptor from multiple sources' do
-      let(:external_entity_source) do
-        create :entity_source, rank: entity_source.rank + 1
-      end
+      let(:rank) { entity_source.rank + [1, -1].sample }
+      let(:external_entity_source) { create :entity_source, rank: rank }
+      let(:entity) { entity_source.known_entities.first }
+      let(:entity_id) { entity.entity_id }
+      let(:enabled) { [true, false].sample }
 
       before do
         idp = create(:basic_federation_entity, :idp,
-                     entity_source: external_entity_source, enabled: true)
+                     entity_source: external_entity_source, enabled: enabled)
 
-        idp.entity_descriptor.entity_id
-           .update(uri: entity_source.known_entities.first.entity_id)
+        idp.entity_descriptor.entity_id.update(uri: entity_id)
 
         entity_source.known_entities.each { |ke| ke.tag_as(tag) }
         external_entity_source.known_entities.each { |ke| ke.tag_as(tag) }
       end
 
+      let(:external_entity) { external_entity_source.known_entities.first }
+
+      let(:entity_ordered_by_rank) do
+        [entity, external_entity].sort_by { |e| e.entity_source.try(:rank) }
+      end
+
+      let(:other_entities) do
+        entity_source.known_entities.tap { |a| a.delete(entity) }
+      end
+
+      describe '#filter_known_entities' do
+        let(:other_entities_as_list) { other_entities.map { |e| [e] } }
+
+        it 'returns enabled and disabled entities as lists ordered by rank' do
+          expect(subject.filter_known_entities(all_tagged_known_entities))
+            .to eq([entity_ordered_by_rank, *other_entities_as_list])
+        end
+      end
+
+      describe '#known_entity_list' do
+        let(:highest_ranked_functioning_entity) do
+          entity_ordered_by_rank.find { |e| e.entity_descriptor.functioning? }
+        end
+
+        let(:expected_entity_descriptors) do
+          [highest_ranked_functioning_entity, *other_entities]
+            .map(&:entity_descriptor)
+        end
+
+        it 'returns functional entities ordered by rank' do
+          result = subject.known_entity_list(all_tagged_known_entities)
+
+          expect(result).to eq(expected_entity_descriptors)
+        end
+      end
+
       include_examples 'EntitiesDescriptor xml' do
         it 'has 6 known entities' do
           expect(KnownEntity.with_all_tags(tag).length).to eq(6)
-        end
-
-        it 'only uses entities from the lowest ranked entity source' do
-          expect(subject.filter_known_entities(all_tagged_known_entities))
-            .to eq(entity_source.known_entities)
         end
       end
     end
