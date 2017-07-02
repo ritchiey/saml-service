@@ -378,16 +378,14 @@ module Metadata
     def sso_descriptor(sso, scope)
       role_descriptor(sso, scope)
 
-      acss = sso.artifact_resolution_services { |ds| ds.order(:index, :id) }
-      acss.each do |ars|
-        artifact_resolution_service(ars)
-      end
+      sso.artifact_resolution_services { |ds| ds.order(:index, :location) }
+         .each { |ars| artifact_resolution_service(ars) }
 
-      sso.single_logout_services { |ds| ds.order(:id) }.each do |slo|
+      sso.single_logout_services { |ds| ds.order(:location) }.each do |slo|
         single_logout_service(slo)
       end
 
-      sso.manage_name_id_services { |ds| ds.order(:id) }.each do |slo|
+      sso.manage_name_id_services { |ds| ds.order(:location) }.each do |slo|
         manage_name_id_service(slo)
       end
 
