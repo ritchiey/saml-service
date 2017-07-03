@@ -20,7 +20,7 @@ module Metadata
         scope.parent[:FriendlyName] = attr.friendly_name
       end
 
-      attr.attribute_values { |ds| ds.order(:id) }.each do |attr_val|
+      attr.attribute_values { |ds| ds.order(:value) }.each do |attr_val|
         attribute_value(attr_val)
       end
     end
@@ -185,7 +185,7 @@ module Metadata
 
     def key_authority(ed)
       shibmd.KeyAuthority(VerifyDepth: ed.ca_verify_depth) do |_|
-        ed.ca_key_infos { |ds| ds.order(:id) }.each do |ca|
+        ed.ca_key_infos { |ds| ds.order(:data) }.each do |ca|
           key_info(ca)
         end
       end
@@ -296,7 +296,7 @@ module Metadata
                                .registration_instant_utc.xmlschema
       }
       mdrpi.RegistrationInfo(ns, attributes) do |_|
-        rps = mi.registration_info.registration_policies { |ds| ds.order(:id) }
+        rps = mi.registration_info.registration_policies { |ds| ds.order(:uri) }
         rps.each do |rp|
           mdrpi.RegistrationPolicy(rp.uri, 'xml:lang' => rp.lang)
         end
@@ -305,15 +305,15 @@ module Metadata
 
     def organization(org)
       root.Organization(ns) do |_|
-        org.organization_names { |ds| ds.order(:id) }.each do |name|
+        org.organization_names { |ds| ds.order(:value) }.each do |name|
           root.OrganizationName(name.value, 'xml:lang' => name.lang)
         end
 
-        org.organization_display_names { |ds| ds.order(:id) }.each do |dname|
+        org.organization_display_names { |ds| ds.order(:value) }.each do |dname|
           root.OrganizationDisplayName(dname.value, 'xml:lang' => dname.lang)
         end
 
-        org.organization_urls { |ds| ds.order(:id) }.each do |url|
+        org.organization_urls { |ds| ds.order(:uri) }.each do |url|
           root.OrganizationURL(url.uri, 'xml:lang' => url.lang)
         end
       end
@@ -354,7 +354,7 @@ module Metadata
         ui_info(rd.ui_info) if rd.ui_info.present?
 
         if rd.scopes?
-          rd.scopes { |ds| ds.order(:id) }.each do |s|
+          rd.scopes { |ds| ds.order(:value) }.each do |s|
             shibmd_scope(s)
           end
         end
@@ -366,8 +366,8 @@ module Metadata
 
         # SPSSODescriptor specific
         if rd.is_a? SPSSODescriptor
-          rdss = rd.discovery_response_services { |ds| ds.order(:index, :id) }
-          rdss.each do |rds|
+          rd.discovery_response_services { |ds| ds.order(:index, :location) }
+            .each do |rds|
             idpdisc.DiscoveryResponse do |rds_node|
               indexed_endpoint(rds, rds_node)
             end
@@ -390,20 +390,18 @@ module Metadata
     def sso_descriptor(sso, scope)
       role_descriptor(sso, scope)
 
-      acss = sso.artifact_resolution_services { |ds| ds.order(:index, :id) }
-      acss.each do |ars|
-        artifact_resolution_service(ars)
-      end
+      sso.artifact_resolution_services { |ds| ds.order(:index, :location) }
+         .each { |ars| artifact_resolution_service(ars) }
 
-      sso.single_logout_services { |ds| ds.order(:id) }.each do |slo|
+      sso.single_logout_services { |ds| ds.order(:location) }.each do |slo|
         single_logout_service(slo)
       end
 
-      sso.manage_name_id_services { |ds| ds.order(:id) }.each do |slo|
+      sso.manage_name_id_services { |ds| ds.order(:location) }.each do |slo|
         manage_name_id_service(slo)
       end
 
-      sso.name_id_formats { |ds| ds.order(:id) }.each do |ndif|
+      sso.name_id_formats { |ds| ds.order(:uri) }.each do |ndif|
         root.NameIDFormat(ndif.uri)
       end
     end
@@ -444,25 +442,19 @@ module Metadata
       root.IDPSSODescriptor(ns) do |idp_node|
         sso_descriptor(idp, idp_node)
 
-        idp.single_sign_on_services { |ds| ds.order(:id) }.each do |ssos|
-          single_sign_on_service(ssos)
-        end
+        idp.single_sign_on_services { |ds| ds.order(:location) }
+           .each { |ssos| single_sign_on_service(ssos) }
 
-        idp.name_id_mapping_services { |ds| ds.order(:id) }.each do |nidms|
-          name_id_mapping_service(nidms)
-        end
+        idp.name_id_mapping_services { |ds| ds.order(:location) }
+           .each { |nidms| name_id_mapping_service(nidms) }
 
-        idp.assertion_id_request_services { |ds| ds.order(:id) }.each do |aidrs|
-          assertion_id_request_service(aidrs)
-        end
+        idp.assertion_id_request_services { |ds| ds.order(:location) }
+           .each { |aidrs| assertion_id_request_service(aidrs) }
 
-        idp.attribute_profiles { |ds| ds.order(:id) }.each do |ap|
-          root.AttributeProfile(ap.uri)
-        end
+        idp.attribute_profiles { |ds| ds.order(:uri) }
+           .each { |ap| root.AttributeProfile(ap.uri) }
 
-        idp.attributes { |ds| ds.order(:name) }.each do |a|
-          attribute(a)
-        end
+        idp.attributes { |ds| ds.order(:name) }.each { |a| attribute(a) }
       end
     end
 
@@ -488,14 +480,16 @@ module Metadata
       root.SPSSODescriptor(ns) do |sp_node|
         sso_descriptor(sp, sp_node)
 
-        acss = sp.assertion_consumer_services { |ds| ds.order(:index, :id) }
-        acss.each do |acs|
-          assertion_consumer_service(acs)
-        end
+        sp.assertion_consumer_services { |ds| ds.order(:index, :location) }
+          .each { |acs| assertion_consumer_service(acs) }
 
-        sp.attribute_consuming_services { |ds| ds.order(:id) }.each do |attrcs|
-          attribute_consuming_service(attrcs)
+        acs = sp.attribute_consuming_services do |ds|
+          ds.qualify
+            .association_join(:service_names)
+            .order(Sequel.qualify(:service_names, :value))
+            .distinct
         end
+        acs.each { |attrcs| attribute_consuming_service(attrcs) }
       end
     end
 
@@ -511,16 +505,15 @@ module Metadata
         isDefault: acs.default
       }
       root.AttributeConsumingService(ns, attributes) do |_acs_node|
-        acs.service_names { |ds| ds.order(:id) }.each do |service_name|
+        acs.service_names { |ds| ds.order(:value) }.each do |service_name|
           root.ServiceName(service_name.value, 'xml:lang' => service_name.lang)
         end
 
-        acs.service_descriptions { |ds| ds.order(:id) }.each do |service_desc|
-          root.ServiceDescription(service_desc.value,
-                                  'xml:lang' => service_desc.lang)
+        acs.service_descriptions { |ds| ds.order(:value) }.each do |desc|
+          root.ServiceDescription(desc.value, 'xml:lang' => desc.lang)
         end
 
-        acs.requested_attributes { |ds| ds.order(:id) }.each do |ra|
+        acs.requested_attributes { |ds| ds.order(:name) }.each do |ra|
           requested_attribute(ra)
         end
       end
@@ -537,19 +530,18 @@ module Metadata
       root.AttributeAuthorityDescriptor(ns) do |aad_node|
         role_descriptor(aad, aad_node)
 
-        aad.attribute_services { |ds| ds.order(:id) }.each do |as|
+        aad.attribute_services { |ds| ds.order(:location) }.each do |as|
           attribute_service(as)
         end
 
-        aad.assertion_id_request_services { |ds| ds.order(:id) }.each do |aidrs|
-          assertion_id_request_service(aidrs)
-        end
+        aad.assertion_id_request_services { |ds| ds.order(:location) }
+           .each { |aidrs| assertion_id_request_service(aidrs) }
 
         aad.name_id_formats { |ds| ds.order(:uri) }.each do |nidf|
           root.NameIDFormat(nidf.uri)
         end
 
-        aad.attribute_profiles { |ds| ds.order(:id) }.each do |ap|
+        aad.attribute_profiles { |ds| ds.order(:uri) }.each do |ap|
           root.AttributeProfile(ap.uri)
         end
 
@@ -571,29 +563,29 @@ module Metadata
 
     def ui_info(info)
       mdui.UIInfo(ns) do |_|
-        info.display_names { |ds| ds.order(:id) }.each do |display_name|
+        info.display_names { |ds| ds.order(:value) }.each do |display_name|
           mdui.DisplayName(display_name.value, 'xml:lang' => display_name.lang)
         end
 
-        info.descriptions { |ds| ds.order(:id) }.each do |description|
+        info.descriptions { |ds| ds.order(:value) }.each do |description|
           mdui.Description(description.value, 'xml:lang' => description.lang)
         end
 
-        info.keyword_lists { |ds| ds.order(:id) }.each do |keywords|
+        info.keyword_lists { |ds| ds.order(:content) }.each do |keywords|
           mdui.Keywords(keywords.content, 'xml:lang' => keywords.lang)
         end
 
-        info.logos { |ds| ds.order(:id) }.each do |logo|
+        info.logos { |ds| ds.order(:uri) }.each do |logo|
           attributes = { height: logo.height, width: logo.width }
           attributes['xml:lang'] = logo.lang if logo.lang.present?
           mdui.Logo(logo.uri, attributes)
         end
 
-        info.information_urls { |ds| ds.order(:id) }.each do |url|
+        info.information_urls { |ds| ds.order(:uri) }.each do |url|
           mdui.InformationURL(url.uri, 'xml:lang' => url.lang)
         end
 
-        info.privacy_statement_urls { |ds| ds.order(:id) }.each do |url|
+        info.privacy_statement_urls { |ds| ds.order(:uri) }.each do |url|
           mdui.PrivacyStatementURL(url.uri, 'xml:lang' => url.lang)
         end
       end
@@ -601,15 +593,15 @@ module Metadata
 
     def disco_hints(disco)
       mdui.DiscoHints(ns) do |_|
-        disco.ip_hints { |ds| ds.order(:id) }.each do |ip_hint|
+        disco.ip_hints { |ds| ds.order(:block) }.each do |ip_hint|
           mdui.IPHint(ip_hint.block)
         end
 
-        disco.domain_hints { |ds| ds.order(:id) }.each do |domain_hint|
+        disco.domain_hints { |ds| ds.order(:domain) }.each do |domain_hint|
           mdui.DomainHint(domain_hint.domain)
         end
 
-        disco.geolocation_hints { |ds| ds.order(:id) }.each do |gh|
+        disco.geolocation_hints { |ds| ds.order(:uri) }.each do |gh|
           mdui.GeolocationHint(gh.uri)
         end
       end
