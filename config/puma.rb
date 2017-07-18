@@ -9,8 +9,8 @@ preload_app!
 daemonize
 
 bind puma_config['bind']
-workers 2
-threads 8, 32
+workers 3
+threads 1, 1
 tag 'saml'
 pidfile 'tmp/pids/puma.pid'
 
