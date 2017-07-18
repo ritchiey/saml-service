@@ -29,7 +29,7 @@ gem 'jbuilder'
 gem 'bcrypt', '~> 3.1'
 
 gem 'god', require: false
-gem 'unicorn', require: false
+gem 'puma', require: false
 
 group :development, :test do
   gem 'capybara'
