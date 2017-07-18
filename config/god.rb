@@ -28,7 +28,7 @@ end
 God.watch do |w|
   defaults(w, 'puma')
 
-  w.start = "bundle exec puma -C config/puma.rb"
+  w.start = 'bundle exec puma -C config/puma.rb'
   w.restart = -> { God.registry['puma'].signal('USR2') }
 
   w.env = { 'RAILS_ENV' => RAILS_ENV }
