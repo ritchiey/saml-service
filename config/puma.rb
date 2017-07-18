@@ -11,7 +11,7 @@ daemonize
 bind puma_config['bind']
 workers 2
 threads 8, 32
-tag 'hostedidp'
+tag 'saml'
 pidfile 'tmp/pids/puma.pid'
 
 stdout_redirect puma_config['stdout'],
