@@ -1,2 +1,5 @@
 ---
-unicorn_port: 8080
+puma:
+  bind: tcp://0.0.0.0:8080
+  stdout: log/stdout.log
+  stderr: log/stderr.log
