@@ -8,8 +8,7 @@ module API
       Sequel::Model.db.transaction(isolation: :repeatable) do
         public_action
         @identity_provider_entities =
-          ed_containing_idp.select(&:functioning?) +
-          red_containing_idp.select(&:functioning?)
+          filter_by_rank(ed_containing_idp + red_containing_idp)
         @service_provider_entities =
           ed_containing_sp.select(&:functioning?) +
           red_containing_sp.select(&:functioning?)
@@ -53,6 +52,26 @@ module API
     private_constant :COMMON_EAGER_FETCH, :SP_EAGER_FETCH, :IDP_EAGER_FETCH,
                      :RAW_COMMON_EAGER_FETCH, :RAW_IDP_EAGER_FETCH,
                      :RAW_SP_EAGER_FETCH
+
+    def filter_by_rank(entities)
+      entities.collect(&:known_entity)
+              .uniq
+              .group_by(&:entity_id)
+              .map { |_, es| known_entity(order_known_entities_by_rank(es)) }
+    end
+
+    def order_known_entities_by_rank(entities)
+      entities.sort_by { |ke| ke.entity_source.try(:rank) }
+    end
+
+    def known_entity(known_entities_by_rank)
+      known_entities_by_rank.each do |ke|
+        ed = ke.entity_descriptor
+        rad = ke.raw_entity_descriptor
+        return ed if ed.try(:functioning?)
+        return rad if rad.try(:functioning?)
+      end
+    end
 
     def ed_containing_sp
       entities_with_role_descriptor(:sp_sso_descriptors)
