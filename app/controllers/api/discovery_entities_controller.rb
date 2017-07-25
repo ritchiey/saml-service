@@ -54,7 +54,6 @@ module API
 
     def filter_by_rank(entities)
       entities.collect(&:known_entity)
-              .uniq
               .group_by(&:entity_id)
               .map { |_, es| known_entity(order_known_entities_by_rank(es)) }
     end
