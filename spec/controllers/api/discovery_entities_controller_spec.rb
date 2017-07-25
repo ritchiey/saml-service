@@ -32,8 +32,13 @@ RSpec.describe API::DiscoveryEntitiesController, type: :controller do
   let!(:service_provider) do
     create(:entity_descriptor, known_entity: sp_known_entity)
   end
+
+  let(:raw_ed_sp_known_entity) do
+    create(:known_entity, entity_source: entity_source)
+  end
+
   let!(:raw_ed_sp) do
-    create(:raw_entity_descriptor_sp, known_entity: sp_known_entity)
+    create(:raw_entity_descriptor_sp, known_entity: raw_ed_sp_known_entity)
   end
 
   let!(:sp_sso_descriptor) do
@@ -43,6 +48,10 @@ RSpec.describe API::DiscoveryEntitiesController, type: :controller do
   let!(:other_identity_provider) {}
   let!(:other_idp_sso_descriptor) {}
   let!(:other_raw_ed_idp) {}
+
+  let!(:other_service_provider) {}
+  let!(:other_sp_sso_descriptor) {}
+  let!(:other_raw_ed_sp) {}
 
   before do
     request.env['HTTP_X509_DN'] = "CN=#{api_subject.x509_cn}".dup if api_subject
@@ -115,9 +124,17 @@ RSpec.describe API::DiscoveryEntitiesController, type: :controller do
     context 'with other entity source' do
       let!(:other_entity_source) { create(:entity_source, rank: other_rank) }
 
+      let!(:other_idp_enabled) { false }
+      let!(:other_sp_enabled) { false }
+
       let!(:other_idp_known_entity) do
         create(:known_entity, entity_source: other_entity_source,
                               enabled: other_idp_enabled)
+      end
+
+      let!(:other_sp_known_entity) do
+        create(:known_entity, entity_source: other_entity_source,
+                              enabled: other_sp_enabled)
       end
 
       context 'other ed-idp same entity id as existing ed-idp' do
@@ -296,6 +313,187 @@ RSpec.describe API::DiscoveryEntitiesController, type: :controller do
               expect(assigns[:identity_provider_entities])
                 .to include(raw_ed_idp)
                 .and not_include(other_raw_ed_idp)
+            end
+          end
+        end
+      end
+
+      context 'other ed-sp same entity id as existing ed-sp' do
+        let!(:other_service_provider) do
+          other = create(:entity_descriptor,
+                         known_entity: other_sp_known_entity,
+                         enabled: other_sp_enabled)
+          other.entity_id.update(uri: service_provider.entity_id.uri)
+          other
+        end
+
+        let!(:other_sp_sso_descriptor) do
+          create(:sp_sso_descriptor,
+                 entity_descriptor: other_service_provider)
+        end
+
+        context 'other has lower rank' do
+          let!(:other_rank) { entity_source.rank - 1 }
+
+          context 'but not functional' do
+            let!(:other_sp_enabled) { false }
+
+            it 'includes the original, ignores other' do
+              expect(assigns[:service_provider_entities])
+                .to include(service_provider)
+                .and not_include(other_service_provider)
+            end
+          end
+
+          context 'and is functional' do
+            let!(:other_sp_enabled) { true }
+
+            it 'includes the other, ignores original' do
+              expect(assigns[:service_provider_entities])
+                .to include(other_service_provider)
+                .and not_include(service_provider)
+            end
+          end
+        end
+
+        context 'other has higher rank' do
+          let!(:other_rank) { entity_source.rank + 1 }
+
+          context 'but not functional' do
+            let!(:other_sp_enabled) { false }
+
+            it 'includes the original, ignores other' do
+              expect(assigns[:service_provider_entities])
+                .to include(service_provider)
+                .and not_include(other_service_provider)
+            end
+          end
+
+          context 'and is functional' do
+            let!(:other_sp_enabled) { true }
+
+            it 'includes the original, ignores other' do
+              expect(assigns[:service_provider_entities])
+                .to include(service_provider)
+                .and not_include(other_service_provider)
+            end
+          end
+        end
+      end
+
+      context 'other rad-sp with same entity id as rad-sp' do
+        let!(:other_raw_ed_sp) do
+          other = create(:raw_entity_descriptor_sp,
+                         known_entity: other_sp_known_entity,
+                         enabled: other_sp_enabled,
+                         sp: true)
+          other.entity_id.update(uri: raw_ed_sp.entity_id.uri)
+          other
+        end
+
+        context 'other has lower rank' do
+          let!(:other_rank) { entity_source.rank - 1 }
+
+          context 'but not functional' do
+            let!(:other_sp_enabled) { false }
+
+            it 'includes the original, ignores other' do
+              expect(assigns[:service_provider_entities])
+                .to include(raw_ed_sp)
+                .and not_include(other_raw_ed_sp)
+            end
+          end
+
+          context 'and is functional' do
+            let!(:other_sp_enabled) { true }
+
+            it 'includes the other, ignores original' do
+              expect(assigns[:service_provider_entities])
+                .to include(other_raw_ed_sp)
+                .and not_include(raw_ed_sp)
+            end
+          end
+        end
+
+        context 'other has higher rank' do
+          let!(:other_rank) { entity_source.rank + 1 }
+
+          context 'but not functional' do
+            let!(:other_sp_enabled) { false }
+
+            it 'includes the original, ignores other' do
+              expect(assigns[:service_provider_entities])
+                .to include(raw_ed_sp)
+                .and not_include(other_raw_ed_sp)
+            end
+          end
+
+          context 'and is functional' do
+            let!(:other_sp_enabled) { true }
+
+            it 'includes the original, ignores other' do
+              expect(assigns[:service_provider_entities])
+                .to include(raw_ed_sp)
+                .and not_include(other_raw_ed_sp)
+            end
+          end
+        end
+      end
+
+      context 'other rad-sp with same entity id as ed-sp' do
+        let!(:other_raw_ed_sp) do
+          other = create(:raw_entity_descriptor_sp,
+                         known_entity: other_sp_known_entity,
+                         enabled: other_sp_enabled,
+                         sp: true)
+          other.entity_id.update(uri: service_provider.entity_id.uri)
+          other
+        end
+
+        context 'other (rad-sp) has lower rank than ed-sp' do
+          let!(:other_rank) { entity_source.rank - 1 }
+
+          context 'but not functional' do
+            let!(:other_sp_enabled) { false }
+
+            it 'includes ed-sp, ignores rad-sp' do
+              expect(assigns[:service_provider_entities])
+                .to include(service_provider)
+                .and not_include(other_raw_ed_sp)
+            end
+          end
+
+          context 'and is functional' do
+            let!(:other_sp_enabled) { true }
+
+            it 'includes the rad-sp, ignores ed-sp' do
+              expect(assigns[:service_provider_entities])
+                .to include(other_raw_ed_sp)
+                .and not_include(service_provider)
+            end
+          end
+        end
+
+        context 'other (rad-sp) has higher rank than ed-sp' do
+          let!(:other_rank) { entity_source.rank + 1 }
+
+          context 'but not functional' do
+            let!(:other_sp_enabled) { false }
+
+            it 'includes ed-sp, ignores rad-sp' do
+              expect(assigns[:service_provider_entities])
+                .to include(service_provider)
+                .and not_include(other_raw_ed_sp)
+            end
+          end
+
+          context 'and is functional' do
+            let!(:other_sp_enabled) { true }
+
+            it 'includes ed-sp, ignores rad-sp' do
+              expect(assigns[:service_provider_entities])
+                .to include(raw_ed_sp)
+                .and not_include(other_raw_ed_sp)
             end
           end
         end

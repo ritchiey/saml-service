@@ -10,8 +10,7 @@ module API
         @identity_provider_entities =
           filter_by_rank(ed_containing_idp + red_containing_idp)
         @service_provider_entities =
-          ed_containing_sp.select(&:functioning?) +
-          red_containing_sp.select(&:functioning?)
+          filter_by_rank(ed_containing_sp + red_containing_sp)
       end
     end
 
