@@ -157,7 +157,7 @@ RSpec.describe API::DiscoveryEntitiesController, type: :controller do
           context 'but not functional' do
             let!(:other_idp_enabled) { false }
 
-            it 'includes the original, ignores other' do
+            it 'includes existing, ignores other' do
               expect(assigns[:identity_provider_entities])
                 .to include(identity_provider)
                 .and not_include(other_identity_provider)
@@ -167,7 +167,7 @@ RSpec.describe API::DiscoveryEntitiesController, type: :controller do
           context 'and is functional' do
             let!(:other_idp_enabled) { true }
 
-            it 'includes the other, ignores original' do
+            it 'includes other, ignores existing' do
               expect(assigns[:identity_provider_entities])
                 .to include(other_identity_provider)
                 .and not_include(identity_provider)
@@ -181,7 +181,7 @@ RSpec.describe API::DiscoveryEntitiesController, type: :controller do
           context 'but not functional' do
             let!(:other_idp_enabled) { false }
 
-            it 'includes the original, ignores other' do
+            it 'includes existing, ignores other' do
               expect(assigns[:identity_provider_entities])
                 .to include(identity_provider)
                 .and not_include(other_identity_provider)
@@ -191,7 +191,7 @@ RSpec.describe API::DiscoveryEntitiesController, type: :controller do
           context 'and is functional' do
             let!(:other_idp_enabled) { true }
 
-            it 'includes the original, ignores other' do
+            it 'includes existing, ignores other' do
               expect(assigns[:identity_provider_entities])
                 .to include(identity_provider)
                 .and not_include(other_identity_provider)
@@ -216,7 +216,7 @@ RSpec.describe API::DiscoveryEntitiesController, type: :controller do
           context 'but not functional' do
             let!(:other_idp_enabled) { false }
 
-            it 'includes the original, ignores other' do
+            it 'includes existing, ignores other' do
               expect(assigns[:identity_provider_entities])
                 .to include(raw_ed_idp)
                 .and not_include(other_raw_ed_idp)
@@ -226,7 +226,7 @@ RSpec.describe API::DiscoveryEntitiesController, type: :controller do
           context 'and is functional' do
             let!(:other_idp_enabled) { true }
 
-            it 'includes the other, ignores original' do
+            it 'includes other, ignores existing' do
               expect(assigns[:identity_provider_entities])
                 .to include(other_raw_ed_idp)
                 .and not_include(raw_ed_idp)
@@ -240,7 +240,7 @@ RSpec.describe API::DiscoveryEntitiesController, type: :controller do
           context 'but not functional' do
             let!(:other_idp_enabled) { false }
 
-            it 'includes the original, ignores other' do
+            it 'includes existing, ignores other' do
               expect(assigns[:identity_provider_entities])
                 .to include(raw_ed_idp)
                 .and not_include(other_raw_ed_idp)
@@ -250,7 +250,7 @@ RSpec.describe API::DiscoveryEntitiesController, type: :controller do
           context 'and is functional' do
             let!(:other_idp_enabled) { true }
 
-            it 'includes the original, ignores other' do
+            it 'includes existing, ignores other' do
               expect(assigns[:identity_provider_entities])
                 .to include(raw_ed_idp)
                 .and not_include(other_raw_ed_idp)
@@ -259,7 +259,7 @@ RSpec.describe API::DiscoveryEntitiesController, type: :controller do
         end
       end
 
-      context 'other rad-idp with same entity id as ed-idp' do
+      context 'rad-idp with same entity id as ed-idp' do
         let!(:other_raw_ed_idp) do
           other = create(:raw_entity_descriptor_idp,
                          known_entity: other_idp_known_entity,
@@ -269,10 +269,10 @@ RSpec.describe API::DiscoveryEntitiesController, type: :controller do
           other
         end
 
-        context 'other (rad-idp) has lower rank than ed-idp' do
+        context 'rad-idp has lower rank than ed-idp' do
           let!(:other_rank) { entity_source.rank - 1 }
 
-          context 'but not functional' do
+          context 'but rad-idp not functional' do
             let!(:other_idp_enabled) { false }
 
             it 'includes ed-idp, ignores rad-idp' do
@@ -282,10 +282,10 @@ RSpec.describe API::DiscoveryEntitiesController, type: :controller do
             end
           end
 
-          context 'and is functional' do
+          context 'and rad-idp is functional' do
             let!(:other_idp_enabled) { true }
 
-            it 'includes the rad-idp, ignores ed-idp' do
+            it 'includes rad-idp, ignores ed-idp' do
               expect(assigns[:identity_provider_entities])
                 .to include(other_raw_ed_idp)
                 .and not_include(identity_provider)
@@ -293,10 +293,10 @@ RSpec.describe API::DiscoveryEntitiesController, type: :controller do
           end
         end
 
-        context 'other (rad-idp) has higher rank than ed-idp' do
+        context 'rad-idp has higher rank than ed-idp' do
           let!(:other_rank) { entity_source.rank + 1 }
 
-          context 'but not functional' do
+          context 'but rad-idp not functional' do
             let!(:other_idp_enabled) { false }
 
             it 'includes ed-idp, ignores rad-idp' do
@@ -306,7 +306,7 @@ RSpec.describe API::DiscoveryEntitiesController, type: :controller do
             end
           end
 
-          context 'and is functional' do
+          context 'and rad-idp is functional' do
             let!(:other_idp_enabled) { true }
 
             it 'includes ed-idp, ignores rad-idp' do
@@ -338,17 +338,17 @@ RSpec.describe API::DiscoveryEntitiesController, type: :controller do
           context 'but not functional' do
             let!(:other_sp_enabled) { false }
 
-            it 'includes the original, ignores other' do
+            it 'includes existing, ignores other' do
               expect(assigns[:service_provider_entities])
                 .to include(service_provider)
                 .and not_include(other_service_provider)
             end
           end
 
-          context 'and is functional' do
+          context 'and other is functional' do
             let!(:other_sp_enabled) { true }
 
-            it 'includes the other, ignores original' do
+            it 'includes other, ignores existing' do
               expect(assigns[:service_provider_entities])
                 .to include(other_service_provider)
                 .and not_include(service_provider)
@@ -362,7 +362,7 @@ RSpec.describe API::DiscoveryEntitiesController, type: :controller do
           context 'but not functional' do
             let!(:other_sp_enabled) { false }
 
-            it 'includes the original, ignores other' do
+            it 'includes existing, ignores other' do
               expect(assigns[:service_provider_entities])
                 .to include(service_provider)
                 .and not_include(other_service_provider)
@@ -372,7 +372,7 @@ RSpec.describe API::DiscoveryEntitiesController, type: :controller do
           context 'and is functional' do
             let!(:other_sp_enabled) { true }
 
-            it 'includes the original, ignores other' do
+            it 'includes existing, ignores other' do
               expect(assigns[:service_provider_entities])
                 .to include(service_provider)
                 .and not_include(other_service_provider)
@@ -397,7 +397,7 @@ RSpec.describe API::DiscoveryEntitiesController, type: :controller do
           context 'but not functional' do
             let!(:other_sp_enabled) { false }
 
-            it 'includes the original, ignores other' do
+            it 'includes existing, ignores other' do
               expect(assigns[:service_provider_entities])
                 .to include(raw_ed_sp)
                 .and not_include(other_raw_ed_sp)
@@ -407,7 +407,7 @@ RSpec.describe API::DiscoveryEntitiesController, type: :controller do
           context 'and is functional' do
             let!(:other_sp_enabled) { true }
 
-            it 'includes the other, ignores original' do
+            it 'includes other, ignores existing' do
               expect(assigns[:service_provider_entities])
                 .to include(other_raw_ed_sp)
                 .and not_include(raw_ed_sp)
@@ -421,7 +421,7 @@ RSpec.describe API::DiscoveryEntitiesController, type: :controller do
           context 'but not functional' do
             let!(:other_sp_enabled) { false }
 
-            it 'includes the original, ignores other' do
+            it 'includes existing, ignores other' do
               expect(assigns[:service_provider_entities])
                 .to include(raw_ed_sp)
                 .and not_include(other_raw_ed_sp)
@@ -431,7 +431,7 @@ RSpec.describe API::DiscoveryEntitiesController, type: :controller do
           context 'and is functional' do
             let!(:other_sp_enabled) { true }
 
-            it 'includes the original, ignores other' do
+            it 'includes existing, ignores other' do
               expect(assigns[:service_provider_entities])
                 .to include(raw_ed_sp)
                 .and not_include(other_raw_ed_sp)
@@ -450,7 +450,7 @@ RSpec.describe API::DiscoveryEntitiesController, type: :controller do
           other
         end
 
-        context 'other (rad-sp) has lower rank than ed-sp' do
+        context 'rad-sp has lower rank than ed-sp' do
           let!(:other_rank) { entity_source.rank - 1 }
 
           context 'but not functional' do
@@ -466,7 +466,7 @@ RSpec.describe API::DiscoveryEntitiesController, type: :controller do
           context 'and is functional' do
             let!(:other_sp_enabled) { true }
 
-            it 'includes the rad-sp, ignores ed-sp' do
+            it 'includes rad-sp, ignores ed-sp' do
               expect(assigns[:service_provider_entities])
                 .to include(other_raw_ed_sp)
                 .and not_include(service_provider)
@@ -474,7 +474,7 @@ RSpec.describe API::DiscoveryEntitiesController, type: :controller do
           end
         end
 
-        context 'other (rad-sp) has higher rank than ed-sp' do
+        context 'rad-sp has higher rank than ed-sp' do
           let!(:other_rank) { entity_source.rank + 1 }
 
           context 'but not functional' do
