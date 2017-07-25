@@ -341,4 +341,46 @@ RSpec.describe KnownEntity do
       end
     end
   end
+
+  describe '#functioning_entity' do
+    subject { entity.functioning_entity }
+
+    context 'as entity descriptor' do
+      let(:entity) { create(:known_entity, :with_idp, enabled: enabled) }
+
+      before { entity.entity_descriptor.update(enabled: enabled) }
+
+      context 'non functioning' do
+        let(:enabled) { false }
+
+        it { is_expected.to be_nil }
+      end
+
+      context 'functioning' do
+        let(:enabled) { true }
+
+        it { is_expected.to eq(entity.entity_descriptor) }
+      end
+    end
+
+    context 'as raw entity descriptor' do
+      let(:entity) do
+        create(:known_entity, :with_raw_entity_descriptor, enabled: enabled)
+      end
+
+      before { entity.raw_entity_descriptor.update(enabled: enabled) }
+
+      context 'non functioning' do
+        let(:enabled) { false }
+
+        it { is_expected.to be_nil }
+      end
+
+      context 'functioning' do
+        let(:enabled) { true }
+
+        it { is_expected.to eq(entity.raw_entity_descriptor) }
+      end
+    end
+  end
 end

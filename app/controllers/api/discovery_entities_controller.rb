@@ -55,20 +55,16 @@ module API
     def filter_by_rank(entities)
       entities.collect(&:known_entity)
               .group_by(&:entity_id)
-              .map { |_, es| known_entity(order_known_entities_by_rank(es)) }
+              .map { |_, es| functioning_entity(order_by_rank(es)) }
     end
 
-    def order_known_entities_by_rank(entities)
-      entities.sort_by { |ke| ke.entity_source.try(:rank) }
+    def order_by_rank(known_entities)
+      known_entities.sort_by { |ke| ke.entity_source.try(:rank) }
     end
 
-    def known_entity(known_entities_by_rank)
-      known_entities_by_rank.each do |ke|
-        ed = ke.entity_descriptor
-        rad = ke.raw_entity_descriptor
-        return ed if ed.try(:functioning?)
-        return rad if rad.try(:functioning?)
-      end
+    def functioning_entity(known_entities_by_rank)
+      known_entities_by_rank.find(&:functioning_entity)
+                            .try(:functioning_entity)
     end
 
     def ed_containing_sp
