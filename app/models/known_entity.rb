@@ -81,6 +81,13 @@ class KnownEntity < Sequel::Model
     desired_derived_tags.each { |tag| apply_derived_tag(tag) }
   end
 
+  def functioning_entity
+    return entity_descriptor if entity_descriptor.try(:functioning?)
+    return raw_entity_descriptor if raw_entity_descriptor.try(:functioning?)
+
+    nil
+  end
+
   private
 
   def apply_derived_tag(name)
