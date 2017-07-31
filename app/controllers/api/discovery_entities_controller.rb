@@ -56,6 +56,7 @@ module API
       entities.collect(&:known_entity)
               .group_by(&:entity_id)
               .map { |_, es| functioning_entity(order_by_rank(es)) }
+              .compact
     end
 
     def order_by_rank(known_entities)
