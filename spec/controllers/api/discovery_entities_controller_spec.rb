@@ -492,7 +492,7 @@ RSpec.describe API::DiscoveryEntitiesController, type: :controller do
 
             it 'includes ed-sp, ignores rad-sp' do
               expect(assigns[:service_provider_entities])
-                .to include(raw_ed_sp)
+                .to include(service_provider)
                 .and not_include(other_raw_ed_sp)
             end
           end
