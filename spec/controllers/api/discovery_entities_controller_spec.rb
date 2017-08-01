@@ -80,6 +80,11 @@ RSpec.describe API::DiscoveryEntitiesController, type: :controller do
         expect(assigns[:identity_provider_entities])
           .not_to include(identity_provider)
       end
+
+      it 'has no nil values' do
+        expect(assigns[:identity_provider_entities])
+          .not_to include(nil)
+      end
     end
 
     context 'for a disabled raw entity descriptor - idp' do
@@ -90,6 +95,11 @@ RSpec.describe API::DiscoveryEntitiesController, type: :controller do
       it 'excludes the identity provider' do
         expect(assigns[:identity_provider_entities])
           .not_to include(raw_ed_idp)
+      end
+
+      it 'has no nil values' do
+        expect(assigns[:identity_provider_entities])
+          .not_to include(nil)
       end
     end
 
@@ -108,6 +118,11 @@ RSpec.describe API::DiscoveryEntitiesController, type: :controller do
         expect(assigns[:service_provider_entities])
           .not_to include(service_provider)
       end
+
+      it 'has no nil values' do
+        expect(assigns[:service_provider_entities])
+          .not_to include(nil)
+      end
     end
 
     context 'for a disabled raw entity descriptor - sp' do
@@ -118,6 +133,11 @@ RSpec.describe API::DiscoveryEntitiesController, type: :controller do
       it 'excludes the service provider' do
         expect(assigns[:service_provider_entities])
           .not_to include(raw_ed_sp)
+      end
+
+      it 'has no nil values' do
+        expect(assigns[:service_provider_entities])
+          .not_to include(nil)
       end
     end
 
@@ -492,7 +512,7 @@ RSpec.describe API::DiscoveryEntitiesController, type: :controller do
 
             it 'includes ed-sp, ignores rad-sp' do
               expect(assigns[:service_provider_entities])
-                .to include(raw_ed_sp)
+                .to include(service_provider)
                 .and not_include(other_raw_ed_sp)
             end
           end
