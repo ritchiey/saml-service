@@ -556,6 +556,20 @@ Sequel.migration do
       index [:idp_sso_descriptor_id], :name=>:idp_ssos_fkey
     end
     
+    create_table(:sirtfi_contact_people) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :contact_id, :contacts, :type=>"int(11)", :null=>false, :key=>[:id]
+      foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :key=>[:id]
+      foreign_key :role_descriptor_id, :role_descriptors, :type=>"int(11)", :key=>[:id]
+      column :extensions, "text"
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      
+      index [:contact_id], :name=>:contact_fkey
+      index [:entity_descriptor_id], :name=>:ed_cp_fkey
+      index [:role_descriptor_id], :name=>:rd_cp_fkey
+    end
+    
     create_table(:ui_infos) do
       primary_key :id, :type=>"int(11)"
       foreign_key :role_descriptor_id, :role_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
@@ -876,5 +890,6 @@ self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20170616045451_ad
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20170619194544_create_derived_tags.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20170802213241_make_key_type_id_nullable.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20170802230844_allow_larger_rank_values.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20170803002700_create_sirtfi_contact_people.rb')"
                 end
               end
