@@ -48,7 +48,7 @@ Sequel.migration do
     
     create_table(:entity_sources) do
       primary_key :id, :type=>"int(11)"
-      column :rank, "int(11)", :null=>false
+      column :rank, "bigint(20)", :null=>false
       column :enabled, "tinyint(1)", :null=>false
       column :created_at, "datetime", :null=>false
       column :updated_at, "datetime", :null=>false
@@ -488,7 +488,7 @@ Sequel.migration do
     
     create_table(:key_descriptors) do
       primary_key :id, :type=>"int(11)"
-      column :key_type_id, "int(11)", :null=>false
+      column :key_type_id, "int(11)"
       column :disabled, "tinyint(1)"
       column :created_at, "datetime"
       column :updated_at, "datetime"
@@ -874,5 +874,7 @@ self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160920023804_re
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160920024949_add_primary_tag_to_metadata_instances.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20170616045451_add_derived_flag_to_tags.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20170619194544_create_derived_tags.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20170802213241_make_key_type_id_nullable.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20170802230844_allow_larger_rank_values.rb')"
                 end
               end

@@ -3,7 +3,8 @@
 FactoryGirl.define do
   factory :entity_source do
     enabled true
-    rank { (Time.now.to_f * 100).to_i }
+    # Max BIGINT value + 1, according to MySQL documentation
+    rank { rand(9_223_372_036_854_775_808) }
     sequence(:source_tag) { |n| "#{Faker::Lorem.characters(20)}-#{n}" }
 
     trait :external do
