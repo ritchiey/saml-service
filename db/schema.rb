@@ -565,9 +565,9 @@ Sequel.migration do
       column :created_at, "datetime"
       column :updated_at, "datetime"
       
-      index [:contact_id], :name=>:contact_fkey
-      index [:entity_descriptor_id], :name=>:ed_cp_fkey
-      index [:role_descriptor_id], :name=>:rd_cp_fkey
+      index [:contact_id], :name=>:sirtfi_contact_fkey
+      index [:entity_descriptor_id], :name=>:sirtfi_ed_cp_fkey
+      index [:role_descriptor_id], :name=>:sirtfi_rd_cp_fkey
     end
     
     create_table(:ui_infos) do
