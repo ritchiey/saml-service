@@ -5,6 +5,10 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
 
   # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
   def create_json(sp)
+    contact_people =
+      contact_instances.map { |cp| contact_person_json(cp) } +
+      sirtfi_contact_instances.map { |cp| sirtfi_contact_person_json(cp) }
+
     {
       id: sp.id,
       display_name: Faker::Lorem.sentence,
@@ -39,8 +43,7 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
             key_descriptors:
               sp.key_descriptors.map { |kd| key_descriptor_json(kd) }
                 .push(bad_key_descriptor_json),
-            contact_people:
-              contact_instances.map { |cp| contact_person_json(cp) },
+            contact_people: contact_people,
             error_url: sp.error_url
           },
           name_id_formats:
@@ -158,7 +161,9 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
 
   before do
     stub_fr_request(:contacts)
-    contact_instances.each { |c| fr_object(Contact.name, c.id) }
+
+    [*contact_instances, *sirtfi_contact_instances]
+      .each { |c| fr_object(Contact.name, c.id) }
 
     stub_fr_request(:attributes)
     stub_fr_request(:service_providers)
@@ -168,6 +173,7 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
     let(:source_sp) { service_provider_instances.first }
     let(:sp_count) { 1 }
     let(:contact_count) { 2 }
+    let(:sirtfi_contact_count) { 2 }
     let(:attribute_count) { 3 }
 
     subject { SPSSODescriptor.last }
@@ -232,6 +238,7 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
           let(:source) do
             service_providers
               .first[:saml][:sso_descriptor][:role_descriptor][:contact_people]
+              .reject { |cp| cp.dig(:type, :name) == 'Security' }
           end
         end
       end
@@ -271,6 +278,7 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
 
     let(:sp_count) { 1 }
     let(:contact_count) { 2 }
+    let(:sirtfi_contact_count) { 2 }
     let(:attribute_count) { 3 }
 
     before { run }
