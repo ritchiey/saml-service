@@ -270,6 +270,14 @@ module Metadata
         contact_people.each do |cp|
           contact_person(cp)
         end
+
+        sirtfi_contact_people = ed.sirtfi_contact_people do |ds|
+          ds.order(:contact_id)
+        end
+
+        sirtfi_contact_people.each do |cp|
+          sirtfi_contact_person(cp)
+        end
       end
     end
 
@@ -313,6 +321,24 @@ module Metadata
 
     def contact_person(cp)
       attributes = { contactType: cp.contact_type }
+      c = cp.contact
+      root.ContactPerson(ns, attributes) do |_|
+        root.Company(c.company) if c.company.present?
+        root.GivenName(c.given_name) if c.given_name.present?
+        root.SurName(c.surname) if c.surname.present?
+        if c.email_address.present?
+          root.EmailAddress("mailto:#{c.email_address}")
+        end
+        root.TelephoneNumber(c.telephone_number) if c.telephone_number.present?
+      end
+    end
+
+    def sirtfi_contact_person(cp)
+      attributes = {
+        contactType: 'other',
+        'remd:contactType': 'http://refeds.org/metadata/contactType/security'
+      }
+
       c = cp.contact
       root.ContactPerson(ns, attributes) do |_|
         root.Company(c.company) if c.company.present?
