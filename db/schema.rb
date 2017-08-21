@@ -48,7 +48,7 @@ Sequel.migration do
     
     create_table(:entity_sources) do
       primary_key :id, :type=>"int(11)"
-      column :rank, "int(11)", :null=>false
+      column :rank, "bigint(20)", :null=>false
       column :enabled, "tinyint(1)", :null=>false
       column :created_at, "datetime", :null=>false
       column :updated_at, "datetime", :null=>false
@@ -488,7 +488,7 @@ Sequel.migration do
     
     create_table(:key_descriptors) do
       primary_key :id, :type=>"int(11)"
-      column :key_type_id, "int(11)", :null=>false
+      column :key_type_id, "int(11)"
       column :disabled, "tinyint(1)"
       column :created_at, "datetime"
       column :updated_at, "datetime"
@@ -554,6 +554,20 @@ Sequel.migration do
       foreign_key :idp_sso_descriptor_id, :idp_sso_descriptors, :type=>"int(11)", :null=>false, :key=>[:id]
       
       index [:idp_sso_descriptor_id], :name=>:idp_ssos_fkey
+    end
+    
+    create_table(:sirtfi_contact_people) do
+      primary_key :id, :type=>"int(11)"
+      foreign_key :contact_id, :contacts, :type=>"int(11)", :null=>false, :key=>[:id]
+      foreign_key :entity_descriptor_id, :entity_descriptors, :type=>"int(11)", :key=>[:id]
+      foreign_key :role_descriptor_id, :role_descriptors, :type=>"int(11)", :key=>[:id]
+      column :extensions, "text"
+      column :created_at, "datetime"
+      column :updated_at, "datetime"
+      
+      index [:contact_id], :name=>:sirtfi_contact_fkey
+      index [:entity_descriptor_id], :name=>:sirtfi_ed_cp_fkey
+      index [:role_descriptor_id], :name=>:sirtfi_rd_cp_fkey
     end
     
     create_table(:ui_infos) do
@@ -874,5 +888,8 @@ self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160920023804_re
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20160920024949_add_primary_tag_to_metadata_instances.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20170616045451_add_derived_flag_to_tags.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20170619194544_create_derived_tags.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20170802213241_make_key_type_id_nullable.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20170802230844_allow_larger_rank_values.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20170803002700_create_sirtfi_contact_people.rb')"
                 end
               end

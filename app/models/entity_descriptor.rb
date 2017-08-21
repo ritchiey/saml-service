@@ -6,6 +6,7 @@ class EntityDescriptor < Sequel::Model
 
   one_to_many :additional_metadata_locations
   one_to_many :contact_people
+  one_to_many :sirtfi_contact_people
   one_to_many :role_descriptors
   one_to_many :idp_sso_descriptors
   one_to_many :sp_sso_descriptors

@@ -206,6 +206,12 @@ RSpec.describe Metadata::SAML do
     include_examples 'ContactPerson xml'
   end
 
+  context 'SIRTFI ContactPersons' do
+    let(:sirtfi_contact_person) { create(:sirtfi_contact_person) }
+    before { subject.sirtfi_contact_person(sirtfi_contact_person) }
+    include_examples 'SIRTFI ContactPerson xml'
+  end
+
   context 'EntityAttributes' do
     let(:entity_attribute) { create :mdattr_entity_attribute }
     before { subject.entity_attribute(entity_attribute) }

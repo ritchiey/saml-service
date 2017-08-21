@@ -37,8 +37,7 @@ group :development, :test do
   gem 'rspec-retry'
   gem 'webmock', require: false
 
-  gem 'aaf-gumboot', git: 'https://github.com/ausaccessfed/aaf-gumboot.git',
-                     branch: 'develop'
+  gem 'aaf-gumboot'
   gem 'factory_girl_rails'
   gem 'faker'
   gem 'rails-controller-testing'

@@ -1,12 +1,4 @@
 GIT
-  remote: https://github.com/ausaccessfed/aaf-gumboot.git
-  revision: b869f8ef0a673e8c107a4a184a70fd130e443c66
-  branch: develop
-  specs:
-    aaf-gumboot (1.0.0.pre.alpha.2)
-      accession (~> 1.0)
-
-GIT
   remote: https://github.com/bradleybeddoes/rspec_sequel_matchers.git
   revision: 2db08f6b2ee0b8bf8f767ceb19c0919379544405
   specs:
@@ -16,6 +8,8 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
+    aaf-gumboot (1.1.0)
+      accession (~> 1.0)
     accession (1.0.0)
     actioncable (5.1.2)
       actionpack (= 5.1.2)
@@ -141,7 +135,7 @@ GEM
       mime-types-data (~> 3.2015)
     mime-types-data (3.2016.0521)
     mini_portile2 (2.2.0)
-    minitest (5.10.2)
+    minitest (5.10.3)
     mono_logger (1.1.0)
     multi_json (1.12.1)
     mustermann (1.0.0)
@@ -153,7 +147,7 @@ GEM
     notiffany (0.1.1)
       nenv (~> 0.1)
       shellany (~> 0.0)
-    parallel (1.11.2)
+    parallel (1.12.0)
     parser (2.4.0.0)
       ast (~> 2.2)
     powerpack (0.1.1)
@@ -276,7 +270,7 @@ GEM
     rufus-scheduler (3.4.2)
       et-orbi (~> 1.0)
     safe_yaml (1.0.4)
-    sequel (4.48.0)
+    sequel (4.49.0)
     sequel-rails (0.9.17)
       actionpack (>= 3.2.0)
       activemodel
@@ -308,7 +302,7 @@ GEM
       ref
     thor (0.19.4)
     thread_safe (0.3.6)
-    tilt (2.0.7)
+    tilt (2.0.8)
     timecop (0.9.1)
     tzinfo (1.2.3)
       thread_safe (~> 0.1)
@@ -333,7 +327,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  aaf-gumboot!
+  aaf-gumboot
   accession
   bcrypt (~> 3.1)
   capybara
@@ -376,4 +370,4 @@ DEPENDENCIES
   xmldsig
 
 BUNDLED WITH
-   1.15.2
+   1.15.3

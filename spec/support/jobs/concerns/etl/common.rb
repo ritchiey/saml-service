@@ -40,13 +40,24 @@ RSpec.shared_examples 'ETL::Common' do
     }
   end
 
-  def contact_person_json(cp)
+  def contact_person_json(contact)
     {
       type: {
         name: ContactPerson::TYPE.keys[rand 0..4].to_s
       },
       contact: {
-        id: cp.id
+        id: contact.id
+      }
+    }
+  end
+
+  def sirtfi_contact_person_json(contact)
+    {
+      type: {
+        name: 'Security'
+      },
+      contact: {
+        id: contact.id
       }
     }
   end
@@ -92,9 +103,16 @@ RSpec.shared_examples 'ETL::Common' do
   let(:contact_instances) do
     create_list(:contact, contact_count)
   end
-  let(:contacts_list) do
-    contact_instances.map { |ci| contact_json(ci) }
+
+  let(:sirtfi_contact_instances) do
+    create_list(:contact, sirtfi_contact_count)
   end
+
+  let(:contacts_list) do
+    [*contact_instances, *sirtfi_contact_instances]
+      .map { |ci| contact_json(ci) }
+  end
+
   let(:contacts) { contacts_list }
 
   shared_examples 'saml_attributes' do
@@ -140,6 +158,11 @@ RSpec.shared_examples 'ETL::Common' do
     it 'updates contact people' do
       expect { run }
         .to(change { subject.entity_descriptor.reload.contact_people })
+    end
+
+    it 'updates sirtfi contact people' do
+      expect { run }
+        .to(change { subject.entity_descriptor.reload.sirtfi_contact_people })
     end
 
     it 'updates protocol supports' do

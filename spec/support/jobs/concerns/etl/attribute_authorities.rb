@@ -5,6 +5,10 @@ RSpec.shared_examples 'ETL::AttributeAuthorities' do
 
   # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
   def create_idp_json(idp)
+    contact_people =
+      contact_instances.map { |cp| contact_person_json(cp) } +
+      sirtfi_contact_instances.map { |cp| sirtfi_contact_person_json(cp) }
+
     {
       id: idp.id,
       display_name: Faker::Lorem.sentence,
@@ -31,8 +35,7 @@ RSpec.shared_examples 'ETL::AttributeAuthorities' do
             key_descriptors:
               idp.key_descriptors.map { |kd| key_descriptor_json(kd) }
                  .push(bad_key_descriptor_json),
-            contact_people:
-              contact_instances.map { |cp| contact_person_json(cp) },
+            contact_people: contact_people,
             error_url: idp.error_url
           },
           name_id_formats:
@@ -166,7 +169,9 @@ RSpec.shared_examples 'ETL::AttributeAuthorities' do
 
   before do
     stub_fr_request(:contacts)
-    contact_instances.each { |c| fr_object(Contact.name, c.id) }
+
+    [*contact_instances, *sirtfi_contact_instances]
+      .each { |c| fr_object(Contact.name, c.id) }
 
     stub_fr_request(:attributes)
     stub_fr_request(:identity_providers)
@@ -180,6 +185,7 @@ RSpec.shared_examples 'ETL::AttributeAuthorities' do
     let(:idp_count) { 1 }
     let(:aa_count) { 1 }
     let(:contact_count) { 1 }
+    let(:sirtfi_contact_count) { 1 }
     let(:attribute_count) { 3 }
 
     subject { AttributeAuthorityDescriptor.last }
@@ -272,6 +278,7 @@ RSpec.shared_examples 'ETL::AttributeAuthorities' do
           let(:source) do
             identity_providers
               .first[:saml][:sso_descriptor][:role_descriptor][:contact_people]
+              .reject { |cp| cp.dig(:type, :name) == 'Security' }
           end
         end
       end
@@ -298,6 +305,7 @@ RSpec.shared_examples 'ETL::AttributeAuthorities' do
     let(:idp_count) { 1 }
     let(:aa_count) { 1 }
     let(:contact_count) { 1 }
+    let(:sirtfi_contact_count) { 1 }
     let(:attribute_count) { 3 }
 
     subject { AttributeAuthorityDescriptor.last }
