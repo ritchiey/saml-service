@@ -42,7 +42,7 @@ class SyncToGitRepository
   end
 
   def sync(ke)
-    encoded_entity_id = Base64.urlsafe_encode64(ke.entity_id, padding: false)
+    encoded_entity_id = Base64.urlsafe_encode64(ke.entity_id).delete('=')
     filename = "entities/#{@md_instance.identifier}-#{encoded_entity_id}.xml"
 
     write_metadata(ke, filename, generate_metadata(ke))

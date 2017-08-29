@@ -33,7 +33,7 @@ RSpec.describe SyncToGitRepository do
     let(:written_blobs) { {} }
 
     let(:encoded_entity_id) do
-      Base64.urlsafe_encode64(entity.entity_id, padding: false)
+      Base64.urlsafe_encode64(entity.entity_id).delete('=')
     end
 
     let(:path) { Faker::Lorem.words.unshift('').join('/') }
