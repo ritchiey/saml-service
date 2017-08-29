@@ -106,11 +106,8 @@ class SyncToGitRepository
   end
 
   def commit(tree, message)
-    author = {
-      name: 'SAML Service',
-      time: Time.now.getlocal,
-      email: 'noreply@aaf.edu.au'
-    }
+    author = { name: 'SAML Service', time: Time.now.getlocal,
+               email: 'noreply@aaf.edu.au' }
 
     Rugged::Commit.create(@repository,
                           tree: tree, message: message,

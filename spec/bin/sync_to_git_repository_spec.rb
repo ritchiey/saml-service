@@ -12,9 +12,9 @@ RSpec.describe SyncToGitRepository do
       allow(File).to receive(:open).with(file_path, 'w').and_yield(file)
 
       allow(repo).to receive(:status).with("entities/#{filename}")
-        .and_return(file_status)
+                                     .and_return(file_status)
 
-      allow(repo).to receive(:write).with(anything, :blob) do |content, blob|
+      allow(repo).to receive(:write).with(anything, :blob) do |content, _blob|
         object_id = SecureRandom.urlsafe_base64
         written_blobs[object_id] = content
         object_id
@@ -25,9 +25,9 @@ RSpec.describe SyncToGitRepository do
       allow(Rugged::Commit).to receive(:create) { |*a| commit_spy.create(*a) }
 
       allow(config).to receive(:[]).with("branch.#{branch_name}.remote")
-        .and_return(remote_name)
+                                   .and_return(remote_name)
       allow(config).to receive(:[]).with("branch.#{branch_name}.merge")
-        .and_return(remote_branch)
+                                   .and_return(remote_branch)
     end
 
     let(:written_blobs) { {} }
