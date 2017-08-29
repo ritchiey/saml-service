@@ -18,15 +18,28 @@ class SyncToGitRepository
     instance_identifier, repository_path = args
     @md_instance = MetadataInstance[identifier: instance_identifier]
     @repository = Rugged::Repository.new(repository_path)
+    @committed = false
   end
 
   def perform
     known_entities = KnownEntity.with_all_tags([@md_instance.primary_tag])
     touched = known_entities.map { |ke| sync(ke) }
     sweep(touched)
+    push if @committed
   end
 
   private
+
+  def push
+    branch = @repository.branches.find do |b|
+      b.canonical_name == @repository.head.canonical_name
+    end
+
+    remote = @repository.config["branch.#{branch.name}.remote"]
+    merge = @repository.config["branch.#{branch.name}.merge"]
+
+    @repository.push(remote, "#{branch.canonical_name}:#{merge}")
+  end
 
   def sync(ke)
     encoded_entity_id = Base64.urlsafe_encode64(ke.entity_id, padding: false)
@@ -104,6 +117,8 @@ class SyncToGitRepository
                           author: author, committer: author,
                           parents: [@repository.head.target],
                           update_ref: 'HEAD')
+
+    @committed = true
   end
 end
 

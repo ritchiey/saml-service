@@ -23,6 +23,11 @@ RSpec.describe SyncToGitRepository do
       allow(index).to receive(:write_tree).with(repo).and_return(new_tree)
 
       allow(Rugged::Commit).to receive(:create) { |*a| commit_spy.create(*a) }
+
+      allow(config).to receive(:[]).with("branch.#{branch_name}.remote")
+        .and_return(remote_name)
+      allow(config).to receive(:[]).with("branch.#{branch_name}.merge")
+        .and_return(remote_branch)
     end
 
     let(:written_blobs) { {} }
@@ -38,17 +43,32 @@ RSpec.describe SyncToGitRepository do
     let(:file_status) { [] }
     let(:empty) { false }
     let(:md_instance) { create(:metadata_instance) }
+    let(:remote_branch) { "refs/heads/#{Faker::Lorem.word}" }
+    let(:remote_name) { Faker::Lorem.word }
+    let(:branch_name) { Faker::Lorem.word }
+    let(:canonical_branch_name) { "refs/heads/#{branch_name}" }
 
     let(:commit_spy) { class_spy(Rugged::Commit) }
     let(:index) { spy(Rugged::Index) }
     let(:head_commit) { double(Rugged::Commit, tree: head_tree) }
     let(:head_tree) { double(Rugged::Tree) }
-    let(:head) { double(Rugged::Reference, target: head_commit) }
     let(:new_tree) { double(Rugged::Tree) }
+    let(:config) { double(Rugged::Config) }
+
+    let(:head) do
+      double(Rugged::Reference, target: head_commit,
+                                canonical_name: canonical_branch_name)
+    end
+
+    let(:branch) do
+      double(Rugged::Branch, name: branch_name,
+                             canonical_name: canonical_branch_name)
+    end
 
     let(:repo) do
       double(Rugged::Repository,
-             empty?: empty, index: index, workdir: path, head: head)
+             empty?: empty, index: index, workdir: path, head: head, push: nil,
+             config: config, branches: [branch])
     end
 
     subject { described_class.new([md_instance.identifier, path]) }
@@ -82,12 +102,24 @@ RSpec.describe SyncToGitRepository do
                   update_ref: 'HEAD')
         end
       end
+
+      it 'pushes to the remote' do
+        run
+
+        expect(repo).to have_received(:push)
+          .with(remote_name, "#{canonical_branch_name}:#{remote_branch}")
+      end
     end
 
     shared_examples 'an up-to-date entity' do
       it 'makes no commits' do
         run
         expect(commit_spy).not_to have_received(:create)
+      end
+
+      it 'makes no push' do
+        run
+        expect(repo).not_to have_received(:push)
       end
     end
 
@@ -104,6 +136,13 @@ RSpec.describe SyncToGitRepository do
                   message: '[sync] remove stale entity', parents: [head_commit],
                   update_ref: 'HEAD')
         end
+      end
+
+      it 'pushes to the remote' do
+        run
+
+        expect(repo).to have_received(:push)
+          .with(remote_name, "#{canonical_branch_name}:#{remote_branch}")
       end
     end
 
