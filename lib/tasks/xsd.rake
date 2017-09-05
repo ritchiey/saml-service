@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'net/http'
+
 namespace :xsd do
   schemas = {
     'schema/xml.xsd' =>
