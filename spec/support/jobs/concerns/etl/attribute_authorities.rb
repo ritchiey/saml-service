@@ -278,7 +278,7 @@ RSpec.shared_examples 'ETL::AttributeAuthorities' do
           let(:source) do
             identity_providers
               .first[:saml][:sso_descriptor][:role_descriptor][:contact_people]
-              .reject { |cp| cp.dig(:type, :name) == 'Security' }
+              .reject { |cp| cp[:type][:name] == 'Security' }
           end
         end
       end
