@@ -33,7 +33,7 @@ RSpec.describe SyncToGitRepository do
     let(:written_blobs) { {} }
 
     let(:encoded_entity_id) do
-      Base64.urlsafe_encode64(entity.entity_id).delete('=')
+      entity.entity_id && Base64.urlsafe_encode64(entity.entity_id).delete('=')
     end
 
     let(:path) { Faker::Lorem.words.unshift('').join('/') }
@@ -193,6 +193,14 @@ RSpec.describe SyncToGitRepository do
       context 'for an unchanged entity' do
         let(:file_status) { [] }
         it_behaves_like 'an up-to-date entity'
+      end
+    end
+
+    context 'for a known entity with no data' do
+      let!(:entity) { create(:known_entity) }
+
+      it 'runs without error' do
+        run
       end
     end
   end
