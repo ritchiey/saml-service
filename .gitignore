@@ -9,7 +9,6 @@
 /schema
 **.orig
 rerun.txt
-.ruby-version
 *.swp
 
 config/initializers/secret_token.rb
