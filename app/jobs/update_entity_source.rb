@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'metadata/schema'
+require 'net/http'
 
 class UpdateEntitySource
   include SetSAMLTypeFromXML
