@@ -36,9 +36,7 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
     let(:raw_entity_descriptor) { { xml: xml, tags: tags, enabled: enabled } }
 
     def run
-      if api_subject
-        request.env['HTTP_X509_DN'] = "CN=#{api_subject.x509_cn}".dup
-      end
+      request.env['HTTP_X509_DN'] = +"CN=#{api_subject.x509_cn}" if api_subject
 
       patch :update, as: :json, params: {
         tag: source_tag,
