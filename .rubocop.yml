@@ -56,3 +56,7 @@ Lint/RescueWithoutErrorClass:
   Exclude:
     - spec/controllers/api/raw_entity_descriptors_controller_spec.rb
     - spec/jobs/update_entity_source_spec.rb
+
+Lint/UriEscapeUnescape:
+  Exclude:
+    - spec/routes/metadata_query_controller_spec.rb
