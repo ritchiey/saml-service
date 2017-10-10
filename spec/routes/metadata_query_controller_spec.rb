@@ -28,7 +28,7 @@ RSpec.describe 'Routes for MetadataQueryController', type: :routing do
   end
 
   it 'routes /:instance/entities/:identifier to #specific_entity_sha1' do
-    uri = URI.encode("/mdq/#{instance}/entities/{sha1}#{sha1_identifier}")
+    uri = CGI.escape("/mdq/#{instance}/entities/{sha1}#{sha1_identifier}")
     expect(get(uri))
       .to route_to(
         controller: 'metadata_query',

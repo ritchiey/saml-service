@@ -12,7 +12,7 @@ FactoryGirl.define do
     association :known_entity
 
     xml do
-      <<-EOF.strip_heredoc
+      <<-ENTITY.strip_heredoc
         <EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata"
           xmlns:mdui="urn:oasis:names:tc:SAML:metadata:ui"
           entityID="#{entity_id_uri}">
@@ -47,7 +47,7 @@ FactoryGirl.define do
                 Location="https://#{hostname}/idp/profile/AttributeQuery/SOAP"/>
           </AttributeAuthorityDescriptor>
         </EntityDescriptor>
-      EOF
+      ENTITY
     end
 
     after :create do |red, eval|
@@ -58,7 +58,7 @@ FactoryGirl.define do
     factory :raw_entity_descriptor_idp do
       idp true
       xml do
-        <<-EOF.strip_heredoc
+        <<-ENTITY.strip_heredoc
           <EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata"
             xmlns:mdui="urn:oasis:names:tc:SAML:metadata:ui"
             entityID="#{entity_id_uri}">
@@ -95,14 +95,14 @@ FactoryGirl.define do
                 Location="https://#{hostname}/idp/profile/SAML2/Redirect/SSO"/>
             </IDPSSODescriptor>
           </EntityDescriptor>
-        EOF
+        ENTITY
       end
     end
 
     factory :raw_entity_descriptor_sp do
       sp true
       xml do
-        <<-EOF.strip_heredoc
+        <<-ENTITY.strip_heredoc
           <EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata"
             xmlns:idpdisc=
               "urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol"
@@ -141,7 +141,7 @@ FactoryGirl.define do
                 index="1" isDefault="true" />
             </SPSSODescriptor>
           </EntityDescriptor>
-        EOF
+        ENTITY
       end
     end
 
@@ -156,7 +156,7 @@ FactoryGirl.define do
       association :known_entity
 
       xml do
-        <<-EOF.strip_heredoc
+        <<-ENTITY.strip_heredoc
           <EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata"
             xmlns:mdui="urn:oasis:names:tc:SAML:metadata:ui"
             entityID="#{entity_id_uri}">
@@ -196,7 +196,7 @@ FactoryGirl.define do
                 Location="https://#{hostname}/idp/profile/AttributeQuery/SOAP"/>
             </AttributeAuthorityDescriptor>
           </EntityDescriptor>
-        EOF
+        ENTITY
       end
     end
 
@@ -211,7 +211,7 @@ FactoryGirl.define do
       association :known_entity
 
       xml do
-        <<-EOF.strip_heredoc
+        <<-ENTITY.strip_heredoc
           <xyz:EntityDescriptor xmlns:xyz="urn:oasis:names:tc:SAML:2.0:metadata"
             xmlns:mdui="urn:oasis:names:tc:SAML:metadata:ui"
             entityID="#{entity_id_uri}">
@@ -251,7 +251,7 @@ FactoryGirl.define do
                 Location="https://#{hostname}/idp/profile/AttributeQuery/SOAP"/>
             </xyz:AttributeAuthorityDescriptor>
           </xyz:EntityDescriptor>
-        EOF
+        ENTITY
       end
     end
   end

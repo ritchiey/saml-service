@@ -2,7 +2,7 @@
 
 RSpec.shared_examples 'RawEntityDescriptor xml' do
   let(:ed_xml) do
-    <<-EOF.strip_heredoc
+    <<-ENTITY.strip_heredoc
       <EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata"
           entityID="https://test.example.com/idp/shibboleth">
         <AttributeAuthorityDescriptor
@@ -12,7 +12,7 @@ RSpec.shared_examples 'RawEntityDescriptor xml' do
               Location="https://example.com/idp/profile/AttributeQuery/SOAP"/>
         </AttributeAuthorityDescriptor>
       </EntityDescriptor>
-    EOF
+    ENTITY
   end
 
   let(:raw_entity_descriptor) { create(:raw_entity_descriptor, xml: ed_xml) }

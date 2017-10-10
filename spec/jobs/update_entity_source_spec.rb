@@ -37,7 +37,7 @@ RSpec.describe UpdateEntitySource do
     fragments.join("\n")
   end
 
-  EMPTY_SIGNATURE = <<-EOF.strip_heredoc
+  EMPTY_SIGNATURE = <<-SIG.strip_heredoc
     <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
       <ds:SignedInfo>
         <ds:CanonicalizationMethod
@@ -61,7 +61,7 @@ RSpec.describe UpdateEntitySource do
 
       <ds:SignatureValue></ds:SignatureValue>
     </ds:Signature>
-  EOF
+  SIG
 
   def entities_descriptor(fore: nil, entities:, type: :raw_entity_descriptor)
     [
@@ -180,7 +180,7 @@ RSpec.describe UpdateEntitySource do
         let(:hostname) { URI.parse(entity_id).hostname }
 
         let(:old_xml) do
-          <<-EOF.strip_heredoc
+          <<-ENTITY.strip_heredoc
             <EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata"
                 entityID="https://#{hostname}/idp/shibboleth">
               <AttributeAuthorityDescriptor
@@ -190,7 +190,7 @@ RSpec.describe UpdateEntitySource do
                     Location="https://#{hostname}/invalid"/>
               </AttributeAuthorityDescriptor>
             </EntityDescriptor>
-          EOF
+          ENTITY
         end
 
         it 'uses the existing entity' do
@@ -302,7 +302,7 @@ RSpec.describe UpdateEntitySource do
 
     let(:old_xml) do
       hostname = URI.parse(entity_ids[0]).host
-      <<-EOF.strip_heredoc
+      <<-ENTITY.strip_heredoc
         <EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata"
             entityID="https://#{hostname}/idp/shibboleth">
           <AttributeAuthorityDescriptor
@@ -312,7 +312,7 @@ RSpec.describe UpdateEntitySource do
                 Location="https://#{hostname}/invalid"/>
           </AttributeAuthorityDescriptor>
         </EntityDescriptor>
-      EOF
+      ENTITY
     end
 
     let!(:other_entity) do

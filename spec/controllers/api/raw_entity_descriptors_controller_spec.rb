@@ -19,7 +19,7 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
     let(:base64_urlsafe_entity_id) { Base64.urlsafe_encode64(entity_id_uri) }
     let(:enabled) { [true, false].sample }
     let(:xml) do
-      <<-EOF.strip_heredoc
+      <<-ENTITY.strip_heredoc
           <EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata"
             xmlns:mdui="urn:oasis:names:tc:SAML:metadata:ui"
             entityID="#{entity_id_uri}">
@@ -30,7 +30,7 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
                 Location="https://#{host_name}/idp/profile/SAML2/Redirect/SSO"/>
             </IDPSSODescriptor>
           </EntityDescriptor>
-        EOF
+        ENTITY
     end
 
     let(:raw_entity_descriptor) { { xml: xml, tags: tags, enabled: enabled } }
@@ -235,7 +235,7 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
         let(:original_host_name) { Faker::Internet.domain_name }
         let(:original_enabled) { [true, false].sample }
         let(:original_xml) do
-          <<-EOF.strip_heredoc
+          <<-ENTITY.strip_heredoc
             <EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata"
               xmlns:mdui="urn:oasis:names:tc:SAML:metadata:ui"
               entityID="#{entity_id_uri}">
@@ -246,7 +246,7 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
        Location="https://#{original_host_name}/idp/profile/SAML2/Redirect/SSO"/>
               </IDPSSODescriptor>
             </EntityDescriptor>
-          EOF
+          ENTITY
         end
 
         let(:original_known_entity) do
@@ -532,14 +532,14 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
       context 'with invalid xml' do
         subject { -> { run } }
         let(:xml) do
-          <<-EOF.strip_heredoc
+          <<-ENTITY.strip_heredoc
             <IDPSSODescriptor
               protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
               <SingleSignOnService
                 Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
                 Location="https://#{host_name}/idp/profile/SAML2/Redirect/SSO"/>
             </IDPSSODescriptor>
-          EOF
+          ENTITY
         end
 
         let(:message) { /xml is not valid per the XML Schema/ }

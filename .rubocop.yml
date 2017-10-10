@@ -3,7 +3,6 @@ inherit_gem:
   aaf-gumboot: aaf-rubocop.yml
 
 AllCops:
-  TargetRubyVersion: 2.2
   Exclude:
     - db/**/*
 
@@ -52,3 +51,8 @@ Rails/SkipsModelValidations:
 
 Rails/FindEach:
   Enabled: false
+
+Lint/RescueWithoutErrorClass:
+  Exclude:
+    - spec/controllers/api/raw_entity_descriptors_controller_spec.rb
+    - spec/jobs/update_entity_source_spec.rb
