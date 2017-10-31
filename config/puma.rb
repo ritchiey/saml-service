@@ -6,7 +6,6 @@ config = YAML.load_file(File.expand_path('../deploy.yml', __FILE__))
 puma_config = config['puma']
 
 preload_app!
-daemonize
 
 bind puma_config['bind']
 workers 3
