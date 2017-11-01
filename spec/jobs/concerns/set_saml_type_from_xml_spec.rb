@@ -51,7 +51,7 @@ RSpec.describe SetSAMLTypeFromXML do
 
   before do
     allow(ed_node).to receive(:xpath) do |path|
-      if path =~ /EntityAttributes/
+      if path.match?(/EntityAttributes/)
         prefix = './/*[local-name() = "EntityAttributes" ' \
           'and namespace-uri() = "urn:oasis:names:tc:SAML:metadata:attribute"]'\
           '/*[local-name() = "Attribute" ' \

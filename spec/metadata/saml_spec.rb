@@ -486,7 +486,7 @@ RSpec.describe Metadata::SAML do
 
   context 'ds:Signature Root RawEntityDescriptor' do
     let(:ed_xml) do
-      <<-EOF.strip_heredoc
+      <<-ENTITY.strip_heredoc
         <EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata"
             entityID="https://test.example.com/idp/shibboleth"
             xmlns:mdrpi="urn:oasis:names:tc:SAML:metadata:rpi">
@@ -513,7 +513,7 @@ RSpec.describe Metadata::SAML do
                 Location="https://example.com/idp/profile/AttributeQuery/SOAP"/>
           </AttributeAuthorityDescriptor>
         </EntityDescriptor>
-      EOF
+      ENTITY
     end
 
     let(:entity) { create(:raw_entity_descriptor, xml: ed_xml) }
