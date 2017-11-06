@@ -17,11 +17,11 @@ class Tag < Sequel::Model
                      :name, message: 'is not in base64 urlsafe alphabet')
   end
 
-  IDP = 'idp'.freeze
-  AA = 'aa'.freeze
-  STANDALONE_AA = 'standalone-aa'.freeze
-  SP = 'sp'.freeze
-  RESEARCH_SCHOLARSHIP = 'research-and-scholarship'.freeze
-  SIRTFI = 'sirtfi'.freeze
-  BLACKLIST = 'blacklist'.freeze
+  IDP = 'idp'
+  AA = 'aa'
+  STANDALONE_AA = 'standalone-aa'
+  SP = 'sp'
+  RESEARCH_SCHOLARSHIP = 'research-and-scholarship'
+  SIRTFI = 'sirtfi'
+  BLACKLIST = 'blacklist'
 end

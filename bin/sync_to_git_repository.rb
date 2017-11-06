@@ -10,7 +10,7 @@ class SyncToGitRepository
 
   def initialize(args)
     if args.length != 2
-      $stderr.puts("usage: #{$PROGRAM_NAME} md_instance_identifier " \
+      warn("usage: #{$PROGRAM_NAME} md_instance_identifier " \
                    '/path/to/git/repository')
       exit 1
     end

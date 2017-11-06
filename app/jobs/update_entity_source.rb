@@ -139,7 +139,7 @@ class UpdateEntitySource
     entity_id = EntityId.where(uri: root_node['entityID']).all.find do |eid|
       eid.parent.known_entity.entity_source == source
     end
-    entity_id.parent.known_entity if entity_id
+    entity_id&.parent&.known_entity
   end
 
   def error_message(primary_error, secondary_error = nil)

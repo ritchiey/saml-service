@@ -2,7 +2,7 @@
 
 source 'https://rubygems.org'
 
-gem 'rails', '~> 5.0'
+gem 'rails', '>= 5.0.0', '< 5.1'
 
 gem 'accession'
 gem 'mysql2'
@@ -30,7 +30,6 @@ gem 'bcrypt', '~> 3.1'
 
 gem 'rugged', require: false
 
-gem 'god', require: false
 gem 'puma', require: false
 
 group :development, :test do
