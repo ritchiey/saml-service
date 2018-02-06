@@ -18,6 +18,7 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
     let(:entity_id_uri) { "https://#{host_name}/shibboleth" }
     let(:base64_urlsafe_entity_id) { Base64.urlsafe_encode64(entity_id_uri) }
     let(:enabled) { [true, false].sample }
+    let(:edugain_enabled) { [true, false].sample }
     let(:xml) do
       <<-ENTITY.strip_heredoc
           <EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata"
@@ -33,7 +34,12 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
         ENTITY
     end
 
-    let(:raw_entity_descriptor) { { xml: xml, tags: tags, enabled: enabled } }
+    let(:raw_entity_descriptor) do
+      { xml: xml,
+        tags: tags,
+        enabled: enabled,
+        edugain_enabled: edugain_enabled }
+    end
 
     def run
       request.env['HTTP_X509_DN'] = +"CN=#{api_subject.x509_cn}" if api_subject
@@ -179,7 +185,14 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
 
             context 'tags' do
               subject { record.tags.map(&:name) }
-              let(:all_tags) { tags + [source_tag, 'idp'] }
+              let(:edugain_export_tag) do
+                edugain_enabled ? 'aaf-edugain-export' : nil
+              end
+
+              let(:all_tags) do
+                tags + [source_tag, 'idp', edugain_export_tag].compact
+              end
+
               it { is_expected.to match_array(all_tags) }
             end
           end
@@ -384,7 +397,14 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
             context 'tags' do
               subject { record.tags.map(&:name) }
               let(:new_tags) { tags.append(source_tag) }
-              let(:all_tags) { new_tags + original_tags + ['idp'] }
+
+              let(:edugain_export_tag) do
+                edugain_enabled ? 'aaf-edugain-export' : nil
+              end
+
+              let(:all_tags) do
+                new_tags + original_tags + ['idp', edugain_export_tag].compact
+              end
 
               it 'appends the new tags' do
                 expect(subject).to match_array(all_tags)
@@ -504,6 +524,13 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
 
       context 'with an invalid enabled flag' do
         let(:enabled) { Faker::Lorem.characters }
+
+        it { is_expected.to have_http_status(:bad_request) }
+        it_behaves_like 'no state changed'
+      end
+
+      context 'with an invalid edugain enabled flag' do
+        let(:edugain_enabled) { Faker::Lorem.characters }
 
         it { is_expected.to have_http_status(:bad_request) }
         it_behaves_like 'no state changed'

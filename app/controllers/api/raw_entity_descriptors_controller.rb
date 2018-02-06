@@ -68,11 +68,17 @@ module API
     def tag_known_entity(known_entity)
       patch_params[:tags].each { |t| known_entity.tag_as(t) }
       known_entity.tag_as(params[:tag])
+
+      if patch_params[:edugain_enabled]
+        known_entity.tag_as('aaf-edugain-export')
+      else
+        known_entity.untag_as('aaf-edugain-export')
+      end
     end
 
     def patch_params
       params.require(:raw_entity_descriptor)
-            .permit(:xml, :enabled, tags: [])
+            .permit(:xml, :enabled, :edugain_enabled, tags: [])
     end
 
     def entity_id_uri
@@ -80,7 +86,8 @@ module API
     end
 
     def valid_patch_params?
-      patch_params[:tags] && [true, false].include?(patch_params[:enabled])
+      patch_params[:tags] && [true, false].include?(patch_params[:enabled]) &&
+        [true, false].include?(patch_params[:edugain_enabled])
     end
 
     def access_path
