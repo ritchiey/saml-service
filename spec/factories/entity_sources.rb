@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :entity_source do
     enabled true
     # Max BIGINT value + 1, according to MySQL documentation

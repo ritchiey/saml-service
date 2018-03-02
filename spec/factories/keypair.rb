@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-FactoryGirl.define do
+FactoryBot.define do
   test_rsa_keys = {}
 
   factory :rsa_key, class: OpenSSL::PKey::RSA do

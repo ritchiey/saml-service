@@ -2,7 +2,7 @@
 
 ENV['RAILS_ENV'] ||= 'test'
 require 'spec_helper'
-require 'factory_girl_rails'
+require 'factory_bot_rails'
 require File.expand_path('../../config/environment', __FILE__)
 require 'rspec/rails'
 require 'capybara/rails'
@@ -13,7 +13,7 @@ Timecop.safe_mode = true
 
 RSpec.configure do |config|
   config.fixture_path = "#{::Rails.root}/spec/fixtures"
-  config.include FactoryGirl::Syntax::Methods
+  config.include FactoryBot::Syntax::Methods
   config.include Rails.application.routes.url_helpers
 
   # Use Sequel matchers and transactions
