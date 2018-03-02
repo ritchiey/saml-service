@@ -6,7 +6,7 @@ gem 'rails', '>= 5.0.0', '< 5.1'
 
 gem 'accession'
 gem 'mysql2'
-gem 'sequel'
+gem 'sequel', '>= 4.0.0', '< 5'
 gem 'sequel-rails'
 
 gem 'nokogiri'
