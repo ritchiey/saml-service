@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :basic_federation, parent: :entity_source do
     after :create do |es|
       create_list(:basic_federation_entity, 2, :idp, entity_source: es)

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :idp_sso_descriptor, parent: :sso_descriptor,
                                class: 'IDPSSODescriptor' do
     want_authn_requests_signed false

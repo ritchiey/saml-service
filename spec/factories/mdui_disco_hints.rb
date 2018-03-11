@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :mdui_disco_hint, class: 'MDUI::DiscoHints' do
     idp_sso_descriptor
 

@@ -6,7 +6,7 @@ gem 'rails', '>= 5.0.0', '< 5.1'
 
 gem 'accession'
 gem 'mysql2'
-gem 'sequel'
+gem 'sequel', '>= 4.0.0', '< 5'
 gem 'sequel-rails'
 
 gem 'nokogiri'
@@ -39,7 +39,7 @@ group :development, :test do
   gem 'webmock', require: false
 
   gem 'aaf-gumboot'
-  gem 'factory_girl_rails'
+  gem 'factory_bot_rails'
   gem 'faker'
   gem 'rails-controller-testing'
   gem 'rspec_sequel_matchers', git: 'https://github.com/bradleybeddoes/rspec_sequel_matchers.git'
