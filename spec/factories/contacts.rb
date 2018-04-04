@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :contact do
     given_name { Faker::Name.first_name }
     surname { Faker::Name.last_name }

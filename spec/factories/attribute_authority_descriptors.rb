@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :attribute_authority_descriptor,
           parent: :role_descriptor, class: 'AttributeAuthorityDescriptor' do
     after(:create) do |aad|

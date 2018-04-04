@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :raw_entity_descriptor do
     transient do
       hostname { "raw.#{Faker::Internet.domain_name}" }

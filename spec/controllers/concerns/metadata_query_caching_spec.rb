@@ -12,7 +12,7 @@ RSpec.describe MetadataQueryCaching do
   end
 
   def mocked_metadata_instance
-    FactoryGirl.build_stubbed(:metadata_instance)
+    FactoryBot.build_stubbed(:metadata_instance)
   end
 
   describe '.generate_document_entities_etag(instance, entities)' do

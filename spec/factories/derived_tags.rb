@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :derived_tag do
     tag_name { Faker::Lorem.word }
     when_tags { Faker::Lorem.words.join(',') }
