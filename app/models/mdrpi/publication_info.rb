@@ -16,7 +16,6 @@ module MDRPI
       validates_presence %i[publisher created_at updated_at]
       return if new?
 
-      validates_presence :usage_policies
       single_parent %i[metadata_instance entity_descriptor]
     end
   end

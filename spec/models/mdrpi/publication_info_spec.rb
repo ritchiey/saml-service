@@ -11,11 +11,6 @@ RSpec.describe MDRPI::PublicationInfo, type: :model do
 
   it { is_expected.to validate_presence :publisher }
 
-  context 'usage policies' do
-    let(:subject) { create :mdrpi_publication_info }
-    it { is_expected.to validate_presence :usage_policies }
-  end
-
   context 'ownership' do
     let(:subject) { create :mdrpi_publication_info }
 
