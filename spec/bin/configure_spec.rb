@@ -139,7 +139,6 @@ RSpec.describe ConfigureCLI do
     let(:tag) { Faker::Lorem.word }
     let(:identifier) { SecureRandom.urlsafe_base64 }
     let(:publisher) { Faker::Internet.url }
-    let(:usage_policy) { Faker::Internet.url }
     let(:lang) { 'en' }
     let!(:keypair) { create(:keypair) }
 
@@ -157,7 +156,6 @@ RSpec.describe ConfigureCLI do
               '--identifier', identifier,
               '--tag', tag,
               '--publisher', publisher,
-              '--usage-policy', usage_policy,
               '--lang', lang]
 
       args += ['--hash', hash] if hash
@@ -184,26 +182,11 @@ RSpec.describe ConfigureCLI do
 
       it 'updates the PublicationInfo' do
         pi = instance.publication_info
-        up = pi.usage_policies.first
 
         run
 
         expect { pi.reload }.to change { pi.values }
           .to include(publisher: publisher)
-
-        expect { up.reload }.to change { up.values }
-          .to include(uri: usage_policy)
-      end
-
-      context 'when the PublicationInfo has two usage_policies' do
-        let!(:other_usage_policy) do
-          create(:mdrpi_usage_policy,
-                 publication_info: instance.publication_info)
-        end
-
-        it 'raises an exception' do
-          expect { run }.to raise_error(/multiple usage policies/)
-        end
       end
     end
 
@@ -218,15 +201,11 @@ RSpec.describe ConfigureCLI do
       it 'creates a valid PublicationInfo' do
         expect { run }.to change(MDRPI::PublicationInfo, :count)
           .by(1)
-          .and change(MDRPI::UsagePolicy, :count).by(1)
 
         md_instance = MetadataInstance.last
 
         expect(md_instance.publication_info)
           .to have_attributes(publisher: publisher)
-
-        expect(md_instance.publication_info.usage_policies.first)
-          .to have_attributes(uri: usage_policy)
       end
     end
 
