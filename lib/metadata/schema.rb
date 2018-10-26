@@ -3,7 +3,7 @@
 module Metadata
   module Schema
     def metadata_schema
-      @schema ||= Nokogiri::XML::Schema.new(file.open)
+      @metadata_schema ||= Nokogiri::XML::Schema.new(file.open)
     end
 
     private

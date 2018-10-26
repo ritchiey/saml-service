@@ -5,6 +5,7 @@ class FederationRegistryObject < Sequel::Model
     fr_obj = find(fr_id: fr_id, internal_class_name: dataset.model.name)
 
     return dataset[fr_obj.internal_id] if fr_obj
+
     nil
   end
 end

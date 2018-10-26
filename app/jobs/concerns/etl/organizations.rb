@@ -20,6 +20,7 @@ module ETL
 
     def org_attrs(org_data)
       return {} unless org_data[:created_at]
+
       { created_at: Time.zone.parse(org_data[:created_at]) }
     end
 

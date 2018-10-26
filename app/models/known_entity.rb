@@ -50,6 +50,7 @@ class KnownEntity < Sequel::Model
 
   def tag_as(name)
     return if tags.any? { |t| t.name == name }
+
     add_tag(Tag.new(name: name))
     update_derived_tags
   end
@@ -92,6 +93,7 @@ class KnownEntity < Sequel::Model
 
   def apply_derived_tag(name)
     return if tags.any? { |t| t.name == name }
+
     add_tag(name: name, derived: true)
   end
 

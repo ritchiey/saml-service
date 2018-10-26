@@ -104,6 +104,7 @@ module RawEntityDescriptorDeconstructor
     disco_hints_node.xpath(DISCO_HINTS_GEOLOCATION_HINT_PATH).each do |glh|
       uri = glh.text.strip
       next unless valid_geolocation_uri?(uri)
+
       uri_parts = MDUI::GeolocationHint.parse_uri_into_parts(uri)
       disco_hints.geolocation_hints <<
         os(latitude: uri_parts[0], longitude: uri_parts[1],

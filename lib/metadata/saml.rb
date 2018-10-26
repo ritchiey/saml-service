@@ -428,6 +428,7 @@ module Metadata
       scope.parent[:Location] = ep.location
 
       return unless ep.response_location?
+
       scope.parent[:ResponseLocation] = ep.response_location
     end
 

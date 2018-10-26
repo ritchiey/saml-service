@@ -27,6 +27,7 @@ class RawEntityDescriptor < Sequel::Model
     # The two remaining validations are very expensive and don't need to run
     # when calling `functioning?` on an unmodified record.
     return unless modified?
+
     validates_unique :known_entity # Prevented by DB schema
     validate_xml
   end
@@ -42,6 +43,7 @@ class RawEntityDescriptor < Sequel::Model
     validate_document_contents(doc)
 
     return if metadata_schema.valid?(doc)
+
     errors.add(:xml, 'is not valid per the XML Schema')
   end
 
@@ -52,6 +54,7 @@ class RawEntityDescriptor < Sequel::Model
 
     ns = doc.root.namespace.try(:href)
     return if ns == 'urn:oasis:names:tc:SAML:2.0:metadata'
+
     errors.add(:xml, 'must have SAML 2.0 metadata namespace on root element')
   end
 end
