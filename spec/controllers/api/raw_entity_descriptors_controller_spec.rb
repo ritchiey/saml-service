@@ -31,7 +31,7 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
                 Location="https://#{host_name}/idp/profile/SAML2/Redirect/SSO"/>
             </IDPSSODescriptor>
           </EntityDescriptor>
-        ENTITY
+      ENTITY
     end
 
     let(:raw_entity_descriptor) do

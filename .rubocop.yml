@@ -60,3 +60,6 @@ Style/RescueStandardError:
 Lint/UriEscapeUnescape:
   Exclude:
     - spec/routes/metadata_query_controller_spec.rb
+
+Naming/UncommunicativeMethodParamName:
+  Enabled: false

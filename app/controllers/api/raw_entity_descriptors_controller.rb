@@ -12,6 +12,7 @@ module API
     def update
       check_access!(access_path)
       raise(BadRequest) unless valid_patch_params?
+
       if existing_entity_id
         update_raw_entity_descriptor
         head :no_content

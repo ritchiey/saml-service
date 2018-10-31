@@ -29,7 +29,7 @@ module MetadataQueryCaching
   end
 
   def known_entities_unmodified?(known_entities, etag)
-    valid_etag?(etag) || unmodified?(known_entities.sort_by(&:updated_at).last)
+    valid_etag?(etag) || unmodified?(known_entities.max_by(&:updated_at))
   end
 
   def known_entity_unmodified?(known_entity, etag)
@@ -38,11 +38,13 @@ module MetadataQueryCaching
 
   def valid_etag?(etag)
     return false unless request.headers['If-None-Match']
+
     request.headers['If-None-Match'] == etag
   end
 
   def unmodified?(obj)
     return false unless request.headers['If-Modified-Since']
+
     obj.updated_at <= request.headers['If-Modified-Since']
   end
 
