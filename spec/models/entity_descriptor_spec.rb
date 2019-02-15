@@ -19,6 +19,7 @@ describe EntityDescriptor do
   context 'optional attributes' do
     it { is_expected.to have_many_to_one :organization }
     it { is_expected.to have_one_to_many :contact_people }
+    it { is_expected.to have_one_to_many :sirtfi_contact_people }
     it { is_expected.to have_one_to_many :additional_metadata_locations }
     it { is_expected.to have_column :extensions, type: :text }
 
@@ -40,6 +41,11 @@ describe EntityDescriptor do
 
       it 'is valid without contacts' do
         expect(subject.contact_people).not_to be_present
+        expect(subject).to be_valid
+      end
+
+      it 'is valid without srtifi contacts' do
+        expect(subject.sirtfi_contact_people).not_to be_present
         expect(subject).to be_valid
       end
 
@@ -226,7 +232,7 @@ describe EntityDescriptor do
 
   describe '#destroy' do
     subject do
-      create :entity_descriptor, :with_technical_contact,
+      create :entity_descriptor, :with_technical_contact, :with_sirtfi_contact,
              :with_publication_info, :with_entity_attribute,
              :with_refeds_rs_entity_category,
              :with_idp, :with_sp, :with_aa
