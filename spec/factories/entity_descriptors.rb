@@ -61,7 +61,8 @@ FactoryBot.define do
 
     trait :with_sirtfi_contact do
       after :create do |ed|
-        ed.add_sirtfi_contact_person create :sirtfi_contact_person, entity_descriptor: ed
+        ed.add_sirtfi_contact_person create :sirtfi_contact_person,
+                                            entity_descriptor: ed
       end
     end
   end
