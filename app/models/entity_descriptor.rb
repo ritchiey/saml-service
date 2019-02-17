@@ -21,6 +21,7 @@ class EntityDescriptor < Sequel::Model
   plugin :touch
   plugin :association_dependencies, additional_metadata_locations: :destroy,
                                     contact_people: :destroy,
+                                    sirtfi_contact_people: :destroy,
                                     role_descriptors: :destroy,
                                     idp_sso_descriptors: :destroy,
                                     sp_sso_descriptors: :destroy,
