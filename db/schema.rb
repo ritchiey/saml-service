@@ -93,7 +93,7 @@ Sequel.migration do
     
     create_table(:localized_names) do
       primary_key :id, :type=>"int(11)"
-      column :value, "varchar(255)", :null=>false
+      column :value, "varchar(2048)", :null=>false
       column :lang, "varchar(255)", :null=>false
       column :created_at, "datetime"
       column :updated_at, "datetime"
@@ -891,5 +891,6 @@ self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20170619194544_cr
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20170802213241_make_key_type_id_nullable.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20170802230844_allow_larger_rank_values.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20170803002700_create_sirtfi_contact_people.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20190225092700_alter_localized_names.rb')"
                 end
               end
