@@ -7,6 +7,7 @@ default: &default
   timeout: 5000
   encoding: utf8
   collation: utf8_bin
+  sql_mode: TRADITIONAL
 
 development:
   <<: *default

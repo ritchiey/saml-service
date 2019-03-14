@@ -27,6 +27,7 @@ module ETL
         next unless c
 
         next contact_person(rd, c, type) unless type == :security
+
         sirtfi_contact_person(rd, c)
       end
     end

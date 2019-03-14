@@ -121,6 +121,7 @@ module ETL
     def add_values_to_requested_attribute(ra, attr_data)
       attr_data[:values].each do |av|
         next unless av[:approved]
+
         ra.add_attribute_value(value: av[:value])
       end
     end

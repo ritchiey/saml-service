@@ -17,6 +17,7 @@ class MetadataQueryController < ApplicationController
     public_action
 
     return not_found unless @metadata_instance.all_entities
+
     tags = [@metadata_instance.primary_tag]
     handle_entities_request(tags)
   end
@@ -121,7 +122,7 @@ class MetadataQueryController < ApplicationController
   def create_known_entities_response(known_entities, etag)
     response = cache_known_entities_response(known_entities, etag)
 
-    create_headers(known_entities.sort_by(&:updated_at).last, etag)
+    create_headers(known_entities.max_by(&:updated_at), etag)
     render body: response[:metadata]
   end
 

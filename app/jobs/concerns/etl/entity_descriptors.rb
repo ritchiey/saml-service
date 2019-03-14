@@ -54,6 +54,7 @@ module ETL
 
     def entity_id(ed, ed_data)
       return ed.entity_id.update(uri: ed_data[:entity_id]) if ed.entity_id
+
       EntityId.create(uri: ed_data[:entity_id], entity_descriptor: ed)
     end
 

@@ -10,8 +10,8 @@ RSpec.describe MDUI::GeolocationHint, type: :model do
   it { is_expected.to validate_presence :uri }
 
   context 'destructuring the geo uri' do
-    let(:latitude) { Faker::Address.latitude }
-    let(:longitude) { Faker::Address.longitude }
+    let(:latitude) { Faker::Address.latitude.to_s }
+    let(:longitude) { Faker::Address.longitude.to_s }
     let(:altitude) { Faker::Number.number(3) }
 
     subject do

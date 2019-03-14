@@ -30,9 +30,4 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ```
 
-*Current Release*: pre release, under development
-
 AAF service responsible for SAML data storage, metadata generation and inter-federation metadata processing.
-
-TODO: Write this document.
-

@@ -14,6 +14,7 @@ class UpdateEntitySource
   def perform(id:)
     source = EntitySource[id]
     raise("Unable to locate EntitySource(id=#{id})") unless source
+
     untouched = KnownEntity.where(entity_source: source).select_map(:id)
 
     document(source).xpath(ENTITY_DESCRIPTOR_XPATH).each do |node|
