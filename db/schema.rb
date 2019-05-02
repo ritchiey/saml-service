@@ -662,8 +662,8 @@ Sequel.migration do
     create_table(:key_infos) do
       primary_key :id, :type=>"int(11)"
       column :data, "text", :null=>false
-      column :subject, "varchar(255)"
-      column :issuer, "varchar(255)"
+      column :subject, "varchar(2048)"
+      column :issuer, "varchar(2048)"
       column :key_name, "varchar(255)"
       column :expiry, "datetime"
       column :created_at, "datetime"
@@ -892,5 +892,6 @@ self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20170802213241_ma
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20170802230844_allow_larger_rank_values.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20170803002700_create_sirtfi_contact_people.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20190225092700_alter_localized_names.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20190320095000_alter_key_subject_issuer.rb')"
                 end
               end
