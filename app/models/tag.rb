@@ -22,6 +22,7 @@ class Tag < Sequel::Model
   STANDALONE_AA = 'standalone-aa'
   SP = 'sp'
   RESEARCH_SCHOLARSHIP = 'research-and-scholarship'
+  DP_COCO = 'dp-coco'
   SIRTFI = 'sirtfi'
   BLACKLIST = 'blacklist'
 end

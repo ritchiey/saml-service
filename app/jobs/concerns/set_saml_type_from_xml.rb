@@ -57,13 +57,14 @@ module SetSAMLTypeFromXML
   def desired_entity_category_tags(ed_node)
     tags = []
     tags << Tag::RESEARCH_SCHOLARSHIP if research_scholarship_entity?(ed_node)
+    tags << Tag::DP_COCO if dp_coco_entity?(ed_node)
     tags << Tag::SIRTFI if sirtfi_entity?(ed_node)
     tags
   end
 
   def all_entity_tags
     [Tag::IDP, Tag::AA, Tag::STANDALONE_AA, Tag::SP,
-     Tag::RESEARCH_SCHOLARSHIP, Tag::SIRTFI]
+     Tag::RESEARCH_SCHOLARSHIP, Tag::DP_COCO, Tag::SIRTFI]
   end
 
   def entity_has_idp_role?(ed_node)
@@ -103,6 +104,29 @@ module SetSAMLTypeFromXML
     matches_entity_attribute_value?(
       ed_node, 'http://macedir.org/entity-category-support',
       'http://refeds.org/category/research-and-scholarship'
+    )
+  end
+
+  def dp_coco_entity?(ed_node)
+    sp_has_dp_coco?(ed_node) ||
+      idp_supports_dp_coco?(ed_node)
+  end
+
+  def sp_has_dp_coco?(ed_node)
+    return false unless entity_has_sp_role?(ed_node)
+
+    matches_entity_attribute_value?(
+      ed_node, 'http://macedir.org/entity-category',
+      'http://www.geant.net/uri/dataprotection-code-of-conduct/v1'
+    )
+  end
+
+  def idp_supports_dp_coco?(ed_node)
+    return false unless entity_has_idp_role?(ed_node)
+
+    matches_entity_attribute_value?(
+      ed_node, 'http://macedir.org/entity-category-support',
+      'http://www.geant.net/uri/dataprotection-code-of-conduct/v1'
     )
   end
 
