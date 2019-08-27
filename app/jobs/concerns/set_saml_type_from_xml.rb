@@ -13,6 +13,8 @@ module SetSAMLTypeFromXML
     xpath_for_metadata_element('AttributeAuthorityDescriptor')
   RESEARCH_AND_SCHOLARSHIP_CATEGORY = 'http://refeds.org/category/research-and-scholarship'
   DP_COCO_CATEGORY = 'http://www.geant.net/uri/dataprotection-code-of-conduct/v1'
+  ENTITY_CATEGORY_ATTR = 'http://macedir.org/entity-category'
+  ENTITY_CATEGORY_SUPPORT_ATTR = 'http://macedir.org/entity-category-support'
 
   def self.xpath_for_entity_attribute_values(name)
     './/*[local-name() = "EntityAttributes" ' \
@@ -100,7 +102,7 @@ module SetSAMLTypeFromXML
     return false unless entity_has_sp_role?(ed_node)
 
     matches_entity_attribute_value?(
-      ed_node, 'http://macedir.org/entity-category', category
+      ed_node, ENTITY_CATEGORY_ATTR, category
     )
   end
 
@@ -108,7 +110,7 @@ module SetSAMLTypeFromXML
     return false unless entity_has_idp_role?(ed_node)
 
     matches_entity_attribute_value?(
-      ed_node, 'http://macedir.org/entity-category-support', category
+      ed_node, ENTITY_CATEGORY_SUPPORT_ATTR, category
     )
   end
 
