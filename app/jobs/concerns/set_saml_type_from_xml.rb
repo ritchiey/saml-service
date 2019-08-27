@@ -11,7 +11,7 @@ module SetSAMLTypeFromXML
   SP_SSO_DESCRIPTOR_XPATH = xpath_for_metadata_element('SPSSODescriptor')
   ATTRIBUTE_AUTHORITY_DESCRIPTOR_XPATH =
     xpath_for_metadata_element('AttributeAuthorityDescriptor')
-  RESEEARCH_AND_SCHOLARSHIP_CATEGORY = 'http://refeds.org/category/research-and-scholarship'
+  RESEARCH_AND_SCHOLARSHIP_CATEGORY = 'http://refeds.org/category/research-and-scholarship'
   DP_COCO_CATEGORY = 'http://www.geant.net/uri/dataprotection-code-of-conduct/v1'
 
   def self.xpath_for_entity_attribute_values(name)
@@ -87,8 +87,8 @@ module SetSAMLTypeFromXML
   end
 
   def research_scholarship_entity?(ed_node)
-    sp_has_category?(ed_node, RESEEARCH_AND_SCHOLARSHIP_CATEGORY) ||
-      idp_supports_category?(ed_node, RESEEARCH_AND_SCHOLARSHIP_CATEGORY)
+    sp_has_category?(ed_node, RESEARCH_AND_SCHOLARSHIP_CATEGORY) ||
+      idp_supports_category?(ed_node, RESEARCH_AND_SCHOLARSHIP_CATEGORY)
   end
 
   def dp_coco_entity?(ed_node)
