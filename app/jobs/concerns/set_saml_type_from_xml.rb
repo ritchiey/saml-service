@@ -11,6 +11,8 @@ module SetSAMLTypeFromXML
   SP_SSO_DESCRIPTOR_XPATH = xpath_for_metadata_element('SPSSODescriptor')
   ATTRIBUTE_AUTHORITY_DESCRIPTOR_XPATH =
     xpath_for_metadata_element('AttributeAuthorityDescriptor')
+  RESEEARCH_AND_SCHOLARSHIP_CATEGORY = 'http://refeds.org/category/research-and-scholarship'
+  DP_COCO_CATEGORY = 'http://www.geant.net/uri/dataprotection-code-of-conduct/v1'
 
   def self.xpath_for_entity_attribute_values(name)
     './/*[local-name() = "EntityAttributes" ' \
@@ -85,48 +87,28 @@ module SetSAMLTypeFromXML
   end
 
   def research_scholarship_entity?(ed_node)
-    sp_has_research_scholarship_category?(ed_node) ||
-      idp_supports_research_scholarship_category?(ed_node)
-  end
-
-  def sp_has_research_scholarship_category?(ed_node)
-    return false unless entity_has_sp_role?(ed_node)
-
-    matches_entity_attribute_value?(
-      ed_node, 'http://macedir.org/entity-category',
-      'http://refeds.org/category/research-and-scholarship'
-    )
-  end
-
-  def idp_supports_research_scholarship_category?(ed_node)
-    return false unless entity_has_idp_role?(ed_node)
-
-    matches_entity_attribute_value?(
-      ed_node, 'http://macedir.org/entity-category-support',
-      'http://refeds.org/category/research-and-scholarship'
-    )
+    sp_has_category?(ed_node, RESEEARCH_AND_SCHOLARSHIP_CATEGORY) ||
+      idp_supports_category?(ed_node, RESEEARCH_AND_SCHOLARSHIP_CATEGORY)
   end
 
   def dp_coco_entity?(ed_node)
-    sp_has_dp_coco?(ed_node) ||
-      idp_supports_dp_coco?(ed_node)
+    sp_has_category?(ed_node, DP_COCO_CATEGORY) ||
+      idp_supports_category?(ed_node, DP_COCO_CATEGORY)
   end
 
-  def sp_has_dp_coco?(ed_node)
+  def sp_has_category?(ed_node, category)
     return false unless entity_has_sp_role?(ed_node)
 
     matches_entity_attribute_value?(
-      ed_node, 'http://macedir.org/entity-category',
-      'http://www.geant.net/uri/dataprotection-code-of-conduct/v1'
+      ed_node, 'http://macedir.org/entity-category', category
     )
   end
 
-  def idp_supports_dp_coco?(ed_node)
+  def idp_supports_category?(ed_node, category)
     return false unless entity_has_idp_role?(ed_node)
 
     matches_entity_attribute_value?(
-      ed_node, 'http://macedir.org/entity-category-support',
-      'http://www.geant.net/uri/dataprotection-code-of-conduct/v1'
+      ed_node, 'http://macedir.org/entity-category-support', category
     )
   end
 
