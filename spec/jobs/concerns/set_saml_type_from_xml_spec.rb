@@ -39,6 +39,20 @@ RSpec.describe SetSAMLTypeFromXML do
     }
   end
 
+  let(:supports_dp_coco) do
+    {
+      'http://macedir.org/entity-category-support' =>
+      [attribute_value('http://www.geant.net/uri/dataprotection-code-of-conduct/v1')]
+    }
+  end
+
+  let(:conforms_to_dp_coco) do
+    {
+      'http://macedir.org/entity-category' =>
+      [attribute_value('http://www.geant.net/uri/dataprotection-code-of-conduct/v1')]
+    }
+  end
+
   let(:xpath_results) do
     {
       'IDPSSODescriptor' => idp_sso_descriptor,
@@ -101,6 +115,7 @@ RSpec.describe SetSAMLTypeFromXML do
         expect(known_entity).to have_received(:untag_as).with('sirtfi')
         expect(known_entity).to have_received(:untag_as)
           .with('research-and-scholarship')
+        expect(known_entity).to have_received(:untag_as).with('dp-coco')
       end
     end
 
@@ -138,6 +153,15 @@ RSpec.describe SetSAMLTypeFromXML do
             .with('research-and-scholarship')
         end
       end
+
+      context 'when DPCoCo is supported' do
+        let(:entity_attributes) { supports_dp_coco }
+
+        it 'adds the tag' do
+          expect(known_entity).to have_received(:tag_as)
+            .with('dp-coco')
+        end
+      end
     end
 
     context 'with an SPSSODescriptor' do
@@ -172,6 +196,15 @@ RSpec.describe SetSAMLTypeFromXML do
         it 'adds the tag' do
           expect(known_entity).to have_received(:tag_as)
             .with('research-and-scholarship')
+        end
+      end
+
+      context 'when conforming to DP-Coco' do
+        let(:entity_attributes) { conforms_to_dp_coco }
+
+        it 'adds the tag' do
+          expect(known_entity).to have_received(:tag_as)
+            .with('dp-coco')
         end
       end
     end
