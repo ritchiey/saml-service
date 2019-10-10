@@ -410,11 +410,11 @@ module Metadata
       sso.artifact_resolution_services { |ds| ds.order(:index, :location) }
          .each { |ars| artifact_resolution_service(ars) }
 
-      sso.single_logout_services { |ds| ds.order(:location) }.each do |slo|
+      sso.single_logout_services { |ds| ds.order(:location, :binding, :response_location) }.each do |slo|
         single_logout_service(slo)
       end
 
-      sso.manage_name_id_services { |ds| ds.order(:location) }.each do |slo|
+      sso.manage_name_id_services { |ds| ds.order(:location, :binding, :response_location) }.each do |slo|
         manage_name_id_service(slo)
       end
 
@@ -460,13 +460,13 @@ module Metadata
       root.IDPSSODescriptor(ns) do |idp_node|
         sso_descriptor(idp, idp_node)
 
-        idp.single_sign_on_services { |ds| ds.order(:location) }
+        idp.single_sign_on_services { |ds| ds.order(:location, :binding, :response_location) }
            .each { |ssos| single_sign_on_service(ssos) }
 
-        idp.name_id_mapping_services { |ds| ds.order(:location) }
+        idp.name_id_mapping_services { |ds| ds.order(:location, :binding, :response_location) }
            .each { |nidms| name_id_mapping_service(nidms) }
 
-        idp.assertion_id_request_services { |ds| ds.order(:location) }
+        idp.assertion_id_request_services { |ds| ds.order(:location, :binding, :response_location) }
            .each { |aidrs| assertion_id_request_service(aidrs) }
 
         idp.attribute_profiles { |ds| ds.order(:uri) }
@@ -548,11 +548,11 @@ module Metadata
       root.AttributeAuthorityDescriptor(ns) do |aad_node|
         role_descriptor(aad, aad_node)
 
-        aad.attribute_services { |ds| ds.order(:location) }.each do |as|
+        aad.attribute_services { |ds| ds.order(:location, :binding, :response_location) }.each do |as|
           attribute_service(as)
         end
 
-        aad.assertion_id_request_services { |ds| ds.order(:location) }
+        aad.assertion_id_request_services { |ds| ds.order(:location, :binding, :response_location) }
            .each { |aidrs| assertion_id_request_service(aidrs) }
 
         aad.name_id_formats { |ds| ds.order(:uri) }.each do |nidf|
