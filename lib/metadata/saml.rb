@@ -371,7 +371,7 @@ module Metadata
         ui_info(rd.ui_info) if rd.ui_info.present?
 
         if rd.scopes?
-          rd.scopes { |ds| ds.order(:value) }.each do |s|
+          rd.scopes { |ds| ds.order(:value, :regexp) }.each do |s|
             shibmd_scope(s)
           end
         end
