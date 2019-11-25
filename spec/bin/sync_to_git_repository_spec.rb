@@ -61,7 +61,9 @@ RSpec.describe SyncToGitRepository do
     let(:sync_config) do
       {
         'instance_identifier' => md_instance.identifier,
-        'repository_path' => path
+        'repository_path' => path,
+        'git_author_name' => 'SAML Service',
+        'git_author_email' => 'noreply@aaf.edu.au'
       }
     end
 
