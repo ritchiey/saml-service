@@ -28,6 +28,8 @@ RSpec.describe SyncToGitRepository do
                                    .and_return(remote_name)
       allow(config).to receive(:[]).with("branch.#{branch_name}.merge")
                                    .and_return(remote_branch)
+      allow(YAML).to receive(:load_file).with(sync_config_path)
+                                        .and_return(sync_config)
     end
 
     let(:written_blobs) { {} }
@@ -54,6 +56,14 @@ RSpec.describe SyncToGitRepository do
     let(:head_tree) { double(Rugged::Tree) }
     let(:new_tree) { double(Rugged::Tree) }
     let(:config) { double(Rugged::Config) }
+    let(:sync_config_path) { Faker::Lorem.words.unshift('').join('/') }
+
+    let(:sync_config) do
+      {
+        'instance_identifier' => md_instance.identifier,
+        'repository_path' => path
+      }
+    end
 
     let(:head) do
       double(Rugged::Reference, target: head_commit,
@@ -71,7 +81,7 @@ RSpec.describe SyncToGitRepository do
              config: config, branches: [branch])
     end
 
-    subject { described_class.new([md_instance.identifier, path]) }
+    subject { described_class.new([sync_config_path]) }
 
     def run
       subject.perform
