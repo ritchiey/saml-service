@@ -78,7 +78,8 @@ class SyncToGitRepository
     if ke.entity_descriptor.try(:functioning?)
       renderer.entity_descriptor(ke.entity_descriptor, NAMESPACES)
     elsif ke.raw_entity_descriptor.try(:functioning?)
-      renderer.raw_entity_descriptor(ke.raw_entity_descriptor, NAMESPACES, true)
+      renderer.raw_entity_descriptor(ke.raw_entity_descriptor, NAMESPACES,
+                                     @config['raw_entity_descriptor_root_node'])
     end
 
     doc = renderer.builder.doc

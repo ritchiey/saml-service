@@ -63,7 +63,8 @@ RSpec.describe SyncToGitRepository do
         'instance_identifier' => md_instance.identifier,
         'repository_path' => path,
         'git_author_name' => 'SAML Service',
-        'git_author_email' => 'noreply@aaf.edu.au'
+        'git_author_email' => 'noreply@aaf.edu.au',
+        'raw_entity_descriptor_root_node' => true
       }
     end
 

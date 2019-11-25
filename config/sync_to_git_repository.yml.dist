@@ -3,4 +3,6 @@ instance_identifier: aaf
 repository_path: /path/to/git/repository
 git_author_name: SAML Service
 git_author_email: noreply@aaf.edu.au
+# whether to construct a new root node
+raw_entity_descriptor_root_node: True
 ...
