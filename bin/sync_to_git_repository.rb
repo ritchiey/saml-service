@@ -29,15 +29,32 @@ class SyncToGitRepository
 
   private
 
-  def push
-    branch = @repository.branches.find do |b|
+  def credential
+    git_auth_conf = @config['git_auth']
+    git_auth_type = git_auth_conf['type'] if git_auth_conf
+    if git_auth_type == 'sshkey'
+      Rugged::Credentials::SshKey.new(username: git_auth_conf['username'],
+                                      publickey: git_auth_conf['publickey'],
+                                      privatekey: git_auth_conf['privatekey'])
+    elsif git_auth_type == 'userpassword'
+      Rugged::Credentials::UserPassword.new(username: git_auth_conf['username'],
+                                            password: git_auth_conf['password'])
+    end
+  end
+
+  def find_branch
+    @repository.branches.find do |b|
       b.canonical_name == @repository.head.canonical_name
     end
+  end
 
+  def push
+    branch = find_branch
     remote = @repository.config["branch.#{branch.name}.remote"]
     merge = @repository.config["branch.#{branch.name}.merge"]
 
-    @repository.push(remote, "#{branch.canonical_name}:#{merge}")
+    @repository.push(remote, "#{branch.canonical_name}:#{merge}",
+                     credentials: credential)
   end
 
   def sync(ke)

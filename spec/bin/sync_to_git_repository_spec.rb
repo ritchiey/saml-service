@@ -120,7 +120,8 @@ RSpec.describe SyncToGitRepository do
         run
 
         expect(repo).to have_received(:push)
-          .with(remote_name, "#{canonical_branch_name}:#{remote_branch}")
+          .with(remote_name, "#{canonical_branch_name}:#{remote_branch}",
+                any_args)
       end
     end
 
@@ -155,7 +156,8 @@ RSpec.describe SyncToGitRepository do
         run
 
         expect(repo).to have_received(:push)
-          .with(remote_name, "#{canonical_branch_name}:#{remote_branch}")
+          .with(remote_name, "#{canonical_branch_name}:#{remote_branch}",
+                any_args)
       end
     end
 
