@@ -1,6 +1,4 @@
 ---
-instance_identifier: aaf
-repository_path: /path/to/git/repository
 git_author_name: SAML Service
 git_author_email: noreply@aaf.edu.au
 git_auth:

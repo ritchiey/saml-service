@@ -9,14 +9,16 @@ class SyncToGitRepository
   include Metadata::SAMLNamespaces
 
   def initialize(args)
-    if args.length != 1
-      warn("usage: #{$PROGRAM_NAME} /path/to/config/file")
+    if args.length != 3
+      warn("usage: #{$PROGRAM_NAME} /path/to/config/file" \
+                   'md_instance_identifier /path/to/git/repository')
       exit 1
     end
 
-    @config = YAML.load_file(args[0])
-    @md_instance = MetadataInstance[identifier: @config['instance_identifier']]
-    @repository = Rugged::Repository.new(@config['repository_path'])
+    config_file_path, instance_identifier, repository_path = args
+    @config = YAML.load_file(config_file_path)
+    @md_instance = MetadataInstance[identifier: instance_identifier]
+    @repository = Rugged::Repository.new(repository_path)
     @committed = false
   end
 

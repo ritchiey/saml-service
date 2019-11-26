@@ -60,8 +60,6 @@ RSpec.describe SyncToGitRepository do
 
     let(:sync_config) do
       {
-        'instance_identifier' => md_instance.identifier,
-        'repository_path' => path,
         'git_author_name' => 'SAML Service',
         'git_author_email' => 'noreply@aaf.edu.au',
         'raw_entity_descriptor_root_node' => true
@@ -84,7 +82,9 @@ RSpec.describe SyncToGitRepository do
              config: config, branches: [branch])
     end
 
-    subject { described_class.new([sync_config_path]) }
+    subject do
+      described_class.new([sync_config_path, md_instance.identifier, path])
+    end
 
     def run
       subject.perform
