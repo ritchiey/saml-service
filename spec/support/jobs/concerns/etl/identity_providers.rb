@@ -289,7 +289,6 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
   end
 
   context 'updating an IDPSSODescriptor' do
-    let(:source_idp) { identity_provider_instances.first }
     let(:idp_count) { 1 }
     let(:contact_count) { 1 }
     let(:sirtfi_contact_count) { 1 }
@@ -304,6 +303,14 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
 
     it 'uses the existing instance' do
       expect { run }.not_to(change { IDPSSODescriptor.count })
+    end
+
+    it 'sets a scope' do
+      expect(subject.scopes.size).to eq(1)
+    end
+
+    it 'sets expected scope' do
+      expect(subject.scopes.first.value).to eq(scope)
     end
 
     it 'does not create more tags' do
@@ -329,6 +336,35 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
 
     it 'updates attributes' do
       expect { run }.to(change { subject.reload.attributes })
+    end
+  end
+
+  context 'updating an IDPSSODescriptor with locked scope', focus: true do
+    let(:idp_count) { 1 }
+    let(:contact_count) { 1 }
+    let(:sirtfi_contact_count) { 1 }
+    let(:attribute_count) { 3 }
+
+    subject { IDPSSODescriptor.last }
+
+    before do
+      run
+    end
+
+    it 'retains locked scopes' do
+      expect(subject.scopes.size).to eq(1)
+      expect(subject.scopes.first.value).to eq(scope)
+
+      locked_scope = create :shibmd_scope, role_descriptor: subject,
+        locked: true
+      expect(subject.scopes.size).to eq(2)
+
+      # Run update again so we can ensure our update subject retains the manually
+      # added but locked scope
+      run
+      expect(subject.scopes.size).to eq(2)
+      expect(subject.scopes.first.value).to eq(scope)
+      expect(subject.scopes.last.value).to eq(locked_scope.value)
     end
   end
 end
