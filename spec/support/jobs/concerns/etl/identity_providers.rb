@@ -339,7 +339,7 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
     end
   end
 
-  context 'updating an IDPSSODescriptor with locked scope', focus: true do
+  context 'updating an IDPSSODescriptor with locked scope' do
     let(:idp_count) { 1 }
     let(:contact_count) { 1 }
     let(:sirtfi_contact_count) { 1 }
@@ -356,11 +356,11 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
       expect(subject.scopes.first.value).to eq(scope)
 
       locked_scope = create :shibmd_scope, role_descriptor: subject,
-        locked: true
+                                           locked: true
       expect(subject.scopes.size).to eq(2)
 
-      # Run update again so we can ensure our update subject retains the manually
-      # added but locked scope
+      # Run update again so we can ensure our update subject retains the
+      # manually added but locked scope
       run
       expect(subject.scopes.size).to eq(2)
       expect(subject.scopes.first.value).to eq(scope)
