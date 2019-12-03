@@ -2,6 +2,7 @@
 
 require 'metadata/saml_namespaces'
 
+# rubocop:disable Metrics/LineLength
 module Metadata
   class SAML
     include SAMLNamespaces
@@ -630,3 +631,5 @@ module Metadata
     end
   end
 end
+
+# rubocop:enable Metrics/LineLength
