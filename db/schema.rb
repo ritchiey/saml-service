@@ -545,6 +545,7 @@ Sequel.migration do
       column :regexp, "tinyint(1)", :default=>false, :null=>false
       column :created_at, "datetime", :null=>false
       column :updated_at, "datetime", :null=>false
+      column :locked, "tinyint(1)", :default=>false, :null=>false
       
       index [:role_descriptor_id], :name=>:scope_rd_fkey
     end
@@ -893,5 +894,6 @@ self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20170802230844_al
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20170803002700_create_sirtfi_contact_people.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20190225092700_alter_localized_names.rb')"
 self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20190320095000_alter_key_subject_issuer.rb')"
+self << "INSERT INTO `schema_migrations` (`filename`) VALUES ('20191203011131_add_fixed_boolean_to_shibmd_scope.rb')"
                 end
               end

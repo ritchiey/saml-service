@@ -10,7 +10,9 @@ module ETL
     end
 
     def scopes(rd, scope_data)
-      rd.scopes.each(&:destroy)
+      # Any scopes which we've added locally i.e. no knowledge
+      # from FR are not removed
+      rd.scopes.select(&:unlocked?).each(&:destroy)
       rd.add_scope(SHIBMD::Scope.new(value: scope_data,
                                      regexp: regexp_scope?(scope_data)))
     end
