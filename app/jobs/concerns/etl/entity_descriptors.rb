@@ -92,7 +92,9 @@ module ETL
       return if ed.blank?
 
       Rails.logger.info "Destroying FR entity #{ed_data[:entity_id]}"
+      ke = ed.known_entity
       ed.destroy
+      ke.destroy
     end
   end
 end
