@@ -40,7 +40,7 @@ group :development, :test do
   gem 'webmock', require: false
 
   gem 'aaf-gumboot'
-  gem 'factory_bot_rails'
+  gem 'factory_bot_rails', '~> 4.11' # TODO: Upgrade to v5 in the furture.
   gem 'faker'
   gem 'rails-controller-testing'
   gem 'rspec_sequel_matchers', git: 'https://github.com/bradleybeddoes/rspec_sequel_matchers.git'
