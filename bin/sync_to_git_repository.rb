@@ -44,7 +44,6 @@ class SyncToGitRepository
     end
   end
 
-  # rubocop:disable Metrics/AbcSize
   def push
     branch = @repository.branches.find do |b|
       b.canonical_name == @repository.head.canonical_name
@@ -56,7 +55,6 @@ class SyncToGitRepository
     @repository.push(remote, "#{branch.canonical_name}:#{merge}",
                      credentials: credential)
   end
-  # rubocop:enable Metrics/AbcSize
 
   def sync(ke)
     return if ke.entity_id.nil?
