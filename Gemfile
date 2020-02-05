@@ -8,6 +8,7 @@ gem 'accession'
 gem 'mysql2'
 gem 'sequel', '>= 4.0.0', '< 5'
 gem 'sequel-rails'
+gem 'sprockets', '3.7.2'
 
 gem 'nokogiri', '>= 1.8.5'
 gem 'xmldsig'
