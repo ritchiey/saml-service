@@ -1,6 +1,7 @@
----
-inherit_gem:
-  aaf-gumboot: aaf-rubocop.yml
+require: rubocop-rails
+
+inherit_from:
+  - https://raw.githubusercontent.com/ausaccessfed/aaf-gumboot/develop/aaf-rubocop.yml
 
 AllCops:
   Exclude:
@@ -61,5 +62,5 @@ Lint/UriEscapeUnescape:
   Exclude:
     - spec/routes/metadata_query_controller_spec.rb
 
-Naming/UncommunicativeMethodParamName:
+Naming/MethodParameterName:
   Enabled: false
