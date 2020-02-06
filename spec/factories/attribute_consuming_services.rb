@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :attribute_consuming_service do
-    index { Faker::Number.number 2 }
+    index { Faker::Number.number digits: 2 }
     default false
     sp_sso_descriptor
 
