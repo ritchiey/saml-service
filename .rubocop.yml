@@ -7,27 +7,27 @@ AllCops:
   Exclude:
     - db/**/*
 
-AbcSize:
+Metrics/AbcSize:
   Exclude:
     - lib/metadata/**/*
 
-ClassLength:
+Metrics/ClassLength:
   Exclude:
     - lib/metadata/saml.rb
 
-MethodLength:
+Metrics/MethodLength:
   Exclude:
     - lib/metadata/saml.rb
 
-CyclomaticComplexity:
+Metrics/CyclomaticComplexity:
   Exclude:
     - lib/metadata/saml.rb
 
-PerceivedComplexity:
+Metrics/PerceivedComplexity:
   Exclude:
     - lib/metadata/saml.rb
 
-BlockLength:
+Metrics/BlockLength:
   Exclude:
     - lib/metadata/saml.rb
     - spec/**/*.rb
