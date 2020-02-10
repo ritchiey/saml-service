@@ -228,9 +228,9 @@ RSpec.describe ConfigureCLI do
   end
 
   describe '#raw_entity_source' do
-    let(:rank) { Faker::Number.number(2).to_i }
+    let(:rank) { Faker::Number.number(digits: 2).to_i }
     let(:url) { Faker::Internet.url }
-    let(:cert_path) { Rails.root.join('spec', 'tmp', 'res_cert.pem') }
+    let(:cert_path) { Rails.root.join('spec/tmp/res_cert.pem') }
     let(:rsa_key) { create(:rsa_key) }
     let(:x509_certificate) { create(:certificate, rsa_key: rsa_key) }
     let(:source_tag) { Faker::Lorem.words.join('-') }
@@ -255,7 +255,7 @@ RSpec.describe ConfigureCLI do
     end
 
     context 'when a source exists' do
-      let(:cert_path2) { Rails.root.join('spec', 'tmp', 'res_cert_new.pem') }
+      let(:cert_path2) { Rails.root.join('spec/tmp/res_cert_new.pem') }
       let(:rsa_key2) { create(:rsa_key) }
       let(:x509_certificate2) { create(:certificate, rsa_key: rsa_key) }
       let!(:source) do

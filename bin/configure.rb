@@ -30,7 +30,7 @@ class ConfigureCLI < Thor
     source ||= new_federation_registry_source(options[:source_tag])
 
     update_registration_info(source)
-    source.update(options.slice(:hostname, :secret))
+    source.update(options.symbolize_keys.slice(:hostname, :secret))
   end
 
   desc 'raw_entity_source [options...]', 'Create or update a source of entities
