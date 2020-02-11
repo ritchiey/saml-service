@@ -24,13 +24,11 @@ RSpec.configure do |config|
   end
 
   config.around(:each, :debug) do |spec|
-    begin
-      logger = Logger.new($stderr)
-      Sequel::Model.db.loggers << logger
-      spec.run
-    ensure
-      Sequel::Model.db.loggers.delete(logger)
-    end
+    logger = Logger.new($stderr)
+    Sequel::Model.db.loggers << logger
+    spec.run
+  ensure
+    Sequel::Model.db.loggers.delete(logger)
   end
 
   config.infer_spec_type_from_file_location!
