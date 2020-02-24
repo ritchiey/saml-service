@@ -12,13 +12,13 @@ FactoryBot.define do
 
   trait :indexed_endpoint do
     endpoint
-    is_default false
+    is_default { false }
     index { Faker::Base.numerify '#' }
   end
 
   trait :default_indexed_endpoint do
     indexed_endpoint
-    is_default true
+    is_default { true }
   end
 
   factory :_endpoint, class: 'Endpoint', traits: [:endpoint]
