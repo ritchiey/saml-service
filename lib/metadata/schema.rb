@@ -9,7 +9,7 @@ module Metadata
     private
 
     def file
-      Rails.root.join('schema/top.xsd')
+      Rails.root.join('schema', 'top.xsd')
     end
   end
 end
