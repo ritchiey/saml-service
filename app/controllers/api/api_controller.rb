@@ -27,8 +27,9 @@ module API
     protected
 
     def ensure_authenticated
-      # Ensure API subject exists and is functioning
-      @subject = APISubject[x509_cn: x509_cn]
+      @subject = APISubject[x509_cn: x509_cn] if x509_dn.present?
+      @subject = nil if authorization.present? && @subject.blank?
+
       raise(Unauthorized, 'Subject invalid') unless @subject
       raise(Unauthorized, 'Subject not functional') unless @subject.functioning?
     end
@@ -55,6 +56,10 @@ module API
     def x509_dn
       x509_dn = request.headers['HTTP_X509_DN'].try(:force_encoding, 'UTF-8')
       x509_dn == '(null)' ? nil : x509_dn
+    end
+
+    def authorization
+      nil
     end
 
     def check_access!(action)

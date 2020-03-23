@@ -85,7 +85,7 @@ RSpec.describe API::APIController, type: :controller do
           expect(json['message']).to eq('SSL client failure.')
         end
         it 'has an error' do
-          expect(json['error']).to eq('Subject DN')
+          expect(json['error']).to eq('Subject invalid')
         end
       end
     end
@@ -102,7 +102,7 @@ RSpec.describe API::APIController, type: :controller do
           expect(json['message']).to eq('SSL client failure.')
         end
         it 'has an error' do
-          expect(json['error']).to eq('Subject DN')
+          expect(json['error']).to eq('Subject invalid')
         end
       end
     end
