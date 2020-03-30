@@ -27,8 +27,12 @@ module API
     protected
 
     def ensure_authenticated
-      @subject = APISubject[x509_cn: x509_cn] if x509_dn.present?
-      @subject = nil if authorization.present? && @subject.blank?
+      unless x509_dn.present? || request.env['Authorization'].present?
+        raise(Unauthorized, 'API authentication method not provided')
+      end
+
+      try_x509_authentication
+      try_token_authentication unless @subject
 
       raise(Unauthorized, 'Subject invalid') unless @subject
       raise(Unauthorized, 'Subject not functional') unless @subject.functioning?
@@ -41,9 +45,13 @@ module API
       raise("No access control performed by #{method}")
     end
 
-    def x509_cn
-      raise(Unauthorized, 'Subject DN') if x509_dn.nil?
+    def try_x509_authentication
+      return if x509_dn.blank?
 
+      @subject = APISubject[x509_cn: x509_cn]
+    end
+
+    def x509_cn
       x509_dn_parsed = OpenSSL::X509::Name.parse(x509_dn)
       x509_dn_hash = Hash[x509_dn_parsed.to_a
                                         .map { |components| components[0..1] }]
@@ -58,8 +66,18 @@ module API
       x509_dn == '(null)' ? nil : x509_dn
     end
 
-    def authorization
-      nil
+    def try_token_authentication
+      header = request.env['Authorization'].try(:force_encoding, 'UTF-8')
+      return if header.blank?
+
+      @subject = APISubject[token: bearer_token(header)]
+    end
+
+    def bearer_token(header)
+      pattern = /^Bearer (?<token>\S+)/
+      return $LAST_MATCH_INFO[:token] if header =~ pattern
+
+      raise(Unauthorized, 'Invalid Authorization header value')
     end
 
     def check_access!(action)
@@ -73,24 +91,24 @@ module API
     end
 
     def unauthorized(exception)
-      message = 'SSL client failure.'
+      message = 'Client request failure.'
       error = exception.message
-      render json: { message: message, error: error }, status: :unauthorized
+      render json: {message: message, error: error}, status: :unauthorized
     end
 
     def forbidden(_exception)
       message = 'The request was understood but explicitly denied.'
-      render json: { message: message }, status: :forbidden
+      render json: {message: message}, status: :forbidden
     end
 
     def resource_not_found(_exception)
       message = 'Resource not found.'
-      render json: { message: message }, status: :not_found
+      render json: {message: message}, status: :not_found
     end
 
     def bad_request(_exception)
       message = 'Bad request.'
-      render json: { message: message }, status: :bad_request
+      render json: {message: message}, status: :bad_request
     end
   end
 end

@@ -4,7 +4,7 @@ require 'gumboot/shared_examples/api_controller'
 
 RSpec.describe API::APIController, type: :controller do
   context 'requesting resource that does not exist' do
-    let(:api_subject) { create(:api_subject) }
+    let(:api_subject) { create(:api_subject, :x509_cn) }
     before { request.env['HTTP_X509_DN'] = +"CN=#{api_subject.x509_cn}" }
 
     controller(API::APIController) do
@@ -32,7 +32,7 @@ RSpec.describe API::APIController, type: :controller do
   end
 
   context 'a bad request' do
-    let(:api_subject) { create(:api_subject) }
+    let(:api_subject) { create(:api_subject, :x509_cn) }
     before { request.env['HTTP_X509_DN'] = +"CN=#{api_subject.x509_cn}" }
 
     controller(API::APIController) do
@@ -75,92 +75,130 @@ RSpec.describe API::APIController, type: :controller do
     subject { response }
     let(:json) { JSON.parse(subject.body) }
 
-    context 'no x509 header set by nginx' do
-      before { get :an_action }
+    context 'x509 authentication' do
+      context 'no x509 header set by nginx' do
+        before { get :an_action }
 
-      it { is_expected.to have_http_status(:unauthorized) }
+        it { is_expected.to have_http_status(:unauthorized) }
 
-      context 'json within response' do
-        it 'has a message' do
-          expect(json['message']).to eq('SSL client failure.')
+        context 'json within response' do
+          it 'has a message' do
+            expect(json['message']).to eq('Client request failure.')
+          end
+          it 'has an error' do
+            expect(json['error']).to eq('API authentication method not provided')
+          end
         end
-        it 'has an error' do
-          expect(json['error']).to eq('Subject invalid')
+      end
+
+      context 'x509 header set to "(null)"' do
+        before do
+          request.env['HTTP_X509_DN'] = '(null)'
+          get :an_action
+        end
+
+        it { is_expected.to have_http_status(:unauthorized) }
+        context 'json within response' do
+          it 'has a message' do
+            expect(json['message']).to eq('Client request failure.')
+          end
+          it 'has an error' do
+            expect(json['error']).to eq('API authentication method not provided')
+          end
+        end
+      end
+
+      context 'invalid x509 header set by nginx' do
+        before do
+          request.env['HTTP_X509_DN'] = "Z=#{Faker::Lorem.word}"
+          get :an_action
+        end
+
+        it { is_expected.to have_http_status(:unauthorized) }
+        context 'json within response' do
+          it 'has a message' do
+            expect(json['message']).to eq('Client request failure.')
+          end
+          it 'has an error' do
+            expect(json['error']).to eq('Subject DN invalid')
+          end
+        end
+      end
+
+      context 'without a CN component to DN' do
+        before do
+          request.env['HTTP_X509_DN'] = "O=#{Faker::Lorem.word}"
+          get :an_action
+        end
+
+        it { is_expected.to have_http_status(:unauthorized) }
+        context 'json within response' do
+          it 'has a message' do
+            expect(json['message']).to eq('Client request failure.')
+          end
+          it 'has an error' do
+            expect(json['error']).to eq('Subject CN invalid')
+          end
+        end
+      end
+
+      context 'with a CN that does not represent an APISubject' do
+        before do
+          request.env['HTTP_X509_DN'] = "/CN=#{Faker::Lorem.word}/" \
+                                        "O=#{Faker::Lorem.word}"
+          get :an_action
+        end
+
+        it { is_expected.to have_http_status(:unauthorized) }
+        context 'json within response' do
+          it 'has a message' do
+            expect(json['message']).to eq('Client request failure.')
+          end
+          it 'has an error' do
+            expect(json['error']).to eq('Subject invalid')
+          end
         end
       end
     end
 
-    context 'x509 header set to "(null)"' do
-      before do
-        request.env['HTTP_X509_DN'] = '(null)'
-        get :an_action
-      end
-
-      it { is_expected.to have_http_status(:unauthorized) }
-      context 'json within response' do
-        it 'has a message' do
-          expect(json['message']).to eq('SSL client failure.')
+    context 'token authentication' do
+      context 'invalid authorization header provided by client' do
+        before do
+          request.env['Authorization'] = "Z #{Faker::Lorem.word}"
+          get :an_action
         end
-        it 'has an error' do
-          expect(json['error']).to eq('Subject invalid')
-        end
-      end
-    end
 
-    context 'invalid x509 header set by nginx' do
-      before do
-        request.env['HTTP_X509_DN'] = "Z=#{Faker::Lorem.word}"
-        get :an_action
-      end
-
-      it { is_expected.to have_http_status(:unauthorized) }
-      context 'json within response' do
-        it 'has a message' do
-          expect(json['message']).to eq('SSL client failure.')
-        end
-        it 'has an error' do
-          expect(json['error']).to eq('Subject DN invalid')
+        it { is_expected.to have_http_status(:unauthorized) }
+        context 'json within response' do
+          it 'has a message' do
+            expect(json['message']).to eq('Client request failure.')
+          end
+          it 'has an error' do
+            expect(json['error']).to eq('Invalid Authorization header value')
+          end
         end
       end
-    end
 
-    context 'without a CN component to DN' do
-      before do
-        request.env['HTTP_X509_DN'] = "O=#{Faker::Lorem.word}"
-        get :an_action
-      end
-
-      it { is_expected.to have_http_status(:unauthorized) }
-      context 'json within response' do
-        it 'has a message' do
-          expect(json['message']).to eq('SSL client failure.')
+      context 'with a token that does not represent an APISubject' do
+        before do
+          request.env['Authorization'] = 'Bearer 123'
+          get :an_action
         end
-        it 'has an error' do
-          expect(json['error']).to eq('Subject CN invalid')
-        end
-      end
-    end
 
-    context 'with a CN that does not represent an APISubject' do
-      before do
-        request.env['HTTP_X509_DN'] = "/CN=#{Faker::Lorem.word}/" \
-                                      "O=#{Faker::Lorem.word}"
-        get :an_action
-      end
-
-      it { is_expected.to have_http_status(:unauthorized) }
-      context 'json within response' do
-        it 'has a message' do
-          expect(json['message']).to eq('SSL client failure.')
-        end
-        it 'has an error' do
-          expect(json['error']).to eq('Subject invalid')
+        it { is_expected.to have_http_status(:unauthorized) }
+        context 'json within response' do
+          it 'has a message' do
+            expect(json['message']).to eq('Client request failure.')
+          end
+          it 'has an error' do
+            expect(json['error']).to eq('Subject invalid')
+          end
         end
       end
     end
 
     context 'with an APISubject that is not functioning' do
-      let(:api_subject) { create :api_subject, enabled: false }
+      let(:api_subject) { create :api_subject, :x509_cn, enabled: false }
 
       before do
         request.env['HTTP_X509_DN'] = "/CN=#{api_subject.x509_cn}/" \
@@ -171,7 +209,7 @@ RSpec.describe API::APIController, type: :controller do
       it { is_expected.to have_http_status(:unauthorized) }
       context 'json within response' do
         it 'has a message' do
-          expect(json['message']).to eq('SSL client failure.')
+          expect(json['message']).to eq('Client request failure.')
         end
         it 'has an error' do
           expect(json['error']).to eq('Subject not functional')
@@ -181,12 +219,8 @@ RSpec.describe API::APIController, type: :controller do
   end
 
   context '#ensure_access_checked as after_action' do
-    subject(:api_subject) { create :api_subject }
+    subject(:api_subject) { create :api_subject, :x509_cn }
     let(:json) { JSON.parse(response.body) }
-
-    before do
-      request.env['HTTP_X509_DN'] = "/CN=#{api_subject.x509_cn}/DC=example"
-    end
 
     RSpec.shared_examples 'APIController base state' do
       it 'fails request to incorrectly implemented action' do
@@ -201,6 +235,10 @@ RSpec.describe API::APIController, type: :controller do
     end
 
     context 'subject without permissions' do
+      before do
+        request.env['HTTP_X509_DN'] = "/CN=#{api_subject.x509_cn}/DC=example"
+      end
+
       include_examples 'APIController base state'
 
       it 'has no permissions' do
@@ -220,8 +258,11 @@ RSpec.describe API::APIController, type: :controller do
     end
 
     context 'subject with invalid permissions' do
+      before do
+        request.env['HTTP_X509_DN'] = "/CN=#{api_subject.x509_cn}/DC=example"
+      end
       subject(:api_subject) do
-        create :api_subject, :authorized, permission: 'invalid:permission'
+        create :api_subject, :x509_cn, :authorized, permission: 'invalid:permission'
       end
 
       include_examples 'APIController base state'
@@ -242,9 +283,32 @@ RSpec.describe API::APIController, type: :controller do
       end
     end
 
-    context 'subject with valid permission' do
+    context 'subject with x509 authentication and valid permission' do
+      before do
+        request.env['HTTP_X509_DN'] = "/CN=#{api_subject.x509_cn}/DC=example"
+      end
       subject(:api_subject) do
-        create :api_subject, :authorized, permission: 'required:permission'
+        create :api_subject, :x509_cn, :authorized, permission: 'required:permission'
+      end
+
+      include_examples 'APIController base state'
+
+      it 'has a valid permission' do
+        expect(api_subject.permissions).to eq(['required:permission'])
+      end
+
+      it 'completes request after permissions checked' do
+        get :an_action
+        expect(response).to have_http_status(:ok)
+      end
+    end
+
+    context 'subject with token authentication and valid permission' do
+      before do
+        request.env['Authorization'] = "Bearer #{api_subject.token}"
+      end
+      subject(:api_subject) do
+        create :api_subject, :token, :authorized, permission: 'required:permission'
       end
 
       include_examples 'APIController base state'
