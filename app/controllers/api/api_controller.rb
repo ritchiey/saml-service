@@ -93,22 +93,22 @@ module API
     def unauthorized(exception)
       message = 'Client request failure.'
       error = exception.message
-      render json: {message: message, error: error}, status: :unauthorized
+      render json: { message: message, error: error }, status: :unauthorized
     end
 
     def forbidden(_exception)
       message = 'The request was understood but explicitly denied.'
-      render json: {message: message}, status: :forbidden
+      render json: { message: message }, status: :forbidden
     end
 
     def resource_not_found(_exception)
       message = 'Resource not found.'
-      render json: {message: message}, status: :not_found
+      render json: { message: message }, status: :not_found
     end
 
     def bad_request(_exception)
       message = 'Bad request.'
-      render json: {message: message}, status: :bad_request
+      render json: { message: message }, status: :bad_request
     end
   end
 end

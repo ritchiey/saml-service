@@ -38,7 +38,7 @@ RSpec.describe API::APISubject, type: :model do
     end
   end
 
-  context 'with x509_cn' do 
+  context 'with x509_cn' do
     subject { build :api_subject, :x509_cn }
     it { is_expected.to be_valid }
     include_examples 'an api_subject'
@@ -53,7 +53,7 @@ RSpec.describe API::APISubject, type: :model do
     end
   end
 
-  context 'with token' do 
+  context 'with token' do
     subject { build :api_subject, :token }
     it { is_expected.to be_valid }
     include_examples 'an api_subject'
