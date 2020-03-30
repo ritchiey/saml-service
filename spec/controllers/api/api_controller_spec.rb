@@ -1,4 +1,4 @@
-require 'rails_helper'
+require 'rails_helper' # rubocop:disable Style/FrozenStringLiteralComment
 
 require 'gumboot/shared_examples/api_controller'
 
