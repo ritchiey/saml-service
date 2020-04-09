@@ -57,6 +57,10 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
       nil
     end
 
+    before do
+      Rails.application.config.saml_service = {api: {authentication: :x509}}
+    end
+
     context 'not permitted' do
       let(:api_subject) { create(:api_subject, :x509_cn) }
       before { run }

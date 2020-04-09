@@ -5,7 +5,11 @@ require 'gumboot/shared_examples/api_controller'
 RSpec.describe API::APIController, type: :controller do
   context 'requesting resource that does not exist' do
     let(:api_subject) { create(:api_subject, :x509_cn) }
-    before { request.env['HTTP_X509_DN'] = +"CN=#{api_subject.x509_cn}" }
+
+    before do
+      Rails.application.config.saml_service = {api: {authentication: :x509}}
+      request.env['HTTP_X509_DN'] = +"CN=#{api_subject.x509_cn}"
+    end
 
     controller(API::APIController) do
       def missing_resource
@@ -33,7 +37,10 @@ RSpec.describe API::APIController, type: :controller do
 
   context 'a bad request' do
     let(:api_subject) { create(:api_subject, :x509_cn) }
-    before { request.env['HTTP_X509_DN'] = +"CN=#{api_subject.x509_cn}" }
+    before do
+      Rails.application.config.saml_service = {api: {authentication: :x509}}
+      request.env['HTTP_X509_DN'] = +"CN=#{api_subject.x509_cn}"
+    end
 
     controller(API::APIController) do
       def a_bad_request
@@ -75,7 +82,41 @@ RSpec.describe API::APIController, type: :controller do
     subject { response }
     let(:json) { JSON.parse(subject.body) }
 
+    context 'invalid authentication method' do
+        before do
+           Rails.application.config.saml_service = {api: {}}
+           get :an_action
+        end
+
+        it { is_expected.to have_http_status(:forbidden) }
+
+        context 'json within response' do
+          it 'has a message' do
+            expect(json['message']).to eq('The request was understood but explicitly denied.')
+          end
+        end
+    end
+
+    context 'unknown authentication method' do
+        before do
+           Rails.application.config.saml_service = {api: {authentication: :x}}
+           get :an_action
+        end
+
+        it { is_expected.to have_http_status(:forbidden) }
+
+        context 'json within response' do
+          it 'has a message' do
+            expect(json['message']).to eq('The request was understood but explicitly denied.')
+          end
+        end
+    end
+
     context 'x509 authentication' do
+      before do
+        Rails.application.config.saml_service = {api: {authentication: :x509}}
+      end
+
       context 'no x509 header set by nginx' do
         before { get :an_action }
 
@@ -86,7 +127,7 @@ RSpec.describe API::APIController, type: :controller do
             expect(json['message']).to eq('Client request failure.')
           end
           it 'has an error' do
-            expect(json['error']).to eq('API authentication method not provided')
+            expect(json['error']).to eq('x509 API authentication method not provided')
           end
         end
       end
@@ -103,7 +144,7 @@ RSpec.describe API::APIController, type: :controller do
             expect(json['message']).to eq('Client request failure.')
           end
           it 'has an error' do
-            expect(json['error']).to eq('API authentication method not provided')
+            expect(json['error']).to eq('x509 API authentication method not provided')
           end
         end
       end
@@ -162,6 +203,10 @@ RSpec.describe API::APIController, type: :controller do
     end
 
     context 'token authentication' do
+      before do
+        Rails.application.config.saml_service = {api: {authentication: :token}}
+      end
+
       context 'invalid authorization header provided by client' do
         before do
           request.env['Authorization'] = "Z #{Faker::Lorem.word}"
@@ -201,6 +246,7 @@ RSpec.describe API::APIController, type: :controller do
       let(:api_subject) { create :api_subject, :x509_cn, enabled: false }
 
       before do
+        Rails.application.config.saml_service = {api: {authentication: :x509}}
         request.env['HTTP_X509_DN'] = "/CN=#{api_subject.x509_cn}/" \
                                       "O=#{Faker::Lorem.word}"
         get :an_action
@@ -260,6 +306,7 @@ RSpec.describe API::APIController, type: :controller do
     context 'subject with invalid permissions' do
       before do
         request.env['HTTP_X509_DN'] = "/CN=#{api_subject.x509_cn}/DC=example"
+        Rails.application.config.saml_service = {api: {authentication: :x509}}
       end
       subject(:api_subject) do
         create :api_subject, :x509_cn, :authorized, permission: 'invalid:permission'
@@ -286,6 +333,7 @@ RSpec.describe API::APIController, type: :controller do
     context 'subject with x509 authentication and valid permission' do
       before do
         request.env['HTTP_X509_DN'] = "/CN=#{api_subject.x509_cn}/DC=example"
+        Rails.application.config.saml_service = {api: {authentication: :x509}}
       end
       subject(:api_subject) do
         create :api_subject, :x509_cn, :authorized, permission: 'required:permission'
@@ -306,6 +354,7 @@ RSpec.describe API::APIController, type: :controller do
     context 'subject with token authentication and valid permission' do
       before do
         request.env['Authorization'] = "Bearer #{api_subject.token}"
+        Rails.application.config.saml_service = {api: {authentication: :token}}
       end
       subject(:api_subject) do
         create :api_subject, :token, :authorized, permission: 'required:permission'

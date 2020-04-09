@@ -27,12 +27,17 @@ module API
     protected
 
     def ensure_authenticated
-      unless x509_dn.present? || request.env['Authorization'].present?
-        raise(Unauthorized, 'API authentication method not provided')
+      if Rails.application.config.saml_service.api&.authentication&.blank?
+         raise(Forbidden, 'API authentication method is not configured')
       end
 
-      try_x509_authentication
-      try_token_authentication unless @subject
+      if Rails.application.config.saml_service.api.authentication == :x509
+        try_x509_authentication
+      elsif Rails.application.config.saml_service.api.authentication == :token
+            try_token_authentication
+        else
+            raise(Forbidden, 'A valid API authentication method is not configured')
+      end
 
       raise(Unauthorized, 'Subject invalid') unless @subject
       raise(Unauthorized, 'Subject not functional') unless @subject.functioning?
@@ -46,7 +51,10 @@ module API
     end
 
     def try_x509_authentication
-      return if x509_dn.blank?
+      if x509_dn.blank?
+        raise(Unauthorized, 'x509 API authentication method not provided')
+        return
+      end
 
       @subject = APISubject[x509_cn: x509_cn]
     end
@@ -68,7 +76,10 @@ module API
 
     def try_token_authentication
       header = request.env['Authorization'].try(:force_encoding, 'UTF-8')
-      return if header.blank?
+      if header.blank?
+        raise(Unauthorized, 'Token API authentication method not provided')
+        return
+      end
 
       @subject = APISubject[token: bearer_token(header)]
     end
