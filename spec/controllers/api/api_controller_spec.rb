@@ -3,11 +3,17 @@ require 'rails_helper' # rubocop:disable Style/FrozenStringLiteralComment
 require 'gumboot/shared_examples/api_controller'
 
 RSpec.describe API::APIController, type: :controller do
+  def auth_type(type)
+      allow(Rails.application)
+          .to receive_message_chain(:config, :saml_service, :api, :authentication)
+          .and_return(type)
+  end
+
   context 'requesting resource that does not exist' do
     let(:api_subject) { create(:api_subject, :x509_cn) }
 
     before do
-      Rails.application.config.saml_service = {api: {authentication: :x509}}
+      auth_type(:x509)
       request.env['HTTP_X509_DN'] = +"CN=#{api_subject.x509_cn}"
     end
 
@@ -38,7 +44,7 @@ RSpec.describe API::APIController, type: :controller do
   context 'a bad request' do
     let(:api_subject) { create(:api_subject, :x509_cn) }
     before do
-      Rails.application.config.saml_service = {api: {authentication: :x509}}
+      auth_type(:x509)
       request.env['HTTP_X509_DN'] = +"CN=#{api_subject.x509_cn}"
     end
 
@@ -84,7 +90,7 @@ RSpec.describe API::APIController, type: :controller do
 
     context 'invalid authentication method' do
         before do
-           Rails.application.config.saml_service = {api: {}}
+           auth_type(nil)
            get :an_action
         end
 
@@ -99,7 +105,7 @@ RSpec.describe API::APIController, type: :controller do
 
     context 'unknown authentication method' do
         before do
-           Rails.application.config.saml_service = {api: {authentication: :x}}
+           auth_type(:unknown)
            get :an_action
         end
 
@@ -114,7 +120,7 @@ RSpec.describe API::APIController, type: :controller do
 
     context 'x509 authentication' do
       before do
-        Rails.application.config.saml_service = {api: {authentication: :x509}}
+           auth_type(:x509)
       end
 
       context 'no x509 header set by nginx' do
@@ -204,7 +210,7 @@ RSpec.describe API::APIController, type: :controller do
 
     context 'token authentication' do
       before do
-        Rails.application.config.saml_service = {api: {authentication: :token}}
+        auth_type(:token)
       end
 
       context 'invalid authorization header provided by client' do
@@ -246,7 +252,7 @@ RSpec.describe API::APIController, type: :controller do
       let(:api_subject) { create :api_subject, :x509_cn, enabled: false }
 
       before do
-        Rails.application.config.saml_service = {api: {authentication: :x509}}
+        auth_type(:x509)
         request.env['HTTP_X509_DN'] = "/CN=#{api_subject.x509_cn}/" \
                                       "O=#{Faker::Lorem.word}"
         get :an_action
@@ -282,6 +288,7 @@ RSpec.describe API::APIController, type: :controller do
 
     context 'subject without permissions' do
       before do
+        auth_type(:x509)
         request.env['HTTP_X509_DN'] = "/CN=#{api_subject.x509_cn}/DC=example"
       end
 
@@ -306,7 +313,7 @@ RSpec.describe API::APIController, type: :controller do
     context 'subject with invalid permissions' do
       before do
         request.env['HTTP_X509_DN'] = "/CN=#{api_subject.x509_cn}/DC=example"
-        Rails.application.config.saml_service = {api: {authentication: :x509}}
+        auth_type(:x509)
       end
       subject(:api_subject) do
         create :api_subject, :x509_cn, :authorized, permission: 'invalid:permission'
@@ -333,7 +340,7 @@ RSpec.describe API::APIController, type: :controller do
     context 'subject with x509 authentication and valid permission' do
       before do
         request.env['HTTP_X509_DN'] = "/CN=#{api_subject.x509_cn}/DC=example"
-        Rails.application.config.saml_service = {api: {authentication: :x509}}
+        auth_type(:x509)
       end
       subject(:api_subject) do
         create :api_subject, :x509_cn, :authorized, permission: 'required:permission'
@@ -354,7 +361,7 @@ RSpec.describe API::APIController, type: :controller do
     context 'subject with token authentication and valid permission' do
       before do
         request.env['Authorization'] = "Bearer #{api_subject.token}"
-        Rails.application.config.saml_service = {api: {authentication: :token}}
+        auth_type(:token)
       end
       subject(:api_subject) do
         create :api_subject, :token, :authorized, permission: 'required:permission'
