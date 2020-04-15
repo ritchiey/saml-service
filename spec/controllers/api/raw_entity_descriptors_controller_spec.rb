@@ -59,8 +59,8 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
 
     before do
       allow(Rails.application.config)
-          .to receive_message_chain(:saml_service, :api, :authentication)
-          .and_return(:x509)
+        .to receive_message_chain(:saml_service, :api, :authentication)
+        .and_return(:x509)
     end
 
     context 'not permitted' do

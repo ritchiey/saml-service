@@ -4,9 +4,9 @@ require 'gumboot/shared_examples/api_controller'
 
 RSpec.describe API::APIController, type: :controller do
   def auth_type(type)
-      allow(Rails.application)
-          .to receive_message_chain(:config, :saml_service, :api, :authentication)
-          .and_return(type)
+    allow(Rails.application)
+      .to receive_message_chain(:config, :saml_service, :api, :authentication)
+      .and_return(type)
   end
 
   context 'requesting resource that does not exist' do
@@ -89,38 +89,38 @@ RSpec.describe API::APIController, type: :controller do
     let(:json) { JSON.parse(subject.body) }
 
     context 'invalid authentication method' do
-        before do
-           auth_type(nil)
-           get :an_action
-        end
+      before do
+        auth_type(nil)
+        get :an_action
+      end
 
-        it { is_expected.to have_http_status(:forbidden) }
+      it { is_expected.to have_http_status(:forbidden) }
 
-        context 'json within response' do
-          it 'has a message' do
-            expect(json['message']).to eq('The request was understood but explicitly denied.')
-          end
+      context 'json within response' do
+        it 'has a message' do
+          expect(json['message']).to eq('The request was understood but explicitly denied.')
         end
+      end
     end
 
     context 'unknown authentication method' do
-        before do
-           auth_type(:unknown)
-           get :an_action
-        end
+      before do
+        auth_type(:unknown)
+        get :an_action
+      end
 
-        it { is_expected.to have_http_status(:forbidden) }
+      it { is_expected.to have_http_status(:forbidden) }
 
-        context 'json within response' do
-          it 'has a message' do
-            expect(json['message']).to eq('The request was understood but explicitly denied.')
-          end
+      context 'json within response' do
+        it 'has a message' do
+          expect(json['message']).to eq('The request was understood but explicitly denied.')
         end
+      end
     end
 
     context 'x509 authentication' do
       before do
-           auth_type(:x509)
+        auth_type(:x509)
       end
 
       context 'no x509 header set by nginx' do

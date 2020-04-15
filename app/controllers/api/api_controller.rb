@@ -27,17 +27,11 @@ module API
     protected
 
     def ensure_authenticated
-      if Rails.application.config.saml_service.api&.authentication&.blank?
-         raise(Forbidden, 'API authentication method is not configured')
+      if Rails.application.config.saml_service.api&.authentication.blank?
+        raise(Forbidden, 'API authentication method is not configured')
       end
 
-      if Rails.application.config.saml_service.api.authentication == :x509
-        try_x509_authentication
-      elsif Rails.application.config.saml_service.api.authentication == :token
-            try_token_authentication
-        else
-            raise(Forbidden, 'A valid API authentication method is not configured')
-      end
+      authenticate
 
       raise(Unauthorized, 'Subject invalid') unless @subject
       raise(Unauthorized, 'Subject not functional') unless @subject.functioning?
@@ -50,11 +44,18 @@ module API
       raise("No access control performed by #{method}")
     end
 
-    def try_x509_authentication
-      if x509_dn.blank?
-        raise(Unauthorized, 'x509 API authentication method not provided')
-        return
+    def authenticate
+      if Rails.application.config.saml_service.api.authentication == :x509
+        try_x509_authentication
+      elsif Rails.application.config.saml_service.api.authentication == :token
+        try_token_authentication
+      else
+        raise(Forbidden, 'A valid API authentication method is not configured')
       end
+    end
+
+    def try_x509_authentication
+      raise(Unauthorized, 'x509 API authentication method not provided') if x509_dn.blank?
 
       @subject = APISubject[x509_cn: x509_cn]
     end
@@ -76,10 +77,7 @@ module API
 
     def try_token_authentication
       header = request.env['Authorization'].try(:force_encoding, 'UTF-8')
-      if header.blank?
-        raise(Unauthorized, 'Token API authentication method not provided')
-        return
-      end
+      raise(Unauthorized, 'Token API authentication method not provided') if header.blank?
 
       @subject = APISubject[token: bearer_token(header)]
     end
