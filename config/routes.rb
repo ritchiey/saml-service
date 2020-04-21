@@ -3,8 +3,8 @@
 require 'api_constraints'
 
 Rails.application.routes.draw do
-  SHA1_REGEXP = /{sha1}(.*)?/
-  URN_REGEXP = /(http|https|urn)(.*)?/
+  SHA1_REGEXP = /{sha1}(.*)?/.freeze
+  URN_REGEXP = /(http|https|urn)(.*)?/.freeze
 
   scope '/mdq' do
     match '/:instance/entities',
