@@ -3,7 +3,7 @@
 require 'openssl'
 
 module API
-  class APIController < ActionController::Base
+  class APIController < ActionController::API
     Forbidden = Class.new(StandardError)
     private_constant :Forbidden
     rescue_from Forbidden, with: :forbidden
@@ -75,7 +75,7 @@ module API
     end
 
     def try_token_authentication
-      header = request.env['Authorization'].try(:force_encoding, 'UTF-8')
+      header = request.headers['Authorization'].try(:force_encoding, 'UTF-8')
       raise(Unauthorized, 'Token API authentication method not provided') if header.blank?
 
       @subject = APISubject[token: bearer_token(header)]

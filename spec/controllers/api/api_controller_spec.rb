@@ -14,7 +14,7 @@ RSpec.describe API::APIController, type: :controller do
 
     before do
       auth_type(:x509)
-      request.env['HTTP_X509_DN'] = +"CN=#{api_subject.x509_cn}"
+      request.headers['HTTP_X509_DN'] = +"CN=#{api_subject.x509_cn}"
     end
 
     controller(API::APIController) do
@@ -45,7 +45,7 @@ RSpec.describe API::APIController, type: :controller do
     let(:api_subject) { create(:api_subject, :x509_cn) }
     before do
       auth_type(:x509)
-      request.env['HTTP_X509_DN'] = +"CN=#{api_subject.x509_cn}"
+      request.headers['HTTP_X509_DN'] = +"CN=#{api_subject.x509_cn}"
     end
 
     controller(API::APIController) do
@@ -140,7 +140,7 @@ RSpec.describe API::APIController, type: :controller do
 
       context 'x509 header set to "(null)"' do
         before do
-          request.env['HTTP_X509_DN'] = '(null)'
+          request.headers['HTTP_X509_DN'] = '(null)'
           get :an_action
         end
 
@@ -157,7 +157,7 @@ RSpec.describe API::APIController, type: :controller do
 
       context 'invalid x509 header set by nginx' do
         before do
-          request.env['HTTP_X509_DN'] = "Z=#{Faker::Lorem.word}"
+          request.headers['HTTP_X509_DN'] = "Z=#{Faker::Lorem.word}"
           get :an_action
         end
 
@@ -174,7 +174,7 @@ RSpec.describe API::APIController, type: :controller do
 
       context 'without a CN component to DN' do
         before do
-          request.env['HTTP_X509_DN'] = "O=#{Faker::Lorem.word}"
+          request.headers['HTTP_X509_DN'] = "O=#{Faker::Lorem.word}"
           get :an_action
         end
 
@@ -191,7 +191,7 @@ RSpec.describe API::APIController, type: :controller do
 
       context 'with a CN that does not represent an APISubject' do
         before do
-          request.env['HTTP_X509_DN'] = "/CN=#{Faker::Lorem.word}/" \
+          request.headers['HTTP_X509_DN'] = "/CN=#{Faker::Lorem.word}/" \
                                         "O=#{Faker::Lorem.word}"
           get :an_action
         end
@@ -215,7 +215,7 @@ RSpec.describe API::APIController, type: :controller do
 
       context 'invalid authorization header provided by client' do
         before do
-          request.env['Authorization'] = "Z #{Faker::Lorem.word}"
+          request.headers['Authorization'] = "Z #{Faker::Lorem.word}"
           get :an_action
         end
 
@@ -232,7 +232,7 @@ RSpec.describe API::APIController, type: :controller do
 
       context 'with a token that does not represent an APISubject' do
         before do
-          request.env['Authorization'] = 'Bearer 123'
+          request.headers['Authorization'] = 'Bearer 123'
           get :an_action
         end
 
@@ -253,7 +253,7 @@ RSpec.describe API::APIController, type: :controller do
 
       before do
         auth_type(:x509)
-        request.env['HTTP_X509_DN'] = "/CN=#{api_subject.x509_cn}/" \
+        request.headers['HTTP_X509_DN'] = "/CN=#{api_subject.x509_cn}/" \
                                       "O=#{Faker::Lorem.word}"
         get :an_action
       end
@@ -289,7 +289,7 @@ RSpec.describe API::APIController, type: :controller do
     context 'subject without permissions' do
       before do
         auth_type(:x509)
-        request.env['HTTP_X509_DN'] = "/CN=#{api_subject.x509_cn}/DC=example"
+        request.headers['HTTP_X509_DN'] = "/CN=#{api_subject.x509_cn}/DC=example"
       end
 
       include_examples 'APIController base state'
@@ -312,7 +312,7 @@ RSpec.describe API::APIController, type: :controller do
 
     context 'subject with invalid permissions' do
       before do
-        request.env['HTTP_X509_DN'] = "/CN=#{api_subject.x509_cn}/DC=example"
+        request.headers['HTTP_X509_DN'] = "/CN=#{api_subject.x509_cn}/DC=example"
         auth_type(:x509)
       end
       subject(:api_subject) do
@@ -339,7 +339,7 @@ RSpec.describe API::APIController, type: :controller do
 
     context 'subject with x509 authentication and valid permission' do
       before do
-        request.env['HTTP_X509_DN'] = "/CN=#{api_subject.x509_cn}/DC=example"
+        request.headers['HTTP_X509_DN'] = "/CN=#{api_subject.x509_cn}/DC=example"
         auth_type(:x509)
       end
       subject(:api_subject) do
@@ -360,7 +360,7 @@ RSpec.describe API::APIController, type: :controller do
 
     context 'subject with token authentication and valid permission' do
       before do
-        request.env['Authorization'] = "Bearer #{api_subject.token}"
+        request.headers['Authorization'] = "Bearer #{api_subject.token}"
         auth_type(:token)
       end
       subject(:api_subject) do
