@@ -291,7 +291,7 @@ GEM
     ruby2_keywords (0.0.2)
     rufus-scheduler (3.6.0)
       fugit (~> 1.1, >= 1.1.6)
-    rugged (1.0.0)
+    rugged (0.28.4.1)
     safe_yaml (1.0.5)
     sequel (4.49.0)
     sequel-rails (1.1.1)
@@ -381,7 +381,7 @@ DEPENDENCIES
   rubocop
   rubocop-faker
   rubocop-rails
-  rugged
+  rugged (= 0.28.4.1)
   sequel (>= 4.0.0, < 5)
   sequel-rails
   shoulda-matchers
