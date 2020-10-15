@@ -2,7 +2,7 @@
 
 AAF service responsible for SAML data storage, metadata generation and inter-federation metadata processing.
 
-## Production Concerns
+## AAF Production Concerns
 
 ### eduGAIN
 
@@ -10,7 +10,7 @@ AAF service responsible for SAML data storage, metadata generation and inter-fed
 
 To export an AAF registered IdP to eduGAIN:
 
-1. Get a session on `app4.core.aaf.edu.au` 
+1. Get a session on `<SAML Service HOST>` 
 1. Become the `saml` user, `$> sudo -iu saml`
 1. Source `.app-env`
 1. Change to `repository`
@@ -33,10 +33,8 @@ a = Attribute.create name: 'urn:oasis:names:tc:SAML:attribute:assurance-certific
 nf = NameFormat.create attribute: a, uri: 'urn:oasis:names:tc:SAML:2.0:attrname-format:uri'
 av = AttributeValue.create value: 'https://refeds.org/sirtfi', attribute: a
 
-
 # Export to eduGAIN
 ed.known_entity.tag_as('aaf-edugain-export')
-
 
 # Finalize
 ed.save
@@ -45,7 +43,9 @@ ed.known_entity.touch
 
 Validate the EntityID will now be pushlished to the global feed:
 
+```
 $> http https://saml.aaf.edu.au/mdq/aaf-edugain-export/entities Accept:application/samlmetadata+xml | rg 'https://idp.example.edu.au/idp/shibboelth'
+```
 
 Advise support all is complete. On our next Metadata publish this will be pushed out to S3 and will picked up and pushed out by global
 metadata aggregate in around 24 hours. Check https://technical.edugain.org/entities to ensure it shows up after those 24 hours if necessary.
@@ -54,7 +54,7 @@ metadata aggregate in around 24 hours. Check https://technical.edugain.org/entit
 
 To export an AAF registered SP to eduGAIN:
 
-1. Get a session on `app4.core.aaf.edu.au` 
+1. Get a session on `<SAML Service Host>` 
 1. Become the `saml` user, `$> sudo -iu saml`
 1. Source `.app-env`
 1. Change to `repository`
@@ -95,7 +95,9 @@ ed.known_entity.touch
 
 Validate the EntityID will now be pushlished to the global feed:
 
+```
 $> http https://saml.aaf.edu.au/mdq/aaf-edugain-export/entities Accept:application/samlmetadata+xml | rg 'https://example.edu.au/shibboleth'
+```
 
 Advise support all is complete. On our next Metadata publish this will be pushed out to S3 and will picked up and pushed out by global
 metadata aggregate in around 24 hours. Check https://technical.edugain.org/entities to ensure it shows up after those 24 hours if necessary.
@@ -111,7 +113,7 @@ Services marked as R&S are preferred within the AAF context.
 
 To import a non AAF registered SP from eduGAIN that is not considered R&S do the following:
 
-1. Get a session on `app4.core.aaf.edu.au` 
+1. Get a session on `<SAML Service Host>` 
 1. Become the `saml` user, `$> sudo -iu saml`
 1. Source `.app-env`
 1. Change to `repository`
@@ -130,7 +132,9 @@ ed.known_entity.touch
 
 Validate the EntityID will now be ingested from the global feed:
 
+```
 $> http https://saml.aaf.edu.au/mdq/aaf-edugain-verified/entities Accept:application/samlmetadata+xml | rg 'https://example.edu/shibboleth'
+```
 
 Advise support all is complete. On our next Metadata publish this will be pushed out to S3 and will picked up and loaded by AAF IdP the next time they
 update metadata.
