@@ -21,23 +21,23 @@ To export an AAF registered IdP to eduGAIN:
 entity_id = 'https://example.edu.au/idp/shibboleth'
 
 ed = EntityId[uri: entity_id].entity_descriptor
-ea = ed.entity_attribute || MDATTR::EntityAttribute.create(entity_descriptor: ed)
+ea = ed.entity_attribute || MDATTR::EntityAttribute.create!(entity_descriptor: ed)
 
 # IdP R&S
-a = Attribute.create name: 'http://macedir.org/entity-category-support', entity_attribute: ea
-nf = NameFormat.create attribute: a, uri: 'urn:oasis:names:tc:SAML:2.0:attrname-format:uri'
-av = AttributeValue.create value: 'http://refeds.org/category/research-and-scholarship', attribute: a
+a = Attribute.create!(name: 'http://macedir.org/entity-category-support', entity_attribute: ea)
+nf = NameFormat.create!(attribute: a, uri: 'urn:oasis:names:tc:SAML:2.0:attrname-format:uri')
+av = AttributeValue.create!(value: 'http://refeds.org/category/research-and-scholarship', attribute: a)
 
 # SIRTFI
-a = Attribute.create name: 'urn:oasis:names:tc:SAML:attribute:assurance-certification', entity_attribute: ea
-nf = NameFormat.create attribute: a, uri: 'urn:oasis:names:tc:SAML:2.0:attrname-format:uri'
-av = AttributeValue.create value: 'https://refeds.org/sirtfi', attribute: a
+a = Attribute.create!(name: 'urn:oasis:names:tc:SAML:attribute:assurance-certification', entity_attribute: ea)
+nf = NameFormat.create!(attribute: a, uri: 'urn:oasis:names:tc:SAML:2.0:attrname-format:uri')
+av = AttributeValue.create!(value: 'https://refeds.org/sirtfi', attribute: a)
 
 # Export to eduGAIN
 ed.known_entity.tag_as('aaf-edugain-export')
 
 # Finalize
-ed.save
+ed.save!
 ed.known_entity.touch
 ```
 
@@ -66,30 +66,30 @@ entity_id = 'https://example.edu.au/shibboleth'
 information_url = 'https://example.edu.au/look-its-some-information-at-a-url'
 
 ed = EntityId[uri: entity_id].entity_descriptor
-ea = ed.entity_attribute || MDATTR::EntityAttribute.create(entity_descriptor: ed)
+ea = ed.entity_attribute || MDATTR::EntityAttribute.create!(entity_descriptor: ed)
 
 # SP R&S
-a = Attribute.create name: 'http://macedir.org/entity-category', entity_attribute: ea
-nf = NameFormat.create attribute: a, uri: 'urn:oasis:names:tc:SAML:2.0:attrname-format:uri'
-av = AttributeValue.create value: 'http://refeds.org/category/research-and-scholarship', attribute: a
+a = Attribute.create!(name: 'http://macedir.org/entity-category', entity_attribute: ea)
+nf = NameFormat.create!(attribute: a, uri: 'urn:oasis:names:tc:SAML:2.0:attrname-format:uri')
+av = AttributeValue.create!(value: 'http://refeds.org/category/research-and-scholarship', attribute: a)
 
 # SP InformationURL
 ed.sp_sso_descriptors.each do |rd|
   ui_info = rd.ui_info || raise('no UIInfo, should not be possible')
   next if ui_info.information_urls.any?
-  MDUI::InformationURL.create(ui_info: ui_info, uri: information_url, lang: 'en')
+  MDUI::InformationURL.create!(ui_info: ui_info, uri: information_url, lang: 'en')
 end
 
 # SIRTFI
-a = Attribute.create name: 'urn:oasis:names:tc:SAML:attribute:assurance-certification', entity_attribute: ea
-nf = NameFormat.create attribute: a, uri: 'urn:oasis:names:tc:SAML:2.0:attrname-format:uri'
-av = AttributeValue.create value: 'https://refeds.org/sirtfi', attribute: a
+a = Attribute.create!(name: 'urn:oasis:names:tc:SAML:attribute:assurance-certification', entity_attribute: ea)
+nf = NameFormat.create!(attribute: a, uri: 'urn:oasis:names:tc:SAML:2.0:attrname-format:uri')
+av = AttributeValue.create!(value: 'https://refeds.org/sirtfi', attribute: a)
 
 # Export to eduGAIN
 ed.known_entity.tag_as('aaf-edugain-export')
 
 # Finalize
-ed.save
+ed.save!
 ed.known_entity.touch
 ```
 
@@ -126,7 +126,7 @@ ed = EntityId[uri: entity_id].raw_entity_descriptor
 ed.known_entity.tag_as('aaf-edugain-verified')
 
 # Finalize
-ed.save
+ed.save!
 ed.known_entity.touch
 ```
 
