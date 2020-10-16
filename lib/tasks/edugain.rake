@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 namespace :edugain do
-  task :publish_idp, [:eid] => :environment do |t, args|
+  task :publish_idp, [:eid] => :environment do |_t, args|
     eid = entity_id(args[:eid])
     ed = eid.entity_descriptor
     ea = find_create_entity_attribute(ed)
@@ -11,7 +13,7 @@ namespace :edugain do
     finalize(ed)
   end
 
-  task :publish_sp, [:eid,:info_url] => :environment do |t, args|
+  task :publish_sp, %i[eid info_url] => :environment do |_t, args|
     eid = entity_id(args[:eid])
     ed = eid.entity_descriptor
     ea = find_create_entity_attribute(ed)
@@ -29,7 +31,7 @@ namespace :edugain do
     finalize(ed)
   end
 
-  task :approve_non_rs_entity, [:eid] => :environment do |t, args|
+  task :approve_non_rs_entity, [:eid] => :environment do |_t, args|
     eid = entity_id(args[:eid])
     ed = eid.raw_entity_descriptor
 
@@ -47,8 +49,8 @@ def entity_id(eid)
 
   entity_id = EntityId[uri: eid]
   if entity_id.nil?
-     p "Could not find an entry for supplied entity_id '#{eid}'"
-     exit
+    p "Could not find an entry for supplied entity_id '#{eid}'"
+    exit
   end
   entity_id
 end
@@ -63,28 +65,30 @@ end
 
 def add_rs_to_idp(ea)
   a = Attribute.create(name: 'http://macedir.org/entity-category-support', entity_attribute: ea)
-  nf = NameFormat.create(attribute: a, uri: 'urn:oasis:names:tc:SAML:2.0:attrname-format:uri')
-  av = AttributeValue.create(value: 'http://refeds.org/category/research-and-scholarship', attribute: a)
+  NameFormat.create(attribute: a, uri: 'urn:oasis:names:tc:SAML:2.0:attrname-format:uri')
+  AttributeValue.create(value: 'http://refeds.org/category/research-and-scholarship', attribute: a)
 end
 
 def add_rs_to_sp(ea)
   a = Attribute.create(name: 'http://macedir.org/entity-category', entity_attribute: ea)
-  nf = NameFormat.create(attribute: a, uri: 'urn:oasis:names:tc:SAML:2.0:attrname-format:uri')
-  av = AttributeValue.create(value: 'http://refeds.org/category/research-and-scholarship', attribute: a)
+  NameFormat.create(attribute: a, uri: 'urn:oasis:names:tc:SAML:2.0:attrname-format:uri')
+  AttributeValue.create(value: 'http://refeds.org/category/research-and-scholarship', attribute: a)
 end
 
 def add_info_url_to_sp(ed, information_url)
   ed.sp_sso_descriptors.each do |rd|
     ui_info = rd.ui_info || raise('no UIInfo, should not be possible')
     next if ui_info.information_urls.any?
+
     MDUI::InformationURL.create(ui_info: ui_info, uri: information_url, lang: 'en')
   end
 end
 
 def add_sirtfi(ea)
-  a = Attribute.create(name: 'urn:oasis:names:tc:SAML:attribute:assurance-certification', entity_attribute: ea)
-  nf = NameFormat.create(attribute: a, uri: 'urn:oasis:names:tc:SAML:2.0:attrname-format:uri')
-  av = AttributeValue.create(value: 'https://refeds.org/sirtfi', attribute: a)
+  a = Attribute.create(name: 'urn:oasis:names:tc:SAML:attribute:assurance-certification',
+                       entity_attribute: ea)
+  NameFormat.create(attribute: a, uri: 'urn:oasis:names:tc:SAML:2.0:attrname-format:uri')
+  AttributeValue.create(value: 'https://refeds.org/sirtfi', attribute: a)
 end
 
 def finalize(ed)
