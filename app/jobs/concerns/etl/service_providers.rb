@@ -71,22 +71,25 @@ module ETL
       end
     end
 
+    # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
     def attribute_consuming_services(sp, acservices_data)
       sp.attribute_consuming_services.each(&:destroy)
       acservices_data.each_with_index do |ac_data, i|
-        next if ac_data[:attributes].empty?
+        requested_attributes = ac_data[:attributes].select { |ra| ra[:approved] }
+        next if requested_attributes.empty?
 
         service_name = ServiceName.new(value: ac_data[:names][0], lang: 'en')
         acs = AttributeConsumingService.create(index: i + 1,
                                                default: ac_data[:is_default],
                                                sp_sso_descriptor: sp)
         acs.add_service_name(service_name)
-        acs_attributes(acs, ac_data)
+        acs_attributes(acs, requested_attributes)
       end
     end
+    # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 
-    def acs_attributes(acs, ac_data)
-      ac_data[:attributes].each do |attr_data|
+    def acs_attributes(acs, requested_attributes)
+      requested_attributes.each do |attr_data|
         next unless correctly_specified?(attr_data)
 
         base = fr_attributes[attr_data[:id]]
