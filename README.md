@@ -2,6 +2,12 @@
 
 AAF service responsible for SAML data storage, metadata generation and inter-federation metadata processing.
 
+## Local Development
+
+SAML Service requires ruby installed through rbenv and a running instance of mysql.
+If that's working, run `bin/setup` to prepare the application.
+Then you can run `bundle exec rspec` to test the application and `rails server` to boot it.
+
 ## AAF Production Concerns
 
 ### eduGAIN
