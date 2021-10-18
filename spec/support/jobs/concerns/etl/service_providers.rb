@@ -68,7 +68,7 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
       name: Faker::Lorem.word,
       is_required: false,
       reason: Faker::Lorem.word,
-      approved: true,
+      approved: ra[:approved],
       specification: ra[:specification] ||= false,
       values: ra[:values]
     }
@@ -137,6 +137,7 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
         description: Faker::Lorem.sentence,
         oid: "#{Faker::Number.number(digits: 4)}:"\
              "#{Faker::Number.number(digits: 4)}",
+        approved: true,
         values: []
       }
     end.push(
@@ -144,6 +145,7 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
       description: Faker::Lorem.sentence,
       oid: "#{Faker::Number.number(digits: 4)}:"\
            "#{Faker::Number.number(digits: 4)}",
+      approved: true,
       values: [],
       specification: true
     ).push(
@@ -151,9 +153,17 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
       description: Faker::Lorem.sentence,
       oid: "#{Faker::Number.number(digits: 4)}:"\
            "#{Faker::Number.number(digits: 4)}",
+      approved: true,
       values: [{ approved: true, value: Faker::Number.number(digits: 4) },
                { approved: false, value: Faker::Number.number(digits: 3) }],
       specification: true
+    ).push(
+      id: attribute_count + 2,
+      description: Faker::Lorem.sentence,
+      oid: "#{Faker::Number.number(digits: 4)}:"\
+           "#{Faker::Number.number(digits: 4)}",
+      approved: false,
+      values: []
     )
   end
 
@@ -199,7 +209,7 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
       before { run }
 
       it 'is provided with attributes that are not acceptable' do
-        expect(attribute_instances.size).to eq(attribute_count + 2)
+        expect(attribute_instances.size).to eq(attribute_count + 3)
       end
 
       it 'requests expected number of attributes' do
