@@ -205,6 +205,24 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
       expect { run }.to change { AttributeConsumingService.count }.by(sp_count)
     end
 
+    context 'with a solo requestedAttribute requiring specification with no requested value provided' do
+      let(:attribute_instances) do
+        [
+          id: 0,
+          description: Faker::Lorem.sentence,
+          oid: "#{Faker::Number.number(digits: 4)}:"\
+               "#{Faker::Number.number(digits: 4)}",
+          approved: true,
+          values: [],
+          specification: true
+        ]
+      end
+
+      it 'does not create a new AttributeConsumingService' do
+        expect { run }.not_to(change { AttributeConsumingService.count })
+      end
+    end
+
     context 'created instance' do
       before { run }
 

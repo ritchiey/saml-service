@@ -75,12 +75,13 @@ module ETL
     def attribute_consuming_services(sp, acservices_data)
       sp.attribute_consuming_services.each(&:destroy)
       acservices_data.each_with_index do |ac_data, i|
-        requested_attributes = ac_data[:attributes].select { |ra| ra[:approved] }
+        requested_attributes = ac_data[:attributes].select do |ra|
+          ra[:approved] && correctly_specified?(ra)
+        end
         next if requested_attributes.empty?
 
         service_name = ServiceName.new(value: ac_data[:names][0], lang: 'en')
-        acs = AttributeConsumingService.create(index: i + 1,
-                                               default: ac_data[:is_default],
+        acs = AttributeConsumingService.create(index: i + 1, default: ac_data[:is_default],
                                                sp_sso_descriptor: sp)
         acs.add_service_name(service_name)
         acs_attributes(acs, requested_attributes)
@@ -90,8 +91,6 @@ module ETL
 
     def acs_attributes(acs, requested_attributes)
       requested_attributes.each do |attr_data|
-        next unless correctly_specified?(attr_data)
-
         base = fr_attributes[attr_data[:id]]
         ra = requested_attribute(acs, attr_data, base)
         acs.add_requested_attribute(ra)
