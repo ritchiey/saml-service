@@ -205,7 +205,7 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
       expect { run }.to change { AttributeConsumingService.count }.by(sp_count)
     end
 
-    context 'with a solo requestedAttribute requiring specification with no requested value provided' do
+    context 'with a solo requestedAttribute requiring specification with no requested value' do
       let(:attribute_instances) do
         [
           id: 0,
