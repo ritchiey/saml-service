@@ -9,17 +9,18 @@ module Edugain
     end
 
     def approve
-      descriptor.known_entity.tag_as 'aaf-edugain-verified'
-      descriptor.known_entity.touch
-      descriptor.save(raise_on_save_failure: true)
+      known_entity.tag_as 'aaf-edugain-verified'
+      known_entity.touch
     end
 
     private
 
-    def descriptor
-      @descriptor ||= EntityId[uri: id].tap do |eid|
-        raise ArgumentError, 'Could not find an entry for supplied id' if eid.nil?
-      end.entity_descriptor
+    def known_entity
+      @known_entity ||= begin
+        entity_id = EntityId.first!(uri: id)
+        descriptor = entity_id.entity_descriptor || entity_id.raw_entity_descriptor
+        descriptor.known_entity
+      end
     end
   end
 end
