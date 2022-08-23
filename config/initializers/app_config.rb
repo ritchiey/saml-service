@@ -2,5 +2,12 @@
 
 Rails.application.configure do
   config.saml_service =
-    RecursiveOpenStruct.new(config_for(:saml_service).deep_symbolize_keys)
+    {
+      metadata: {
+        negative_cache_ttl: 600
+      },
+      api: {
+        authentication: :token
+      }
+    }.deep_symbolize_keys
 end

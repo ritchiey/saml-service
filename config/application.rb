@@ -32,7 +32,19 @@ module Saml
       Sequel::Model.plugin :validation_helpers
     end
 
-    config.cache_store = :redis_store, 'redis://localhost:6379/0/cache'
+    if ENV['REDIS_AUTH_TOKEN'].present?
+      config.cache_store = :redis_cache_store, {
+        url: "#{ENV.fetch('REDIS_SCHEME', 'rediss')}://:#{CGI.escape(ENV.fetch('REDIS_AUTH_TOKEN', 'password'))}@" \
+             "#{ENV.fetch('REDIS_HOST', 'localhost')}:6379/0",
+        ssl_params: { verify_mode: OpenSSL::SSL::VERIFY_NONE },
+        namespace: 'val',
+        pool_size: 5,
+        pool_timeout: 5
+      }
+    ## this is the legacy config can be removed once nnwo is used for live
+    else
+      config.cache_store = :redis_store, 'redis://localhost:6379/0/cache'
+    end
     config.autoload_paths << Rails.root.join('app', 'jobs', 'concerns')
 
     config.sequel.logger = Logger.new($stderr) if ENV['AAF_DEBUG']
