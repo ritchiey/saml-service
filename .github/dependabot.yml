@@ -1,0 +1,15 @@
+version: 2
+updates:
+  - package-ecosystem: "bundler"
+    directory: /
+    schedule:
+      interval: "daily"
+      time: "09:00"
+      timezone: "Australia/Brisbane"
+
+    # Raise pull requests for version updates
+    # to bundler against the `develop` branch
+    target-branch: "develop"
+    # Labels on pull requests for version updates only
+    labels:
+      - "gem dependencies"
