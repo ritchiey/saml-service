@@ -75,19 +75,19 @@ jobs:
 
       - name: RSpec
         env:
-          HOSTEDIDP_DB_USERNAME: root
-          HOSTEDIDP_DB_PASSWORD: password
-          HOSTEDIDP_DB_HOST: host.docker.internal
+          SAML_DB_USERNAME: root
+          SAML_DB_PASSWORD: password
+          SAML_DB_HOST: host.docker.internal
           PREPARE_DB: true
           RAILS_ENV: test
         run: |
           docker run \
             --env-file=.env.test.dist \
-            --add-host=$HOSTEDIDP_DB_HOST:host-gateway \
-            -e HOSTEDIDP_DB_HOST \
+            --add-host=$SAML_DB_HOST:host-gateway \
+            -e SAML_DB_HOST \
             -e PREPARE_DB \
-            -e HOSTEDIDP_DB_USERNAME \
-            -e HOSTEDIDP_DB_PASSWORD \
+            -e SAML_DB_USERNAME \
+            -e SAML_DB_PASSWORD \
             $IMAGE_ID:$IMAGE_TAG \
             rspec
 
