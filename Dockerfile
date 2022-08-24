@@ -22,9 +22,19 @@ RUN apt-get install -y --no-install-recommends \
 	build-essential \
 	apt-utils \
 	unzip \
+	cmake \
 	pkg-config \
 	&& bundle install \
-	&& apt-get purge -y --auto-remove build-essential apt-utils git libpq-dev gnupg
+	&& apt-get purge -y --auto-remove \
+	build-essential \
+	apt-utils \
+	git \
+	libpq-dev \
+	gnupg \
+	cmake \
+	pkg-config
+
+RUN apt-get install -y mariadb-client
 
 COPY . .
 COPY .docker/bin ./bin

@@ -6,6 +6,8 @@ Rails.application.routes.draw do
   SHA1_REGEXP = /{sha1}(.*)?/.freeze
   URN_REGEXP = /(http|https|urn)(.*)?/.freeze
 
+  get 'health' => 'health#show'
+
   scope '/mdq' do
     match '/:instance/entities',
           to: 'metadata_query#all_entities', via: :all
@@ -45,5 +47,3 @@ Rails.application.routes.draw do
     end
   end
 end
-
-get 'health' => 'health#show'

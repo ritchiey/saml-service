@@ -1,8 +1,8 @@
 default: &default
   adapter: mysql2
-  username: <%= ENV['SAML_DB_USERNAME'] || saml_app %>
-  password: <%= ENV['SAML_DB_PASSWORD'] || password %>
-  host: <%= ENV['SAML_DB_HOST'] || 127.0.0.1 %>
+  username: <%= ENV['SAML_DB_USERNAME'] || 'saml_app' %>
+  password: <%= ENV['SAML_DB_PASSWORD'] || 'password' %>
+  host: <%= ENV['SAML_DB_HOST'] || '127.0.0.1' %>
   port: <%= ENV['SAML_DB_PORT'] || 3306 %>
   pool: 5
   timeout: 5000
@@ -12,11 +12,11 @@ default: &default
 
 development:
   <<: *default
-  database: <%= ENV['SAML_DB_NAME'] || saml_development %>
+  database: <%= ENV['SAML_DB_NAME'] || 'saml_development' %>
 
 test:
   <<: *default
-  database: <%= ENV['SAML_DB_NAME'] || saml_test %>
+  database: <%= ENV['SAML_DB_NAME'] || 'saml_test' %>
 
 production:
   <<: *default
