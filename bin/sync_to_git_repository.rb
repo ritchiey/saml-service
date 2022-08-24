@@ -11,7 +11,7 @@ class SyncToGitRepository
   def initialize(args)
     if args.length != 3
       warn("usage: #{$PROGRAM_NAME} /path/to/config/file" \
-                   'md_instance_identifier /path/to/git/repository')
+           'md_instance_identifier /path/to/git/repository')
       exit 1
     end
 
@@ -70,7 +70,7 @@ class SyncToGitRepository
   def sweep(touched)
     prefix = "entities/#{@md_instance.identifier}-"
 
-    all = @repository.index.map { |e| e[:path] }
+    all = @repository.index.pluck(:path)
                      .select { |p| p.start_with?(prefix) }
 
     (all - touched).each { |path| remove_stale(path) }
@@ -78,7 +78,7 @@ class SyncToGitRepository
 
   def write_metadata(ke, filename, xml)
     full_path = File.join(@repository.workdir, filename)
-    File.open(full_path, 'w') { |f| f.write(xml) }
+    File.write(full_path, xml)
 
     return if @repository.status(filename).empty?
 

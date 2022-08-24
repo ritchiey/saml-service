@@ -9,8 +9,6 @@ else
   echo "Preparing database..."
   if [ "${RAILS_ENV-}" != "production" ]; then
     bundle exec rake db:create
-    bundle exec rake db:migrate
-  else
-    bundle exec rake db:migrate
   fi
+  bundle exec rake db:migrate
 fi
