@@ -65,4 +65,3 @@ FROM saml-service as production
 ENV RAILS_ENV production
 RUN rm -rf spec
 RUN bundle config set --local without "development test" && bundle install
-RUN SECRET_KEY_BASE=1 bundle exec rake assets:precompile
