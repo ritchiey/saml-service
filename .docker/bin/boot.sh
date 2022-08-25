@@ -14,8 +14,7 @@ touch /tmp/started
 
 if [ "${DEBUG_CONTAINER-}" == "true" ]; then
   echo 'Debugging!'
-  trap : TERM INT
-  exec tail -f /dev/null & wait
+  exec tail -f /dev/null
 else
   echo 'Running!'
   exec bundle exec $1
