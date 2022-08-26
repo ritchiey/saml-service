@@ -12,12 +12,12 @@ gem 'sequel-rails'
 gem 'nokogiri', '>= 1.8.5'
 gem 'xmldsig'
 
+gem 'implicit-schema'
+gem 'lograge'
 gem 'redis'
 gem 'redis-rails'
 gem 'resque'
 gem 'resque-retry'
-
-gem 'implicit-schema'
 
 gem 'recursive-open-struct'
 
