@@ -52,6 +52,8 @@ RUN groupadd -g 501 app \
 USER app
 
 EXPOSE 3000
+ARG RELEASE_VERSION="VERSION_PROVIDED_ON_BUILD"
+ENV RELEASE_VERSION $RELEASE_VERSION
 ENTRYPOINT [ "/app/bin/boot.sh" ]
 CMD [ "puma"]
 FROM saml-service as development
