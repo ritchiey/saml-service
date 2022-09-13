@@ -1,4 +1,4 @@
-ARG DOCKER_ECR="139301490686.dkr.ecr.ap-southeast-2.amazonaws.com/"
+ARG DOCKER_ECR=""
 FROM ${DOCKER_ECR}ruby-base-image:2.7 as ruby
 FROM ruby as saml-service
 

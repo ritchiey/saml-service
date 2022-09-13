@@ -1,11 +1,11 @@
+-include .env
+
 LOCAL_IP=$(shell ipconfig getifaddr en0)
 PWD=$(shell pwd)
 docker-login:
 	@if [ "${DOCKER_ECR}" != "" ]; then \
-		aws-vault exec shared_services -- aws ecr get-login-password --region ap-southeast-2 | docker login --username AWS --password-stdin 139301490686.dkr.ecr.ap-southeast-2.amazonaws.com; \
+		aws-vault exec shared_services -- aws ecr get-login-password --region ap-southeast-2 | docker login --username AWS --password-stdin ${DOCKER_ECR}; \
 	fi
-## comment out this if m1 and use a local built image instead
-DOCKER_ECR=139301490686.dkr.ecr.ap-southeast-2.amazonaws.com/
 BUILD_TARGET=--target development
 
 build-image:
