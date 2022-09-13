@@ -53,7 +53,9 @@ jobs:
       - name: Build Test OCI Image
         run: |
           docker pull $IMAGE_ID:latest || true
-          docker build --target development --cache-from $IMAGE_ID:latest -t $IMAGE_ID:$IMAGE_TAG .
+          docker build --target development \
+          --build-arg DOCKER_ECR=${{ secrets.DOCKER_ECR }} \
+          --cache-from $IMAGE_ID:latest -t $IMAGE_ID:$IMAGE_TAG .
 
       - name: Rubocop
         run: |
@@ -96,6 +98,7 @@ jobs:
         run: |
           docker pull $IMAGE_ID:latest || true
           docker build --cache-from $IMAGE_ID:latest \
+          --build-arg DOCKER_ECR=${{ secrets.DOCKER_ECR }} \
           --build-arg RELEASE_VERSION=${IMAGE_TAG} \
           -t $IMAGE_ID:$IMAGE_TAG .
 
