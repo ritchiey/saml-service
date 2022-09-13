@@ -9,6 +9,7 @@ on:
 
 jobs:
   push:
+    name: Test, build and push image
     runs-on: ubuntu-latest
     permissions:
       id-token: write
