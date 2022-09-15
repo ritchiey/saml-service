@@ -20,15 +20,4 @@ Sentry.init do |config|
     # This number likely needs to be debated and modified over time as needs/plans change
     0.2
   end
-
-  filter = ActiveSupport::ParameterFilter.new(Rails.application.config.filter_parameters)
-  config.before_send = lambda do |event, _hint|
-    case event
-    when Sentry::Event
-      event.request.data = filter.filter(event.request.data) if event.request.data.present?
-    when Hash
-      event = filter.filter(event)
-    end
-    event
-  end
 end
