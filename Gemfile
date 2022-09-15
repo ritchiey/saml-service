@@ -9,6 +9,7 @@ gem 'mysql2'
 gem 'sequel', '>= 4.0.0', '< 5'
 gem 'sequel-rails'
 
+gem 'crawler_detect'
 gem 'nokogiri', '>= 1.8.5'
 gem 'xmldsig'
 
