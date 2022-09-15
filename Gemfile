@@ -29,6 +29,9 @@ gem 'rugged', '0.28.4.1', require: false
 
 gem 'puma', require: false
 
+gem 'sentry-rails'
+gem 'sentry-ruby'
+
 group :development, :test do
   gem 'capybara'
   gem 'rspec-rails'

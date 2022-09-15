@@ -319,6 +319,11 @@ GEM
     rufus-scheduler (3.6.0)
       fugit (~> 1.1, >= 1.1.6)
     rugged (0.28.4.1)
+    sentry-rails (5.4.2)
+      railties (>= 5.0)
+      sentry-ruby (~> 5.4.2)
+    sentry-ruby (5.4.2)
+      concurrent-ruby (~> 1.0, >= 1.0.2)
     sequel (4.49.0)
     sequel-rails (1.1.1)
       actionpack (>= 4.0.0)
@@ -409,6 +414,8 @@ DEPENDENCIES
   rubocop-faker (= 1.0.0)
   rubocop-rails (= 2.6.0)
   rugged (= 0.28.4.1)
+  sentry-rails
+  sentry-ruby
   sequel (>= 4.0.0, < 5)
   sequel-rails
   shoulda-matchers
