@@ -26,13 +26,12 @@ Sentry.init do |config|
       # the request's path (env["PATH_INFO"]) instead of "Controller#action"
       case transaction_name
       when /health/
-        0.0
+        return 0.0
       end
-    else
-      # For everything else take a smaller sample size as
-      # we're on a smaller plan and don't want to consume all resources
-      # This number likely needs to be debated and modified over time as needs/plans change
-      0.2
     end
+    # For everything else take a smaller sample size as
+    # we're on a smaller plan and don't want to consume all resources
+    # This number likely needs to be debated and modified over time as needs/plans change
+    0.2
   end
 end
