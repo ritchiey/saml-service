@@ -8,6 +8,10 @@ Sentry.init do |config|
   config.release = Rails.application.config.saml_service[:version]
 
   config.traces_sampler = lambda do |sampling_context|
+    transaction_context = sampling_context[:transaction_context]
+    op = transaction_context[:op]
+    transaction_name = transaction_context[:name]
+
     # If this is the continuation of a trace, just use that decision (rate controlled by the caller)
     return sampling_context[:parent_sampled] unless sampling_context[:parent_sampled].nil?
 
@@ -15,6 +19,7 @@ Sentry.init do |config|
     # Last confirmed correct regex for AWS health check UA on 28/7/2021
     ua = Sentry.get_current_scope.rack_env['HTTP_USER_AGENT']
     return 0.0 if ua && (CrawlerDetect.is_crawler?(ua) || ua.match?(/^Amazon-Route53-Health-Check-Service/))
+    return 0.0 if op == '/request/' && transaction_name == '/health/'
 
     # For everything else take a smaller sample size as we're on a smaller plan and don't want to consume all resources
     # This number likely needs to be debated and modified over time as needs/plans change
