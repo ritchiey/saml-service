@@ -19,10 +19,20 @@ Sentry.init do |config|
     # Last confirmed correct regex for AWS health check UA on 28/7/2021
     ua = Sentry.get_current_scope.rack_env['HTTP_USER_AGENT']
     return 0.0 if ua && (CrawlerDetect.is_crawler?(ua) || ua.match?(/^Amazon-Route53-Health-Check-Service/))
-    return 0.0 if op == '/request/' && transaction_name == '/health/'
 
-    # For everything else take a smaller sample size as we're on a smaller plan and don't want to consume all resources
-    # This number likely needs to be debated and modified over time as needs/plans change
-    0.2
+    case op
+    when /request/
+      # for Rails applications, transaction_name would be
+      # the request's path (env["PATH_INFO"]) instead of "Controller#action"
+      case transaction_name
+      when /health/
+        0.0
+      end
+    else
+      # For everything else take a smaller sample size as
+      # we're on a smaller plan and don't want to consume all resources
+      # This number likely needs to be debated and modified over time as needs/plans change
+      0.2
+    end
   end
 end
