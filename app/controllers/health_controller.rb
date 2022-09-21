@@ -5,7 +5,7 @@ class HealthController < ApplicationController
   skip_after_action :ensure_access_checked
 
   def show
-    (Rails.env.production? && Redis.new(url: config.saml_service[:redis][:url]).ping) &&
-      Sequel::Model.db.test_connection
+    redis_url = Rails.application.config.saml_service[:redis][:url]
+    (Rails.env.production? && Redis.new(url: redis_url).ping) && Sequel::Model.db.test_connection
   end
 end
