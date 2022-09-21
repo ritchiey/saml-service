@@ -24,6 +24,7 @@ run-image-bash:
 	--env-file=.env \
 	-e SAML_DB_HOST=${LOCAL_IP} \
 	-v ${PWD}/app:/app/app \
+	-v ${PWD}/config:/app/config \
 	-v ${PWD}/lib:/app/lib \
 	-v ${PWD}/log:/app/log \
 	-v ${PWD}/db:/app/db \
@@ -35,6 +36,7 @@ remove-all-containers:
 run-image:
 	docker run --rm -p 3000:3000 --name  saml-service --env-file=.env \
 	-v ${PWD}/app:/app/app \
+	-v ${PWD}/config:/app/config \
 	-v ${PWD}/lib:/app/lib \
 	-v ${PWD}/log:/app/log \
 	-v ${PWD}/db:/app/db \
