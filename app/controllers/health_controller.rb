@@ -6,6 +6,9 @@ class HealthController < ApplicationController
 
   def show
     redis_url = Rails.application.config.saml_service[:redis][:url]
-    (Rails.env.production? && Redis.new(url: redis_url).ping) && Sequel::Model.db.test_connection
+    (Rails.env.production? && Redis.new(
+      url: redis_url,
+      ssl_params: { verify_mode: OpenSSL::SSL::VERIFY_NONE }
+    ).ping) && Sequel::Model.db.test_connection
   end
 end
