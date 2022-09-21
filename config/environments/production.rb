@@ -85,19 +85,18 @@ Rails.application.configure do
     config.logger = ActiveSupport::TaggedLogging.new(logger)
   end
 
-  if ENV['REDIS_AUTH_TOKEN'].present?
-    config.cache_store = :redis_cache_store, {
-      url: "#{ENV.fetch('REDIS_SCHEME', 'rediss')}://:#{CGI.escape(ENV.fetch('REDIS_AUTH_TOKEN', 'password'))}@" \
-           "#{ENV.fetch('REDIS_HOST', 'localhost')}:6379/0",
-      ssl_params: { verify_mode: OpenSSL::SSL::VERIFY_NONE },
-      namespace: 'val',
-      pool_size: 5,
-      pool_timeout: 5
-    }
-  ## this is the legacy config can be removed once nnwo is used for live
-  else
-    config.cache_store = :redis_store, 'redis://localhost:6379/0/cache'
-  end
+  config.cache_store = if ENV['REDIS_AUTH_TOKEN'].present?
+                         [:redis_cache_store, {
+                           url: config.validator_service[:redis][:url],
+                           ssl_params: { verify_mode: OpenSSL::SSL::VERIFY_NONE },
+                           namespace: 'val',
+                           pool_size: 5,
+                           pool_timeout: 5
+                         }]
+                       ## this is the legacy config can be removed once nnwo is used for live
+                       else
+                         [:redis_cache_store, config.validator_service[:redis][:url]]
+                       end
 
   config.public_file_server.enabled = ENV['RAILS_SERVE_STATIC_FILES'].present?
 
