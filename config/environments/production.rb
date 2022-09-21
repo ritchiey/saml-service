@@ -87,7 +87,7 @@ Rails.application.configure do
 
   config.cache_store = if ENV['REDIS_AUTH_TOKEN'].present?
                          [:redis_cache_store, {
-                           url: config.validator_service[:redis][:url],
+                           url: config.saml_service[:redis][:url],
                            ssl_params: { verify_mode: OpenSSL::SSL::VERIFY_NONE },
                            namespace: 'val',
                            pool_size: 5,
@@ -95,7 +95,7 @@ Rails.application.configure do
                          }]
                        ## this is the legacy config can be removed once nnwo is used for live
                        else
-                         [:redis_cache_store, config.validator_service[:redis][:url]]
+                         [:redis_cache_store, config.saml_service[:redis][:url]]
                        end
 
   config.public_file_server.enabled = ENV['RAILS_SERVE_STATIC_FILES'].present?
