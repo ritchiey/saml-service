@@ -21,8 +21,8 @@ module Saml
   class Application < Rails::Application
     # Settings in config/environments/* take precedence over those
     # specified here.
-
-    redis_user = ENV.fetch('REDIS_AUTH_TOKEN', nil).present? ? ":#{CGI.escape(ENV.fetch('REDIS_AUTH_TOKEN', nil))}@" : ''
+    redis_user = ''
+    redis_user = ":#{CGI.escape(ENV.fetch('REDIS_AUTH_TOKEN', nil))}@" if ENV.fetch('REDIS_AUTH_TOKEN', nil).present?
     config.saml_service =
       RecursiveOpenStruct.new({
         metadata: {
