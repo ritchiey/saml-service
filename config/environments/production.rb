@@ -85,7 +85,7 @@ Rails.application.configure do
     config.logger = ActiveSupport::TaggedLogging.new(logger)
   end
 
-  config.cache_store = if ENV['REDIS_AUTH_TOKEN'].present?
+  config.cache_store = if ENV['REDIS_HOST'].present?
                          [:redis_cache_store, {
                            url: config.saml_service[:redis][:url],
                            ssl_params: { verify_mode: OpenSSL::SSL::VERIFY_NONE },
