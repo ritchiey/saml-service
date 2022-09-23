@@ -2,10 +2,9 @@ name: Build Docker Image
 on:
   push:
     branches:
-      - feature/docker
-      # - develop
-      # - master
-  # pull_request:
+      - develop
+      - master
+  pull_request:
 
 jobs:
   push:
@@ -103,25 +102,21 @@ jobs:
           -t $IMAGE_ID:$IMAGE_TAG .
 
       - name: Push to ECR
-        #if: (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'develop') && github.event_name == 'push'
-        if: github.ref == 'refs/heads/feature/docker'
+        if: (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'develop') && github.event_name == 'push'
         run: |
           docker tag $IMAGE_ID:$IMAGE_TAG $IMAGE_ID:$VERSION
           docker tag $IMAGE_ID:$IMAGE_TAG $IMAGE_ID:latest
           docker push --all-tags $IMAGE_ID
 
-      ## TODO: once this is in master we will need to if master || development and provide branch name
       - name: Update GitOps Repo to trigger deploys
-        #if: env.BRANCH_NAME == 'master' && github.event_name == 'push'
-        if: github.ref == 'refs/heads/feature/docker'
+        if: env.BRANCH_NAME == 'master' && github.event_name == 'push'
         uses: ausaccessfed/publish_app@v1.0.11
         with:
           environments: test,production
           projects: saml-service
 
       - name: Update GitOps Repo to trigger deploys
-        #if: env.BRANCH_NAME == 'develop' && github.event_name == 'push'
-        if: github.ref == 'refs/heads/feature/docker'
+        if: env.BRANCH_NAME == 'develop' && github.event_name == 'push'
         uses: ausaccessfed/publish_app@v1.0.11
         with:
           environments: development
