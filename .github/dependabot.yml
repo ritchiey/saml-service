@@ -6,6 +6,3 @@ updates:
       interval: "weekly"
       time: "09:00"
       timezone: "Australia/Brisbane"
-    # Labels on pull requests for version updates only
-    labels:
-      - "gem dependencies"
