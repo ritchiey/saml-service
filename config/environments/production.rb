@@ -95,7 +95,9 @@ Rails.application.configure do
                          }]
                        ## this is the legacy config can be removed once nnwo is used for live
                        else
-                         [:redis_cache_store, config.saml_service[:redis][:url]]
+                         [:redis_cache_store, {
+                           url: config.saml_service[:redis][:url]
+                         }]
                        end
 
   config.public_file_server.enabled = ENV['RAILS_SERVE_STATIC_FILES'].present?
