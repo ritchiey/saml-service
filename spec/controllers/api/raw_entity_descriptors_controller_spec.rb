@@ -14,17 +14,17 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
     let(:enabled) { [true, false].sample }
     let(:edugain_enabled) { [true, false].sample }
     let(:xml) do
-      <<-ENTITY.strip_heredoc
-          <EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata"
-            xmlns:mdui="urn:oasis:names:tc:SAML:metadata:ui"
-            entityID="#{entity_id_uri}">
-            <IDPSSODescriptor
-              protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
-              <SingleSignOnService
-                Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
-                Location="https://#{host_name}/idp/profile/SAML2/Redirect/SSO"/>
-            </IDPSSODescriptor>
-          </EntityDescriptor>
+      <<~ENTITY
+        <EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata"
+          xmlns:mdui="urn:oasis:names:tc:SAML:metadata:ui"
+          entityID="#{entity_id_uri}">
+          <IDPSSODescriptor
+            protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+            <SingleSignOnService
+              Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
+              Location="https://#{host_name}/idp/profile/SAML2/Redirect/SSO"/>
+          </IDPSSODescriptor>
+        </EntityDescriptor>
       ENTITY
     end
 
@@ -86,7 +86,7 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
 
         context 'raw entity descriptors' do
           subject { -> { run } }
-          it { is_expected.to change(RawEntityDescriptor, :count).by(1) }
+          it { expect { run }.to change(RawEntityDescriptor, :count).by(1) }
           context 'record' do
             before { run }
             let(:record) { RawEntityDescriptor.last }
@@ -165,7 +165,7 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
 
         context 'known entities' do
           subject { -> { run } }
-          it { is_expected.to change(KnownEntity, :count).by(1) }
+          it { expect { run }.to change(KnownEntity, :count).by(1) }
 
           context 'record' do
             before { run }
@@ -200,7 +200,7 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
 
         context 'entity ids' do
           subject { -> { run } }
-          it { is_expected.to change(EntityId, :count).by(1) }
+          it { expect { run }.to change(EntityId, :count).by(1) }
 
           context 'record' do
             before { run }
@@ -246,17 +246,17 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
         let(:original_host_name) { Faker::Internet.domain_name }
         let(:original_enabled) { [true, false].sample }
         let(:original_xml) do
-          <<-ENTITY.strip_heredoc
-            <EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata"
-              xmlns:mdui="urn:oasis:names:tc:SAML:metadata:ui"
-              entityID="#{entity_id_uri}">
-              <IDPSSODescriptor
-             protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
-                <SingleSignOnService
-                  Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
-       Location="https://#{original_host_name}/idp/profile/SAML2/Redirect/SSO"/>
-              </IDPSSODescriptor>
-            </EntityDescriptor>
+          <<~ENTITY
+                 <EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata"
+                   xmlns:mdui="urn:oasis:names:tc:SAML:metadata:ui"
+                   entityID="#{entity_id_uri}">
+                   <IDPSSODescriptor
+                  protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+                     <SingleSignOnService
+                       Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
+            Location="https://#{original_host_name}/idp/profile/SAML2/Redirect/SSO"/>
+                   </IDPSSODescriptor>
+                 </EntityDescriptor>
           ENTITY
         end
 
@@ -486,7 +486,7 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
         let(:raw_entity_descriptor) { {} }
         subject { -> { run } }
 
-        it { is_expected.to raise_error(ActionController::ParameterMissing) }
+        it { expect { run }.to raise_error(ActionController::ParameterMissing) }
         it_behaves_like 'no state changed'
       end
 
@@ -495,7 +495,7 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
         subject { -> { run } }
         let(:message) { /xml is not present/ }
 
-        it { is_expected.to raise_error(Sequel::ValidationFailed, message) }
+        it { expect { run }.to raise_error(Sequel::ValidationFailed, message) }
         it_behaves_like 'no state changed'
       end
 
@@ -504,7 +504,7 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
         subject { -> { run } }
         let(:message) { /invalid base64/ }
 
-        it { is_expected.to raise_error(ArgumentError, message) }
+        it { expect { run }.to raise_error(ArgumentError, message) }
         it_behaves_like 'no state changed'
       end
 
@@ -541,7 +541,7 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
         subject { -> { run } }
         let(:message) { /uri is not present/ }
 
-        it { is_expected.to raise_error(Sequel::ValidationFailed, message) }
+        it { expect { run }.to raise_error(Sequel::ValidationFailed, message) }
         it_behaves_like 'no state changed'
       end
 
@@ -550,14 +550,14 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
         subject { -> { run } }
         let(:message) { /name is not in base64 urlsafe alphabet/ }
 
-        it { is_expected.to raise_error(Sequel::ValidationFailed, message) }
+        it { expect { run }.to raise_error(Sequel::ValidationFailed, message) }
         it_behaves_like 'no state changed'
       end
 
       context 'with invalid xml' do
         subject { -> { run } }
         let(:xml) do
-          <<-ENTITY.strip_heredoc
+          <<~ENTITY
             <IDPSSODescriptor
               protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
               <SingleSignOnService
@@ -569,7 +569,7 @@ RSpec.describe API::RawEntityDescriptorsController, type: :controller do
 
         let(:message) { /xml is not valid per the XML Schema/ }
 
-        it { is_expected.to raise_error(Sequel::ValidationFailed, message) }
+        it { expect { run }.to raise_error(Sequel::ValidationFailed, message) }
         it_behaves_like 'no state changed'
       end
     end
