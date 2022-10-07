@@ -39,7 +39,7 @@ RSpec.describe Metadata::Saml do
   end
 
   context 'EntitiesDescriptors' do
-    let(:entity_source) { create :basic_federation, :with_technical_contact }
+    let(:entity_source) { create :basic_federation }
     let(:tag) { Faker::Lorem.word }
     let(:all_tagged_known_entities) { KnownEntity.with_all_tags(tag) }
 
@@ -478,7 +478,10 @@ RSpec.describe Metadata::Saml do
 
   context 'ds:Signature Root EntityDescriptor' do
     let(:entity) { create(:idp_sso_descriptor).entity_descriptor }
-    before { subject.root_entity_descriptor(entity.known_entity) }
+    before do
+      entity.add_sirtfi_contact_person create :sirtfi_contact_person, entity_descriptor: entity
+      subject.root_entity_descriptor(entity.known_entity)
+    end
     include_examples 'ds:Signature xml' do
       let(:root_node) { 'EntityDescriptor' }
     end
