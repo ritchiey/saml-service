@@ -39,7 +39,7 @@ RSpec.describe Metadata::Saml do
   end
 
   context 'EntitiesDescriptors' do
-    let(:entity_source) { create :basic_federation }
+    let(:entity_source) { create :basic_federation, :with_technical_contact }
     let(:tag) { Faker::Lorem.word }
     let(:all_tagged_known_entities) { KnownEntity.with_all_tags(tag) }
 
