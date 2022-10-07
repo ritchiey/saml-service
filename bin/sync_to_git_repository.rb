@@ -147,4 +147,3 @@ if $PROGRAM_NAME == __FILE__
   end
 end
 # :nocov:
-
