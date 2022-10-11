@@ -7,8 +7,6 @@ Sentry.init do |config|
   config.environment = Rails.application.config.saml_service[:url_options][:base_url]
   config.release = Rails.application.config.saml_service[:version]
 
-  config.logger.level = Logger::WARN
-
   config.traces_sampler = lambda do |sampling_context|
     transaction_context = sampling_context[:transaction_context]
     op = transaction_context[:op]
