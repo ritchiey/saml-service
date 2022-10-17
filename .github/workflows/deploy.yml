@@ -7,6 +7,12 @@ on:
       - "dependabot/**"
   issue_comment:
     types: [created]
+  workflow_call:
+    secrets:
+      ROLE:
+        required: true
+      DOCKER_ECR:
+        required: true
 
 jobs:
   push:
