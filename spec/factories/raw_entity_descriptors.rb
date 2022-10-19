@@ -73,7 +73,7 @@ FactoryBot.define do
             #{discovery_response}
             #{ui_info}
             #{disco_hints}
-          </#{namespace}Extension>
+          </#{namespace}Extensions>
           #{final_descriptor}
         </#{namespace}EntityDescriptor>
       ENTITY
