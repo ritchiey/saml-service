@@ -1,0 +1,41 @@
+name: Dependabot Auto Merge Dev/Test dependencies
+on:
+  pull_request:
+
+permissions:
+  id-token: write
+  statuses: write
+  pull-requests: write
+  issues: write
+  repository-projects: write
+  contents: write
+
+jobs:
+  tests:
+    if: contains(github.head_ref,'dependabot/') && github.actor == 'dependabot[bot]'
+    name: tests
+    uses: ./.github/workflows/deploy.yml
+    secrets:
+      ROLE: ${{ secrets.ROLE }}
+      DOCKER_ECR: ${{ secrets.DOCKER_ECR }}
+
+  dependabot:
+    runs-on: ubuntu-latest
+    env:
+      PR_URL: ${{github.event.pull_request.html_url}}
+      GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+    if: contains(github.head_ref,'dependabot') && github.actor == 'dependabot[bot]'
+    steps:
+      - name: Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v1.1.1
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Approve a PR
+        if: ${{ steps.metadata.outputs.dependency-type != 'direct:production' }}
+        run: gh pr review --approve "$PR_URL"
+
+      - name: Enable auto-merge for Dependabot PRs
+        if: ${{ steps.metadata.outputs.dependency-type != 'direct:production' }}
+        run: gh pr merge --auto --squash "$PR_URL"
