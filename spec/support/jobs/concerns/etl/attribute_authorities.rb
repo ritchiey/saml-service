@@ -2,8 +2,6 @@
 
 RSpec.shared_examples 'ETL::AttributeAuthorities' do
   include_examples 'ETL::Common'
-
-  # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
   def create_idp_json(idp)
     contact_people =
       contact_instances.map { |cp| contact_person_json(cp) } +
@@ -68,7 +66,7 @@ RSpec.shared_examples 'ETL::AttributeAuthorities' do
       }
     }
   end
-  # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
+  # rubocop:enable
 
   def attribute_json(a)
     {
@@ -194,6 +192,20 @@ RSpec.shared_examples 'ETL::AttributeAuthorities' do
     it 'creates a new instance' do
       expect { run }
         .to change { AttributeAuthorityDescriptor.count }.by(aa_count)
+    end
+
+    context 'when not functioning' do
+      let(:attribute_authorities_list) do
+        attribute_authorities_instances.map do |aa|
+          json = create_aa_json(identity_provider_instances.first, aa, true)
+          json[:saml][:attribute_services].each { |service| service[:functioning] = false }
+          json
+        end
+      end
+
+      it 'creates a new instance' do
+        expect { run }.not_to change(AttributeService, :count)
+      end
     end
 
     it 'the instance is valid' do

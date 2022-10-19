@@ -2,8 +2,6 @@
 
 RSpec.shared_examples 'ETL::IdentityProviders' do
   include_examples 'ETL::Common'
-
-  # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
   def create_json(idp)
     contact_people =
       contact_instances.map { |cp| contact_person_json(cp) } +
@@ -20,11 +18,11 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
         scope: scope,
         authnrequests_signed: idp.want_authn_requests_signed,
         single_sign_on_services:
-          idp.single_sign_on_services.map { |s| endpoint_json(s) },
+          idp.single_sign_on_services.map { |s| endpoint_json(s, functioning: services_functioning) },
         name_id_mapping_services:
-          idp.name_id_mapping_services.map { |s| endpoint_json(s) },
+          idp.name_id_mapping_services.map { |s| endpoint_json(s, functioning: services_functioning) },
         assertion_id_request_services:
-          idp.assertion_id_request_services.map { |s| endpoint_json(s) },
+          idp.assertion_id_request_services.map { |s| endpoint_json(s, functioning: services_functioning) },
         attribute_profiles:
           idp.attribute_profiles.map { |ap| saml_uri_json(ap) },
         attributes: attribute_instances.map { |a| attribute_json(a) },
@@ -42,17 +40,17 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
             idp.name_id_formats.map { |nidf| saml_uri_json(nidf) },
           artifact_resolution_services:
             idp.artifact_resolution_services.map do |ars|
-              indexed_endpoint_json(ars)
+              indexed_endpoint_json(ars, functioning: services_functioning)
             end,
           single_logout_services:
-            idp.single_logout_services.map { |slo| endpoint_json(slo) },
+            idp.single_logout_services.map { |slo| endpoint_json(slo, functioning: services_functioning) },
           manage_nameid_services:
-            idp.manage_name_id_services.map { |mnids| endpoint_json(mnids) }
+            idp.manage_name_id_services.map { |mnids| endpoint_json(mnids, functioning: services_functioning) }
         }
       }
     }
   end
-  # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
+  # rubocop:enable
 
   def attribute_json(a)
     {
@@ -97,6 +95,8 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
                 :with_artifact_resolution_services,
                 :with_disco_hints)
   end
+
+  let(:services_functioning) { true }
 
   let(:identity_providers_list) do
     identity_provider_instances.map { |idp| create_json(idp) }
@@ -162,6 +162,34 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
     it 'creates a new tag' do
       expect { run }
         .to change { Tag.count }.by(1)
+    end
+
+    context 'when process_idp? is false' do
+      let(:identity_providers_list) do
+        identity_provider_instances.map do |idp|
+          data = create_json(idp)
+          data[:attribute_authority_only] = true
+          data
+        end
+      end
+
+      it 'doesnt create a new instance' do
+        expect { run }.not_to(change { IDPSSODescriptor })
+      end
+    end
+
+    context 'when functioning is false' do
+      let(:services_functioning) { false }
+
+      it 'doesnt create a new SingleSignOnService' do
+        expect { run }.not_to(change do
+                                [
+                                  SingleSignOnService.count,
+                                  NameIdMappingService.count,
+                                  AssertionIdRequestService.count
+                                ]
+                              end)
+      end
     end
 
     context 'created instance' do

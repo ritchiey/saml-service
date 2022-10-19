@@ -1,17 +1,17 @@
 # frozen_string_literal: true
 
 RSpec.shared_examples 'ETL::Common' do
-  def endpoint_json(s)
+  def endpoint_json(s, functioning: true)
     {
       location: s.location,
       binding: {
         uri: s.binding
       },
-      functioning: true
+      functioning: functioning
     }
   end
 
-  def indexed_endpoint_json(s)
+  def indexed_endpoint_json(s, functioning: true)
     {
       location: s.location,
       index: s.index,
@@ -19,7 +19,7 @@ RSpec.shared_examples 'ETL::Common' do
       binding: {
         uri: s.binding
       },
-      functioning: true
+      functioning: functioning
     }
   end
 

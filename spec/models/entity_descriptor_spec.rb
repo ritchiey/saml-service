@@ -186,45 +186,66 @@ describe EntityDescriptor do
     end
 
     context 'when referencing an IdP' do
-      let(:idp) { create :idp_sso_descriptor, :with_ui_info }
       subject { idp.entity_descriptor }
 
+      let(:idp) { create :idp_sso_descriptor, :with_ui_info }
+
       include_examples 'edugain compliance'
+      context 'with active idps and contacts' do
+        let(:another_idp) { create :idp_sso_descriptor, :with_ui_info }
 
-      context 'without functioning IdP' do
-        it 'is not edugain compliant' do
-          subject.idp_sso_descriptors.first.update(enabled: false)
-          expect(subject).not_to be_edugain_compliant
+        before do
+          another_idp
+          cp = create :contact_person, contact_type: :technical
+          subject.add_contact_person(cp)
         end
-      end
 
-      context 'without IdP MDUI' do
-        let(:idp) { create :idp_sso_descriptor }
+        context 'without functioning IdP' do
+          it 'is not edugain compliant' do
+            subject.idp_sso_descriptors.first.update(enabled: false)
+            expect(subject).not_to be_edugain_compliant
+          end
+        end
 
-        it 'is not edugain compliant' do
-          expect(subject).not_to be_edugain_compliant
+        context 'without IdP MDUI' do
+          let(:idp) { create :idp_sso_descriptor }
+
+          it 'is not edugain compliant' do
+            expect(subject).not_to be_edugain_compliant
+          end
         end
       end
     end
 
     context 'when referencing an SP' do
-      let(:sp) { create :sp_sso_descriptor, :with_ui_info }
       subject { sp.entity_descriptor }
+
+      let(:sp) { create :sp_sso_descriptor, :with_ui_info }
 
       include_examples 'edugain compliance'
 
-      context 'without functioning SP' do
-        it 'is not edugain compliant' do
-          subject.sp_sso_descriptors.first.update(enabled: false)
-          expect(subject).not_to be_edugain_compliant
+      context 'with active idps and contacts' do
+        let(:another_sp) { create :sp_sso_descriptor, :with_ui_info }
+
+        before do
+          another_sp
+          cp = create :contact_person, contact_type: :technical
+          subject.add_contact_person(cp)
         end
-      end
 
-      context 'without SP MDUI' do
-        let(:sp) { create :sp_sso_descriptor }
+        context 'without functioning SP' do
+          it 'is not edugain compliant' do
+            subject.sp_sso_descriptors.first.update(enabled: false)
+            expect(subject).not_to be_edugain_compliant
+          end
+        end
 
-        it 'is not edugain compliant' do
-          expect(subject).not_to be_edugain_compliant
+        context 'without SP MDUI' do
+          let(:sp) { create :sp_sso_descriptor }
+
+          it 'is not edugain compliant' do
+            expect(subject).not_to be_edugain_compliant
+          end
         end
       end
     end

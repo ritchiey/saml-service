@@ -101,6 +101,21 @@ RSpec.describe API::APIController, type: :controller do
       end
     end
 
+    context 'invalid authentication' do
+      before do
+        allow(Rails.application.config.saml_service).to receive(:api).and_return(nil)
+        get :an_action
+      end
+
+      it { is_expected.to have_http_status(:forbidden) }
+
+      context 'json within response' do
+        it 'has a message' do
+          expect(json['message']).to eq('The request was understood but explicitly denied.')
+        end
+      end
+    end
+
     context 'unknown authentication method' do
       before do
         auth_type(:unknown)
@@ -209,6 +224,23 @@ RSpec.describe API::APIController, type: :controller do
     context 'token authentication' do
       before do
         auth_type(:token)
+      end
+
+      context 'no authorization header provided by client' do
+        before do
+          request.headers['Authorization'] = nil
+          get :an_action
+        end
+
+        it { is_expected.to have_http_status(:unauthorized) }
+        context 'json within response' do
+          it 'has a message' do
+            expect(json['message']).to eq('Client request failure.')
+          end
+          it 'has an error' do
+            expect(json['error']).to eq('Token API authentication method not provided')
+          end
+        end
       end
 
       context 'invalid authorization header provided by client' do

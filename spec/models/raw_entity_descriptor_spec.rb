@@ -135,6 +135,14 @@ RSpec.describe RawEntityDescriptor do
       expect(subject.ui_info.privacy_statement_urls).to all(respond_to(:lang))
         .and all(respond_to(:uri))
     end
+
+    context 'without ui info' do
+      subject { create :raw_entity_descriptor, :without_ui_info }
+
+      it 'is nil' do
+        expect(subject.ui_info).to be_nil
+      end
+    end
   end
 
   describe '#disco_hints' do
@@ -169,6 +177,14 @@ RSpec.describe RawEntityDescriptor do
         expect(subject.disco_hints.geolocation_hints.size).to eq(1)
       end
     end
+
+    context 'without disco hints' do
+      subject { create :raw_entity_descriptor, :without_disco_hints }
+
+      it 'is nil' do
+        expect(subject.disco_hints).to be_nil
+      end
+    end
   end
 
   describe '#discovery_response_services' do
@@ -196,6 +212,14 @@ RSpec.describe RawEntityDescriptor do
           .to all(have_attributes(is_default: nil))
       end
     end
+
+    context 'without discovery_response' do
+      subject { create :raw_entity_descriptor_sp, :without_discovery_response }
+
+      it 'is nil' do
+        expect(subject.discovery_response_services).to be_nil
+      end
+    end
   end
 
   describe '#single_sign_on_services' do
@@ -206,6 +230,14 @@ RSpec.describe RawEntityDescriptor do
       expect(subject.single_sign_on_services)
         .to all(respond_to(:location))
         .and all(respond_to(:binding))
+    end
+
+    context 'without sso services' do
+      subject { create :raw_entity_descriptor_sp }
+
+      it 'is nil' do
+        expect(subject.single_sign_on_services).to be_nil
+      end
     end
   end
 end
