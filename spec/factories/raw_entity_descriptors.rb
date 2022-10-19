@@ -215,6 +215,10 @@ FactoryBot.define do
           ENTITY
         end
       end
+
+      enabled { true }
+
+      association :known_entity
     end
   end
 end
