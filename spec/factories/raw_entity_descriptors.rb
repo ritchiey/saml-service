@@ -199,14 +199,7 @@ FactoryBot.define do
       transient do
         hostname { "raw.#{Faker::Internet.domain_name}" }
         entity_id_uri { "https://#{hostname}/shibboleth" }
-      end
-
-      enabled { true }
-
-      association :known_entity
-
-      transient do
-        namespace { nil }
+        namespace { 'xyz:' }
         disco_hints do
           <<~ENTITY.strip
             <mdui:DiscoHints>
