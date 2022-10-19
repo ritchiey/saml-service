@@ -1,0 +1,13 @@
+name: Build Docker Image
+on:
+  push:
+    branches:
+      - "dependabot/**"
+jobs:
+  push:
+    name: Test, Build and Push image
+    runs-on: ubuntu-latest
+
+    steps:
+      - id: Skipped
+        run: echo "Skipped"
