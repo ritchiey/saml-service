@@ -12,12 +12,11 @@ RUN mkdir -p ./public/assets \
 	&& mkdir tmp/pids \
 	&& gem install bundler
 
-RUN apt-get install -y mariadb-client
-
 # Install development tools so that the gems can be built
 # Once the gems are installed, the tools are purged as they are no longer required
 RUN apt-get install -y --no-install-recommends \
 	build-essential \
+	mariadb-client \
 	apt-utils \
 	unzip \
 	cmake \
