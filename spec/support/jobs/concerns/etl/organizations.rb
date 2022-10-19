@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.shared_examples 'ETL::Organizations' do
+  # rubocop:disable Metrics/MethodLength
   def create_json(id)
     {
       id: id,
@@ -21,6 +22,7 @@ RSpec.shared_examples 'ETL::Organizations' do
       created_at: fr_time(org_created_at)
     }
   end
+  # rubocop:enable Metrics/MethodLength
 
   let(:org_created_at) { Time.zone.at(rand(Time.now.utc.to_i)) }
   let(:organization_list) do

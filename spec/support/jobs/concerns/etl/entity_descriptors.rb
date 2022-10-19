@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.shared_examples 'ETL::EntityDescriptors' do
+  # rubocop:disable Metrics/MethodLength
   def create_json(id, functioning: true, services_functioning: true, empty: false)
     {
       id: id,
@@ -53,6 +54,7 @@ RSpec.shared_examples 'ETL::EntityDescriptors' do
       }
     }
   end
+  # rubocop:enable Metrics/MethodLength
 
   let(:ed_created_at) { Time.zone.at(rand(Time.now.utc.to_i)) }
   let(:entity_descriptor_list) do
