@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 RSpec.shared_examples 'ETL::Organizations' do
-  # rubocop:disable Metrics/MethodLength
   def create_json(id)
     {
       id: id,
@@ -22,7 +21,6 @@ RSpec.shared_examples 'ETL::Organizations' do
       created_at: fr_time(org_created_at)
     }
   end
-  # rubocop:enable Metrics/MethodLength
 
   let(:org_created_at) { Time.zone.at(rand(Time.now.utc.to_i)) }
   let(:organization_list) do
@@ -66,24 +64,21 @@ RSpec.shared_examples 'ETL::Organizations' do
            updated_at: -> { truncated_now })
 
     it 'has an OrganizationName' do
-      expect(subject.organization_names.last.value)
-        .to eq(organizations.last[:domain])
-      expect(subject.organization_names.last.lang)
-        .to eq(organizations.last[:lang])
-    end
-
-    it 'has an OrganizationDisplayName' do
-      expect(subject.organization_display_names.last.value)
-        .to eq(organizations.last[:display_name])
-      expect(subject.organization_display_names.last.lang)
-        .to eq(organizations.last[:lang])
-    end
-
-    it 'has an OrganizationURL' do
-      expect(subject.organization_urls.last.uri)
-        .to eq(organizations.last[:url])
-      expect(subject.organization_urls.last.lang)
-        .to eq(organizations.last[:lang])
+      expect({
+               domain: subject.organization_names.last.value,
+               name_lang: subject.organization_names.last.lang,
+               display_name: subject.organization_display_names.last.value,
+               display_lang: subject.organization_display_names.last.lang,
+               uri: subject.organization_urls.last.uri,
+               lang: subject.organization_urls.last.lang
+             }).to match({
+                           entity_id: organizations.last[:domain],
+                           registration_authority: organizations.last[:lang],
+                           registration_policy_uri: organizations.last[:display_name],
+                           registration_policy_uri_lang: organizations.last[:lang],
+                           source_tag: organizations.last[:url],
+                           lang: organizations.last[:lang]
+                         })
     end
   end
 
@@ -103,26 +98,15 @@ RSpec.shared_examples 'ETL::Organizations' do
 
       it 'updated created_at' do
         expect { run }
-          .to change { subject.reload.created_at }
-          .to eq(org_created_at)
-      end
-
-      it 'has an OrganizationName' do
-        expect { run }
-          .to change { subject.reload.organization_names.last.value }
-          .to eq(organizations.last[:domain])
-      end
-
-      it 'has an OrganizationDisplayName' do
-        expect { run }
-          .to change { subject.reload.organization_display_names.last.value }
-          .to eq(organizations.last[:display_name])
-      end
-
-      it 'has an OrganizationURL' do
-        expect { run }
-          .to change { subject.reload.organization_urls.last.uri }
-          .to eq(organizations.last[:url])
+          .to change { subject.reload.created_at }.to eq(org_created_at).and(
+            change { subject.reload.organization_names.last.value }.to(eq(organizations.last[:domain]))
+          ).and(
+            change { subject.reload.organization_display_names.last.value }.to(
+              eq(organizations.last[:display_name])
+            )
+          ).and(
+            change { subject.reload.organization_urls.last.uri }.to(eq(organizations.last[:url]))
+          )
       end
     end
   end
@@ -132,22 +116,13 @@ RSpec.shared_examples 'ETL::Organizations' do
 
     shared_examples 'obj creation' do
       it 'creates Organization' do
-        expect { run }.to change { Organization.count }.by(organization_count)
-      end
-
-      it 'creates OrganizationName' do
-        expect { run }
-          .to change { OrganizationName.count }.by(organization_count)
-      end
-
-      it 'creates OrganizationDisplayName' do
-        expect { run }
-          .to change { OrganizationDisplayName.count }.by(organization_count)
-      end
-
-      it 'creates OrganizationURL' do
-        expect { run }
-          .to change { OrganizationURL.count }.by(organization_count)
+        expect { run }.to change { Organization.count }.by(organization_count).and(
+          change { OrganizationName.count }.by(organization_count)
+        ).and(
+          change { OrganizationDisplayName.count }.by(organization_count)
+        ).and(
+          change { OrganizationURL.count }.by(organization_count)
+        )
       end
     end
 

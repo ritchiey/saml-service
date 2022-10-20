@@ -6,13 +6,10 @@ RSpec.shared_examples 'mdattr:EntityAttribute xml' do
 
   it 'is created' do
     expect(xml).to have_xpath(entity_attribute_path, count: 1)
+    expect(xml).to have_xpath(attribute_path, count: 1)
   end
 
   context 'attributes' do
-    it 'creates single attribute node' do
-      expect(xml).to have_xpath(attribute_path, count: 1)
-    end
-
     context 'multiple attributes' do
       let(:entity_attribute) do
         create :mdattr_entity_attribute, :with_multiple_attributes

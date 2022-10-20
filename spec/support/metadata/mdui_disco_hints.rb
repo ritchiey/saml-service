@@ -8,13 +8,12 @@ RSpec.shared_examples 'mdui:DiscoHints xml' do
 
   it 'is created' do
     expect(xml).to have_xpath(mdui_disco_path, count: 1)
+    expect(xml).to have_xpath(ip_hint_path, count: 1)
+    expect(xml).to have_xpath(domain_hint_path, count: 1)
+    expect(xml).to have_xpath(geolocation_hint_path, count: 1)
   end
 
   context 'IPHints' do
-    it 'is created' do
-      expect(xml).to have_xpath(ip_hint_path, count: 1)
-    end
-
     context 'rendered node' do
       let(:node) { xml.first(:xpath, ip_hint_path) }
       it 'sets correct value' do
@@ -24,10 +23,6 @@ RSpec.shared_examples 'mdui:DiscoHints xml' do
   end
 
   context 'DomainHint' do
-    it 'is created' do
-      expect(xml).to have_xpath(domain_hint_path, count: 1)
-    end
-
     context 'rendered node' do
       let(:node) { xml.first(:xpath, domain_hint_path) }
       it 'sets correct value' do
@@ -37,10 +32,6 @@ RSpec.shared_examples 'mdui:DiscoHints xml' do
   end
 
   context 'GeolocationHint' do
-    it 'is created' do
-      expect(xml).to have_xpath(geolocation_hint_path, count: 1)
-    end
-
     context 'rendered node' do
       let(:node) { xml.first(:xpath, geolocation_hint_path) }
       it 'sets correct value' do

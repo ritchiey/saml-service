@@ -31,8 +31,6 @@ RSpec.shared_examples 'RawEntityDescriptor xml' do
       it 'sets ID' do
         expect(node['ID']).to eq(subject.instance_id)
           .and start_with(federation_identifier)
-      end
-      it 'sets validUntil' do
         expect(node['validUntil'])
           .to eq((Time.now.utc + metadata_validity_period).xmlschema)
       end

@@ -41,11 +41,7 @@ RSpec.shared_examples 'EntitiesDescriptor xml' do
       it 'sets ID' do
         expect(node['ID']).to eq(subject.instance_id)
           .and start_with(federation_identifier)
-      end
-      it 'sets Name' do
         expect(node['Name']).to eq(metadata_name)
-      end
-      it 'sets validUntil' do
         expect(node['validUntil'])
           .to eq((Time.now.utc + metadata_validity_period).xmlschema)
       end

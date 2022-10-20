@@ -253,16 +253,8 @@ RSpec.shared_examples 'ETL::AttributeAuthorities' do
       context 'scopes' do
         it 'sets a scope' do
           expect(subject.scopes.size).to eq(1)
-        end
-
-        it 'sets expected scope' do
           expect(subject.scopes.first.value).to eq(scope)
-        end
-
-        context 'normal scope' do
-          it 'sets regex to false' do
-            expect(subject.scopes.first.regexp).not_to be
-          end
+          expect(subject.scopes.first.regexp).not_to be
         end
 
         context 'regex scope' do
@@ -352,28 +344,17 @@ RSpec.shared_examples 'ETL::AttributeAuthorities' do
     include_examples 'updating a RoleDescriptor'
 
     it 'uses the existing instance' do
-      expect { run }.not_to(change { AttributeAuthorityDescriptor.count })
-    end
-
-    it 'does not create more tags' do
-      expect { run }.not_to(change { Tag.count })
-    end
-
-    it 'updates attribute services' do
-      expect { run }.to(change { subject.reload.attribute_services })
-    end
-
-    it 'updates assertion id request services' do
-      expect { run }
-        .to(change { subject.reload.assertion_id_request_services })
-    end
-
-    it 'updates attribute profiles' do
-      expect { run }.to(change { subject.reload.attribute_profiles })
-    end
-
-    it 'updates attributes' do
-      expect { run }.to(change { subject.reload.attributes })
+      expect { run }.to(not_change { AttributeAuthorityDescriptor.count }.and(
+        not_change { Tag.count }
+      ).and(
+        change { subject.reload.attribute_services }
+      ).and(
+        change { subject.reload.assertion_id_request_services }
+      ).and(
+        change { subject.reload.attribute_profiles }
+      ).and(
+        change { subject.reload.attributes }
+      ))
     end
   end
 end

@@ -25,8 +25,10 @@ shared_examples 'a taggable model' do |tag_factory, association|
         create(tag_factory,
                factory_args(tag_name, instance, association))
       end
-      it { is_expected.to contain_exactly(instance) }
-      it { is_expected.to contain_exactly(an_instance_of(described_class)) }
+      it {
+        is_expected.to contain_exactly(instance)
+        is_expected.to contain_exactly(an_instance_of(described_class))
+      }
     end
 
     context "when a tag exists for multiple #{described_class.name}" do
@@ -37,8 +39,8 @@ shared_examples 'a taggable model' do |tag_factory, association|
         create(tag_factory, factory_args(tag_name,
                                          another_instance, association))
       end
-      it { is_expected.to contain_exactly(instance, another_instance) }
       it "should contain two instances of #{described_class}" do
+        is_expected.to contain_exactly(instance, another_instance)
         expect(subject).to contain_exactly(an_instance_of(described_class),
                                            an_instance_of(described_class))
       end
@@ -55,8 +57,10 @@ shared_examples 'a taggable model' do |tag_factory, association|
                                          association))
       end
 
-      it { is_expected.to contain_exactly(instance) }
-      it { is_expected.to contain_exactly(an_instance_of(described_class)) }
+      it {
+        is_expected.to contain_exactly(instance)
+        is_expected.to contain_exactly(an_instance_of(described_class))
+      }
     end
 
     context "with a tag amongst many #{described_class.name}" do
@@ -71,8 +75,10 @@ shared_examples 'a taggable model' do |tag_factory, association|
                                          association))
       end
 
-      it { is_expected.to contain_exactly(instance) }
-      it { is_expected.to contain_exactly(an_instance_of(described_class)) }
+      it { 
+        is_expected.to contain_exactly(instance) 
+        is_expected.to contain_exactly(an_instance_of(described_class))
+      }
     end
   end
 
@@ -91,8 +97,10 @@ shared_examples 'a taggable model' do |tag_factory, association|
         before do
           create(tag_factory, factory_args(tag_name, instance, association))
         end
-        it { is_expected.to contain_exactly(instance) }
-        it { is_expected.to contain_exactly(an_instance_of(described_class)) }
+        it { 
+          is_expected.to contain_exactly(instance) 
+          is_expected.to contain_exactly(an_instance_of(described_class))
+        }
       end
 
       context "when multiple #{described_class.name} associations exists" do
@@ -102,8 +110,8 @@ shared_examples 'a taggable model' do |tag_factory, association|
           create(tag_factory, factory_args(tag_name,
                                            another_instance, association))
         end
-        it { is_expected.to contain_exactly(instance, another_instance) }
         it "should contain two instances of #{described_class}" do
+          is_expected.to contain_exactly(instance, another_instance)
           expect(subject).to contain_exactly(an_instance_of(described_class),
                                              an_instance_of(described_class))
         end
@@ -126,8 +134,10 @@ shared_examples 'a taggable model' do |tag_factory, association|
                                            association))
         end
 
-        it { is_expected.to contain_exactly(instance) }
-        it { is_expected.to contain_exactly(an_instance_of(described_class)) }
+        it { 
+          is_expected.to contain_exactly(instance)
+          is_expected.to contain_exactly(an_instance_of(described_class))
+         }
       end
 
       context "with a #{described_class.name} associated with one tag only" do
@@ -168,8 +178,6 @@ shared_examples 'a taggable model' do |tag_factory, association|
         it "should contain all #{described_class} instances" do
           expect(subject).to contain_exactly(instance, another_instance_1,
                                              another_instance_2)
-        end
-        it "should contain three instances of #{described_class}" do
           expect(subject).to contain_exactly(an_instance_of(described_class),
                                              an_instance_of(described_class),
                                              an_instance_of(described_class))

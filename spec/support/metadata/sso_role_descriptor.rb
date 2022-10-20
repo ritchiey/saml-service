@@ -16,14 +16,13 @@ RSpec.shared_examples 'SSODescriptor xml' do
 
   it 'is created' do
     expect(xml).to have_xpath(sso_descriptor_path)
+    expect(xml).not_to have_xpath(artifact_resolution_service_path)
+    expect(xml).not_to have_xpath(single_logout_service_path)
+    expect(xml).not_to have_xpath(manage_name_id_service_path)
+    expect(xml).not_to have_xpath(name_id_format_path)
   end
 
   context 'ArtifactResolutionService' do
-    context 'when not populated' do
-      it 'is not rendered' do
-        expect(xml).not_to have_xpath(artifact_resolution_service_path)
-      end
-    end
     context 'when populated' do
       let(:sso_descriptor) do
         create parent_node, :with_artifact_resolution_services
@@ -35,11 +34,6 @@ RSpec.shared_examples 'SSODescriptor xml' do
   end
 
   context 'SingleLogoutService' do
-    context 'when not populated' do
-      it 'is not rendered' do
-        expect(xml).not_to have_xpath(single_logout_service_path)
-      end
-    end
     context 'when populated' do
       let(:sso_descriptor) do
         create parent_node, :with_single_logout_services
@@ -51,11 +45,6 @@ RSpec.shared_examples 'SSODescriptor xml' do
   end
 
   context 'ManageNameIDService' do
-    context 'when not populated' do
-      it 'is not rendered' do
-        expect(xml).not_to have_xpath(manage_name_id_service_path)
-      end
-    end
     context 'when populated' do
       let(:sso_descriptor) do
         create parent_node, :with_manage_name_id_services
@@ -67,11 +56,6 @@ RSpec.shared_examples 'SSODescriptor xml' do
   end
 
   context 'NameIDFormat' do
-    context 'when not populated' do
-      it 'is not rendered' do
-        expect(xml).not_to have_xpath(name_id_format_path)
-      end
-    end
     context 'when populated' do
       let(:node) { xml.first(:xpath, name_id_format_path) }
       let(:sso_descriptor) do
@@ -79,8 +63,6 @@ RSpec.shared_examples 'SSODescriptor xml' do
       end
       it 'is rendered' do
         expect(xml).to have_xpath(name_id_format_path, count: 2)
-      end
-      it 'has expected value' do
         expect(node.text).to eq(sso_descriptor.name_id_formats.first.uri)
       end
     end

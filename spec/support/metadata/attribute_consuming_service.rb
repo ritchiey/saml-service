@@ -20,8 +20,6 @@ RSpec.shared_examples 'AttributeConsumingService xml' do
     context 'index' do
       it 'is rendered' do
         expect(node['index']).to be_truthy
-      end
-      it 'has expected value' do
         expect(node['index']).to eq(attribute_consuming_service.index.to_s)
       end
     end
@@ -29,8 +27,6 @@ RSpec.shared_examples 'AttributeConsumingService xml' do
     context 'isDefault' do
       it 'is rendered' do
         expect(node['isDefault']).to be_truthy
-      end
-      it 'has expected value' do
         expect(node['isDefault'])
           .to eq(attribute_consuming_service.default.to_s)
       end
@@ -47,8 +43,6 @@ RSpec.shared_examples 'AttributeConsumingService xml' do
       context 'lang' do
         it 'is rendered' do
           expect(node['xml:lang']).not_to be_nil
-        end
-        it 'has expected value' do
           expect(node['xml:lang'])
             .to eq(attribute_consuming_service.service_names.first.lang)
         end
@@ -80,8 +74,6 @@ RSpec.shared_examples 'AttributeConsumingService xml' do
       context 'lang' do
         it 'is rendered' do
           expect(node['xml:lang']).not_to be_nil
-        end
-        it 'has expected value' do
           expect(node['xml:lang'])
             .to eq(attribute_consuming_service.service_descriptions.first.lang)
         end

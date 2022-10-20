@@ -17,16 +17,8 @@ RSpec.shared_examples 'Organization xml' do
 
     it 'is created' do
       expect(xml).to have_xpath(organization_name_path, count: 2)
-    end
-
-    context 'attributes' do
-      it 'sets lang' do
-        expect(node['xml:lang'])
-          .to eq(organization.organization_names.first.lang)
-      end
-    end
-
-    it 'has correct value' do
+      expect(node['xml:lang'])
+        .to eq(organization.organization_names.first.lang)
       expect(node.text).to eq(organization.organization_names.first.value)
     end
   end
@@ -36,16 +28,8 @@ RSpec.shared_examples 'Organization xml' do
 
     it 'is created' do
       expect(xml).to have_xpath(organization_display_name_path, count: 2)
-    end
-
-    context 'attributes' do
-      it 'sets lang' do
-        expect(node['xml:lang'])
-          .to eq(organization.organization_display_names.first.lang)
-      end
-    end
-
-    it 'has correct value' do
+      expect(node['xml:lang'])
+        .to eq(organization.organization_display_names.first.lang)
       expect(node.text)
         .to eq(organization.organization_display_names.first.value)
     end
@@ -56,16 +40,8 @@ RSpec.shared_examples 'Organization xml' do
 
     it 'is created' do
       expect(xml).to have_xpath(organization_url_path, count: 2)
-    end
-
-    context 'attributes' do
-      it 'sets lang' do
-        expect(node['xml:lang'])
-          .to eq(organization.organization_urls.first.lang)
-      end
-    end
-
-    it 'has correct value' do
+      expect(node['xml:lang'])
+        .to eq(organization.organization_urls.first.lang)
       expect(node.text)
         .to eq(organization.organization_urls.first.uri)
     end

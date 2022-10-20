@@ -23,21 +23,15 @@ RSpec.shared_examples 'md:EntitiesDescriptor xml' do
         expect(xml).to have_xpath(registration_info_path, count: 1)
       end
     end
-    context 'RegistrationInfo not set' do
-      it 'does not create RegistrationInfo node' do
-        expect(xml).to have_xpath(registration_info_path, count: 0)
-      end
+    it 'does not create RegistrationInfo node' do
+      expect(xml).to have_xpath(registration_info_path, count: 0)
+      expect(xml).to have_xpath(entity_attributes_path, count: 0)
     end
 
     context 'with EntityAttributes' do
       let(:add_entity_attributes) { true }
       it 'creates EntityAttributes node' do
         expect(xml).to have_xpath(entity_attributes_path, count: 1)
-      end
-    end
-    context 'without EntityAttributes' do
-      it 'does not create EntityAttributes node' do
-        expect(xml).to have_xpath(entity_attributes_path, count: 0)
       end
     end
   end

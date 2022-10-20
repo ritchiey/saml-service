@@ -169,25 +169,19 @@ RSpec.shared_examples 'ETL::EntityDescriptors' do
            updated_at: -> { truncated_now })
 
     it 'has entity_id' do
-      expect(subject.entity_id.uri)
-        .to eq(entity_descriptors.last[:entity_id])
-    end
-
-    it 'has registration_authority' do
-      expect(subject.registration_info.registration_authority)
-        .to eq(fr_source.registration_authority)
-    end
-
-    it 'has registration_policy' do
-      expect(subject.registration_info.registration_policies.first.uri)
-        .to eq(fr_source.registration_policy_uri)
-      expect(subject.registration_info.registration_policies.first.lang)
-        .to eq(fr_source.registration_policy_uri_lang)
-    end
-
-    it 'has known_entity with federation tag' do
-      expect(subject.known_entity.tags.first.name)
-        .to eq(subject.known_entity.entity_source.source_tag)
+      expect({
+               entity_id: subject.entity_id.uri,
+               registration_authority: subject.registration_info.registration_authority,
+               registration_policy_uri: subject.registration_info.registration_policies.first.uri,
+               registration_policy_uri_lang: subject.registration_info.registration_policies.first.lang,
+               source_tag: subject.known_entity.tags.first.name
+             }).to match({
+                           entity_id: entity_descriptors.last[:entity_id],
+                           registration_authority: fr_source.registration_authority,
+                           registration_policy_uri: fr_source.registration_policy_uri,
+                           registration_policy_uri_lang: fr_source.registration_policy_uri_lang,
+                           source_tag: subject.known_entity.entity_source.source_tag
+                         })
     end
 
     context 'when services functioning is false' do
@@ -223,15 +217,9 @@ RSpec.shared_examples 'ETL::EntityDescriptors' do
       it 'updates the EntityID uri' do
         expect { run }.to change { subject.reload.entity_id.uri }
           .to eq(updated_entityid)
-      end
-
-      it 'modifies KnownEntity updated_at' do
         Timecop.travel(1.second) do
           expect { run }.to(change { subject.reload.known_entity.updated_at })
         end
-      end
-
-      it 'has known_entity with federation tag' do
         expect(subject.known_entity.tags.first.name)
           .to eq(subject.known_entity.entity_source.source_tag)
       end

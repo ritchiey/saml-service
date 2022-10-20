@@ -118,75 +118,45 @@ RSpec.shared_examples 'ETL::Common' do
   shared_examples 'saml_attributes' do
     it 'has source data' do
       expect(source.count).to be > 0
-    end
-
-    it 'creates new instances' do
       expect(target.count)
         .to eq(source.count)
-    end
-
-    it 'sets name' do
       source.each_with_index do |s, i|
-        expect(target[i].name) == "urn:oid:#{s[:oid]}"
-      end
-    end
-
-    it 'sets friendly_name' do
-      source.each_with_index do |s, i|
-        expect(target[i].friendly_name == s[:name])
-      end
-    end
-
-    it 'sets description' do
-      source.each_with_index do |s, i|
-        expect(target[i].description == s[:description])
-      end
-    end
-
-    it 'sets oid' do
-      source.each_with_index do |s, i|
-        expect(target[i].oid == s[:oid])
+        expect({
+                 description: target[i].description,
+                 oid: target[i].oid,
+                 friendly_name: target[i].friendly_name,
+                 name: target[i].name
+               }).to match({
+                             description: s[:description],
+                             oid: s[:oid],
+                             friendly_name: s[:name],
+                             name: "urn:oid:#{s[:oid]}"
+                           })
       end
     end
   end
 
   shared_examples 'updating a RoleDescriptor' do
     it 're-uses contact instances' do
-      expect { run }.not_to(change { Contact.count })
-    end
-
-    it 'updates contact people' do
-      expect { run }
-        .to(change { subject.entity_descriptor.reload.contact_people })
-    end
-
-    it 'updates sirtfi contact people' do
-      expect { run }
-        .to(change { subject.entity_descriptor.reload.sirtfi_contact_people })
-    end
-
-    it 'updates protocol supports' do
-      expect { run }.to(change { subject.reload.protocol_supports })
-    end
-
-    it 'updates key descriptors' do
-      expect { run }.to(change { subject.reload.key_descriptors })
+      expect { run }.to(not_change { Contact.count }.and(
+        change { subject.entity_descriptor.reload.contact_people }
+      ).and(
+        change { subject.entity_descriptor.reload.sirtfi_contact_people }
+      ).and(
+        change { subject.reload.protocol_supports }
+      ).and(
+        change { subject.reload.key_descriptors }
+      ))
     end
   end
 
   shared_examples 'updating MDUI content' do
     it 'updates mdui display_names' do
-      expect { run }.to(change { subject.reload.ui_info.display_names })
-    end
-
-    it 'updates mdui descriptions' do
-      expect { run }.to(change { subject.reload.ui_info.descriptions })
-    end
-
-    it 'squishes incoming description' do
-      run
-      expect(subject.reload.ui_info.descriptions.first.value)
-        .to eq(description.squish)
+      expect { run }.to(change { subject.reload.ui_info.display_names }.and(
+        change { subject.reload.ui_info.descriptions }
+      ).and(
+        change { subject.reload.ui_info.descriptions.first.value }.to(description.squish)
+      ))
     end
   end
 
@@ -194,19 +164,13 @@ RSpec.shared_examples 'ETL::Common' do
     include_examples 'updating a RoleDescriptor'
 
     it 'updates name id formats' do
-      expect { run }.to(change { subject.reload.name_id_formats })
-    end
-
-    it 'updates artifact resolution services' do
-      expect { run }.to(change { subject.reload.artifact_resolution_services })
-    end
-
-    it 'updates single_logout_services' do
-      expect { run }.to(change { subject.reload.single_logout_services })
-    end
-
-    it 'updates manage name id services' do
-      expect { run }.to(change { subject.reload.manage_name_id_services })
+      expect { run }.to(change { subject.reload.name_id_formats }.and(
+        change { subject.reload.artifact_resolution_services }
+      ).and(
+        change { subject.reload.single_logout_services }
+      ).and(
+        change { subject.reload.manage_name_id_services }
+      ))
     end
   end
 end

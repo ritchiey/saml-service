@@ -193,16 +193,11 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
     subject { SPSSODescriptor.last }
 
     it 'creates a new instance' do
-      expect { run }.to change { SPSSODescriptor.count }.by(sp_count)
-    end
-
-    it 'creates a new tag' do
-      expect { run }
-        .to change { Tag.count }.by(1)
-    end
-
-    it 'creates a new AttributeConsumingService ' do
-      expect { run }.to change { AttributeConsumingService.count }.by(sp_count)
+      expect { run }.to change { SPSSODescriptor.count }.by(sp_count).and(
+        change { Tag.count }.by(1)
+      ).and(
+        change { AttributeConsumingService.count }.by(sp_count)
+      )
     end
 
     context 'when no AttributeConsumingService to add' do
@@ -333,19 +328,15 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
     include_examples 'updating MDUI content'
 
     it 'uses the existing instance' do
-      expect { run }.not_to(change { SPSSODescriptor.count })
-    end
-
-    it 'does not create more tags' do
-      expect { run }.not_to(change { Tag.count })
-    end
-
-    it 'updates assertion_consumer_services' do
-      expect { run }.to(change { subject.reload.assertion_consumer_services })
-    end
-
-    it 'updates discovery_response_services' do
-      expect { run }.to(change { subject.reload.discovery_response_services })
+      expect { run }.to(not_change { SPSSODescriptor.count }.and(
+        not_change { Tag.count }
+      ).and(
+        change { subject.reload.assertion_consumer_services }
+      ).and(
+        change { subject.reload.discovery_response_services }
+      ).and(
+        change { subject.reload.attribute_consuming_services }
+      ))
     end
 
     context 'when no discovery_response_services not functioning' do
@@ -358,10 +349,6 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
       it 'doesnt update discovery_response_services' do
         expect { run }.not_to(change { subject.reload.discovery_response_services })
       end
-    end
-
-    it 'updates attribute_consuming_services' do
-      expect { run }.to(change { subject.reload.attribute_consuming_services })
     end
   end
 end

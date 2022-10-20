@@ -22,23 +22,18 @@ RSpec.shared_examples 'IDPSSODescriptor xml' do
 
   it 'is created' do
     expect(xml).to have_xpath(idp_sso_descriptor_path)
+    expect(node['WantAuthnRequestsSigned']).to be_falsey
+    expect(xml).to have_xpath(single_sign_on_service_path, count: 1)
+    expect(xml).not_to have_xpath(name_id_mapping_service_path)
+    expect(xml).not_to have_xpath(assertion_id_request_service_path)
+    expect(xml).not_to have_xpath(attribute_profile_path)
+    expect(xml).not_to have_xpath(attribute_path)
+    expect(xml).not_to have_xpath(mdui_disco_hints_path)
   end
 
   let(:node) { xml.first(:xpath, idp_sso_descriptor_path) }
 
-  context 'attributes' do
-    context 'WantAuthnRequestsSigned' do
-      it 'is not rendered' do
-        expect(node['WantAuthnRequestsSigned']).to be_falsey
-      end
-    end
-  end
-
   context 'SingleSignOnServices' do
-    it 'is rendered' do
-      expect(xml).to have_xpath(single_sign_on_service_path, count: 1)
-    end
-
     context 'multiple endpoints' do
       let(:idp_sso_descriptor) do
         create :idp_sso_descriptor, :with_multiple_single_sign_on_services
@@ -50,11 +45,6 @@ RSpec.shared_examples 'IDPSSODescriptor xml' do
   end
 
   context 'NameIDMappingServices' do
-    context 'when not populated' do
-      it 'is not rendered' do
-        expect(xml).not_to have_xpath(name_id_mapping_service_path)
-      end
-    end
     context 'when populated' do
       let(:idp_sso_descriptor) do
         create :idp_sso_descriptor, :with_name_id_mapping_services
@@ -66,11 +56,6 @@ RSpec.shared_examples 'IDPSSODescriptor xml' do
   end
 
   context 'AssertionIDRequestServices' do
-    context 'when not populated' do
-      it 'is not rendered' do
-        expect(xml).not_to have_xpath(assertion_id_request_service_path)
-      end
-    end
     context 'when populated' do
       let(:idp_sso_descriptor) do
         create :idp_sso_descriptor, :with_assertion_id_request_services
@@ -82,11 +67,6 @@ RSpec.shared_examples 'IDPSSODescriptor xml' do
   end
 
   context 'AttributeProfiles' do
-    context 'when not populated' do
-      it 'is not rendered' do
-        expect(xml).not_to have_xpath(attribute_profile_path)
-      end
-    end
     context 'when populated' do
       let(:node) { xml.first(:xpath, attribute_profile_path) }
       let(:idp_sso_descriptor) do
@@ -102,11 +82,6 @@ RSpec.shared_examples 'IDPSSODescriptor xml' do
   end
 
   context 'Attributes' do
-    context 'when not populated' do
-      it 'is not rendered' do
-        expect(xml).not_to have_xpath(attribute_path)
-      end
-    end
     context 'when populated' do
       let(:idp_sso_descriptor) do
         create :idp_sso_descriptor, :with_attributes
@@ -118,11 +93,6 @@ RSpec.shared_examples 'IDPSSODescriptor xml' do
   end
 
   context 'mdui:DiscoHints' do
-    context 'when not populated' do
-      it 'is not rendered' do
-        expect(xml).not_to have_xpath(mdui_disco_hints_path)
-      end
-    end
     context 'when populated' do
       let(:idp_sso_descriptor) do
         create :idp_sso_descriptor, :with_disco_hints
