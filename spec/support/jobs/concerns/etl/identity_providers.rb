@@ -367,6 +367,16 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
     it 'updates attributes' do
       expect { run }.to(change { subject.reload.attributes })
     end
+
+    context 'when no name format' do
+      before do
+        IDPSSODescriptor.last.attributes.each { |x| x.name_format.destroy }
+      end
+
+      it 'doesnt create a new SingleSignOnService' do
+        expect { run }.to(change { NameFormat.count })
+      end
+    end
   end
 
   context 'updating an IDPSSODescriptor with locked scope' do
