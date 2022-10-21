@@ -16,25 +16,24 @@ RSpec.shared_examples 'RoleDescriptor xml' do
     expect(role_descriptor.protocol_supports.length).to eq(2)
     expect(node['protocolSupportEnumeration'])
       .to eq(role_descriptor.protocol_supports.map(&:uri).join(' '))
-      expect(node['errorURL']).to be_falsey
-      expect(xml).not_to have_xpath(extensions_path)
-      expect(xml).not_to have_xpath(key_descriptors_path)
-      expect(xml).not_to have_xpath(organization_path)
-      expect(xml).not_to have_xpath(contacts_path)
-      expect(xml).not_to have_xpath(mdui_ui_info_path)
-      expect(xml).not_to have_xpath(shibmd_scope_path)
-
+    expect(node['errorURL']).to be_falsey
+    expect(xml).not_to have_xpath(extensions_path)
+    expect(xml).not_to have_xpath(key_descriptors_path)
+    expect(xml).not_to have_xpath(organization_path)
+    expect(xml).not_to have_xpath(contacts_path)
+    expect(xml).not_to have_xpath(mdui_ui_info_path)
+    expect(xml).not_to have_xpath(shibmd_scope_path)
   end
 
   context 'attributes' do
-      context 'when populated' do
-        let(:role_descriptor) do
-          create parent_node, :with_error_url
-        end
-        it 'is rendered' do
-          expect(node['errorURL']).to eq(role_descriptor.error_url)
-        end
+    context 'when populated' do
+      let(:role_descriptor) do
+        create parent_node, :with_error_url
       end
+      it 'is rendered' do
+        expect(node['errorURL']).to eq(role_descriptor.error_url)
+      end
+    end
   end
 
   context 'Extensions' do

@@ -75,8 +75,8 @@ shared_examples 'a taggable model' do |tag_factory, association|
                                          association))
       end
 
-      it { 
-        is_expected.to contain_exactly(instance) 
+      it {
+        is_expected.to contain_exactly(instance)
         is_expected.to contain_exactly(an_instance_of(described_class))
       }
     end
@@ -97,8 +97,8 @@ shared_examples 'a taggable model' do |tag_factory, association|
         before do
           create(tag_factory, factory_args(tag_name, instance, association))
         end
-        it { 
-          is_expected.to contain_exactly(instance) 
+        it {
+          is_expected.to contain_exactly(instance)
           is_expected.to contain_exactly(an_instance_of(described_class))
         }
       end
@@ -134,10 +134,10 @@ shared_examples 'a taggable model' do |tag_factory, association|
                                            association))
         end
 
-        it { 
+        it {
           is_expected.to contain_exactly(instance)
           is_expected.to contain_exactly(an_instance_of(described_class))
-         }
+        }
       end
 
       context "with a #{described_class.name} associated with one tag only" do

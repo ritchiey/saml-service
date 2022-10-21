@@ -15,9 +15,9 @@ RSpec.shared_examples 'SIRTFI ContactPerson xml' do
 
   it 'is created' do
     expect(xml).to have_xpath(contact_person_path, count: 1)
-      expect(node['contactType']).to eq('other')
-      expect(node['remd:contactType'])
-        .to eq('http://refeds.org/metadata/contactType/security')
+    expect(node['contactType']).to eq('other')
+    expect(node['remd:contactType'])
+      .to eq('http://refeds.org/metadata/contactType/security')
   end
 
   context 'Company' do

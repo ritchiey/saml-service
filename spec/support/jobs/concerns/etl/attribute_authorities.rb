@@ -195,7 +195,10 @@ RSpec.shared_examples 'ETL::AttributeAuthorities' do
 
     it 'creates a new instance' do
       expect { run }
-        .to change { AttributeAuthorityDescriptor.count }.by(aa_count)
+        .to change { AttributeAuthorityDescriptor.count }.by(aa_count).and(
+          change { Tag.count }.by(1)
+        )
+      expect(AttributeAuthorityDescriptor.last).to be_valid
     end
 
     context 'when no key type' do
@@ -270,16 +273,6 @@ RSpec.shared_examples 'ETL::AttributeAuthorities' do
       it 'creates a new instance' do
         expect { run }.not_to change(AttributeService, :count)
       end
-    end
-
-    it 'the instance is valid' do
-      run
-      expect(AttributeAuthorityDescriptor.last).to be_valid
-    end
-
-    it 'creates a new tag' do
-      expect { run }
-        .to change { Tag.count }.by(1)
     end
 
     context 'without a scope' do

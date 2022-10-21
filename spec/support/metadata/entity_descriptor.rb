@@ -54,6 +54,7 @@ RSpec.shared_examples 'EntityDescriptor xml' do
       expect(xml).to have_xpath(entity_attributes_path, count: 0)
       expect(xml).to have_xpath(organization_path, count: 1)
       expect(xml).to have_xpath(technical_contact_path, count: 1)
+      expect(xml).to have_xpath(idp_path, count: 1)
     end
 
     context 'attributes' do
@@ -79,12 +80,6 @@ RSpec.shared_examples 'EntityDescriptor xml' do
     end
 
     context 'RoleDescriptors' do
-      context 'IDPSSODescriptor' do
-        it 'creates IDPSSODescriptor node' do
-          expect(xml).to have_xpath(idp_path, count: 1)
-        end
-      end
-
       context 'SPSSODescriptor' do
         let(:create_idp) { false }
         let(:create_sp) { true }
@@ -106,8 +101,6 @@ RSpec.shared_examples 'EntityDescriptor xml' do
         let(:create_aa) { true }
         it 'creates IDPSSODescriptor node' do
           expect(xml).to have_xpath(idp_path, count: 1)
-        end
-        it 'creates AttributeAuthorityDescriptor node' do
           expect(xml).to have_xpath(aad_path, count: 1)
         end
       end

@@ -6,14 +6,10 @@ RSpec.shared_examples 'md:EntitiesDescriptor xml' do
 
   it 'is schema-valid' do
     expect(validation_errors).to be_empty
-  end
-
-  it 'is created' do
     expect(xml).to have_xpath(entities_descriptor_path)
-  end
-
-  it 'renders child EntityDescriptors' do
     expect(xml).to have_xpath(entity_descriptor_path, count: 5)
+    expect(xml).to have_xpath(registration_info_path, count: 0)
+    expect(xml).to have_xpath(entity_attributes_path, count: 0)
   end
 
   context 'Extensions' do
@@ -22,10 +18,6 @@ RSpec.shared_examples 'md:EntitiesDescriptor xml' do
       it 'creates RegistrationInfo node' do
         expect(xml).to have_xpath(registration_info_path, count: 1)
       end
-    end
-    it 'does not create RegistrationInfo node' do
-      expect(xml).to have_xpath(registration_info_path, count: 0)
-      expect(xml).to have_xpath(entity_attributes_path, count: 0)
     end
 
     context 'with EntityAttributes' do

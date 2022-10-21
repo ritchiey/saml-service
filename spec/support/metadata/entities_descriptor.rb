@@ -31,6 +31,7 @@ RSpec.shared_examples 'EntitiesDescriptor xml' do
 
     it 'defines namespaces' do
       expect(namespaces).to eq(Metadata::Saml::NAMESPACES)
+      expect(xml).to have_xpath(all_publication_infos, count: 1)
     end
 
     context 'attributes' do
@@ -44,12 +45,6 @@ RSpec.shared_examples 'EntitiesDescriptor xml' do
         expect(node['Name']).to eq(metadata_name)
         expect(node['validUntil'])
           .to eq((Time.now.utc + metadata_validity_period).xmlschema)
-      end
-    end
-
-    context 'Extensions' do
-      it 'creates a mdrpi:PublisherInfo' do
-        expect(xml).to have_xpath(all_publication_infos, count: 1)
       end
     end
   end

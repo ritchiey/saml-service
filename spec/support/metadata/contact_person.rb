@@ -15,12 +15,7 @@ RSpec.shared_examples 'ContactPerson xml' do
 
   it 'is created' do
     expect(xml).to have_xpath(contact_person_path, count: 1)
-  end
-
-  context 'attributes' do
-    it 'sets contactType' do
-      expect(node['contactType']).to eq(contact_person.contact_type.to_s)
-    end
+    expect(node['contactType']).to eq(contact_person.contact_type.to_s)
   end
 
   context 'Company' do

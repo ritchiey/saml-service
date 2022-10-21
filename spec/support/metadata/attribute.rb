@@ -9,23 +9,16 @@ RSpec.shared_examples 'saml:Attribute xml' do
   context 'Attribute' do
     it 'is created' do
       expect(xml).to have_xpath(attribute_path, count: 1)
+      expect(node['NameFormat']).to eq(attribute.name_format.uri)
+      expect(node['Name']).to eq(attribute.name)
     end
 
     context 'attributes' do
-      it 'sets Name' do
-        expect(node['Name']).to eq(attribute.name)
-      end
-
       context 'NameFormat' do
         context 'without value' do
           let(:attribute) { create :minimal_attribute }
           it 'is not included' do
             expect(node['NameFormat']).to be_falsey
-          end
-        end
-        context 'with value' do
-          it 'is included' do
-            expect(node['NameFormat']).to eq(attribute.name_format.uri)
           end
         end
       end
@@ -60,9 +53,6 @@ RSpec.shared_examples 'saml:Attribute xml' do
         let(:attribute) { create :attribute, :with_values }
         it 'is created' do
           expect(xml).to have_xpath(attribute_value_path, count: 3)
-        end
-
-        it 'renders expected values' do
           nodes.each_with_index do |node, i|
             expect(node.text).to eq(attribute.attribute_values[i].value)
           end
