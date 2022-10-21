@@ -2,6 +2,7 @@
 
 RSpec.shared_examples 'ETL::IdentityProviders' do
   include_examples 'ETL::Common'
+  # rubocop:disable Metrics/Metrics/AbcSize
   def create_json(idp)
     contact_people =
       contact_instances.map { |cp| contact_person_json(cp) } +

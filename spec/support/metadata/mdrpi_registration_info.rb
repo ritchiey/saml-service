@@ -29,7 +29,7 @@ RSpec.shared_examples 'mdrpi:RegistrationInfo xml' do
       end
       it 'is created' do
         expect(xml).to have_xpath(registration_policies_path, count: 1)
-          expect(node['xml:lang']).to eq(rp.lang)
+        expect(node['xml:lang']).to eq(rp.lang)
         expect(node.text).to eq(rp.uri)
       end
     end
