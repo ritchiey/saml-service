@@ -11,25 +11,21 @@ RSpec.shared_examples 'KeyDescriptor xml' do
     expect(node['use']).to be_falsey
   end
 
-  context 'attributes' do
-    context 'use' do
-      context 'when populated' do
-        context 'for signing' do
-          let(:key_descriptor) do
-            create(:key_descriptor, :signing)
-          end
-          it 'is rendered' do
-            expect(node['use']).to eq('signing')
-          end
-        end
-        context 'for encryption' do
-          let(:key_descriptor) do
-            create(:key_descriptor, :encryption)
-          end
-          it 'is rendered' do
-            expect(node['use']).to eq('encryption')
-          end
-        end
+  context 'attributes use when populated' do
+    context 'for signing' do
+      let(:key_descriptor) do
+        create(:key_descriptor, :signing)
+      end
+      it 'is rendered' do
+        expect(node['use']).to eq('signing')
+      end
+    end
+    context 'for encryption' do
+      let(:key_descriptor) do
+        create(:key_descriptor, :encryption)
+      end
+      it 'is rendered' do
+        expect(node['use']).to eq('encryption')
       end
     end
   end

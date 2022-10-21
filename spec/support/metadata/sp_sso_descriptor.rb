@@ -29,36 +29,30 @@ RSpec.shared_examples 'SPSSODescriptor xml' do
     end
   end
 
-  context 'AssertionConsumerService' do
-    context 'multiple endpoints' do
-      let(:sp_sso_descriptor) do
-        create :sp_sso_descriptor, :with_multiple_assertion_consumer_services
-      end
-      it 'renders all' do
-        expect(xml).to have_xpath(assertion_consumer_service_path, count: 3)
-      end
+  context 'AssertionConsumerService multiple endpoints' do
+    let(:sp_sso_descriptor) do
+      create :sp_sso_descriptor, :with_multiple_assertion_consumer_services
+    end
+    it 'renders all' do
+      expect(xml).to have_xpath(assertion_consumer_service_path, count: 3)
     end
   end
 
-  context 'AttributeConsumingService' do
-    context 'when populated' do
-      let(:sp_sso_descriptor) do
-        create :sp_sso_descriptor, :with_attribute_consuming_services
-      end
-      it 'is rendered' do
-        expect(xml).to have_xpath(attribute_consuming_service_path, count: 2)
-      end
+  context 'AttributeConsumingService when populated' do
+    let(:sp_sso_descriptor) do
+      create :sp_sso_descriptor, :with_attribute_consuming_services
+    end
+    it 'is rendered' do
+      expect(xml).to have_xpath(attribute_consuming_service_path, count: 2)
     end
   end
 
-  context 'idpdisc:DiscoveryResponse' do
-    context 'when populated' do
-      let(:sp_sso_descriptor) do
-        create :sp_sso_descriptor, :with_discovery_response_services
-      end
-      it 'is rendered' do
-        expect(xml).to have_xpath(idpdisc_discovery_response_path, count: 1)
-      end
+  context 'idpdisc:DiscoveryResponse when populated' do
+    let(:sp_sso_descriptor) do
+      create :sp_sso_descriptor, :with_discovery_response_services
+    end
+    it 'is rendered' do
+      expect(xml).to have_xpath(idpdisc_discovery_response_path, count: 1)
     end
   end
 end

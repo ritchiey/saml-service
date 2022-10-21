@@ -33,73 +33,59 @@ RSpec.shared_examples 'IDPSSODescriptor xml' do
 
   let(:node) { xml.first(:xpath, idp_sso_descriptor_path) }
 
-  context 'SingleSignOnServices' do
-    context 'multiple endpoints' do
-      let(:idp_sso_descriptor) do
-        create :idp_sso_descriptor, :with_multiple_single_sign_on_services
-      end
-      it 'renders all' do
-        expect(xml).to have_xpath(single_sign_on_service_path, count: 3)
-      end
+  context 'SingleSignOnServices multiple endpoints' do
+    let(:idp_sso_descriptor) do
+      create :idp_sso_descriptor, :with_multiple_single_sign_on_services
+    end
+    it 'renders all' do
+      expect(xml).to have_xpath(single_sign_on_service_path, count: 3)
     end
   end
 
-  context 'NameIDMappingServices' do
-    context 'when populated' do
-      let(:idp_sso_descriptor) do
-        create :idp_sso_descriptor, :with_name_id_mapping_services
-      end
-      it 'is rendered' do
-        expect(xml).to have_xpath(name_id_mapping_service_path, count: 2)
-      end
+  context 'NameIDMappingServices when populated' do
+    let(:idp_sso_descriptor) do
+      create :idp_sso_descriptor, :with_name_id_mapping_services
+    end
+    it 'is rendered' do
+      expect(xml).to have_xpath(name_id_mapping_service_path, count: 2)
     end
   end
 
-  context 'AssertionIDRequestServices' do
-    context 'when populated' do
-      let(:idp_sso_descriptor) do
-        create :idp_sso_descriptor, :with_assertion_id_request_services
-      end
-      it 'is rendered' do
-        expect(xml).to have_xpath(assertion_id_request_service_path, count: 2)
-      end
+  context 'AssertionIDRequestServices when populated' do
+    let(:idp_sso_descriptor) do
+      create :idp_sso_descriptor, :with_assertion_id_request_services
+    end
+    it 'is rendered' do
+      expect(xml).to have_xpath(assertion_id_request_service_path, count: 2)
     end
   end
 
-  context 'AttributeProfiles' do
-    context 'when populated' do
-      let(:node) { xml.first(:xpath, attribute_profile_path) }
-      let(:idp_sso_descriptor) do
-        create :idp_sso_descriptor, :with_attribute_profiles
-      end
-      it 'is rendered' do
-        expect(xml).to have_xpath(attribute_profile_path, count: 2)
-      end
-      it 'has expected value' do
-        expect(node.text).to eq(idp_sso_descriptor.attribute_profiles.first.uri)
-      end
+  context 'AttributeProfiles when populated' do
+    let(:node) { xml.first(:xpath, attribute_profile_path) }
+    let(:idp_sso_descriptor) do
+      create :idp_sso_descriptor, :with_attribute_profiles
+    end
+    it 'is rendered' do
+      expect(xml).to have_xpath(attribute_profile_path, count: 2)
+      expect(node.text).to eq(idp_sso_descriptor.attribute_profiles.first.uri)
     end
   end
 
-  context 'Attributes' do
-    context 'when populated' do
-      let(:idp_sso_descriptor) do
-        create :idp_sso_descriptor, :with_attributes
-      end
-      it 'is rendered' do
-        expect(xml).to have_xpath(attribute_path, count: 2)
-      end
+  context 'Attributes when populated' do
+    let(:idp_sso_descriptor) do
+      create :idp_sso_descriptor, :with_attributes
+    end
+    it 'is rendered' do
+      expect(xml).to have_xpath(attribute_path, count: 2)
     end
   end
 
-  context 'mdui:DiscoHints' do
-    context 'when populated' do
-      let(:idp_sso_descriptor) do
-        create :idp_sso_descriptor, :with_disco_hints
-      end
-      it 'is rendered' do
-        expect(xml).to have_xpath(mdui_disco_hints_path)
-      end
+  context 'mdui:DiscoHints when populated' do
+    let(:idp_sso_descriptor) do
+      create :idp_sso_descriptor, :with_disco_hints
+    end
+    it 'is rendered' do
+      expect(xml).to have_xpath(mdui_disco_hints_path)
     end
   end
 end

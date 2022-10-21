@@ -16,9 +16,7 @@ shared_examples 'a taggable model' do |tag_factory, association|
 
     subject { described_class.with_any_tag(tag_name) }
 
-    context 'when no tags exist' do
-      it { is_expected.to eq([]) }
-    end
+    it { is_expected.to eq([]) }
 
     context 'when an associated tag exists' do
       before do
@@ -89,9 +87,7 @@ shared_examples 'a taggable model' do |tag_factory, association|
     context 'with a single argument' do
       subject { described_class.with_all_tags(tag_name) }
 
-      context 'when no associations exist' do
-        it { is_expected.to eq([]) }
-      end
+      it { is_expected.to eq([]) }
 
       context "when a single #{described_class.name} association exists" do
         before do
@@ -123,9 +119,7 @@ shared_examples 'a taggable model' do |tag_factory, association|
 
       subject { described_class.with_all_tags([tag_name, another_tag_name]) }
 
-      context 'when no associations exist' do
-        it { is_expected.to eq([]) }
-      end
+      it { is_expected.to eq([]) }
 
       context "with a #{described_class.name} associated with all tags" do
         before do

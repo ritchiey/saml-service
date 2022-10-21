@@ -13,30 +13,24 @@ RSpec.shared_examples 'mdui:DiscoHints xml' do
     expect(xml).to have_xpath(geolocation_hint_path, count: 1)
   end
 
-  context 'IPHints' do
-    context 'rendered node' do
-      let(:node) { xml.first(:xpath, ip_hint_path) }
-      it 'sets correct value' do
-        expect(node.text).to eq(disco_hints.ip_hints.first.block)
-      end
+  context 'IPHints rendered node' do
+    let(:node) { xml.first(:xpath, ip_hint_path) }
+    it 'sets correct value' do
+      expect(node.text).to eq(disco_hints.ip_hints.first.block)
     end
   end
 
-  context 'DomainHint' do
-    context 'rendered node' do
-      let(:node) { xml.first(:xpath, domain_hint_path) }
-      it 'sets correct value' do
-        expect(node.text).to eq(disco_hints.domain_hints.first.domain)
-      end
+  context 'DomainHint rendered node' do
+    let(:node) { xml.first(:xpath, domain_hint_path) }
+    it 'sets correct value' do
+      expect(node.text).to eq(disco_hints.domain_hints.first.domain)
     end
   end
 
-  context 'GeolocationHint' do
-    context 'rendered node' do
-      let(:node) { xml.first(:xpath, geolocation_hint_path) }
-      it 'sets correct value' do
-        expect(node.text).to eq(disco_hints.geolocation_hints.first.uri)
-      end
+  context 'GeolocationHint rendered node' do
+    let(:node) { xml.first(:xpath, geolocation_hint_path) }
+    it 'sets correct value' do
+      expect(node.text).to eq(disco_hints.geolocation_hints.first.uri)
     end
   end
 end

@@ -21,11 +21,6 @@ RSpec.shared_examples 'AttributeConsumingService xml' do
     context 'index' do
       it 'is rendered' do
         expect(node['index']).to eq(attribute_consuming_service.index.to_s)
-      end
-    end
-
-    context 'isDefault' do
-      it 'is rendered' do
         expect(node['isDefault'])
           .to eq(attribute_consuming_service.default.to_s)
       end
@@ -38,12 +33,10 @@ RSpec.shared_examples 'AttributeConsumingService xml' do
       expect(xml).to have_xpath(service_name_path)
     end
 
-    context 'attributes' do
-      context 'lang' do
-        it 'is rendered' do
-          expect(node['xml:lang'])
-            .to eq(attribute_consuming_service.service_names.first.lang)
-        end
+    context 'attributes lang' do
+      it 'is rendered' do
+        expect(node['xml:lang'])
+          .to eq(attribute_consuming_service.service_names.first.lang)
       end
     end
 
@@ -68,12 +61,10 @@ RSpec.shared_examples 'AttributeConsumingService xml' do
       expect(xml).to have_xpath(service_description_path)
     end
 
-    context 'attributes' do
-      context 'lang' do
-        it 'is rendered' do
-          expect(node['xml:lang'])
-            .to eq(attribute_consuming_service.service_descriptions.first.lang)
-        end
+    context 'attributes lang' do
+      it 'is rendered' do
+        expect(node['xml:lang'])
+          .to eq(attribute_consuming_service.service_descriptions.first.lang)
       end
     end
 

@@ -14,29 +14,25 @@ RSpec.shared_examples 'saml:Attribute xml' do
     end
 
     context 'attributes' do
-      context 'NameFormat' do
-        context 'without value' do
-          let(:attribute) { create :minimal_attribute }
-          it 'is not included' do
-            expect(node['NameFormat']).to be_falsey
-          end
+      context 'NameFormat without value' do
+        let(:attribute) { create :minimal_attribute }
+        it 'is not included' do
+          expect(node['NameFormat']).to be_falsey
         end
       end
 
-      context 'FriendlyName' do
-        context 'without value' do
-          let(:attribute) { create :minimal_attribute }
-          it 'is not included' do
-            expect(node['FriendlyName']).to be_falsey
-          end
+      context 'FriendlyName without value' do
+        let(:attribute) { create :minimal_attribute }
+        it 'is not included' do
+          expect(node['FriendlyName']).to be_falsey
         end
-        context 'with value' do
-          let(:attribute) do
-            create :minimal_attribute, friendly_name: Faker::Lorem.word
-          end
-          it 'is included' do
-            expect(node['FriendlyName']).to eq(attribute.friendly_name)
-          end
+      end
+      context 'with value' do
+        let(:attribute) do
+          create :minimal_attribute, friendly_name: Faker::Lorem.word
+        end
+        it 'is included' do
+          expect(node['FriendlyName']).to eq(attribute.friendly_name)
         end
       end
     end
