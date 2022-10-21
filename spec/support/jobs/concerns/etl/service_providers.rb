@@ -3,12 +3,11 @@
 RSpec.shared_examples 'ETL::ServiceProviders' do
   include_examples 'ETL::Common'
 
-  # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
-  def create_json(sp, services_functioning: true)
-    contact_people =
-      contact_instances.map { |cp| contact_person_json(cp) } +
+  let(:contact_people) do
+    contact_instances.map { |cp| contact_person_json(cp) } +
       sirtfi_contact_instances.map { |cp| sirtfi_contact_person_json(cp) }
-
+  end
+  def create_json(sp, services_functioning: true)
     {
       id: sp.id,
       display_name: Faker::Lorem.sentence,
@@ -60,7 +59,7 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
       }
     }
   end
-  # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
+  # rubocop:enable
 
   def requested_attribute_json(ra)
     {
@@ -198,6 +197,36 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
       ).and(
         change { AttributeConsumingService.count }.by(sp_count)
       )
+    end
+
+    context 'With invalid contacts' do
+      let(:contact_people) do
+        contact_people = contact_instances.map { |cp| contact_person_json(cp) } +
+                         sirtfi_contact_instances.map { |cp| sirtfi_contact_person_json(cp) }
+        contact_people.each do |contact|
+          contact[:type][:name] = :blah
+        end
+        contact_people
+      end
+
+      it 'creates a new AttributeConsumingService ' do
+        expect { run }.to(change { AttributeConsumingService.count })
+      end
+    end
+
+    context 'Without fr contacts' do
+      let(:contact_people) do
+        contact_people = contact_instances.map { |cp| contact_person_json(cp) } +
+                         sirtfi_contact_instances.map { |cp| sirtfi_contact_person_json(cp) }
+        contact_people.each do |contact|
+          FederationRegistryObject.find(fr_id: contact[:contact][:id], internal_class_name: Contact.dataset.model.name).destroy
+        end
+        contact_people
+      end
+
+      it 'creates a new AttributeConsumingService ' do
+        expect { run }.to(change { AttributeConsumingService.count })
+      end
     end
 
     context 'when no AttributeConsumingService to add' do

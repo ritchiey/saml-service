@@ -7,7 +7,6 @@ RSpec.shared_examples 'ETL::AttributeAuthorities' do
     contact_people =
       contact_instances.map { |cp| contact_person_json(cp) } +
       sirtfi_contact_instances.map { |cp| sirtfi_contact_person_json(cp) }
-
     {
       id: idp.id,
       display_name: Faker::Lorem.sentence,
@@ -119,7 +118,9 @@ RSpec.shared_examples 'ETL::AttributeAuthorities' do
     identity_provider_instances.map { |idp| create_idp_json(idp) }
   end
 
-  let(:identity_providers) { identity_providers_list }
+  let(:identity_providers) do
+    identity_providers_list
+  end
 
   let(:attribute_authorities_instances) do
     create_list(:attribute_authority_descriptor, aa_count)
@@ -195,6 +196,66 @@ RSpec.shared_examples 'ETL::AttributeAuthorities' do
     it 'creates a new instance' do
       expect { run }
         .to change { AttributeAuthorityDescriptor.count }.by(aa_count)
+    end
+
+    context 'when no key type' do
+      let(:identity_providers) do
+        identity_providers_list.each do |json|
+          json[:saml][:sso_descriptor][:role_descriptor][:key_descriptors].each do |descriptor|
+            descriptor.delete(:type)
+          end
+        end
+      end
+
+      it 'creates a new instance' do
+        expect { run }
+          .to change { AttributeAuthorityDescriptor.count }.by(aa_count)
+      end
+    end
+
+    context 'when no key info' do
+      let(:identity_providers) do
+        identity_providers_list.each do |json|
+          json[:saml][:sso_descriptor][:role_descriptor][:key_descriptors].each do |descriptor|
+            descriptor.delete(:key_info)
+          end
+        end
+      end
+
+      it 'raises validation error' do
+        expect { run }
+          .to raise_error(Sequel::ValidationFailed, 'key_info is not present')
+      end
+    end
+
+    context 'when no key info certificate' do
+      let(:identity_providers) do
+        identity_providers_list.each do |json|
+          json[:saml][:sso_descriptor][:role_descriptor][:key_descriptors].each do |descriptor|
+            descriptor[:key_info].delete(:certificate)
+          end
+        end
+      end
+
+      it 'raises validation error' do
+        expect { run }
+          .to raise_error(Sequel::ValidationFailed, 'key_info is not present')
+      end
+    end
+
+    context 'when no key info certificate data' do
+      let(:identity_providers) do
+        identity_providers_list.each do |json|
+          json[:saml][:sso_descriptor][:role_descriptor][:key_descriptors].each do |descriptor|
+            descriptor[:key_info][:certificate].delete(:data)
+          end
+        end
+      end
+
+      it 'raises validation error' do
+        expect { run }
+          .to raise_error(Sequel::ValidationFailed, 'key_info is not present')
+      end
     end
 
     context 'when not functioning' do
