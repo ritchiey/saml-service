@@ -2,7 +2,7 @@
 
 RSpec.shared_examples 'ETL::IdentityProviders' do
   include_examples 'ETL::Common'
-  # rubocop:disable Metrics/Metrics/AbcSize
+  # rubocop:disable Metrics/MethodLength,Metrics/AbcSize
   def create_json(idp)
     contact_people =
       contact_instances.map { |cp| contact_person_json(cp) } +
@@ -51,7 +51,7 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
       }
     }
   end
-  # rubocop:enable
+  # rubocop:enable  Metrics/MethodLength,Metrics/AbcSize
 
   def attribute_json(a)
     {
