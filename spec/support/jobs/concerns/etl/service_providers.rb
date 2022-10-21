@@ -7,6 +7,7 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
     contact_instances.map { |cp| contact_person_json(cp) } +
       sirtfi_contact_instances.map { |cp| sirtfi_contact_person_json(cp) }
   end
+  # rubocop:disable Metrics/MethodLength,Metrics/AbcSize
   def create_json(sp, services_functioning: true)
     {
       id: sp.id,
@@ -59,7 +60,7 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
       }
     }
   end
-  # rubocop:enable
+  # rubocop:enable  Metrics/MethodLength,Metrics/AbcSize
 
   def requested_attribute_json(ra)
     {
@@ -219,7 +220,9 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
         contact_people = contact_instances.map { |cp| contact_person_json(cp) } +
                          sirtfi_contact_instances.map { |cp| sirtfi_contact_person_json(cp) }
         contact_people.each do |contact|
-          FederationRegistryObject.find(fr_id: contact[:contact][:id], internal_class_name: Contact.dataset.model.name).destroy
+          FederationRegistryObject
+            .find(fr_id: contact[:contact][:id], internal_class_name: Contact.dataset.model.name)
+            .destroy
         end
         contact_people
       end
