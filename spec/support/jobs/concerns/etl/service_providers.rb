@@ -359,7 +359,8 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
     include_examples 'updating an SSODescriptor'
     include_examples 'updating MDUI content'
 
-    it 'uses the existing instance, does not create tags, updates assertion_consumer_services and discovery_response_services' do
+    it 'uses the existing instance, does not create tags, updates assertion_consumer_services' \
+       'and discovery_response_services' do
       expect { run }.to(not_change { SPSSODescriptor.count }.and(
         not_change { Tag.count }
       ).and(
