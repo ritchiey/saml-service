@@ -305,7 +305,7 @@ RSpec.shared_examples 'ETL::AttributeAuthorities' do
       end
 
       context 'scopes' do
-        it 'sets scopes and regex to false' do
+        it 'sets scope and sets regex to false' do
           expect(subject.scopes.size).to eq(1)
           expect(subject.scopes.first.value).to eq(scope)
           expect(subject.scopes.first.regexp).not_to be
