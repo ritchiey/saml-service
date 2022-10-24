@@ -43,7 +43,7 @@ RSpec.shared_examples 'ContactPerson xml' do
       end
     end
     context 'when known' do
-      it 'is created has correct value' do
+      it 'is created with correct value' do
         expect(xml).to have_xpath(contact_person_given_name_path, count: 1)
         expect(node.text).to eq(contact_person.contact.given_name)
       end
