@@ -75,7 +75,7 @@ RSpec.shared_examples 'ContactPerson xml' do
       end
     end
     context 'when known' do
-      it 'is created has correct value' do
+      it 'is created with correct value' do
         expect(xml).to have_xpath(contact_person_email_address_path, count: 1)
         expect(node.text)
           .to eq("mailto:#{contact_person.contact.email_address}")
