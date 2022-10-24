@@ -39,7 +39,7 @@ RSpec.shared_examples 'EntitiesDescriptor xml' do
 
       around { |example| Timecop.freeze { example.run } }
 
-      it 'sets ID and name and validuntil' do
+      it 'sets ID, name and validuntil' do
         expect(node['ID']).to eq(subject.instance_id)
           .and start_with(federation_identifier)
         expect(node['Name']).to eq(metadata_name)
