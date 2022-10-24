@@ -18,7 +18,7 @@ end
 RSpec.shared_examples 'indexed_endpoint' do
   include_examples 'endpoint'
 
-  it 'expected data' do
+  it 'sets expected data' do
     source.each_with_index do |s, i|
       expect(
         { is_default: target[i].is_default, index: target[i].index }
