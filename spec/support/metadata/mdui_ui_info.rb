@@ -20,7 +20,7 @@ RSpec.shared_examples 'mdui:UIInfo xml' do
   context 'DisplayName' do
     context 'rendered node' do
       let(:node) { xml.first(:xpath, mdui_display_name_path) }
-      it 'sets languageand text' do
+      it 'sets language and text' do
         expect(node['xml:lang']).to eq(ui_info.display_names.first.lang)
         expect(node.text).to eq(ui_info.display_names.first.value)
       end
