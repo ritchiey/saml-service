@@ -178,6 +178,11 @@ RSpec.describe SyncToGitRepository do
         it_behaves_like 'an up-to-date entity'
       end
 
+      context 'for non functioning entity' do
+        let(:raw_entity_descriptor) { create(:raw_entity_descriptor, enabled: false) }
+        it_behaves_like 'an up-to-date entity'
+      end
+
       context 'for a removed entity' do
         let(:stale) { "entities/#{md_instance.identifier}-stale-entity.xml" }
 

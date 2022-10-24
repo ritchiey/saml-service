@@ -3,12 +3,12 @@
 RSpec.shared_examples 'ETL::ServiceProviders' do
   include_examples 'ETL::Common'
 
-  # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
-  def create_json(sp)
-    contact_people =
-      contact_instances.map { |cp| contact_person_json(cp) } +
+  let(:contact_people) do
+    contact_instances.map { |cp| contact_person_json(cp) } +
       sirtfi_contact_instances.map { |cp| sirtfi_contact_person_json(cp) }
-
+  end
+  # rubocop:disable Metrics/MethodLength,Metrics/AbcSize
+  def create_json(sp, services_functioning: true)
     {
       id: sp.id,
       display_name: Faker::Lorem.sentence,
@@ -30,11 +30,11 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
           end,
         assertion_consumer_services:
           sp.assertion_consumer_services.map do |acs|
-            indexed_endpoint_json(acs)
+            indexed_endpoint_json(acs, functioning: services_functioning)
           end,
         discovery_response_services:
           sp.discovery_response_services.map do |drs|
-            indexed_endpoint_json(drs)
+            indexed_endpoint_json(drs, functioning: services_functioning)
           end,
         sso_descriptor: {
           role_descriptor: {
@@ -50,7 +50,7 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
             sp.name_id_formats.map { |nidf| saml_uri_json(nidf) },
           artifact_resolution_services:
             sp.artifact_resolution_services.map do |ars|
-              indexed_endpoint_json(ars)
+              indexed_endpoint_json(ars, functioning: services_functioning)
             end,
           single_logout_services:
             sp.single_logout_services.map { |slo| endpoint_json(slo) },
@@ -60,7 +60,7 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
       }
     }
   end
-  # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
+  # rubocop:enable  Metrics/MethodLength,Metrics/AbcSize
 
   def requested_attribute_json(ra)
     {
@@ -205,6 +205,52 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
       expect { run }.to change { AttributeConsumingService.count }.by(sp_count)
     end
 
+    context 'With invalid contacts' do
+      let(:contact_people) do
+        contact_people = contact_instances.map { |cp| contact_person_json(cp) } +
+                         sirtfi_contact_instances.map { |cp| sirtfi_contact_person_json(cp) }
+        contact_people.each do |contact|
+          contact[:type][:name] = :blah
+        end
+        contact_people
+      end
+
+      it 'creates a new AttributeConsumingService ' do
+        expect { run }.to(change { AttributeConsumingService.count })
+      end
+    end
+
+    context 'Without fr contacts' do
+      let(:contact_people) do
+        contact_people = contact_instances.map { |cp| contact_person_json(cp) } +
+                         sirtfi_contact_instances.map { |cp| sirtfi_contact_person_json(cp) }
+        contact_people.each do |contact|
+          FederationRegistryObject
+            .find(fr_id: contact[:contact][:id], internal_class_name: Contact.dataset.model.name)
+            .destroy
+        end
+        contact_people
+      end
+
+      it 'creates a new AttributeConsumingService ' do
+        expect { run }.to(change { AttributeConsumingService.count })
+      end
+    end
+
+    context 'when no AttributeConsumingService to add' do
+      let(:service_providers_list) do
+        service_provider_instances.map do |sp|
+          json = create_json(sp)
+          json[:saml][:attribute_consuming_services] = nil
+          json
+        end
+      end
+
+      it 'doesnt create a new AttributeConsumingService ' do
+        expect { run }.not_to(change { AttributeConsumingService.count })
+      end
+    end
+
     context 'with a solo requestedAttribute requiring specification with no requested value' do
       let(:attribute_instances) do
         [
@@ -332,6 +378,18 @@ RSpec.shared_examples 'ETL::ServiceProviders' do
 
     it 'updates discovery_response_services' do
       expect { run }.to(change { subject.reload.discovery_response_services })
+    end
+
+    context 'when no discovery_response_services not functioning' do
+      let(:service_providers_list) do
+        service_provider_instances.map do |sp|
+          create_json(sp, services_functioning: false)
+        end
+      end
+
+      it 'doesnt update discovery_response_services' do
+        expect { run }.not_to(change { subject.reload.discovery_response_services })
+      end
     end
 
     it 'updates attribute_consuming_services' do

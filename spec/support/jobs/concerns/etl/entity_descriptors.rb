@@ -2,7 +2,7 @@
 
 RSpec.shared_examples 'ETL::EntityDescriptors' do
   # rubocop:disable Metrics/MethodLength
-  def create_json(id, functioning = true, empty = false)
+  def create_json(id, functioning: true, services_functioning: true, empty: false)
     {
       id: id,
       entity_id: Faker::Internet.url,
@@ -36,19 +36,19 @@ RSpec.shared_examples 'ETL::EntityDescriptors' do
         identity_providers: [
           {
             id: 3000 + id,
-            functioning: true
+            functioning: services_functioning
           }
         ],
         service_providers: [
           {
             id: 4000 + id,
-            functioning: true
+            functioning: services_functioning
           }
         ],
         attribute_authorities: [
           {
             id: 5000 + id,
-            functioning: true
+            functioning: services_functioning
           }
         ]
       }
@@ -92,7 +92,7 @@ RSpec.shared_examples 'ETL::EntityDescriptors' do
     let(:entity_descriptor_count) { 1 }
     let(:entity_descriptor_list) do
       (0...entity_descriptor_count)
-        .reduce([]) { |a, e| a << create_json(1000 + e, false) }
+        .reduce([]) { |a, e| a << create_json(1000 + e, functioning: false) }
     end
 
     it 'does not create an EntityDescriptor' do
@@ -122,7 +122,7 @@ RSpec.shared_examples 'ETL::EntityDescriptors' do
     let(:entity_descriptor_count) { 1 }
     let(:entity_descriptor_list) do
       (0...entity_descriptor_count)
-        .reduce([]) { |a, e| a << create_json(1000 + e, true, true) }
+        .reduce([]) { |a, e| a << create_json(1000 + e, functioning: true, empty: true) }
     end
 
     it 'does not create an EntityDescriptor' do
@@ -188,6 +188,23 @@ RSpec.shared_examples 'ETL::EntityDescriptors' do
     it 'has known_entity with federation tag' do
       expect(subject.known_entity.tags.first.name)
         .to eq(subject.known_entity.entity_source.source_tag)
+    end
+
+    context 'when services functioning is false' do
+      let(:entity_descriptor_list) do
+        (0...entity_descriptor_count)
+          .reduce([]) { |a, e| a << create_json(1000 + e, services_functioning: false) }
+      end
+
+      it 'doesnt create a new SingleSignOnService' do
+        expect { run }.not_to(change do
+                                [
+                                  ArtifactResolutionService.count,
+                                  SingleLogoutService.count,
+                                  ManageNameIdService.count
+                                ]
+                              end)
+      end
     end
   end
 
