@@ -110,7 +110,7 @@ RSpec.shared_examples 'mdui:UIInfo xml' do
 
     context 'rendered node' do
       let(:node) { xml.first(:xpath, mdui_privacystatementurl_path) }
-      it 'sets language, text' do
+      it 'sets language and text' do
         expect(node['xml:lang'])
           .to eq(ui_info.privacy_statement_urls.first.lang)
         expect(node.text).to eq(ui_info.privacy_statement_urls.first.uri)
