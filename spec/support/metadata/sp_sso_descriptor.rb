@@ -23,7 +23,7 @@ RSpec.shared_examples 'SPSSODescriptor xml' do
   context 'attributes' do
     let(:node) { xml.first(:xpath, sp_sso_descriptor_path) }
 
-    it 'is not rendered' do
+    it 'are not rendered' do
       expect(node['AuthnRequestsSigned']).to be_falsey
       expect(node['WantAssertionsSigned']).to be_falsey
     end
