@@ -7,7 +7,7 @@ RSpec.shared_examples 'Endpoint xml' do
 
   context 'attributes' do
     let(:node) { xml.first(:xpath, endpoint_path) }
-    it 'has binding, location' do
+    it 'has binding and location' do
       expect(node['Binding']).to eq(endpoint.binding)
       expect(node['Location']).to eq(endpoint.location)
       expect(xml).not_to have_xpath("#{endpoint_path}[@ResponseLocation]")
