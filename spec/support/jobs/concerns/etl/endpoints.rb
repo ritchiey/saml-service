@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.shared_examples 'endpoint' do
-  it 'expected data' do
+  it 'sets expected data' do
     expect(source.count).to be > 0
     expect(target.count)
       .to eq(source.count)
