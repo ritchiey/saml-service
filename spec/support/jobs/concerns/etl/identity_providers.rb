@@ -205,7 +205,7 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
       end
 
       context 'scopes' do
-        it 'sets a scope and refex to false' do
+        it 'sets a scope with regexp: false' do
           expect(subject.scopes.size).to eq(1)
           expect(subject.scopes.first.value).to eq(scope)
           expect(subject.scopes.first.regexp).not_to be
