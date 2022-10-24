@@ -323,7 +323,7 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
     include_examples 'updating an SSODescriptor'
     include_examples 'updating MDUI content'
 
-    it 'Works as expected, sets scope, doesnt make tags, updates sso, assertion id, attribute profile and attributes' do
+    it 'works as expected, sets scope, doesnt make tags, updates sso, assertion id, attribute profile and attributes' do
       expect { run }.to(not_change { IDPSSODescriptor.count }.and(
         not_change { Tag.count }
       ).and(
