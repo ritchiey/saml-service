@@ -205,18 +205,10 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
       end
 
       context 'scopes' do
-        it 'sets a scope' do
+        it 'sets a scope with regexp: false' do
           expect(subject.scopes.size).to eq(1)
-        end
-
-        it 'sets expected scope' do
           expect(subject.scopes.first.value).to eq(scope)
-        end
-
-        context 'normal scope' do
-          it 'sets regex to false' do
-            expect(subject.scopes.first.regexp).not_to be
-          end
+          expect(subject.scopes.first.regexp).not_to be
         end
 
         context 'regex scope' do
@@ -331,41 +323,22 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
     include_examples 'updating an SSODescriptor'
     include_examples 'updating MDUI content'
 
-    it 'uses the existing instance' do
-      expect { run }.not_to(change { IDPSSODescriptor.count })
-    end
-
-    it 'sets a scope' do
+    it 'works as expected, sets scope, doesnt make tags, updates sso, assertion id, attribute profile and attributes' do
+      expect { run }.to(not_change { IDPSSODescriptor.count }.and(
+        not_change { Tag.count }
+      ).and(
+        change { subject.reload.single_sign_on_services }
+      ).and(
+        change { subject.reload.name_id_mapping_services }
+      ).and(
+        change { subject.reload.assertion_id_request_services }
+      ).and(
+        change { subject.reload.attribute_profiles }
+      ).and(
+        change { subject.reload.attributes }
+      ))
       expect(subject.scopes.size).to eq(1)
-    end
-
-    it 'sets expected scope' do
       expect(subject.scopes.first.value).to eq(scope)
-    end
-
-    it 'does not create more tags' do
-      expect { run }.not_to(change { Tag.count })
-    end
-
-    it 'updates single sign on services' do
-      expect { run }.to(change { subject.reload.single_sign_on_services })
-    end
-
-    it 'updates name id mapping services' do
-      expect { run }.to(change { subject.reload.name_id_mapping_services })
-    end
-
-    it 'updates assertion id request services' do
-      expect { run }
-        .to(change { subject.reload.assertion_id_request_services })
-    end
-
-    it 'updates attribute profiles' do
-      expect { run }.to(change { subject.reload.attribute_profiles })
-    end
-
-    it 'updates attributes' do
-      expect { run }.to(change { subject.reload.attributes })
     end
 
     context 'when no name format' do
