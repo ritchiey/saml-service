@@ -116,23 +116,27 @@ RSpec.shared_examples 'ETL::Common' do
   let(:contacts) { contacts_list }
 
   shared_examples 'saml_attributes' do
+    it 'sets friendly_name' do
+      source.each_with_index do |s, i|
+        expect(target[i].friendly_name == s[:name])
+      end
+    end
+
     it 'has source data' do
-      expect(source.count).to be > 0
-      expect(target.count)
-        .to eq(source.count)
       source.each_with_index do |s, i|
         expect({
                  description: target[i].description,
                  oid: target[i].oid,
-                 friendly_name: target[i].friendly_name,
                  name: target[i].name
                }).to match({
                              description: s[:description],
                              oid: s[:oid],
-                             friendly_name: s[:name],
                              name: "urn:oid:#{s[:oid]}"
                            })
       end
+      expect(source.count).to be > 0
+      expect(target.count)
+        .to eq(source.count)
     end
   end
 
@@ -153,10 +157,14 @@ RSpec.shared_examples 'ETL::Common' do
   shared_examples 'updating MDUI content' do
     it 'updates mdui display_names' do
       expect { run }.to(change { subject.reload.ui_info.display_names }.and(
-        change { subject.reload.ui_info.descriptions }
-      ).and(
-        change { subject.reload.ui_info.descriptions.first.value }.to(description.squish)
-      ))
+                          change { subject.reload.ui_info.descriptions }
+                        ))
+    end
+
+    it 'squishes incoming description' do
+      run
+      expect(subject.reload.ui_info.descriptions.first.value)
+        .to eq(description.squish)
     end
   end
 

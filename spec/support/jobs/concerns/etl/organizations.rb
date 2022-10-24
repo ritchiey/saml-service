@@ -67,7 +67,7 @@ RSpec.shared_examples 'ETL::Organizations' do
 
     it 'has an OrganizationName' do
       expect({
-               domain: subject.organization_names.last.value,
+               entity_id: subject.organization_names.last.value,
                name_lang: subject.organization_names.last.lang,
                display_name: subject.organization_display_names.last.value,
                display_lang: subject.organization_display_names.last.lang,
@@ -75,10 +75,10 @@ RSpec.shared_examples 'ETL::Organizations' do
                lang: subject.organization_urls.last.lang
              }).to match({
                            entity_id: organizations.last[:domain],
-                           registration_authority: organizations.last[:lang],
-                           registration_policy_uri: organizations.last[:display_name],
-                           registration_policy_uri_lang: organizations.last[:lang],
-                           source_tag: organizations.last[:url],
+                           name_lang: organizations.last[:lang],
+                           display_name: organizations.last[:display_name],
+                           display_lang: organizations.last[:lang],
+                           uri: organizations.last[:url],
                            lang: organizations.last[:lang]
                          })
     end
@@ -100,14 +100,14 @@ RSpec.shared_examples 'ETL::Organizations' do
 
       it 'updated created_at' do
         expect { run }
-          .to change { subject.reload.created_at }.to eq(org_created_at).and(
-            change { subject.reload.organization_names.last.value }.to(eq(organizations.last[:domain]))
+          .to change { subject.reload.created_at }.to(org_created_at).and(
+            change { subject.reload.organization_names.last.value }.to(organizations.last[:domain])
           ).and(
             change { subject.reload.organization_display_names.last.value }.to(
-              eq(organizations.last[:display_name])
+              organizations.last[:display_name]
             )
           ).and(
-            change { subject.reload.organization_urls.last.uri }.to(eq(organizations.last[:url]))
+            change { subject.reload.organization_urls.last.uri }.to(organizations.last[:url])
           )
       end
     end
