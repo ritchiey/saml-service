@@ -19,18 +19,22 @@ RSpec.shared_examples 'ds:Signature xml' do
   end
 
   it 'has a <Signature> element, c14n method, reference element, signed, and transforms' do
+    ## has a <Signature> element
     e = signed_info.find(:xpath, 'ds:CanonicalizationMethod')
     transforms = reference.all(:xpath, 'ds:Transforms/ds:Transform')
                           .map { |transform| transform['Algorithm'] }
 
     expect(xml).to have_xpath(sig_xpath.to_s)
+    ## has algorithm
     expect(e['Algorithm']).to eq('http://www.w3.org/2001/10/xml-exc-c14n#')
     expect(signed_info).to have_xpath('ds:SignatureMethod', count: 1).and(
       have_xpath('ds:Reference', count: 1)
     ).and(
       have_xpath('ds:CanonicalizationMethod', count: 1)
     )
+    ## designates the root element to be signed
     expect(reference['URI']).to eq("##{subject.instance_id}")
+    ## transforms
     expect(reference).to have_xpath('ds:Transforms', count: 1).and(
       have_xpath('ds:Transforms/ds:Transform', count: 2)
     ).and(have_xpath('ds:DigestMethod', count: 1))
@@ -38,6 +42,7 @@ RSpec.shared_examples 'ds:Signature xml' do
       'http://www.w3.org/2000/09/xmldsig#enveloped-signature',
       'http://www.w3.org/2001/10/xml-exc-c14n#'
     )
+    ## xml elements
     expect(signature).to have_xpath('ds:KeyInfo', count: 1)
       .and have_xpath('ds:KeyInfo/ds:KeyValue', count: 1)
       .and have_xpath('ds:KeyInfo/ds:X509Data', count: 1)
@@ -56,6 +61,7 @@ RSpec.shared_examples 'ds:Signature xml' do
 
     expect(exponent).to eq(key.e.to_i)
 
+    ## has cerificate
     cert = [
       '-----BEGIN CERTIFICATE-----',
       signature.find(:xpath, './/ds:X509Certificate').text.strip,
