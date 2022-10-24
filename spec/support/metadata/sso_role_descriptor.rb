@@ -14,7 +14,7 @@ RSpec.shared_examples 'SSODescriptor xml' do
     "#{sso_descriptor_path}/NameIDFormat"
   end
 
-  it 'is created without sso, name_id and artificat resolution' do
+  it 'is created without sso, name_id and artifact resolution' do
     expect(xml).to have_xpath(sso_descriptor_path)
     expect(xml).not_to have_xpath(artifact_resolution_service_path)
     expect(xml).not_to have_xpath(single_logout_service_path)
