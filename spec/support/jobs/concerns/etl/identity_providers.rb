@@ -51,7 +51,7 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
       }
     }
   end
-  # rubocop:enable  Metrics/MethodLength,Metrics/AbcSize
+  # rubocop:enable Metrics/MethodLength,Metrics/AbcSize
 
   def attribute_json(a)
     {
