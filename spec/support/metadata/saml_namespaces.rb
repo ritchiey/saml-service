@@ -6,7 +6,7 @@ RSpec.shared_examples 'SAML namespaces' do
   context 'SAML namespaces' do
     let(:ns) { subject.ns }
 
-    it do
+    it 'works as expected' do
       is_expected.to be_a_kind_of Metadata::SamlNamespaces
       is_expected.to respond_to(:root).and(
         respond_to(:saml)

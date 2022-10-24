@@ -122,7 +122,7 @@ RSpec.shared_examples 'ETL::Common' do
       end
     end
 
-    it 'has source data' do
+    it 'sets rest of data' do
       source.each_with_index do |s, i|
         expect({
                  description: target[i].description,
@@ -141,7 +141,7 @@ RSpec.shared_examples 'ETL::Common' do
   end
 
   shared_examples 'updating a RoleDescriptor' do
-    it 're-uses contact instances' do
+    it 're-uses contact instances, updates contacts, updates protocol and key descriptors' do
       expect { run }.to(not_change { Contact.count }.and(
         change { subject.entity_descriptor.reload.contact_people }
       ).and(
@@ -155,7 +155,7 @@ RSpec.shared_examples 'ETL::Common' do
   end
 
   shared_examples 'updating MDUI content' do
-    it 'updates mdui display_names' do
+    it 'updates mdui display_names and description' do
       expect { run }.to(change { subject.reload.ui_info.display_names }.and(
                           change { subject.reload.ui_info.descriptions }
                         ))
@@ -171,7 +171,7 @@ RSpec.shared_examples 'ETL::Common' do
   shared_examples 'updating an SSODescriptor' do
     include_examples 'updating a RoleDescriptor'
 
-    it 'updates name id formats' do
+    it 'updates name id formats, artifact resolutions and single_logout services' do
       expect { run }.to(change { subject.reload.name_id_formats }.and(
         change { subject.reload.artifact_resolution_services }
       ).and(

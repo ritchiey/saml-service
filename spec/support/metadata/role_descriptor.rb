@@ -11,7 +11,7 @@ RSpec.shared_examples 'RoleDescriptor xml' do
 
   let(:node) { xml.first(:xpath, role_descriptor_path) }
 
-  it 'is created' do
+  it 'is created without extensions, key_descriptiors, organizations, contacts, ui_info, shibmd, error url with protocols' do
     expect(xml).to have_xpath(role_descriptor_path)
     expect(role_descriptor.protocol_supports.length).to eq(2)
     expect(node['protocolSupportEnumeration'])

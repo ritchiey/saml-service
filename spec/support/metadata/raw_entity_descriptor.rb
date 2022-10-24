@@ -27,7 +27,7 @@ RSpec.shared_examples 'RawEntityDescriptor xml' do
 
     around { |example| Timecop.freeze { example.run } }
 
-    it 'sets ID' do
+    it 'sets ID and validUntil' do
       expect(node['ID']).to eq(subject.instance_id)
         .and start_with(federation_identifier)
       expect(node['validUntil'])

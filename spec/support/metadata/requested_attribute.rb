@@ -16,15 +16,13 @@ RSpec.shared_examples 'RequestedAttribute xml' do
 
   context 'RequestedAttribute' do
     context 'attributes' do
-      context 'NameFormat' do
-        context 'with value' do
-          let(:requested_attribute) do
-            create :requested_attribute, :with_name_format
-          end
-          it 'is included' do
-            expect(node['NameFormat'])
-              .to eq(requested_attribute.name_format.uri)
-          end
+      context 'NameFormat with value' do
+        let(:requested_attribute) do
+          create :requested_attribute, :with_name_format
+        end
+        it 'is included' do
+          expect(node['NameFormat'])
+            .to eq(requested_attribute.name_format.uri)
         end
       end
 

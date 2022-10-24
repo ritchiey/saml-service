@@ -205,7 +205,7 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
       end
 
       context 'scopes' do
-        it 'sets a scope' do
+        it 'sets a scope and refex to false' do
           expect(subject.scopes.size).to eq(1)
           expect(subject.scopes.first.value).to eq(scope)
           expect(subject.scopes.first.regexp).not_to be
@@ -323,7 +323,7 @@ RSpec.shared_examples 'ETL::IdentityProviders' do
     include_examples 'updating an SSODescriptor'
     include_examples 'updating MDUI content'
 
-    it 'Works as expected' do
+    it 'Works as expected, sets scope, doesnt make tags, updates sso, assertion id, attribute profile and attributes' do
       expect { run }.to(not_change { IDPSSODescriptor.count }.and(
         not_change { Tag.count }
       ).and(

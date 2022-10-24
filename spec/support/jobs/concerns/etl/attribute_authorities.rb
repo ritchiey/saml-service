@@ -193,7 +193,7 @@ RSpec.shared_examples 'ETL::AttributeAuthorities' do
 
     subject { AttributeAuthorityDescriptor.last }
 
-    it 'creates a new instance' do
+    it 'creates a new instance and tag' do
       expect { run }
         .to change { AttributeAuthorityDescriptor.count }.by(aa_count).and(
           change { Tag.count }.by(1)
@@ -305,7 +305,7 @@ RSpec.shared_examples 'ETL::AttributeAuthorities' do
       end
 
       context 'scopes' do
-        it 'sets a scope' do
+        it 'sets scopes and regex to false' do
           expect(subject.scopes.size).to eq(1)
           expect(subject.scopes.first.value).to eq(scope)
           expect(subject.scopes.first.regexp).not_to be
@@ -397,7 +397,7 @@ RSpec.shared_examples 'ETL::AttributeAuthorities' do
 
     include_examples 'updating a RoleDescriptor'
 
-    it 'uses the existing instance' do
+    it 'uses the existing instance, doesnt create tags, updates' do
       expect { run }.to(not_change { AttributeAuthorityDescriptor.count }.and(
         not_change { Tag.count }
       ).and(

@@ -48,7 +48,7 @@ RSpec.shared_examples 'EntityDescriptor xml' do
 
   RSpec.shared_examples 'md:EntityDescriptor xml' do
     let(:create_idp) { true } # Ensure ED is valid to pass #functioning?
-    it 'is created' do
+    it 'is created, RegistrationInfo node, no EntityAttributes node, IDPSSODescriptor node, AttributeAuthorityDescriptor node, creates Organization, creates technical contact' do
       expect(xml).to have_xpath(entity_descriptor_path)
       expect(xml).to have_xpath(registration_info_path, count: 1)
       expect(xml).to have_xpath(entity_attributes_path, count: 0)
@@ -180,7 +180,7 @@ RSpec.shared_examples 'EntityDescriptor xml' do
     context 'attributes' do
       let(:node) { xml.find(:xpath, entity_descriptor_path) }
 
-      it 'sets ID' do
+      it 'sets ID, validuntil' do
         expect(node['ID']).to be_falsey
         expect(node['validUntil']).to be_falsey
       end

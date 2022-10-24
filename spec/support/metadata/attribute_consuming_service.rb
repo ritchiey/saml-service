@@ -19,7 +19,7 @@ RSpec.shared_examples 'AttributeConsumingService xml' do
     let(:node) { xml.first(:xpath, attribute_consuming_service_path) }
 
     context 'index' do
-      it 'is rendered' do
+      it 'is rendered and has expected value' do
         expect(node['index']).to eq(attribute_consuming_service.index.to_s)
         expect(node['isDefault'])
           .to eq(attribute_consuming_service.default.to_s)

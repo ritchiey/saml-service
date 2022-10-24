@@ -13,7 +13,7 @@ RSpec.shared_examples 'SIRTFI ContactPerson xml' do
   end
   let(:node) { xml.first(:xpath, contact_person_path) }
 
-  it 'is created' do
+  it 'is created with contactType and remd:contactType' do
     expect(xml).to have_xpath(contact_person_path, count: 1)
     expect(node['contactType']).to eq('other')
     expect(node['remd:contactType'])
@@ -31,7 +31,7 @@ RSpec.shared_examples 'SIRTFI ContactPerson xml' do
       end
     end
     context 'when known' do
-      it 'is created' do
+      it 'is created with company' do
         expect(xml).to have_xpath(contact_person_company_path, count: 1)
         expect(node.text).to eq(sirtfi_contact_person.contact.company)
       end
@@ -49,7 +49,7 @@ RSpec.shared_examples 'SIRTFI ContactPerson xml' do
       end
     end
     context 'when known' do
-      it 'is created' do
+      it 'is created with contact person' do
         expect(xml).to have_xpath(contact_person_given_name_path, count: 1)
         expect(node.text).to eq(sirtfi_contact_person.contact.given_name)
       end
@@ -67,7 +67,7 @@ RSpec.shared_examples 'SIRTFI ContactPerson xml' do
       end
     end
     context 'when known' do
-      it 'is created' do
+      it 'is created with surname' do
         expect(xml).to have_xpath(contact_person_surname_path, count: 1)
         expect(node.text).to eq(sirtfi_contact_person.contact.surname)
       end
@@ -85,7 +85,7 @@ RSpec.shared_examples 'SIRTFI ContactPerson xml' do
       end
     end
     context 'when known' do
-      it 'is created' do
+      it 'is created with email' do
         expect(xml).to have_xpath(contact_person_email_address_path, count: 1)
         expect(node.text)
           .to eq("mailto:#{sirtfi_contact_person.contact.email_address}")
@@ -104,7 +104,7 @@ RSpec.shared_examples 'SIRTFI ContactPerson xml' do
       end
     end
     context 'when known' do
-      it 'is created' do
+      it 'is created with telephone' do
         expect(xml)
           .to have_xpath(contact_person_telephone_number_path, count: 1)
         expect(node.text).to eq(sirtfi_contact_person.contact.telephone_number)

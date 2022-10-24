@@ -5,7 +5,7 @@ RSpec.shared_examples 'KeyDescriptor xml' do
   let(:key_info_path) { "#{key_descriptor_path}/ds:KeyInfo" }
   let(:node) { xml.first(:xpath, key_descriptor_path) }
 
-  it 'is created' do
+  it 'is created, no use' do
     expect(xml).to have_xpath(key_descriptor_path)
     expect(xml).to have_xpath(key_info_path)
     expect(node['use']).to be_falsey

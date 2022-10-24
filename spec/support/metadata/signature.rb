@@ -18,7 +18,7 @@ RSpec.shared_examples 'ds:Signature xml' do
     Base64.decode64(str).unpack('C*').reduce { |a, e| (a << 8) + e }
   end
 
-  it 'has a <Signature> element' do
+  it 'has a <Signature> element, c14n method, reference element, signed, and transforms' do
     e = signed_info.find(:xpath, 'ds:CanonicalizationMethod')
     transforms = reference.all(:xpath, 'ds:Transforms/ds:Transform')
                           .map { |transform| transform['Algorithm'] }

@@ -65,7 +65,7 @@ RSpec.shared_examples 'ETL::Organizations' do
     verify(created_at: -> { org_created_at },
            updated_at: -> { truncated_now })
 
-    it 'has an OrganizationName' do
+    it 'has an OrganizationName, OrganizationDisplayName and OrganizationURL' do
       expect({
                entity_id: subject.organization_names.last.value,
                name_lang: subject.organization_names.last.lang,
@@ -98,7 +98,7 @@ RSpec.shared_examples 'ETL::Organizations' do
       verify(created_at: -> { subject.created_at },
              updated_at: -> { truncated_now })
 
-      it 'updated created_at' do
+      it 'updated created_at, OrganizationName, OrganizationDisplayName and OrganizationURL' do
         expect { run }
           .to change { subject.reload.created_at }.to(org_created_at).and(
             change { subject.reload.organization_names.last.value }.to(organizations.last[:domain])
@@ -117,7 +117,7 @@ RSpec.shared_examples 'ETL::Organizations' do
     let(:organizations) { organization_list }
 
     shared_examples 'obj creation' do
-      it 'creates Organization' do
+      it 'creates Organization, OrganizationName, OrganizationDisplayName and OrganizationURL' do
         expect { run }.to change { Organization.count }.by(organization_count).and(
           change { OrganizationName.count }.by(organization_count)
         ).and(

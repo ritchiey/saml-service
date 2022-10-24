@@ -168,7 +168,7 @@ RSpec.shared_examples 'ETL::EntityDescriptors' do
     verify(created_at: -> { ed_created_at },
            updated_at: -> { truncated_now })
 
-    it 'has entity_id' do
+    it 'has entity_id, registration_authority, registration_policy and known_entity with tag' do
       expect({
                entity_id: subject.entity_id.uri,
                registration_authority: subject.registration_info.registration_authority,
@@ -214,7 +214,7 @@ RSpec.shared_examples 'ETL::EntityDescriptors' do
         stub_fr_request(:entity_descriptors)
       end
 
-      it 'updates the EntityID uri' do
+      it 'updates the EntityID uri, KnownEntity and federation tag' do
         expect { run }.to change { subject.reload.entity_id.uri }
           .to eq(updated_entityid)
         Timecop.travel(1.second) do

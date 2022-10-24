@@ -27,7 +27,7 @@ RSpec.shared_examples 'ContactPerson xml' do
       end
     end
     context 'when known' do
-      it 'is created' do
+      it 'is created has correct value' do
         expect(xml).to have_xpath(contact_person_company_path, count: 1)
         expect(node.text).to eq(contact_person.contact.company)
       end
@@ -43,7 +43,7 @@ RSpec.shared_examples 'ContactPerson xml' do
       end
     end
     context 'when known' do
-      it 'is created' do
+      it 'is created has correct value' do
         expect(xml).to have_xpath(contact_person_given_name_path, count: 1)
         expect(node.text).to eq(contact_person.contact.given_name)
       end
@@ -59,7 +59,7 @@ RSpec.shared_examples 'ContactPerson xml' do
       end
     end
     context 'when known' do
-      it 'is created' do
+      it 'is created has correct value' do
         expect(xml).to have_xpath(contact_person_surname_path, count: 1)
         expect(node.text).to eq(contact_person.contact.surname)
       end
@@ -75,7 +75,7 @@ RSpec.shared_examples 'ContactPerson xml' do
       end
     end
     context 'when known' do
-      it 'is created' do
+      it 'is created has correct value' do
         expect(xml).to have_xpath(contact_person_email_address_path, count: 1)
         expect(node.text)
           .to eq("mailto:#{contact_person.contact.email_address}")
@@ -92,7 +92,7 @@ RSpec.shared_examples 'ContactPerson xml' do
       end
     end
     context 'when known' do
-      it 'is created' do
+      it 'is created has correct value' do
         expect(xml)
           .to have_xpath(contact_person_telephone_number_path, count: 1)
         expect(node.text).to eq(contact_person.contact.telephone_number)

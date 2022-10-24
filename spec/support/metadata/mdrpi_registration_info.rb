@@ -11,7 +11,7 @@ RSpec.shared_examples 'mdrpi:RegistrationInfo xml' do
       expect(xml).to have_xpath(registration_info_path, count: 1)
     end
 
-    context 'attributes' do
+    context 'attributes, registration instant, registrationAuthority' do
       let(:node) { xml.find(:xpath, registration_info_path) }
       it 'sets registration authority' do
         expect(node['registrationAuthority'])
@@ -27,7 +27,7 @@ RSpec.shared_examples 'mdrpi:RegistrationInfo xml' do
       let(:rp) do
         root_node.registration_info.registration_policies.first
       end
-      it 'is created' do
+      it 'is created with lang and text' do
         expect(xml).to have_xpath(registration_policies_path, count: 1)
         expect(node['xml:lang']).to eq(rp.lang)
         expect(node.text).to eq(rp.uri)

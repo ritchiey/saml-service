@@ -6,7 +6,7 @@ RSpec.shared_examples 'mdui:DiscoHints xml' do
   let(:domain_hint_path) { "#{mdui_disco_path}/mdui:DomainHint" }
   let(:geolocation_hint_path) { "#{mdui_disco_path}/mdui:GeolocationHint" }
 
-  it 'is created' do
+  it 'is created with IPHints and domain hints and geolocation hints and disco hints' do
     expect(xml).to have_xpath(mdui_disco_path, count: 1)
     expect(xml).to have_xpath(ip_hint_path, count: 1)
     expect(xml).to have_xpath(domain_hint_path, count: 1)

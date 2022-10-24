@@ -7,7 +7,7 @@ RSpec.shared_examples 'saml:Attribute xml' do
   let(:node) { xml.find(:xpath, attribute_path) }
 
   context 'Attribute' do
-    it 'is created' do
+    it 'is created, sets name and uri' do
       expect(xml).to have_xpath(attribute_path, count: 1)
       expect(node['NameFormat']).to eq(attribute.name_format.uri)
       expect(node['Name']).to eq(attribute.name)
@@ -47,7 +47,7 @@ RSpec.shared_examples 'saml:Attribute xml' do
       end
       context 'Attribute has attribute_values' do
         let(:attribute) { create :attribute, :with_values }
-        it 'is created' do
+        it 'is created and renders expected values' do
           expect(xml).to have_xpath(attribute_value_path, count: 3)
           nodes.each_with_index do |node, i|
             expect(node.text).to eq(attribute.attribute_values[i].value)

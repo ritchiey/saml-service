@@ -66,7 +66,7 @@ RSpec.shared_examples 'AttributeAuthorityDescriptor xml' do
                :with_multiple_name_id_formats
       end
       let(:node) { xml.first(:xpath, name_id_format_path) }
-      it 'is rendered' do
+      it 'is rendered and has expected value' do
         expect(xml).to have_xpath(name_id_format_path, count: 2)
         expect(node.text)
           .to eq(attribute_authority_descriptor.name_id_formats.first.uri)
@@ -86,7 +86,7 @@ RSpec.shared_examples 'AttributeAuthorityDescriptor xml' do
                :with_multiple_attribute_profiles
       end
       let(:node) { xml.first(:xpath, attribute_profile_path) }
-      it 'is rendered' do
+      it 'is rendered and has expected value' do
         expect(xml).to have_xpath(attribute_profile_path, count: 2)
         expect(node.text)
           .to eq(attribute_authority_descriptor.attribute_profiles.first.uri)
@@ -106,7 +106,7 @@ RSpec.shared_examples 'AttributeAuthorityDescriptor xml' do
                :with_multiple_attributes
       end
       let(:node) { xml.first(:xpath, attribute_path) }
-      it 'is rendered' do
+      it 'is rendered and has expected value' do
         expect(xml).to have_xpath(attribute_path, count: 2)
         expect(node['Name'])
           .to eq(attribute_authority_descriptor.attributes.first.name)

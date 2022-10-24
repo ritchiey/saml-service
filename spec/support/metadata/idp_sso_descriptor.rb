@@ -20,7 +20,7 @@ RSpec.shared_examples 'IDPSSODescriptor xml' do
     "#{idp_sso_descriptor_path}/Extensions/mdui:DiscoHints"
   end
 
-  it 'is created' do
+  it 'is created, no WantAuthnRequestsSigned, no NameIDMappingServices, no AssertionIDRequestServices, no AttributeProfiles, no mdui:DiscoHints' do
     expect(xml).to have_xpath(idp_sso_descriptor_path)
     expect(node['WantAuthnRequestsSigned']).to be_falsey
     expect(xml).to have_xpath(single_sign_on_service_path, count: 1)

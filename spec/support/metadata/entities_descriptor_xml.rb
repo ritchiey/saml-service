@@ -4,7 +4,7 @@ RSpec.shared_examples 'md:EntitiesDescriptor xml' do
   let(:schema) { Nokogiri::XML::Schema.new(File.open('schema/top.xsd', 'r')) }
   let(:validation_errors) { schema.validate(Nokogiri::XML.parse(raw_xml)) }
 
-  it 'is schema-valid' do
+  it 'is schema-valid and created, child EntityDescriptors, no RegistrationInfo node, no EntityAttributes node' do
     expect(validation_errors).to be_empty
     expect(xml).to have_xpath(entities_descriptor_path)
     expect(xml).to have_xpath(entity_descriptor_path, count: 5)

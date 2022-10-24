@@ -15,7 +15,7 @@ RSpec.shared_examples 'Organization xml' do
   context 'OrganizationName' do
     let(:node) { xml.first(:xpath, organization_name_path) }
 
-    it 'is created' do
+    it 'is created, lang and text' do
       expect(xml).to have_xpath(organization_name_path, count: 2)
       expect(node['xml:lang'])
         .to eq(organization.organization_names.first.lang)
@@ -26,7 +26,7 @@ RSpec.shared_examples 'Organization xml' do
   context 'OrganizationDisplayName' do
     let(:node) { xml.first(:xpath, organization_display_name_path) }
 
-    it 'is created' do
+    it 'is created, lang and value' do
       expect(xml).to have_xpath(organization_display_name_path, count: 2)
       expect(node['xml:lang'])
         .to eq(organization.organization_display_names.first.lang)
@@ -38,7 +38,7 @@ RSpec.shared_examples 'Organization xml' do
   context 'OrganizationURL' do
     let(:node) { xml.first(:xpath, organization_url_path) }
 
-    it 'is created' do
+    it 'is created, lang and uri' do
       expect(xml).to have_xpath(organization_url_path, count: 2)
       expect(node['xml:lang'])
         .to eq(organization.organization_urls.first.lang)

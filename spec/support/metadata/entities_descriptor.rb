@@ -29,7 +29,7 @@ RSpec.shared_examples 'EntitiesDescriptor xml' do
     include_examples 'shibmd:KeyAuthority xml'
     include_examples 'md:EntitiesDescriptor xml'
 
-    it 'defines namespaces' do
+    it 'defines namespaces and mdrpi:PublisherInfo' do
       expect(namespaces).to eq(Metadata::Saml::NAMESPACES)
       expect(xml).to have_xpath(all_publication_infos, count: 1)
     end
@@ -39,7 +39,7 @@ RSpec.shared_examples 'EntitiesDescriptor xml' do
 
       around { |example| Timecop.freeze { example.run } }
 
-      it 'sets ID' do
+      it 'sets ID and name and validuntil' do
         expect(node['ID']).to eq(subject.instance_id)
           .and start_with(federation_identifier)
         expect(node['Name']).to eq(metadata_name)
