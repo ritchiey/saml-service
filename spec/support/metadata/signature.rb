@@ -97,12 +97,6 @@ RSpec.shared_examples 'ds:Signature xml' do
         e = reference.find(:xpath, 'ds:DigestMethod')
         expect(e['Algorithm']).to eq('http://www.w3.org/2000/09/xmldsig#sha1')
 
-        hash = OpenSSL::Digest::SHA1.digest(c14n_xml)
-        expected = Base64.strict_encode64(hash)
-
-        expect(reference.find(:xpath, 'ds:DigestValue').text.strip)
-          .to eq(expected)
-
         rsa_sig = key.sign(OpenSSL::Digest.new('SHA1'), c14n_signed_info)
         expected = Base64.strict_encode64(rsa_sig).strip
 
@@ -110,6 +104,12 @@ RSpec.shared_examples 'ds:Signature xml' do
           .to eq(expected)
 
         expect(validation_errors).to be_empty
+      end
+
+      it 'includes the digest value' do
+        hash = OpenSSL::Digest::SHA256.digest(c14n_xml)
+        expect(reference.find(:xpath, 'ds:DigestValue').text.strip)
+          .to eq(Base64.strict_encode64(hash))
       end
     end
 
@@ -124,19 +124,17 @@ RSpec.shared_examples 'ds:Signature xml' do
         e = reference.find(:xpath, 'ds:DigestMethod')
         expect(e['Algorithm']).to eq('http://www.w3.org/2001/04/xmlenc#sha256')
 
-        hash = OpenSSL::Digest::SHA256.digest(c14n_xml)
-        expected = Base64.strict_encode64(hash)
-
-        expect(reference.find(:xpath, 'ds:DigestValue').text.strip)
-          .to eq(expected)
-
         rsa_sig = key.sign(OpenSSL::Digest.new('SHA256'), c14n_signed_info)
-        expected = Base64.strict_encode64(rsa_sig).strip
-
         expect(signature.find(:xpath, 'ds:SignatureValue').text.strip)
-          .to eq(expected)
+          .to eq(Base64.strict_encode64(rsa_sig).strip)
 
         expect(validation_errors).to be_empty
+      end
+
+      it 'includes the digest value' do
+        hash = OpenSSL::Digest::SHA256.digest(c14n_xml)
+        expect(reference.find(:xpath, 'ds:DigestValue').text.strip)
+          .to eq(Base64.strict_encode64(hash))
       end
     end
   end

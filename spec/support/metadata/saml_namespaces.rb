@@ -7,9 +7,8 @@ RSpec.shared_examples 'SAML namespaces' do
     let(:ns) { subject.ns }
 
     it do
-      is_expected.to be_a_kind_of Metadata::SamlNamespaces.and(
-        respond_to(:root)
-      ).and(
+      is_expected.to be_a_kind_of Metadata::SamlNamespaces
+      is_expected.to respond_to(:root).and(
         respond_to(:saml)
       ).and(
         respond_to(:idpdisc)
