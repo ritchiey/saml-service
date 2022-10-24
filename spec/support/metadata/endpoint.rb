@@ -14,7 +14,7 @@ RSpec.shared_examples 'Endpoint xml' do
     end
     context 'ResponseLocation when populated' do
       let(:endpoint) { create parent_node, :response_location }
-      it 'is rendered, location' do
+      it 'is rendered and has location' do
         expect(xml).to have_xpath("#{endpoint_path}[@ResponseLocation]")
         expect(node['ResponseLocation']).to eq(endpoint.response_location)
       end
