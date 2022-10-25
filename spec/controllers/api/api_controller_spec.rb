@@ -10,11 +10,6 @@ RSpec.describe API::APIController, type: :controller do
   context 'requesting resource that does not exist' do
     let(:api_subject) { create(:api_subject, :x509_cn) }
 
-    before do
-      auth_type(:x509)
-      request.headers['HTTP_X509_DN'] = +"CN=#{api_subject.x509_cn}"
-    end
-
     controller(API::APIController) do
       def missing_resource
         public_action
@@ -23,20 +18,21 @@ RSpec.describe API::APIController, type: :controller do
     end
 
     before do
+      auth_type(:x509)
+      request.headers['HTTP_X509_DN'] = +"CN=#{api_subject.x509_cn}"
       @routes.draw do
         get '/api/missing_resource' => 'api/api#missing_resource'
       end
+      get :missing_resource
     end
 
-    before { get :missing_resource }
     subject { response }
     let(:data) { JSON.parse(response.body) }
 
-    it { is_expected.to have_http_status(:not_found) }
-
-    it 'responds with the exception' do
+    it {
+      is_expected.to have_http_status(:not_found)
       expect(data['message']).to match(/Resource not found/)
-    end
+    }
   end
 
   context 'a bad request' do
@@ -44,6 +40,10 @@ RSpec.describe API::APIController, type: :controller do
     before do
       auth_type(:x509)
       request.headers['HTTP_X509_DN'] = +"CN=#{api_subject.x509_cn}"
+      @routes.draw do
+        get '/api/a_bad_request' => 'api/api#a_bad_request'
+      end
+      get :a_bad_request
     end
 
     controller(API::APIController) do
@@ -53,21 +53,13 @@ RSpec.describe API::APIController, type: :controller do
       end
     end
 
-    before do
-      @routes.draw do
-        get '/api/a_bad_request' => 'api/api#a_bad_request'
-      end
-    end
-
-    before { get :a_bad_request }
     subject { response }
     let(:data) { JSON.parse(response.body) }
 
-    it { is_expected.to have_http_status(:bad_request) }
-
-    it 'responds with the exception' do
+    it {
+      is_expected.to have_http_status(:bad_request)
       expect(data['message']).to match(/Bad request/)
-    end
+    }
   end
 
   include_examples 'Anon controller'
@@ -92,13 +84,10 @@ RSpec.describe API::APIController, type: :controller do
         get :an_action
       end
 
-      it { is_expected.to have_http_status(:forbidden) }
-
-      context 'json within response' do
-        it 'has a message' do
-          expect(json['message']).to eq('The request was understood but explicitly denied.')
-        end
-      end
+      it {
+        is_expected.to have_http_status(:forbidden)
+        expect(json['message']).to eq('The request was understood but explicitly denied.')
+      }
     end
 
     context 'invalid authentication' do
@@ -107,13 +96,10 @@ RSpec.describe API::APIController, type: :controller do
         get :an_action
       end
 
-      it { is_expected.to have_http_status(:forbidden) }
-
-      context 'json within response' do
-        it 'has a message' do
-          expect(json['message']).to eq('The request was understood but explicitly denied.')
-        end
-      end
+      it {
+        is_expected.to have_http_status(:forbidden)
+        expect(json['message']).to eq('The request was understood but explicitly denied.')
+      }
     end
 
     context 'unknown authentication method' do
@@ -122,13 +108,10 @@ RSpec.describe API::APIController, type: :controller do
         get :an_action
       end
 
-      it { is_expected.to have_http_status(:forbidden) }
-
-      context 'json within response' do
-        it 'has a message' do
-          expect(json['message']).to eq('The request was understood but explicitly denied.')
-        end
-      end
+      it {
+        is_expected.to have_http_status(:forbidden)
+        expect(json['message']).to eq('The request was understood but explicitly denied.')
+      }
     end
 
     context 'x509 authentication' do
@@ -139,16 +122,11 @@ RSpec.describe API::APIController, type: :controller do
       context 'no x509 header set by nginx' do
         before { get :an_action }
 
-        it { is_expected.to have_http_status(:unauthorized) }
-
-        context 'json within response' do
-          it 'has a message' do
-            expect(json['message']).to eq('Client request failure.')
-          end
-          it 'has an error' do
-            expect(json['error']).to eq('x509 API authentication method not provided')
-          end
-        end
+        it {
+          is_expected.to have_http_status(:unauthorized)
+          expect(json['message']).to eq('Client request failure.')
+          expect(json['error']).to eq('x509 API authentication method not provided')
+        }
       end
 
       context 'x509 header set to "(null)"' do
@@ -157,15 +135,11 @@ RSpec.describe API::APIController, type: :controller do
           get :an_action
         end
 
-        it { is_expected.to have_http_status(:unauthorized) }
-        context 'json within response' do
-          it 'has a message' do
-            expect(json['message']).to eq('Client request failure.')
-          end
-          it 'has an error' do
-            expect(json['error']).to eq('x509 API authentication method not provided')
-          end
-        end
+        it {
+          is_expected.to have_http_status(:unauthorized)
+          expect(json['message']).to eq('Client request failure.')
+          expect(json['error']).to eq('x509 API authentication method not provided')
+        }
       end
 
       context 'invalid x509 header set by nginx' do
@@ -174,15 +148,11 @@ RSpec.describe API::APIController, type: :controller do
           get :an_action
         end
 
-        it { is_expected.to have_http_status(:unauthorized) }
-        context 'json within response' do
-          it 'has a message' do
-            expect(json['message']).to eq('Client request failure.')
-          end
-          it 'has an error' do
-            expect(json['error']).to eq('Subject DN invalid')
-          end
-        end
+        it {
+          is_expected.to have_http_status(:unauthorized)
+          expect(json['message']).to eq('Client request failure.')
+          expect(json['error']).to eq('Subject DN invalid')
+        }
       end
 
       context 'without a CN component to DN' do
@@ -191,15 +161,11 @@ RSpec.describe API::APIController, type: :controller do
           get :an_action
         end
 
-        it { is_expected.to have_http_status(:unauthorized) }
-        context 'json within response' do
-          it 'has a message' do
-            expect(json['message']).to eq('Client request failure.')
-          end
-          it 'has an error' do
-            expect(json['error']).to eq('Subject CN invalid')
-          end
-        end
+        it {
+          is_expected.to have_http_status(:unauthorized)
+          expect(json['message']).to eq('Client request failure.')
+          expect(json['error']).to eq('Subject CN invalid')
+        }
       end
 
       context 'with a CN that does not represent an APISubject' do
@@ -209,15 +175,11 @@ RSpec.describe API::APIController, type: :controller do
           get :an_action
         end
 
-        it { is_expected.to have_http_status(:unauthorized) }
-        context 'json within response' do
-          it 'has a message' do
-            expect(json['message']).to eq('Client request failure.')
-          end
-          it 'has an error' do
-            expect(json['error']).to eq('Subject invalid')
-          end
-        end
+        it {
+          is_expected.to have_http_status(:unauthorized)
+          expect(json['message']).to eq('Client request failure.')
+          expect(json['error']).to eq('Subject invalid')
+        }
       end
     end
 
@@ -232,15 +194,11 @@ RSpec.describe API::APIController, type: :controller do
           get :an_action
         end
 
-        it { is_expected.to have_http_status(:unauthorized) }
-        context 'json within response' do
-          it 'has a message' do
-            expect(json['message']).to eq('Client request failure.')
-          end
-          it 'has an error' do
-            expect(json['error']).to eq('Token API authentication method not provided')
-          end
-        end
+        it {
+          is_expected.to have_http_status(:unauthorized)
+          expect(json['message']).to eq('Client request failure.')
+          expect(json['error']).to eq('Token API authentication method not provided')
+        }
       end
 
       context 'invalid authorization header provided by client' do
@@ -249,15 +207,11 @@ RSpec.describe API::APIController, type: :controller do
           get :an_action
         end
 
-        it { is_expected.to have_http_status(:unauthorized) }
-        context 'json within response' do
-          it 'has a message' do
-            expect(json['message']).to eq('Client request failure.')
-          end
-          it 'has an error' do
-            expect(json['error']).to eq('Invalid Authorization header value')
-          end
-        end
+        it {
+          is_expected.to have_http_status(:unauthorized)
+          expect(json['message']).to eq('Client request failure.')
+          expect(json['error']).to eq('Invalid Authorization header value')
+        }
       end
 
       context 'with a token that does not represent an APISubject' do
@@ -266,15 +220,11 @@ RSpec.describe API::APIController, type: :controller do
           get :an_action
         end
 
-        it { is_expected.to have_http_status(:unauthorized) }
-        context 'json within response' do
-          it 'has a message' do
-            expect(json['message']).to eq('Client request failure.')
-          end
-          it 'has an error' do
-            expect(json['error']).to eq('Subject invalid')
-          end
-        end
+        it {
+          is_expected.to have_http_status(:unauthorized)
+          expect(json['message']).to eq('Client request failure.')
+          expect(json['error']).to eq('Subject invalid')
+        }
       end
     end
 
@@ -288,15 +238,11 @@ RSpec.describe API::APIController, type: :controller do
         get :an_action
       end
 
-      it { is_expected.to have_http_status(:unauthorized) }
-      context 'json within response' do
-        it 'has a message' do
-          expect(json['message']).to eq('Client request failure.')
-        end
-        it 'has an error' do
-          expect(json['error']).to eq('Subject not functional')
-        end
-      end
+      it {
+        is_expected.to have_http_status(:unauthorized)
+        expect(json['message']).to eq('Client request failure.')
+        expect(json['error']).to eq('Subject not functional')
+      }
     end
   end
 
@@ -332,8 +278,6 @@ RSpec.describe API::APIController, type: :controller do
         before { get :an_action }
         it 'should respond with status code :forbidden (403)' do
           expect(response).to have_http_status(:forbidden)
-        end
-        it 'recieves a json message' do
           expect(json['message'])
             .to eq('The request was understood but explicitly denied.')
         end
@@ -359,8 +303,6 @@ RSpec.describe API::APIController, type: :controller do
         before { get :an_action }
         it 'should respond with status code :forbidden (403)' do
           expect(response).to have_http_status(:forbidden)
-        end
-        it 'recieves a json message' do
           expect(json['message'])
             .to eq('The request was understood but explicitly denied.')
         end
