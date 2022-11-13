@@ -147,14 +147,14 @@ jobs:
 
       - name: Update GitOps Repo to trigger deploys
         if: env.BRANCH_NAME == 'master' && github.event_name == 'push'
-        uses: ausaccessfed/publish_app@v1.0.11
+        uses: ausaccessfed/publish_app@v1.1.0
         with:
           environments: test,production
           projects: saml-service
 
       - name: Update GitOps Repo to trigger deploys
         if: github.event_name == 'issue_comment' || github.event_name == 'schedule'
-        uses: ausaccessfed/publish_app@v1.0.11
+        uses: ausaccessfed/publish_app@v1.1.0
         with:
           environments: development
           projects: saml-service
