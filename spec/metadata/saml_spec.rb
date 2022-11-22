@@ -85,11 +85,11 @@ RSpec.describe Metadata::Saml do
       let(:entity) { entity_source.known_entities.first }
       let(:entity_id) { entity.entity_id }
       let(:enabled) { [true, false].sample }
-
+      let(:idp) do
+        create(:basic_federation_entity, :idp,
+               entity_source: external_entity_source, enabled: enabled)
+      end
       before do
-        idp = create(:basic_federation_entity, :idp,
-                     entity_source: external_entity_source, enabled: enabled)
-
         idp.entity_descriptor.entity_id.update(uri: entity_id)
 
         entity_source.known_entities.each { |ke| ke.tag_as(tag) }
@@ -231,6 +231,7 @@ RSpec.describe Metadata::Saml do
       let(:role_descriptor) { create parent_node }
       before do
         subject.root.RoleDescriptor(subject.ns) do |rd|
+          role_descriptor.ui_info&.logos&.each { |logo| logo.update(lang: nil) }
           subject.role_descriptor(role_descriptor, rd)
         end
       end
@@ -478,7 +479,10 @@ RSpec.describe Metadata::Saml do
 
   context 'ds:Signature Root EntityDescriptor' do
     let(:entity) { create(:idp_sso_descriptor).entity_descriptor }
-    before { subject.root_entity_descriptor(entity.known_entity) }
+    before do
+      entity.add_sirtfi_contact_person create :sirtfi_contact_person, entity_descriptor: entity
+      subject.root_entity_descriptor(entity.known_entity)
+    end
     include_examples 'ds:Signature xml' do
       let(:root_node) { 'EntityDescriptor' }
     end

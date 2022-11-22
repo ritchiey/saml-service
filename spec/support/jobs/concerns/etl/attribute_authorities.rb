@@ -2,13 +2,11 @@
 
 RSpec.shared_examples 'ETL::AttributeAuthorities' do
   include_examples 'ETL::Common'
-
-  # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+  # rubocop:disable Metrics/MethodLength,Metrics/AbcSize
   def create_idp_json(idp)
     contact_people =
       contact_instances.map { |cp| contact_person_json(cp) } +
       sirtfi_contact_instances.map { |cp| sirtfi_contact_person_json(cp) }
-
     {
       id: idp.id,
       display_name: Faker::Lorem.sentence,
@@ -52,8 +50,10 @@ RSpec.shared_examples 'ETL::AttributeAuthorities' do
       }
     }
   end
+  # rubocop:enable Metrics/MethodLength,Metrics/AbcSize
 
-  def create_aa_json(idp, aa)
+  # rubocop:disable Metrics/MethodLength
+  def create_aa_json(idp, aa, extract)
     {
       id: aa.id,
       display_name: Faker::Lorem.sentence,
@@ -61,14 +61,14 @@ RSpec.shared_examples 'ETL::AttributeAuthorities' do
       functioning: aa.functioning?,
       created_at: idp_created_at,
       saml: {
-        extract_metadata_from_idp_sso_descriptor: true,
+        extract_metadata_from_idp_sso_descriptor: extract,
         attribute_services:
           aa.attribute_services.map { |as| endpoint_json(as) },
         idp_sso_descriptor: idp.id
       }
     }
   end
-  # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
+  # rubocop:enable Metrics/MethodLength
 
   def attribute_json(a)
     {
@@ -118,7 +118,9 @@ RSpec.shared_examples 'ETL::AttributeAuthorities' do
     identity_provider_instances.map { |idp| create_idp_json(idp) }
   end
 
-  let(:identity_providers) { identity_providers_list }
+  let(:identity_providers) do
+    identity_providers_list
+  end
 
   let(:attribute_authorities_instances) do
     create_list(:attribute_authority_descriptor, aa_count)
@@ -126,7 +128,7 @@ RSpec.shared_examples 'ETL::AttributeAuthorities' do
 
   let(:attribute_authorities_list) do
     attribute_authorities_instances.map do |aa|
-      create_aa_json(identity_provider_instances.first, aa)
+      create_aa_json(identity_provider_instances.first, aa, true)
     end
   end
 
@@ -191,19 +193,98 @@ RSpec.shared_examples 'ETL::AttributeAuthorities' do
 
     subject { AttributeAuthorityDescriptor.last }
 
-    it 'creates a new instance' do
+    it 'creates a new instance and tag' do
       expect { run }
-        .to change { AttributeAuthorityDescriptor.count }.by(aa_count)
-    end
-
-    it 'the instance is valid' do
-      run
+        .to change { AttributeAuthorityDescriptor.count }.by(aa_count).and(
+          change { Tag.count }.by(1)
+        )
       expect(AttributeAuthorityDescriptor.last).to be_valid
     end
 
-    it 'creates a new tag' do
-      expect { run }
-        .to change { Tag.count }.by(1)
+    context 'when no key type' do
+      let(:identity_providers) do
+        identity_providers_list.each do |json|
+          json[:saml][:sso_descriptor][:role_descriptor][:key_descriptors].each do |descriptor|
+            descriptor.delete(:type)
+          end
+        end
+      end
+
+      it 'creates a new instance' do
+        expect { run }
+          .to change { AttributeAuthorityDescriptor.count }.by(aa_count)
+      end
+    end
+
+    context 'when no key info' do
+      let(:identity_providers) do
+        identity_providers_list.each do |json|
+          json[:saml][:sso_descriptor][:role_descriptor][:key_descriptors].each do |descriptor|
+            descriptor.delete(:key_info)
+          end
+        end
+      end
+
+      it 'raises validation error' do
+        expect { run }
+          .to raise_error(Sequel::ValidationFailed, 'key_info is not present')
+      end
+    end
+
+    context 'when no key info certificate' do
+      let(:identity_providers) do
+        identity_providers_list.each do |json|
+          json[:saml][:sso_descriptor][:role_descriptor][:key_descriptors].each do |descriptor|
+            descriptor[:key_info].delete(:certificate)
+          end
+        end
+      end
+
+      it 'raises validation error' do
+        expect { run }
+          .to raise_error(Sequel::ValidationFailed, 'key_info is not present')
+      end
+    end
+
+    context 'when no key info certificate data' do
+      let(:identity_providers) do
+        identity_providers_list.each do |json|
+          json[:saml][:sso_descriptor][:role_descriptor][:key_descriptors].each do |descriptor|
+            descriptor[:key_info][:certificate].delete(:data)
+          end
+        end
+      end
+
+      it 'raises validation error' do
+        expect { run }
+          .to raise_error(Sequel::ValidationFailed, 'key_info is not present')
+      end
+    end
+
+    context 'when not functioning' do
+      let(:attribute_authorities_list) do
+        attribute_authorities_instances.map do |aa|
+          json = create_aa_json(identity_provider_instances.first, aa, true)
+          json[:saml][:attribute_services].each { |service| service[:functioning] = false }
+          json
+        end
+      end
+
+      it 'creates a new instance' do
+        expect { run }.not_to change(AttributeService, :count)
+      end
+    end
+
+    context 'without a scope' do
+      let(:attribute_authorities_list) do
+        attribute_authorities_instances.map do |aa|
+          create_aa_json(identity_provider_instances.first, aa, false)
+        end
+      end
+
+      it 'works' do
+        expect { run }.to raise_error(StandardError, 'Does not support AA (even standalone) who do not derive from IdP')
+      end
     end
 
     context 'created instance' do
@@ -214,19 +295,20 @@ RSpec.shared_examples 'ETL::AttributeAuthorities' do
                updated_at: -> { truncated_now },
                error_url: -> { source_idp.error_url })
       end
-      context 'scopes' do
-        it 'sets a scope' do
+
+      context 'with idp_sso_descriptors' do
+        let(:entity_descriptor) { create :entity_descriptor, :with_idp }
+
+        it 'works' do
           expect(subject.scopes.size).to eq(1)
         end
+      end
 
-        it 'sets expected scope' do
+      context 'scopes' do
+        it 'sets scope and sets regex to false' do
+          expect(subject.scopes.size).to eq(1)
           expect(subject.scopes.first.value).to eq(scope)
-        end
-
-        context 'normal scope' do
-          it 'sets regex to false' do
-            expect(subject.scopes.first.regexp).not_to be
-          end
+          expect(subject.scopes.first.regexp).not_to be
         end
 
         context 'regex scope' do
@@ -315,29 +397,18 @@ RSpec.shared_examples 'ETL::AttributeAuthorities' do
 
     include_examples 'updating a RoleDescriptor'
 
-    it 'uses the existing instance' do
-      expect { run }.not_to(change { AttributeAuthorityDescriptor.count })
-    end
-
-    it 'does not create more tags' do
-      expect { run }.not_to(change { Tag.count })
-    end
-
-    it 'updates attribute services' do
-      expect { run }.to(change { subject.reload.attribute_services })
-    end
-
-    it 'updates assertion id request services' do
-      expect { run }
-        .to(change { subject.reload.assertion_id_request_services })
-    end
-
-    it 'updates attribute profiles' do
-      expect { run }.to(change { subject.reload.attribute_profiles })
-    end
-
-    it 'updates attributes' do
-      expect { run }.to(change { subject.reload.attributes })
+    it 'uses the existing instance, doesnt create tags, updates' do
+      expect { run }.to(not_change { AttributeAuthorityDescriptor.count }.and(
+        not_change { Tag.count }
+      ).and(
+        change { subject.reload.attribute_services }
+      ).and(
+        change { subject.reload.assertion_id_request_services }
+      ).and(
+        change { subject.reload.attribute_profiles }
+      ).and(
+        change { subject.reload.attributes }
+      ))
     end
   end
 end
