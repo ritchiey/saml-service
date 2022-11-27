@@ -57,7 +57,7 @@ jobs:
           echo "BRANCH_NAME=$branch_name" >> $GITHUB_ENV
 
           if [ "${{github.event_name}}" == "issue_comment" ]; then
-            image_tag=${{steps.comment-branch.outputs.head_ref}}-${{github.sha}}
+            image_tag=${{steps.comment-branch.outputs.head_ref}}-${{steps.comment-branch.outputs.head_sha}}
           else
             image_tag=${{github.sha}}
           fi
