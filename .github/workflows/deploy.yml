@@ -86,6 +86,7 @@ jobs:
           # Strip git ref prefix from version
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
           IMAGE_ID=$(echo "$ECR_REGISTRY/$ECR_REPOSITORY" | tr '[A-Z]' '[a-z]')
+          echo "ECR_REGISTRY=$ECR_REGISTRY" >> $GITHUB_ENV
           echo "IMAGE_ID=$IMAGE_ID" >> $GITHUB_ENV
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
@@ -150,17 +151,21 @@ jobs:
 
       - name: Update GitOps Repo to trigger deploys
         if: env.BRANCH_NAME == 'master' && github.event_name == 'push'
-        uses: ausaccessfed/publish_app@v1.1.0
-        with:
-          environments: test,production
-          projects: saml-service
+        run: |
+          printenv > .envs
+          docker run --env-file .envs \
+          -e PROJECTS="saml-service" \
+          -e ENVIRONMENTS="test,production" \
+          $ECR_REGISTRY/publish_app:latest
 
       - name: Update GitOps Repo to trigger deploys
         if: github.event_name == 'issue_comment' || github.event_name == 'schedule'
-        uses: ausaccessfed/publish_app@v1.1.0
-        with:
-          environments: development
-          projects: saml-service
+        run: |
+          printenv > .envs
+          docker run --env-file .envs \
+          -e PROJECTS="saml-service" \
+          -e ENVIRONMENTS="development" \
+          $ECR_REGISTRY/publish_app:latest
 
       - name: Set final commit status
         uses: myrotvorets/set-commit-status-action@master
