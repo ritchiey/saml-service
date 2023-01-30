@@ -141,7 +141,7 @@ jobs:
           -t $IMAGE_ID:$IMAGE_TAG .
 
       - name: Push to ECR
-        if: (github.event_name == 'push' && env.BRANCH_NAME == 'master') || github.event_name == 'issue_comment'
+        if: (github.event_name == 'push' && env.BRANCH_NAME == 'master') || github.event_name == 'issue_comment' || github.event_name == 'schedule'
         run: |
           [ "${{ env.BRANCH_NAME }}" == "master" ]  && [ "${{github.event_name}}" == "push" ] && docker tag $IMAGE_ID:$IMAGE_TAG $IMAGE_ID:latest
           docker push --all-tags $IMAGE_ID
