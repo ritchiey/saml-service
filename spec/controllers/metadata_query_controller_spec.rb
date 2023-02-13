@@ -300,7 +300,7 @@ RSpec.describe MetadataQueryController, type: :controller do
         context 'valid client request' do
           let(:etag) do
             caching.generate_document_entities_etag(
-              metadata_instance, [entity_descriptor.known_entity]
+              metadata_instance, [entity_descriptor.known_entity, entity_descriptor.known_entity]
             )
           end
           context 'valid entity_descriptor' do
