@@ -11,7 +11,7 @@ USER root
 
 EXPOSE 3000
 ENTRYPOINT [ "/app/bin/boot.sh" ]
-CMD [ "puma"]
+CMD [ "bundle exec puma"]
 
 FROM base as dependencies
 

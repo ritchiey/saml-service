@@ -23,23 +23,8 @@ jobs:
       event_comment_body: ${{ github.event.comment.body }}
       production_environments: "test,production"
       extra_task_1_name: Tests
-      extra_task_1: |
-        docker run \
-           --env-file=.env.test.dist \
-           --add-host=host.docker.internal:host-gateway \
-           -e SAML_DB_HOST="host.docker.internal" \
-           -e PREPARE_DB="true" \
-           -e SAML_DB_USERNAME="root" \
-           -e SAML_DB_PASSWORD="password" \
-           app:cache \
-           rspec
+      extra_task_1: docker run --env-file=.env.test.dist --add-host=host.docker.internal:host-gateway -e SAML_DB_HOST=host.docker.internal -e PREPARE_DB=true -e SAML_DB_USERNAME=root -e SAML_DB_PASSWORD=password app:cache bundle exec rspec
       extra_task_2_name: rubocop
-      extra_task_2: |
-        docker run \
-          app:cache \
-          "rubocop -P"
+      extra_task_2: docker run app:cache bundle exec rubocop -P
       extra_task_3_name: brakeman
-      extra_task_3: |
-        docker run \
-          app:cache \
-          "brakeman"
+      extra_task_3: docker run app:cache bundle exec brakeman
