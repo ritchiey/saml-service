@@ -25,18 +25,19 @@ class MetadataQueryController < ApplicationController
   end
 
   def specific_entity
-    handle_entity_request(select_entity_by_rank(EntityId.where(uri: params[:identifier]).all))
+    handle_entity_request(select_entity_with_tag_by_rank(EntityId.where(uri: params[:identifier]).all))
   end
 
   def specific_entity_sha1
     sha1_identifier = params[:identifier].match(SHA1_REGEX)
-    handle_entity_request(select_entity_by_rank(EntityId.where(sha1: sha1_identifier[1]).all))
+    handle_entity_request(select_entity_with_tag_by_rank(EntityId.where(sha1: sha1_identifier[1]).all))
   end
 
   private
 
-  def select_entity_by_rank(entity_ids)
-    entity_ids.min_by { |e| e.parent.known_entity.entity_source.rank }
+  def select_entity_with_tag_by_rank(entity_ids)
+    entity_ids.select { |e| e.parent.known_entity.tags.map(&:name).include?(@metadata_instance.primary_tag) }
+              .min_by { |e| e.parent.known_entity.entity_source.rank }
   end
 
   def handle_entities_request(tags)
