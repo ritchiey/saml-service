@@ -3,15 +3,20 @@
 module API
   class DiscoveryEntitiesController < APIController
     skip_before_action :ensure_authenticated
+    helper_method :identity_provider_entities, :service_provider_entities
 
     def index
       Sequel::Model.db.transaction(isolation: :repeatable) do
         public_action
-        @identity_provider_entities =
-          filter_by_rank(ed_containing_idp + red_containing_idp)
-        @service_provider_entities =
-          filter_by_rank(ed_containing_sp + red_containing_sp)
       end
+    end
+
+    def identity_provider_entities
+      filter_by_rank(ed_containing_idp + red_containing_idp)
+    end
+
+    def service_provider_entities
+      filter_by_rank(ed_containing_sp + red_containing_sp)
     end
 
     private
