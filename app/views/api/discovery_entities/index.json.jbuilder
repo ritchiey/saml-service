@@ -63,7 +63,7 @@ def insert_single_sign_on_soap_endpoints(json, obj)
   json.soap(sso_soap_endpoints)
 end
 
-json.identity_providers(identity_provider_entities) do |obj|
+json.identity_providers(@identity_provider_entities) do |obj|
   ui_info =
     obj.try(:idp_sso_descriptors).try(:first).try(:ui_info) ||
     obj.try(:ui_info) ||
@@ -86,7 +86,7 @@ json.identity_providers(identity_provider_entities) do |obj|
   json.domains(domains.map(&:domain))
 end
 
-json.service_providers(service_provider_entities) do |obj|
+json.service_providers(@service_provider_entities) do |obj|
   ui_info =
     obj.try(:sp_sso_descriptors).try(:first).try(:ui_info) ||
     obj.try(:ui_info) ||
