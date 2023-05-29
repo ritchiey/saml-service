@@ -12,9 +12,7 @@ module Edugain
       add_research_and_scholarship
       add_sirtfi
       entity_descriptor.known_entity.tag_as 'aaf-edugain-export'
-      # rubocop:disable Rails/SkipsModelValidations
       entity_descriptor.known_entity.touch
-      # rubocop:enable Rails/SkipsModelValidations
       entity_descriptor.save raise_on_save_failure: true
     end
 

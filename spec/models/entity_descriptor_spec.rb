@@ -108,9 +108,7 @@ describe EntityDescriptor do
 
     it 'modifies parent EntityDescriptor on save' do
       Timecop.travel(30.seconds) do
-        # rubocop:disable Rails/SkipsModelValidations
         expect { subject.touch }.to(change { subject.updated_at })
-        # rubocop:enable Rails/SkipsModelValidations
       end
     end
   end

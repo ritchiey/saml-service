@@ -42,7 +42,7 @@ module Metadata
       @created_at = Time.now.utc
       @expires_at = created_at + metadata_instance.validity_period
       @instance_id = "#{metadata_instance.federation_identifier}" \
-                     "#{created_at.to_formatted_s(:number)}"
+                     "#{created_at.to_fs(:number)}"
     end
 
     def sign

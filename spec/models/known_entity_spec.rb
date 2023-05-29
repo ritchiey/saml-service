@@ -17,9 +17,7 @@ RSpec.describe KnownEntity do
 
     it 'modifies parent EntityDescriptor on save' do
       Timecop.travel(1.second) do
-        # rubocop:disable Rails/SkipsModelValidations
         expect { subject.touch }.to(change { subject.updated_at })
-        # rubocop:enable Rails/SkipsModelValidations
       end
     end
   end

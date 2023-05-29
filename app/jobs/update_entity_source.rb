@@ -43,9 +43,7 @@ class UpdateEntitySource
 
     # Changes updated_at timestamp for associated KnownEntity
     # which is used by MDQP for etag generation / caching.
-    # rubocop:disable Rails/SkipsModelValidations
     ke.touch
-    # rubocop:enable Rails/SkipsModelValidations
     untouched.delete(ke.id)
   end
 

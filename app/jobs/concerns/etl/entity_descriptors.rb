@@ -84,9 +84,7 @@ module Etl
     def indicate_content_updated(ke)
       # Changes updated_at timestamp for associated KnownEntity
       # which is used by MDQP for etag generation / caching.
-      # rubocop:disable Rails/SkipsModelValidations
       ke.touch
-      # rubocop:enable Rails/SkipsModelValidations
     end
 
     def destroy_existing_ed(ed_data)
