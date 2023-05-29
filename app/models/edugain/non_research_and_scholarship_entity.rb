@@ -10,7 +10,9 @@ module Edugain
 
     def approve
       known_entity.tag_as 'aaf-edugain-verified'
+      # rubocop:disable Rails/SkipsModelValidations
       known_entity.touch
+      # rubocop:enable Rails/SkipsModelValidations
     end
 
     private

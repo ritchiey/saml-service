@@ -54,7 +54,9 @@ module API
 
     def persist_known_entity(ke)
       ke.update(enabled: patch_params[:enabled])
+      # rubocop:disable Rails/SkipsModelValidations
       ke.touch
+      # rubocop:enable Rails/SkipsModelValidations
     end
 
     def persist_raw_entity_descriptor(red)
